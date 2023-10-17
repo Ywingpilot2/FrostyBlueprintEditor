@@ -1,8 +1,6 @@
 # Blueprint Editor
 A plugin for [Frosty Editor](https://github.com/CadeEvs/FrostyToolsuite/tree/1.0.6.3) which allows assets such as LogicPrefabBlueprints and SpatialPrefabBlueprints to be edited in a proper graph form.
 
-![graph](https://github.com/Ywingpilot2/FrostyBlueprintEditor/assets/136618828/6dacba23-fc95-419e-a3d0-64304305f724)
-
 This tool is still unfinished, with many things relating to optimization and additional support needing to be done. PRs are very much so welcomed!
 
 ## What is finished:
