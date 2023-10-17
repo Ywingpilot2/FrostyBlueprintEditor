@@ -1,0 +1,35 @@
+﻿<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:XamlGeneratedNamespace"
+    xmlns:core="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
+    xmlns:ctrl="clr-namespace:Frosty.Controls;assembly=FrostyControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:fdev="FrostyDeveloper">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    
+    <SolidColorBrush x:Key="EventConnection"
+                     Color="#FFFFFF" />
+    <SolidColorBrush x:Key="PropertyConnection"
+                     Color="#00FF21" />
+    <SolidColorBrush x:Key="LinkConnection"
+                     Color="#0094FF" />
+    <SolidColorBrush x:Key="NodeText"
+                     Color="#3B3B3B" />
+    
+    <SolidColorBrush x:Key="CanvasBackground" Color="#141414"/>
+    <SolidColorBrush x:Key="CanvasGridMajor" Color="#000000"/>
+    <SolidColorBrush x:Key="CanvasGridMinor" Color="#242424"/>
+    
+    <GeometryDrawing x:Key="SmallGridGeometry"
+                     Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
+                     Brush="{StaticResource CanvasGridMinor}" />
+
+    <GeometryDrawing x:Key="LargeGridGeometry"
+                     Geometry="M0,0 L0,1 0.015,1 0.015,0.015 1,0.015 1,0 Z"
+                     Brush="{StaticResource CanvasGridMajor}" />
+    
+</ResourceDictionary>
