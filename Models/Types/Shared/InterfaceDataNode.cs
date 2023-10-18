@@ -81,7 +81,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 Guid = guid,
                                 HeaderColor =
                                     new SolidColorBrush(
-                                        (Color)ColorConverter.ConvertFromString("#FFFFFF")), //Event connection color
+                                        (Color)ColorConverter.ConvertFromString("#F8F8F8")), //Event connection color 5FD95F
                                 Object = interfaceItem,
                                 Outputs = new ObservableCollection<OutputViewModel>()
                             {
@@ -98,7 +98,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 Guid = guid,
                                 HeaderColor =
                                     new SolidColorBrush(
-                                        (Color)ColorConverter.ConvertFromString("#FFFFFF")), //Event connection color
+                                        (Color)ColorConverter.ConvertFromString("#F8F8F8")), //Event connection color
                                 Object = interfaceItem,
                                 Inputs = new ObservableCollection<InputViewModel>()
                             {
@@ -119,7 +119,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 Guid = guid,
                                 HeaderColor =
                                     new SolidColorBrush(
-                                        (Color)ColorConverter.ConvertFromString("#0094FF")), //Link connection color
+                                        (Color)ColorConverter.ConvertFromString("#6FA9CE")), //Link connection color
                                 Object = interfaceItem,
                                 Outputs = new ObservableCollection<OutputViewModel>()
                             {
@@ -136,7 +136,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 Guid = guid,
                                 HeaderColor =
                                     new SolidColorBrush(
-                                        (Color)ColorConverter.ConvertFromString("#0094FF")), //Link connection color
+                                        (Color)ColorConverter.ConvertFromString("#6FA9CE")), //Link connection color
                                 Object = interfaceItem,
                                 Inputs = new ObservableCollection<InputViewModel>()
                             {

@@ -86,11 +86,12 @@
                             <nodify:Node Header="{Binding Name}"
                                          Input="{Binding Inputs}"
                                          Output="{Binding Outputs}"
-                                         HeaderBrush="{StaticResource TitleBackground}"
+                                         HeaderBrush="{Binding HeaderColor}"
                                          ContentBrush="{StaticResource Background}"
                                          Background="{StaticResource Background}"
                                          Width="{Binding _width}"
-                                         BorderBrush="#555555">
+                                         BorderBrush="#555555"
+                                         FontFamily="Consolas">
 
                                 <nodify:Node.InputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type types:InputViewModel}">
@@ -140,7 +141,7 @@
                                                           CompletedCommand="{Binding FinishCommand}"
                                                           AllowOnlyConnectors="True" 
                                                           EnableSnapping="True"
-                                                          Stroke="{Binding ConnectionColor}"
+                                                            
                                                           />
                         </DataTemplate>
                     </nodify:NodifyEditor.PendingConnectionTemplate>
