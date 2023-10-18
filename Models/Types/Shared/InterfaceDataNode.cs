@@ -34,124 +34,125 @@ namespace BlueprintEditor.Models.Types.Shared
             switch (interfaceItem.GetType().Name)
             {
                 default: //DataField
-                {
-                    if (isOut)
                     {
-                        var interfaceNode = new InterfaceDataNode()
+                        if (isOut)
                         {
-                            Guid = guid,
-                            HeaderColor =
-                                new SolidColorBrush(
-                                    (Color)ColorConverter.ConvertFromString("#00FF21")), //Property connection color
-                            Object = interfaceItem,
-                            Outputs = new ObservableCollection<OutputViewModel>()
+                            var interfaceNode = new InterfaceDataNode()
+                            {
+                                Guid = guid,
+                                HeaderColor =
+                                    new SolidColorBrush(
+                                        (Color)ColorConverter.ConvertFromString("#00FF21")), //Property connection color
+                                Object = interfaceItem,
+                                Outputs = new ObservableCollection<OutputViewModel>()
                             {
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property }
                             }
-                        };
-                        InterfaceDataNodes.Add(interfaceNode);
-                        return interfaceNode;
-                    }
-                    else
-                    {
-                        var interfaceNode = new InterfaceDataNode()
+                            };
+                            InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            return interfaceNode;
+                        }
+                        else
                         {
-                            Guid = guid,
-                            HeaderColor =
-                                new SolidColorBrush(
-                                    (Color)ColorConverter.ConvertFromString("#00FF21")), //Property connection color
-                            Object = interfaceItem,
-                            Inputs = new ObservableCollection<InputViewModel>()
+                            var interfaceNode = new InterfaceDataNode()
+                            {
+                                Guid = guid,
+                                HeaderColor =
+                                    new SolidColorBrush(
+                                        (Color)ColorConverter.ConvertFromString("#00FF21")), //Property connection color
+                                Object = interfaceItem,
+                                Inputs = new ObservableCollection<InputViewModel>()
                             {
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property }
                             }
-                        };
-                        InterfaceDataNodes.Add(interfaceNode);
-                        return interfaceNode;
-                    }
+                            };
+                            InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            return interfaceNode;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case "DynamicEvent":
-                {
-                    if (isOut)
                     {
-                        var interfaceNode = new InterfaceDataNode()
+                        if (isOut)
                         {
-                            Guid = guid,
-                            HeaderColor =
-                                new SolidColorBrush(
-                                    (Color)ColorConverter.ConvertFromString("#FFFFFF")), //Event connection color
-                            Object = interfaceItem,
-                            Outputs = new ObservableCollection<OutputViewModel>()
+                            var interfaceNode = new InterfaceDataNode()
+                            {
+                                Guid = guid,
+                                HeaderColor =
+                                    new SolidColorBrush(
+                                        (Color)ColorConverter.ConvertFromString("#FFFFFF")), //Event connection color
+                                Object = interfaceItem,
+                                Outputs = new ObservableCollection<OutputViewModel>()
                             {
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event }
                             }
-                        };
-                        InterfaceDataNodes.Add(interfaceNode);
-                        return interfaceNode;
-                    }
-                    else
-                    {
-                        var interfaceNode = new InterfaceDataNode()
+                            };
+                            InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            return interfaceNode;
+                        }
+                        else
                         {
-                            Guid = guid,
-                            HeaderColor =
-                                new SolidColorBrush(
-                                    (Color)ColorConverter.ConvertFromString("#FFFFFF")), //Event connection color
-                            Object = interfaceItem,
-                            Inputs = new ObservableCollection<InputViewModel>()
+                            var interfaceNode = new InterfaceDataNode()
+                            {
+                                Guid = guid,
+                                HeaderColor =
+                                    new SolidColorBrush(
+                                        (Color)ColorConverter.ConvertFromString("#FFFFFF")), //Event connection color
+                                Object = interfaceItem,
+                                Inputs = new ObservableCollection<InputViewModel>()
                             {
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event }
                             },
-                        };
-                        InterfaceDataNodes.Add(interfaceNode);
-                        return interfaceNode;
+                            };
+                            InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            return interfaceNode;
+                        }
+                        break;
                     }
-                    break;
-                }
                 case "DynamicLink":
-                {
-                    if (isOut)
                     {
-                        var interfaceNode = new InterfaceDataNode()
+                        if (isOut)
                         {
-                            Guid = guid,
-                            HeaderColor =
-                                new SolidColorBrush(
-                                    (Color)ColorConverter.ConvertFromString("#0094FF")), //Link connection color
-                            Object = interfaceItem,
-                            Outputs = new ObservableCollection<OutputViewModel>()
+                            var interfaceNode = new InterfaceDataNode()
+                            {
+                                Guid = guid,
+                                HeaderColor =
+                                    new SolidColorBrush(
+                                        (Color)ColorConverter.ConvertFromString("#0094FF")), //Link connection color
+                                Object = interfaceItem,
+                                Outputs = new ObservableCollection<OutputViewModel>()
                             {
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Link }
                             }
-                        };
-                        InterfaceDataNodes.Add(interfaceNode);
-                        return interfaceNode;
-                    }
-                    else
-                    {
-                        var interfaceNode = new InterfaceDataNode()
+                            };
+                            InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            return interfaceNode;
+                        }
+                        else
                         {
-                            Guid = guid,
-                            HeaderColor =
-                                new SolidColorBrush(
-                                    (Color)ColorConverter.ConvertFromString("#0094FF")), //Link connection color
-                            Object = interfaceItem,
-                            Inputs = new ObservableCollection<InputViewModel>()
+                            var interfaceNode = new InterfaceDataNode()
+                            {
+                                Guid = guid,
+                                HeaderColor =
+                                    new SolidColorBrush(
+                                        (Color)ColorConverter.ConvertFromString("#0094FF")), //Link connection color
+                                Object = interfaceItem,
+                                Inputs = new ObservableCollection<InputViewModel>()
                             {
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Link }
                             }
-                        };
-                        InterfaceDataNodes.Add(interfaceNode);
-                        return interfaceNode;
+                            };
+                            InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            return interfaceNode;
+                        }
+                        break;
                     }
-                    break;
-                }
             }
         }
 
-        public static List<InterfaceDataNode> InterfaceDataNodes = new List<InterfaceDataNode>();
+        public static Dictionary<string, InterfaceDataNode> InterfaceInputDataNodes = new Dictionary<string, InterfaceDataNode>();
+        public static Dictionary<string, InterfaceDataNode> InterfaceOutputDataNodes = new Dictionary<string, InterfaceDataNode>();
 
         public override bool Equals(object obj)
         {

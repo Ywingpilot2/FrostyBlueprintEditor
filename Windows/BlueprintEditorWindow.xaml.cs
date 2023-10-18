@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -66,9 +68,21 @@ namespace BlueprintEditor.Windows
                 node.Guid = ((dynamic)obj).GetInstanceGuid();
             }
 
+            // cache shit
+            Dictionary<AssetClassGuid, int> instanceGuids = new Dictionary<AssetClassGuid, int>();
+
+            for (int i = 0; i < EditorUtils.Editor.Nodes.Count; i++)
+            {
+                if (instanceGuids.ContainsKey(EditorUtils.Editor.Nodes[i].Guid))
+                {
+                    continue;
+                }
+                instanceGuids.Add(EditorUtils.Editor.Nodes[i].Guid, i);
+            }
+
             #region Create interface node
-            
-            PointerRef interfaceRef = openedProperties.Interface;
+
+            PointerRef interfaceRef = (PointerRef) openedProperties.Interface;
 
             NodeUtils.CreateInterfaceNodes(interfaceRef.Internal);
 
@@ -85,41 +99,32 @@ namespace BlueprintEditor.Windows
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
 
-                foreach (NodeBaseModel editorNode in EditorUtils.Editor.Nodes)
-                {
-                    if (sourceNode != null && targetNode != null) break;
-                    
-                    //First check if the the node is an interface node
-                    if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Outputs.Count > 0 && interfaceNode.Outputs.First().Title.StartsWith(propertyConnection.SourceField.ToString()))
-                            {
-                                sourceNode = interfaceNode;
-                            }
-                        }
-                    }
+                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
+                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
 
-                    if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Inputs.Count > 0 && interfaceNode.Inputs.First().Title.StartsWith(propertyConnection.TargetField.ToString()))
-                            {
-                                targetNode = interfaceNode;
-                            }
-                        }
-                    }
-                    
-                    if (editorNode.Guid == ((dynamic)propertyConnection.Source.Internal).GetInstanceGuid())
-                    {
-                        sourceNode = editorNode;
-                    }
-                    if (editorNode.Guid == ((dynamic)propertyConnection.Target.Internal).GetInstanceGuid())
-                    {
-                        targetNode = editorNode;
-                    }
+                if (sourceNode != null && targetNode != null) break;
+
+                string asdasd = (string)propertyConnection.SourceField.ToString();
+                string asdasdasd = (string)propertyConnection.TargetField.ToString();
+
+                //First check if the the node is an interface node
+                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
+                }
+                else
+                {
+                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                }
+
+
+                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
+                }
+                else
+                {
+                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
                 }
 
                 //We encountered an error
@@ -147,43 +152,30 @@ namespace BlueprintEditor.Windows
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
 
-                foreach (NodeBaseModel editorNode in EditorUtils.Editor.Nodes)
-                {
-                    if (sourceNode != null && targetNode != null) break;
-                    
-                    //First check if the the node is an interface node
-                    //First check if the the node is an interface node
-                    if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Outputs.Count > 0 && interfaceNode.Outputs.First().Title.StartsWith(eventConnection.SourceEvent.Name.ToString()))
-                            {
-                                sourceNode = interfaceNode;
-                            }
-                        }
-                    }
+                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
+                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
 
-                    if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Inputs.Count > 0 && interfaceNode.Inputs.First().Title.StartsWith(eventConnection.TargetEvent.Name.ToString()))
-                            {
-                                targetNode = interfaceNode;
-                            }
-                        }
-                    }
-                        
-                    if (editorNode.Guid == ((dynamic)eventConnection.Source.Internal).GetInstanceGuid())
-                    {
-                        sourceNode = editorNode;
-                    }
-                    if (editorNode.Guid == ((dynamic)eventConnection.Target.Internal).GetInstanceGuid())
-                    {
-                        targetNode = editorNode;
-                    }
+                if (sourceNode != null && targetNode != null) break;
+                    
+                //First check if the the node is an interface node
+                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
                 }
+                else
+                {
+                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                }
+
+                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
+                }
+                else
+                {
+                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                }
+
 
                 //We encountered an error
                 if (sourceNode == null || targetNode == null)
@@ -210,43 +202,28 @@ namespace BlueprintEditor.Windows
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
 
-                foreach (NodeBaseModel editorNode in EditorUtils.Editor.Nodes)
-                {
-                    if (sourceNode != null && targetNode != null) break;
-                    
-                    //First check if the the node is an interface node
-                    //First check if the the node is an interface node
-                    if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Outputs.Count > 0 && interfaceNode.Outputs.First().Title.StartsWith(linkConnection.SourceField.ToString()))
-                            {
-                                sourceNode = interfaceNode;
-                            }
-                        }
-                    }
+                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)linkConnection.Source.Internal).GetInstanceGuid();
+                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
 
-                    if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Inputs.Count > 0 && interfaceNode.Inputs.First().Title.StartsWith(linkConnection.TargetField.ToString()))
-                            {
-                                targetNode = interfaceNode;
-                            }
-                        }
-                    }
-                        
-                    if (editorNode.Guid == ((dynamic)linkConnection.Source.Internal).GetInstanceGuid())
-                    {
-                        sourceNode = editorNode;
-                    }
-                    if (editorNode.Guid == ((dynamic)linkConnection.Target.Internal).GetInstanceGuid())
-                    {
-                        targetNode = editorNode;
-                    }
+                //First check if the the node is an interface node
+                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
                 }
+                else
+                {
+                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                }
+
+                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
+                }
+                else
+                {
+                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                }
+
 
                 //We encountered an error
                 if (sourceNode == null || targetNode == null)
@@ -277,6 +254,11 @@ namespace BlueprintEditor.Windows
             }
 
             #endregion
+
+            InterfaceDataNode.InterfaceInputDataNodes.Clear();
+            InterfaceDataNode.InterfaceOutputDataNodes.Clear();
+
+            instanceGuids.Clear();
         }
 
         private void Editor_ControlInput(object sender, KeyEventArgs e)

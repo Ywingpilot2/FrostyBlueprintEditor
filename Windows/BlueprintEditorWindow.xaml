@@ -118,10 +118,15 @@
                     <!--Connection Definition(Changes how connections are displayed)-->
                     <nodify:NodifyEditor.ConnectionTemplate>
                         <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                            <nodify:LineConnection Source="{Binding Source.Anchor}"
+                            <nodify:Connection Source="{Binding Source.Anchor}"
                                                    Target="{Binding Target.Anchor}"
                                                    Fill="{Binding ConnectionColor}"
-                                                   Stroke="{Binding ConnectionColor}" />
+                                                   Stroke="{Binding ConnectionColor}" 
+                                                   ArrowSize="0,0"
+                                                   SourceOffset="0,0"
+                                                   TargetOffset="0,0"
+                                                   Spacing="5"
+                                                   />
                         </DataTemplate>
                     </nodify:NodifyEditor.ConnectionTemplate>
 
