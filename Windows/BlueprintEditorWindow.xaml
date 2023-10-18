@@ -125,7 +125,7 @@
                                                    ArrowSize="0,0"
                                                    SourceOffset="0,0"
                                                    TargetOffset="0,0"
-                                                   Spacing="5"
+                                                   Spacing="3"
                                                    />
                         </DataTemplate>
                     </nodify:NodifyEditor.ConnectionTemplate>
