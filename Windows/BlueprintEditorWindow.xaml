@@ -86,9 +86,9 @@
                             <nodify:Node Header="{Binding Name}"
                                          Input="{Binding Inputs}"
                                          Output="{Binding Outputs}"
-                                         HeaderBrush="{Binding HeaderColor}"
-                                         ContentBrush="{StaticResource MenuItemHighlight}"
-                                         Background="{StaticResource MenuItemHighlight}"
+                                         HeaderBrush="{StaticResource TitleBackground}"
+                                         ContentBrush="{StaticResource Background}"
+                                         Background="{StaticResource Background}"
                                          Width="{Binding _width}">
 
                                 <nodify:Node.InputConnectorTemplate>
@@ -133,9 +133,19 @@
                     <!--This displays whenever the user is attempting to create a new connection-->
                     <nodify:NodifyEditor.PendingConnectionTemplate>
                         <DataTemplate DataType="{x:Type editor:PendingConnectionViewModel}">
-                            <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
+                            <!--<nodify:PendingConnection StartedCommand="{Binding StartCommand}"
                                                       CompletedCommand="{Binding FinishCommand}"
-                                                      AllowOnlyConnectors="True" />
+                                                      AllowOnlyConnectors="True" />-->
+
+                            <nodify:Connection Source="{Binding Source.Anchor}"
+                                                   Target="{Binding Target.Anchor}"
+                                                   Fill="{Binding ConnectionColor}"
+                                                   Stroke="{Binding ConnectionColor}" 
+                                                   ArrowSize="0,0"
+                                                   SourceOffset="0,0"
+                                                   TargetOffset="0,0"
+                                                   Spacing="3"
+                                                   />
                         </DataTemplate>
                     </nodify:NodifyEditor.PendingConnectionTemplate>
 
