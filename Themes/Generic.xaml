@@ -21,9 +21,9 @@
     <SolidColorBrush x:Key="NodeText"
                      Color="#3B3B3B" />
     <SolidColorBrush x:Key="NodeSelectedColor"
-                     Color="#040404 " />
+                     Color="#040404" />
     <SolidColorBrush x:Key="NodeBorderColor"
-                     Color="#040404 " />
+                     Color="#040404" />
     
     <SolidColorBrush x:Key="CanvasBackground" Color="#141414"/>
     <SolidColorBrush x:Key="CanvasGridMajor" Color="#000000"/>
