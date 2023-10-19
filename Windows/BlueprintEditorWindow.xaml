@@ -87,17 +87,20 @@
                                          Input="{Binding Inputs}"
                                          Output="{Binding Outputs}"
                                          HeaderBrush="{Binding HeaderColor}"
-                                         ContentBrush="{StaticResource MenuItemHighlight}"
-                                         Background="{StaticResource MenuItemHighlight}"
-                                         Width="{Binding _width}">
+                                         ContentBrush="{StaticResource Background}"
+                                         Background="{StaticResource Background}"
+                                         Width="{Binding _width}"
+                                         BorderBrush="#555555"
+                                         FontFamily="Consolas">
 
                                 <nodify:Node.InputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type types:InputViewModel}">
                                         <nodify:NodeInput Header="{Binding Title}"
                                                           IsConnected="{Binding IsConnected}"
                                                           Anchor="{Binding Anchor, Mode=OneWayToSource}"
-                                                          Background="{StaticResource MenuItemHighlight}"
-                                                          BorderBrush="{Binding ConnectionColor}" />
+                                                          Background="{StaticResource Background}"
+                                                          BorderBrush="{Binding ConnectionColor}" 
+                                                          Foreground="#000000"/>
                                     </DataTemplate>
                                 </nodify:Node.InputConnectorTemplate>
 
@@ -106,8 +109,9 @@
                                         <nodify:NodeOutput Header="{Binding Title}"
                                                            IsConnected="{Binding IsConnected}"
                                                            Anchor="{Binding Anchor, Mode=OneWayToSource}"
-                                                           Background="{StaticResource MenuItemHighlight}"
-                                                           BorderBrush="{Binding ConnectionColor}" />
+                                                           Background="{StaticResource Background}"
+                                                           BorderBrush="{Binding ConnectionColor}"
+                                                           Foreground="#000000" />
                                     </DataTemplate>
                                 </nodify:Node.OutputConnectorTemplate>
 
@@ -118,10 +122,15 @@
                     <!--Connection Definition(Changes how connections are displayed)-->
                     <nodify:NodifyEditor.ConnectionTemplate>
                         <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                            <nodify:LineConnection Source="{Binding Source.Anchor}"
+                            <nodify:Connection Source="{Binding Source.Anchor}"
                                                    Target="{Binding Target.Anchor}"
                                                    Fill="{Binding ConnectionColor}"
-                                                   Stroke="{Binding ConnectionColor}" />
+                                                   Stroke="{Binding ConnectionColor}" 
+                                                   ArrowSize="0,0"
+                                                   SourceOffset="0,0"
+                                                   TargetOffset="0,0"
+                                                   Spacing="0"
+                                                   />
                         </DataTemplate>
                     </nodify:NodifyEditor.ConnectionTemplate>
 
@@ -129,8 +138,11 @@
                     <nodify:NodifyEditor.PendingConnectionTemplate>
                         <DataTemplate DataType="{x:Type editor:PendingConnectionViewModel}">
                             <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
-                                                      CompletedCommand="{Binding FinishCommand}"
-                                                      AllowOnlyConnectors="True" />
+                                                          CompletedCommand="{Binding FinishCommand}"
+                                                          AllowOnlyConnectors="True" 
+                                                          EnableSnapping="True"
+                                                            
+                                                          />
                         </DataTemplate>
                     </nodify:NodifyEditor.PendingConnectionTemplate>
 

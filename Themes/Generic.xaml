@@ -12,14 +12,17 @@
     </ResourceDictionary.MergedDictionaries>
     
     <SolidColorBrush x:Key="EventConnection"
-                     Color="#FFFFFF" />
+                     Color="#F8F8F8" />
     <SolidColorBrush x:Key="PropertyConnection"
-                     Color="#00FF21" />
+                     Color="#5FD95F" />
     <SolidColorBrush x:Key="LinkConnection"
-                     Color="#0094FF" />
-    
+                     Color="#6FA9CE" />
     <SolidColorBrush x:Key="NodeText"
                      Color="#3B3B3B" />
+    <SolidColorBrush x:Key="TitleBackground"
+                     Color="#3F3F3F" />
+    <SolidColorBrush x:Key="Background"
+                     Color="#C2C2C2" />
     <SolidColorBrush x:Key="NodeSelectedColor"
                      Color="#040404" />
     <SolidColorBrush x:Key="NodeBorderColor"
@@ -27,7 +30,7 @@
     
     <SolidColorBrush x:Key="CanvasBackground" Color="#141414"/>
     <SolidColorBrush x:Key="CanvasGridMajor" Color="#000000"/>
-    <SolidColorBrush x:Key="CanvasGridMinor" Color="#242424"/>
+    <SolidColorBrush x:Key="CanvasGridMinor" Color="#1C1C1C"/>
     
     <GeometryDrawing x:Key="SmallGridGeometry"
                      Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"

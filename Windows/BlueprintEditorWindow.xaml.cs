@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -66,9 +68,21 @@ namespace BlueprintEditor.Windows
                 node.Guid = ((dynamic)obj).GetInstanceGuid();
             }
 
+            // cache shit
+            Dictionary<AssetClassGuid, int> instanceGuids = new Dictionary<AssetClassGuid, int>();
+
+            for (int i = 0; i < EditorUtils.Editor.Nodes.Count; i++)
+            {
+                if (instanceGuids.ContainsKey(EditorUtils.Editor.Nodes[i].Guid))
+                {
+                    continue;
+                }
+                instanceGuids.Add(EditorUtils.Editor.Nodes[i].Guid, i);
+            }
+
             #region Create interface node
-            
-            PointerRef interfaceRef = openedProperties.Interface;
+
+            PointerRef interfaceRef = (PointerRef) openedProperties.Interface;
 
             NodeUtils.CreateInterfaceNodes(interfaceRef.Internal);
 
@@ -85,41 +99,32 @@ namespace BlueprintEditor.Windows
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
 
-                foreach (NodeBaseModel editorNode in EditorUtils.Editor.Nodes)
-                {
-                    if (sourceNode != null && targetNode != null) break;
-                    
-                    //First check if the the node is an interface node
-                    if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Outputs.Count > 0 && interfaceNode.Outputs.First().Title.StartsWith(propertyConnection.SourceField.ToString()))
-                            {
-                                sourceNode = interfaceNode;
-                            }
-                        }
-                    }
+                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
+                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
 
-                    if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Inputs.Count > 0 && interfaceNode.Inputs.First().Title.StartsWith(propertyConnection.TargetField.ToString()))
-                            {
-                                targetNode = interfaceNode;
-                            }
-                        }
-                    }
-                    
-                    if (editorNode.Guid == ((dynamic)propertyConnection.Source.Internal).GetInstanceGuid())
-                    {
-                        sourceNode = editorNode;
-                    }
-                    if (editorNode.Guid == ((dynamic)propertyConnection.Target.Internal).GetInstanceGuid())
-                    {
-                        targetNode = editorNode;
-                    }
+                if (sourceNode != null && targetNode != null) break;
+
+                string asdasd = (string)propertyConnection.SourceField.ToString();
+                string asdasdasd = (string)propertyConnection.TargetField.ToString();
+
+                //First check if the the node is an interface node
+                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
+                }
+                else
+                {
+                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                }
+
+
+                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
+                }
+                else
+                {
+                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
                 }
 
                 //We encountered an error
@@ -147,43 +152,30 @@ namespace BlueprintEditor.Windows
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
 
-                foreach (NodeBaseModel editorNode in EditorUtils.Editor.Nodes)
-                {
-                    if (sourceNode != null && targetNode != null) break;
-                    
-                    //First check if the the node is an interface node
-                    //First check if the the node is an interface node
-                    if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Outputs.Count > 0 && interfaceNode.Outputs.First().Title.StartsWith(eventConnection.SourceEvent.Name.ToString()))
-                            {
-                                sourceNode = interfaceNode;
-                            }
-                        }
-                    }
+                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
+                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
 
-                    if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Inputs.Count > 0 && interfaceNode.Inputs.First().Title.StartsWith(eventConnection.TargetEvent.Name.ToString()))
-                            {
-                                targetNode = interfaceNode;
-                            }
-                        }
-                    }
-                        
-                    if (editorNode.Guid == ((dynamic)eventConnection.Source.Internal).GetInstanceGuid())
-                    {
-                        sourceNode = editorNode;
-                    }
-                    if (editorNode.Guid == ((dynamic)eventConnection.Target.Internal).GetInstanceGuid())
-                    {
-                        targetNode = editorNode;
-                    }
+                if (sourceNode != null && targetNode != null) break;
+                    
+                //First check if the the node is an interface node
+                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
                 }
+                else
+                {
+                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                }
+
+                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
+                }
+                else
+                {
+                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                }
+
 
                 //We encountered an error
                 if (sourceNode == null || targetNode == null)
@@ -210,43 +202,28 @@ namespace BlueprintEditor.Windows
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
 
-                foreach (NodeBaseModel editorNode in EditorUtils.Editor.Nodes)
-                {
-                    if (sourceNode != null && targetNode != null) break;
-                    
-                    //First check if the the node is an interface node
-                    //First check if the the node is an interface node
-                    if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Outputs.Count > 0 && interfaceNode.Outputs.First().Title.StartsWith(linkConnection.SourceField.ToString()))
-                            {
-                                sourceNode = interfaceNode;
-                            }
-                        }
-                    }
+                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)linkConnection.Source.Internal).GetInstanceGuid();
+                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
 
-                    if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
-                    {
-                        foreach (InterfaceDataNode interfaceNode in InterfaceDataNode.InterfaceDataNodes)
-                        {
-                            if (interfaceNode.Inputs.Count > 0 && interfaceNode.Inputs.First().Title.StartsWith(linkConnection.TargetField.ToString()))
-                            {
-                                targetNode = interfaceNode;
-                            }
-                        }
-                    }
-                        
-                    if (editorNode.Guid == ((dynamic)linkConnection.Source.Internal).GetInstanceGuid())
-                    {
-                        sourceNode = editorNode;
-                    }
-                    if (editorNode.Guid == ((dynamic)linkConnection.Target.Internal).GetInstanceGuid())
-                    {
-                        targetNode = editorNode;
-                    }
+                //First check if the the node is an interface node
+                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
                 }
+                else
+                {
+                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                }
+
+                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                {
+                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
+                }
+                else
+                {
+                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                }
+
 
                 //We encountered an error
                 if (sourceNode == null || targetNode == null)
@@ -277,6 +254,95 @@ namespace BlueprintEditor.Windows
             }
 
             #endregion
+
+            InterfaceDataNode.InterfaceInputDataNodes.Clear();
+            InterfaceDataNode.InterfaceOutputDataNodes.Clear();
+
+            instanceGuids.Clear();
+
+            ApplyAutoLayout();
+        }
+        /// <summary>
+        /// Applies auto layout as made & used by LevelEditor
+        /// </summary>
+        public void ApplyAutoLayout()
+        {
+            // TODO: Find a more precise way to do this
+            // Credit to github.com/CadeEvs for source(is temp, and will be replaced, though is a good placeholder)
+            FrostyTaskWindow.Show(BlueprintWindow, "Sorting nodes...", "", task =>
+            {
+                //Gather node data
+                Dictionary<NodeBaseModel, List<NodeBaseModel>> ancestors = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
+                Dictionary<NodeBaseModel, List<NodeBaseModel>> children = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
+
+                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
+                {
+                    ancestors.Add(node, new List<NodeBaseModel>());
+                    children.Add(node, new List<NodeBaseModel>());
+                }
+
+                foreach (ConnectionViewModel connection in EditorUtils.Editor.Connections)
+                {
+                    ancestors[connection.TargetNode].Add(connection.SourceNode);
+                    children[connection.SourceNode].Add(connection.TargetNode);
+                }
+
+                List<List<NodeBaseModel>> columns = new List<List<NodeBaseModel>>();
+                List<NodeBaseModel> alreadyProcessed = new List<NodeBaseModel>();
+
+                int columnIdx = 1;
+                columns.Add(new List<NodeBaseModel>());
+
+                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
+                {
+                    if (ancestors[node].Count == 0 && children[node].Count == 0)
+                    {
+                        alreadyProcessed.Add(node);
+                        columns[0].Add(node);
+                        continue;
+                    }
+
+                    if (ancestors[node].Count == 0)
+                    {
+                        EditorUtils.LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
+                    }
+                }
+
+                columnIdx = 1;
+                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
+                {
+                    if (!alreadyProcessed.Contains(node))
+                    {
+                        EditorUtils.LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
+                    }
+                }
+
+                double x = 100.0;
+                double width = 0.0;
+
+                foreach (List<NodeBaseModel> column in columns)
+                {
+                    double y = 96.0;
+                    foreach (NodeBaseModel node in column)
+                    {
+                        x -= (x % 8);
+                        y -= (y % 8);
+                        node.Location = new Point(x, y);
+
+                        double curWidth = Math.Floor((node.RealWidth + 40.0) / 4.0) * 8.0;
+                        double curHeight = Math.Floor(((node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
+
+                        y += curHeight + 56.0;
+
+                        if (curWidth > width)
+                        {
+                            width = curWidth;
+                        }
+                    }
+
+                    x += width + 280.0;
+                }
+            });
         }
 
         private void Editor_ControlInput(object sender, KeyEventArgs e)
@@ -358,83 +424,7 @@ namespace BlueprintEditor.Windows
         /// <param name="e"></param>
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            //TODO: Find a more precise way to do this
-            //Credit to github.com/CadeEvs for source(is temp, and will be replaced, though is a good placeholder)
-            
-            FrostyTaskWindow.Show(BlueprintWindow, "Sorting nodes...", "", task =>
-            { 
-                //Gather node data
-                Dictionary<NodeBaseModel, List<NodeBaseModel>> ancestors = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
-                Dictionary<NodeBaseModel, List<NodeBaseModel>> children = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
-
-                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
-                {
-                    ancestors.Add(node, new List<NodeBaseModel>());
-                    children.Add(node, new List<NodeBaseModel>());
-                }
-
-                foreach (ConnectionViewModel connection in EditorUtils.Editor.Connections)
-                {
-                    ancestors[connection.TargetNode].Add(connection.SourceNode);
-                    children[connection.SourceNode].Add(connection.TargetNode);
-                }
-            
-                List<List<NodeBaseModel>> columns = new List<List<NodeBaseModel>>();
-                List<NodeBaseModel> alreadyProcessed = new List<NodeBaseModel>();
-
-                int columnIdx = 1;
-                columns.Add(new List<NodeBaseModel>());
-
-                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
-                {
-                    if (ancestors[node].Count == 0 && children[node].Count == 0)
-                    {
-                        alreadyProcessed.Add(node);
-                        columns[0].Add(node);
-                        continue;
-                    }
-
-                    if (ancestors[node].Count == 0)
-                    {
-                        EditorUtils.LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
-                    }
-                }
-
-                columnIdx = 1;
-                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
-                {
-                    if (!alreadyProcessed.Contains(node))
-                    {
-                        EditorUtils.LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
-                    }
-                }
-
-                double x = 100.0;
-                double width = 0.0;
-
-                foreach (List<NodeBaseModel> column in columns)
-                {
-                    double y = 96.0;
-                    foreach (NodeBaseModel node in column)
-                    {
-                        x -= (x % 8);
-                        y -= (y % 8);
-                        node.Location = new Point(x, y); 
-
-                        double curWidth = Math.Floor((node.RealWidth + 40.0) / 4.0) * 8.0;
-                        double curHeight = Math.Floor(((node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
-
-                        y += curHeight + 56.0;
-
-                        if (curWidth > width)
-                        {
-                            width = curWidth;
-                        }
-                    }
-
-                    x += width + 280.0;
-                } 
-            });
+            ApplyAutoLayout();
         }
 
         #endregion

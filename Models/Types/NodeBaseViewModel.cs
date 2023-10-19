@@ -18,7 +18,7 @@ namespace BlueprintEditor.Models.Types
         public virtual string Name { get; set; }
 
         public virtual SolidColorBrush HeaderColor { get; set; } =
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#454545"));
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3F3F3F"));
         public virtual string ObjectType { get; } = "null";
         public AssetClassGuid Guid { get; set; }
 
