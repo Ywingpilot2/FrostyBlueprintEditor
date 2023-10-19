@@ -231,13 +231,13 @@ namespace BlueprintEditor.Models.Editor
                 if (target != null && target.GetType().Name != "OutputViewModel" && _source != null && _source.Type == ((InputViewModel)target).Type)
                 {
                     connection = editor.Connect(_source, (InputViewModel)target);
-                    _source = null; //Set these values to null that way they aren't saved in memory
                 }
                 else if (target != null && target.GetType().Name == "OutputViewModel" && _target != null && _target.Type == ((OutputViewModel)target).Type)
                 {
                     connection = editor.Connect((OutputViewModel)target, _target);
-                    _target = null;
                 }
+                _source = null; //Set these values to null that way they aren't saved in memory
+                _target = null;
 
                 #region Edit Ebx
 
