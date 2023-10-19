@@ -146,11 +146,17 @@
                         </DataTemplate>
                     </nodify:NodifyEditor.PendingConnectionTemplate>
 
-                    <!--No idea what this is for tbh-->
+                    <!--Defines a variety of stylistic things relating to nodes(e.g border color)-->
                     <nodify:NodifyEditor.ItemContainerStyle>
                         <Style TargetType="{x:Type nodify:ItemContainer}">
                             <Setter Property="Location"
                                     Value="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Setter Property="BorderThickness"
+                                    Value="2"></Setter>
+                            <Setter Property="BorderBrush"
+                                    Value="{StaticResource NodeBorderColor}"></Setter>
+                            <Setter Property="SelectedBrush"
+                                    Value="{StaticResource NodeSelectedColor}"></Setter>
                         </Style>
                     </nodify:NodifyEditor.ItemContainerStyle>
 

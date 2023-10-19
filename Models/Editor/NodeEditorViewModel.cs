@@ -12,6 +12,7 @@ using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
+using Nodify;
 using Prism.Commands;
 
 namespace BlueprintEditor.Models.Editor
@@ -211,7 +212,6 @@ namespace BlueprintEditor.Models.Editor
         
         public PendingConnectionViewModel(EditorViewModel editor)
         {
-            EditorViewModel editor1 = editor;
             StartCommand = new DelegateCommand<Object>(source =>
             {
                 //Open the asset when editing in order to ensure the least issues
@@ -230,12 +230,12 @@ namespace BlueprintEditor.Models.Editor
                 ConnectionViewModel connection = null;
                 if (target != null && target.GetType().Name != "OutputViewModel" && _source != null && _source.Type == ((InputViewModel)target).Type)
                 {
-                    connection = editor1.Connect(_source, (InputViewModel)target);
+                    connection = editor.Connect(_source, (InputViewModel)target);
                     _source = null; //Set these values to null that way they aren't saved in memory
                 }
                 else if (target != null && target.GetType().Name == "OutputViewModel" && _target != null && _target.Type == ((OutputViewModel)target).Type)
                 {
-                    connection = editor1.Connect((OutputViewModel)target, _target);
+                    connection = editor.Connect((OutputViewModel)target, _target);
                     _target = null;
                 }
 
@@ -253,8 +253,9 @@ namespace BlueprintEditor.Models.Editor
                             eventConnection.SourceEvent.Name = connection.SourceField;
                             eventConnection.TargetEvent.Name = connection.TargetField;
 
-                            ((dynamic)editor1.EditedEbxAsset.RootObject).EventConnections
+                            ((dynamic)editor.EditedEbxAsset.RootObject).EventConnections
                                 .Add(eventConnection);
+                            connection.Object = eventConnection;
                             break;
                         }
                         case ConnectionType.Property:
@@ -266,8 +267,9 @@ namespace BlueprintEditor.Models.Editor
                             propertyConnection.SourceField = connection.SourceField;
                             propertyConnection.TargetField = connection.TargetField;
 
-                            ((dynamic)editor1.EditedEbxAsset.RootObject).PropertyConnections
+                            ((dynamic)editor.EditedEbxAsset.RootObject).PropertyConnections
                                 .Add(propertyConnection);
+                            connection.Object = propertyConnection;
 
                             break;
                         }
@@ -280,14 +282,15 @@ namespace BlueprintEditor.Models.Editor
                             linkConnection.SourceField = connection.SourceField;
                             linkConnection.TargetField = connection.TargetField;
 
-                            ((dynamic)editor1.EditedEbxAsset.RootObject).LinkConnections.Add(
+                            ((dynamic)editor.EditedEbxAsset.RootObject).LinkConnections.Add(
                                 linkConnection);
+                            connection.Object = linkConnection;
 
                             break;
                         }
                     }
 
-                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(editor1.EditedEbxAsset.FileGuid).Name, editor1.EditedEbxAsset);
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(editor.EditedEbxAsset.FileGuid).Name, editor.EditedEbxAsset);
                 App.EditorWindow.DataExplorer.RefreshItems();
 
                 #endregion
