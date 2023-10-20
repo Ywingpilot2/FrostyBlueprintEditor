@@ -47,6 +47,7 @@
     <ProjectReference Include="..\..\FrostyControls\FrostyControls.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\FrostyEditor\FrostyEditor.csproj" />
     <ProjectReference Include="..\..\FrostyHash\FrostyHash.vcxproj">
       <Private>false</Private>
     </ProjectReference>

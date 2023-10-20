@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -17,12 +18,13 @@ using BlueprintEditor.Models.Types;
 using BlueprintEditor.Models.Types.Shared;
 using BlueprintEditor.Utils;
 using Frosty.Controls;
-using Frosty.Core;
 using Frosty.Core.Windows;
+using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
+using App = Frosty.Core.App;
 
 namespace BlueprintEditor.Windows
 {
@@ -253,91 +255,9 @@ namespace BlueprintEditor.Windows
 
             instanceGuids.Clear();
 
-            ApplyAutoLayout();
+            EditorUtils.ApplyLayouts(_file);
         }
         
-        /// <summary>
-        /// Applies auto layout as made & used by LevelEditor
-        /// </summary>
-        public void ApplyAutoLayout()
-        {
-            // TODO: Find a more precise way to do this
-            // Credit to github.com/CadeEvs for source(is temp, and will be replaced, though is a good placeholder)
-            FrostyTaskWindow.Show(BlueprintWindow, "Sorting nodes...", "", task =>
-            {
-                //Gather node data
-                Dictionary<NodeBaseModel, List<NodeBaseModel>> ancestors = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
-                Dictionary<NodeBaseModel, List<NodeBaseModel>> children = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
-
-                foreach (NodeBaseModel node in EditorUtils.CurrentEditor.Nodes)
-                {
-                    ancestors.Add(node, new List<NodeBaseModel>());
-                    children.Add(node, new List<NodeBaseModel>());
-                }
-
-                foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.Connections)
-                {
-                    ancestors[connection.TargetNode].Add(connection.SourceNode);
-                    children[connection.SourceNode].Add(connection.TargetNode);
-                }
-
-                List<List<NodeBaseModel>> columns = new List<List<NodeBaseModel>>();
-                List<NodeBaseModel> alreadyProcessed = new List<NodeBaseModel>();
-
-                int columnIdx = 1;
-                columns.Add(new List<NodeBaseModel>());
-
-                foreach (NodeBaseModel node in EditorUtils.CurrentEditor.Nodes)
-                {
-                    if (ancestors[node].Count == 0 && children[node].Count == 0)
-                    {
-                        alreadyProcessed.Add(node);
-                        columns[0].Add(node);
-                        continue;
-                    }
-
-                    if (ancestors[node].Count == 0)
-                    {
-                        EditorUtils.LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
-                    }
-                }
-
-                columnIdx = 1;
-                foreach (NodeBaseModel node in EditorUtils.CurrentEditor.Nodes)
-                {
-                    if (!alreadyProcessed.Contains(node))
-                    {
-                        EditorUtils.LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
-                    }
-                }
-
-                double x = 100.0;
-                double width = 0.0;
-
-                foreach (List<NodeBaseModel> column in columns)
-                {
-                    double y = 96.0;
-                    foreach (NodeBaseModel node in column)
-                    {
-                        x -= (x % 8);
-                        y -= (y % 8);
-                        node.Location = new Point(x, y);
-
-                        double curWidth = Math.Floor((node.RealWidth + 40.0) / 4.0) * 8.0;
-                        double curHeight = Math.Floor(((node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
-
-                        y += curHeight + 56.0;
-
-                        if (curWidth > width)
-                        {
-                            width = curWidth;
-                        }
-                    }
-
-                    x += width + 280.0;
-                }
-            });
-        }
 
         private void Editor_ControlInput(object sender, KeyEventArgs e)
         {
@@ -352,7 +272,9 @@ namespace BlueprintEditor.Windows
 
         private void BlueprintEditorWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            //TODO: Save Layouts
+            App.EditorWindow.OpenAsset(_file);
+            EditorUtils.SaveLayouts(_file);
+
             EditorUtils.Editors.Remove(_file.Filename);
         }
         
@@ -410,7 +332,7 @@ namespace BlueprintEditor.Windows
         /// <param name="e"></param>
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            ApplyAutoLayout();
+            EditorUtils.ApplyAutoLayout();
         }
 
         #endregion
