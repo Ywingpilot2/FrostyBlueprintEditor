@@ -17,11 +17,6 @@ namespace BlueprintEditor.Models.MenuItems
         /// The type itself
         /// </summary>
         public Type NodeType { get; set; }
-        
-        /// <summary>
-        /// Whether or not this is the selected item in the TypesList
-        /// </summary>
-        public bool IsSelected => EditorUtils.TypesViewModelListSelectedItem == this;
 
         public NodeTypeViewModel(Type type)
         {

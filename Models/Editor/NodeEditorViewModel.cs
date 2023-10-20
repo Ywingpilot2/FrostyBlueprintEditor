@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types;
+using BlueprintEditor.Models.Types.Shared;
 using BlueprintEditor.Utils;
 using Frosty.Core;
 using FrostySdk;
@@ -26,19 +29,24 @@ namespace BlueprintEditor.Models.Editor
     public class EditorViewModel
     {
         public ObservableCollection<NodeBaseModel> Nodes { get; } = new ObservableCollection<NodeBaseModel>();
+        
+        public Dictionary<string, InterfaceDataNode> InterfaceInputDataNodes = new Dictionary<string, InterfaceDataNode>();
+        public Dictionary<string, InterfaceDataNode> InterfaceOutputDataNodes = new Dictionary<string, InterfaceDataNode>();
         public ObservableCollection<NodeBaseModel> SelectedNodes { get; } = new ObservableCollection<NodeBaseModel>();
         public ObservableCollection<ConnectionViewModel> Connections { get; } = new ObservableCollection<ConnectionViewModel>();
         public PendingConnectionViewModel PendingConnection { get; }
+        public SolidColorBrush PendingConnectionColor { get; } = new SolidColorBrush(Colors.White);
         public ICommand DisconnectConnectorCommand { get; }
 
-        
+        public string EditorName { get; }
         public EbxAsset EditedEbxAsset { get; set; }
-
+        public AssetClassGuid InterfaceGuid { get; set; }
         public dynamic EditedProperties => EditedEbxAsset.RootObject;
 
         public EditorViewModel()
         {
             EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.EditorWindow.GetOpenedAssetEntry());
+            EditorName = App.EditorWindow.GetOpenedAssetEntry().Filename;
             
             PendingConnection = new PendingConnectionViewModel(this);
             
@@ -55,9 +63,281 @@ namespace BlueprintEditor.Models.Editor
                 }
             });
 
-            EditorUtils.Editor = this;
+            EditorUtils.Editors.Add(EditorName, this);
         }
-        
+
+        #region Node Editing
+
+        /// <summary>
+        /// This will create a new node from an object
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public NodeBaseModel CreateNodeFromObject(object obj)
+        {
+            string key = obj.GetType().Name;
+            if (!NodeUtils.NodeExtensions.ContainsKey(key))
+            {
+                key = "null";
+            }
+
+            var newNode = (NodeBaseModel)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
+            newNode.Name = obj.GetType().Name;
+            newNode.Object = obj;
+            
+            if (key == "null")
+            {
+                newNode.Inputs = NodeUtils.GenerateNodeInputs(obj.GetType(), newNode);
+            }
+            
+            newNode.OnCreation();
+
+            EditorUtils.CurrentEditor.Nodes.Add(newNode);
+            return newNode;
+        }
+
+        /// <summary>
+        /// Deletes a node(and by extension all of its connections).
+        /// </summary>
+        /// <param name="node">Node to delete</param>
+        public void DeleteNode(NodeBaseModel node)
+        {
+            #region Interface removal
+
+            if (node.ObjectType == "EditorInterfaceNode")
+            {
+                //Is this in or out?
+                if (node.Inputs.Count != 0)
+                {
+                    var input = node.Inputs[0];
+                    
+                    foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(input))
+                    {
+                        EditorUtils.CurrentEditor.Disconnect(connection);
+                    }
+                    
+                    switch (input.Type)
+                    {
+                        case ConnectionType.Property:
+                        {
+                            dynamic objToRemove = null;
+                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields)
+                            {
+                                if (field.Name.ToString() == input.Title)
+                                {
+                                    objToRemove = field;
+                                }
+                            }
+
+                            if (objToRemove != null)
+                            {
+                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields.Remove(objToRemove);
+                            }
+                            break;
+                        }
+                        case ConnectionType.Event:
+                        {
+                            dynamic objToRemove = null;
+                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputEvents)
+                            {
+                                if (field.Name.ToString() == input.Title)
+                                {
+                                    objToRemove = field;
+                                }
+                            }
+
+                            if (objToRemove != null)
+                            {
+                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputEvents.Remove(objToRemove);
+                            }
+                            break;
+                        }
+                        case ConnectionType.Link:
+                        {
+                            dynamic objToRemove = null;
+                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputLinks)
+                            {
+                                if (field.Name.ToString() == input.Title)
+                                {
+                                    objToRemove = field;
+                                }
+                            }
+
+                            if (objToRemove != null)
+                            {
+                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputLinks.Remove(objToRemove);
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+                else
+                {
+                    var output = node.Outputs[0];
+                    
+                    foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(output))
+                    {
+                        EditorUtils.CurrentEditor.Disconnect(connection);
+                    }
+                    
+                    switch (output.Type)
+                    {
+                        case ConnectionType.Property:
+                        {
+                            dynamic objToRemove = null;
+                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields)
+                            {
+                                if (field.Name.ToString() == output.Title)
+                                {
+                                    objToRemove = field;
+                                }
+                            }
+
+                            if (objToRemove != null)
+                            {
+                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields.Remove(objToRemove);
+                            }
+                            break;
+                        }
+                        case ConnectionType.Event:
+                        {
+                            dynamic objToRemove = null;
+                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputEvents)
+                            {
+                                if (field.Name.ToString() == output.Title)
+                                {
+                                    objToRemove = field;
+                                }
+                            }
+
+                            if (objToRemove != null)
+                            {
+                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputEvents.Remove(objToRemove);
+                            }
+                            break;
+                        }
+                        case ConnectionType.Link:
+                        {
+                            dynamic objToRemove = null;
+                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputLinks)
+                            {
+                                if (field.Name.ToString() == output.Title)
+                                {
+                                    objToRemove = field;
+                                }
+                            }
+
+                            if (objToRemove != null)
+                            {
+                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputLinks.Remove(objToRemove);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                EditorUtils.CurrentEditor.Nodes.Remove(node);
+                
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
+                App.EditorWindow.DataExplorer.RefreshItems();
+                return;
+            }
+
+            #endregion
+
+            #region Object Removal
+            
+            foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(node))
+            {
+                EditorUtils.CurrentEditor.Disconnect(connection);
+            }
+
+            //Remove the object pointer
+            List<PointerRef> pointerRefs = EditorUtils.CurrentEditor.EditedProperties.Objects;
+            pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == node.Object.GetInstanceGuid());
+            
+            EditorUtils.CurrentEditor.EditedEbxAsset.RemoveObject(node.Object);
+            EditorUtils.CurrentEditor.Nodes.Remove(node);
+            
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
+            App.EditorWindow.DataExplorer.RefreshItems();
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Interfaces
+
+        /// <summary>
+        /// Creates an interface node from a InterfaceDescriptorData
+        /// </summary>
+        /// <param name="obj">InterfaceDescriptorData</param>
+        /// <returns></returns>
+        public void CreateInterfaceNodes(object obj)
+        {
+            InterfaceGuid = ((dynamic)obj).GetInstanceGuid();
+            
+            foreach (dynamic field in ((dynamic)obj).Fields)
+            {
+                if (field.AccessType.ToString() == "FieldAccessType_Source") //Source
+                {
+                    NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
+                    node.Object = obj;
+                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                }
+                else if (field.AccessType.ToString() == "FieldAccessType_Target") //Target
+                {
+                    NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
+                    node.Object = obj;
+                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                }
+                else //Source and Target
+                {
+                    NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
+                    node.Object = obj;
+                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                    
+                    node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
+                    node.Object = obj;
+                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                }
+            }
+
+            foreach (dynamic inputEvent in ((dynamic)obj).InputEvents)
+            {
+                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(inputEvent, true, InterfaceGuid);
+                node.Object = obj;
+                EditorUtils.CurrentEditor.Nodes.Add(node);
+            }
+                
+            foreach (dynamic outputEvent in ((dynamic)obj).OutputEvents)
+            {
+                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(outputEvent, false, InterfaceGuid);
+                node.Object = obj;
+                EditorUtils.CurrentEditor.Nodes.Add(node);
+            }
+                
+            foreach (dynamic inputLink in ((dynamic)obj).InputLinks)
+            {
+                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(inputLink, true, InterfaceGuid);
+                node.Object = obj;
+                EditorUtils.CurrentEditor.Nodes.Add(node);
+            }
+                
+            foreach (dynamic outputLink in ((dynamic)obj).OutputLinks)
+            {
+                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(outputLink, false, InterfaceGuid);
+                node.Object = obj;
+                EditorUtils.CurrentEditor.Nodes.Add(node);
+            }
+        }
+
+        #endregion
+
+        #region Connecting and Disconnecting nodes
+
         /// <summary>
         /// Connect 2 nodes together.
         /// </summary>
@@ -139,6 +419,10 @@ namespace BlueprintEditor.Models.Editor
             Connections.Remove(connection);
         }
 
+        #endregion
+
+        #region Getting Connections
+
         /// <summary>
         /// Gets a list of connections with this <see cref="InputViewModel"/>
         /// </summary>
@@ -192,6 +476,8 @@ namespace BlueprintEditor.Models.Editor
             });
             return connections;
         }
+
+        #endregion
     }
     
     #endregion
@@ -204,11 +490,14 @@ namespace BlueprintEditor.Models.Editor
     /// </summary>
     public class PendingConnectionViewModel
     {
-        private OutputViewModel _source;
-        private InputViewModel _target;
+        public OutputViewModel Source { get; set; }
+        public InputViewModel Target { get; set; }
 
         public ICommand StartCommand { get; }
         public ICommand FinishCommand { get; }
+        
+        public Point SourceAnchor { get; set; }
+        public Point TargetAnchor { get; set; }
         
         public PendingConnectionViewModel(EditorViewModel editor)
         {
@@ -218,26 +507,26 @@ namespace BlueprintEditor.Models.Editor
                 App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(editor.EditedEbxAsset.FileGuid));
                 if (source.GetType().Name == "OutputViewModel")
                 {
-                    _source = (OutputViewModel)source;
+                    Source = (OutputViewModel)source;
                 }
                 else
                 {
-                    _target = (InputViewModel)source;
+                    Target = (InputViewModel)source;
                 }
             });
             FinishCommand = new DelegateCommand<Object>(target =>
             {
                 ConnectionViewModel connection = null;
-                if (target != null && target.GetType().Name != "OutputViewModel" && _source != null && _source.Type == ((InputViewModel)target).Type)
+                if (target != null && target.GetType().Name != "OutputViewModel" && Source != null && Source.Type == ((InputViewModel)target).Type)
                 {
-                    connection = editor.Connect(_source, (InputViewModel)target);
+                    connection = editor.Connect(Source, (InputViewModel)target);
                 }
-                else if (target != null && target.GetType().Name == "OutputViewModel" && _target != null && _target.Type == ((OutputViewModel)target).Type)
+                else if (target != null && target.GetType().Name == "OutputViewModel" && Target != null && Target.Type == ((OutputViewModel)target).Type)
                 {
-                    connection = editor.Connect((OutputViewModel)target, _target);
+                    connection = editor.Connect((OutputViewModel)target, Target);
                 }
-                _source = null; //Set these values to null that way they aren't saved in memory
-                _target = null;
+                Source = null; //Set these values to null that way they aren't saved in memory
+                Target = null;
 
                 #region Edit Ebx
 

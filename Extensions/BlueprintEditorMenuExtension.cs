@@ -18,7 +18,7 @@ namespace BlueprintEditor.Extensions
 
         public override RelayCommand MenuItemClicked => new RelayCommand((o) =>
         {
-            if (App.EditorWindow.GetOpenedAssetEntry() != null && EditorUtils.Editor == null)
+            if (App.EditorWindow.GetOpenedAssetEntry() != null && !EditorUtils.Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
             {
                 BlueprintEditorWindow blueprintEditor = new BlueprintEditorWindow();
                 blueprintEditor.Show();
@@ -29,9 +29,9 @@ namespace BlueprintEditor.Extensions
             {
                 App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
             }
-            else if (EditorUtils.Editor != null)
+            else if (EditorUtils.Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
             {
-                App.Logger.LogWarning("There can only be one blueprint editor open at a time.");
+                App.Logger.LogError("This editor is already open.");
             }
         });
     }

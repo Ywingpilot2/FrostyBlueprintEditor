@@ -17,7 +17,8 @@
                    ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterOwner"
                    Icon="pack://application:,,,/BlueprintEditor;component/Images/BlueprintEdit.png"
                    x:Name="BlueprintWindow"
-                   Closing="BlueprintEditorWindow_OnClosing">
+                   Closing="BlueprintEditorWindow_OnClosing"
+                   GotMouseCapture="BlueprintEditorWindow_OnGotFocus">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -141,18 +142,22 @@
                                                           CompletedCommand="{Binding FinishCommand}"
                                                           AllowOnlyConnectors="True" 
                                                           EnableSnapping="True"
-                                                            
-                                                          />
+                                                          SourceAnchor="{Binding SourceAnchor}"
+                                                          TargetAnchor="{Binding TargetAnchor}">
+                            </nodify:PendingConnection>
                         </DataTemplate>
                     </nodify:NodifyEditor.PendingConnectionTemplate>
 
                     <!--Defines a variety of stylistic things relating to nodes(e.g border color)-->
                     <nodify:NodifyEditor.ItemContainerStyle>
-                        <Style TargetType="{x:Type nodify:ItemContainer}">
+                        <Style TargetType="{x:Type nodify:ItemContainer}"
+                               BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
                             <Setter Property="Location"
                                     Value="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Setter Property="BorderThickness"
                                     Value="2"></Setter>
+                            <Setter Property="HighlightBrush"
+                                    Value="{StaticResource NodeSelectedColor}"></Setter>
                             <Setter Property="BorderBrush"
                                     Value="{StaticResource NodeBorderColor}"></Setter>
                             <Setter Property="SelectedBrush"

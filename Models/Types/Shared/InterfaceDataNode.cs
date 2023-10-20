@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using BlueprintEditor.Models.Connections;
+using BlueprintEditor.Utils;
 using FrostySdk.Ebx;
 
 namespace BlueprintEditor.Models.Types.Shared
@@ -49,7 +50,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property }
                             }
                             };
-                            InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            EditorUtils.CurrentEditor.InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
                             return interfaceNode;
                         }
                         else
@@ -66,7 +67,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property }
                             }
                             };
-                            InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            EditorUtils.CurrentEditor.InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
                             return interfaceNode;
                         }
 
@@ -88,7 +89,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event }
                             }
                             };
-                            InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            EditorUtils.CurrentEditor.InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
                             return interfaceNode;
                         }
                         else
@@ -105,7 +106,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event }
                             },
                             };
-                            InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            EditorUtils.CurrentEditor.InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
                             return interfaceNode;
                         }
                         break;
@@ -126,7 +127,7 @@ namespace BlueprintEditor.Models.Types.Shared
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Link }
                             }
                             };
-                            InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            EditorUtils.CurrentEditor.InterfaceOutputDataNodes.Add(interfaceItem.Name, interfaceNode);
                             return interfaceNode;
                         }
                         else
@@ -143,16 +144,13 @@ namespace BlueprintEditor.Models.Types.Shared
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Link }
                             }
                             };
-                            InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
+                            EditorUtils.CurrentEditor.InterfaceInputDataNodes.Add(interfaceItem.Name, interfaceNode);
                             return interfaceNode;
                         }
                         break;
                     }
             }
         }
-
-        public static Dictionary<string, InterfaceDataNode> InterfaceInputDataNodes = new Dictionary<string, InterfaceDataNode>();
-        public static Dictionary<string, InterfaceDataNode> InterfaceOutputDataNodes = new Dictionary<string, InterfaceDataNode>();
 
         public override bool Equals(object obj)
         {

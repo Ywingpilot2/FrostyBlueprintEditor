@@ -5,7 +5,9 @@
     xmlns:core="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
     xmlns:ctrl="clr-namespace:Frosty.Controls;assembly=FrostyControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:fdev="FrostyDeveloper">
+    xmlns:fdev="FrostyDeveloper"
+    xmlns:nodify="https://miroiu.github.io/nodify"
+    xmlns:connections="clr-namespace:BlueprintEditor.Models.Connections">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
@@ -23,10 +25,11 @@
                      Color="#3F3F3F" />
     <SolidColorBrush x:Key="Background"
                      Color="#C2C2C2" />
-    <SolidColorBrush x:Key="NodeSelectedColor"
-                     Color="#040404" />
+    
     <SolidColorBrush x:Key="NodeBorderColor"
-                     Color="#040404" />
+                     Color="Transparent" />
+    <SolidColorBrush x:Key="NodeSelectedColor"
+                     Color="#EEE8AB" />
     
     <SolidColorBrush x:Key="CanvasBackground" Color="#141414"/>
     <SolidColorBrush x:Key="CanvasGridMajor" Color="#000000"/>

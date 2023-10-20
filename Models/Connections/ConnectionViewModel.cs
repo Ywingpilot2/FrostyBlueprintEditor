@@ -78,7 +78,7 @@ namespace BlueprintEditor.Models.Connections
             Source.IsConnected = true;
             Target.IsConnected = true;
 
-            Parallel.ForEach(EditorUtils.Editor.Nodes, node =>
+            Parallel.ForEach(EditorUtils.CurrentEditor.Nodes, node =>
             {
                 if (node.Inputs.Contains(Target))
                 {
@@ -105,7 +105,15 @@ namespace BlueprintEditor.Models.Connections
             {
                 if (obj.GetType() == GetType())
                 {
-                    connectionB = ((ConnectionViewModel)obj).Object;
+                    ConnectionViewModel connection2 = ((ConnectionViewModel)obj);
+                    if (connection2.Type == Type)
+                    {
+                        connectionB = connection2.Object;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else if (obj.GetType() == Object.GetType())
                 {

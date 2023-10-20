@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Reflection;
+using System.Windows;
+using System.Windows.Data;
 using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types;
+using Frosty.Core;
 using FrostySdk.IO;
+using Nodify;
 
 namespace BlueprintEditor.Utils
 {
@@ -16,24 +21,28 @@ namespace BlueprintEditor.Utils
     /// </summary>
     public static class EditorUtils
     {
-        public static EditorViewModel Editor;
-
-        private static Object typesList_selectedItem;
+        /// <summary>
+        /// A list of all Editors
+        /// </summary>
+        public static Dictionary<string, EditorViewModel> Editors = new Dictionary<string, EditorViewModel>();
 
         /// <summary>
-        /// The item that is currently selected in the TypesList
+        /// This gets the currently open <see cref="EditorViewModel"/>
         /// </summary>
-        public static NodeTypeViewModel TypesViewModelListSelectedItem
+        public static EditorViewModel CurrentEditor
         {
             get
             {
-                if (typesList_selectedItem == null) return null;
-
-                return (NodeTypeViewModel)typesList_selectedItem;
+                EditorViewModel editor = null;
+                //So frosty task window doesn't fucksplode
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    editor = Editors[App.EditorWindow.GetOpenedAssetEntry().Filename];
+                });
+                return editor;
             }
-            set => typesList_selectedItem = value;
         }
-        
+
         public static int LayoutNodes(NodeBaseModel node, Dictionary<NodeBaseModel, List<NodeBaseModel>> children, List<List<NodeBaseModel>> columns, List<NodeBaseModel> alreadyProcessed, int column)
         {
             if (alreadyProcessed.Contains(node))

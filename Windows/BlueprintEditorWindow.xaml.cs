@@ -29,12 +29,15 @@ namespace BlueprintEditor.Windows
     public partial class BlueprintEditorWindow : FrostyWindow
     {
         private readonly Random _rng = new Random();
+        private readonly EbxAssetEntry _file;
+        private NodeTypeViewModel _selectedType;
 
         public BlueprintEditorWindow()
         {
             InitializeComponent();
             Owner = Application.Current.MainWindow;
             Title = $"Ebx Graph({App.EditorWindow.GetOpenedAssetEntry().Filename})";
+            _file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
             
             //Setup UI methods
             TypesList_FilterBox.KeyUp += FilterBox_FilterEnter;
@@ -64,27 +67,27 @@ namespace BlueprintEditor.Windows
             foreach (PointerRef ptr in openedProperties.Objects) 
             {
                 object obj = ptr.Internal;
-                NodeBaseModel node = NodeUtils.CreateNodeFromObject(obj);
+                NodeBaseModel node = EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
                 node.Guid = ((dynamic)obj).GetInstanceGuid();
             }
 
             // cache shit
             Dictionary<AssetClassGuid, int> instanceGuids = new Dictionary<AssetClassGuid, int>();
 
-            for (int i = 0; i < EditorUtils.Editor.Nodes.Count; i++)
+            for (int i = 0; i < EditorUtils.CurrentEditor.Nodes.Count; i++)
             {
-                if (instanceGuids.ContainsKey(EditorUtils.Editor.Nodes[i].Guid))
+                if (instanceGuids.ContainsKey(EditorUtils.CurrentEditor.Nodes[i].Guid))
                 {
                     continue;
                 }
-                instanceGuids.Add(EditorUtils.Editor.Nodes[i].Guid, i);
+                instanceGuids.Add(EditorUtils.CurrentEditor.Nodes[i].Guid, i);
             }
 
             #region Create interface node
 
             PointerRef interfaceRef = (PointerRef) openedProperties.Interface;
 
-            NodeUtils.CreateInterfaceNodes(interfaceRef.Internal);
+            EditorUtils.CurrentEditor.CreateInterfaceNodes(interfaceRef.Internal);
 
             #endregion
                 
@@ -102,29 +105,24 @@ namespace BlueprintEditor.Windows
                 AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
                 AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
 
-                if (sourceNode != null && targetNode != null) break;
-
-                string asdasd = (string)propertyConnection.SourceField.ToString();
-                string asdasdasd = (string)propertyConnection.TargetField.ToString();
-
                 //First check if the the node is an interface node
-                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
                 {
-                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
+                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
                 }
                 else
                 {
-                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                    sourceNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[sourceGuid]];
                 }
 
 
-                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
                 {
-                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
+                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
                 }
                 else
                 {
-                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                    targetNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[targetGuid]];
                 }
 
                 //We encountered an error
@@ -139,7 +137,7 @@ namespace BlueprintEditor.Windows
                 OutputViewModel sourceOutput = sourceNode.GetOutput(propertyConnection.SourceField,
                     ConnectionType.Property, true);
 
-                var connection = EditorUtils.Editor.Connect(sourceOutput, targetInput);
+                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
                 connection.Object = propertyConnection;
             }
                 
@@ -155,25 +153,23 @@ namespace BlueprintEditor.Windows
                 AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
                 AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
 
-                if (sourceNode != null && targetNode != null) break;
-                    
                 //First check if the the node is an interface node
-                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
                 {
-                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
+                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
                 }
                 else
                 {
-                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                    sourceNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[sourceGuid]];
                 }
 
-                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
                 {
-                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
+                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
                 }
                 else
                 {
-                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                    targetNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[targetGuid]];
                 }
 
 
@@ -189,7 +185,7 @@ namespace BlueprintEditor.Windows
                 OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name,
                     ConnectionType.Event, true);
                         
-                var connection = EditorUtils.Editor.Connect(sourceOutput, targetInput);
+                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
                 connection.Object = eventConnection;
             }
                 
@@ -206,22 +202,22 @@ namespace BlueprintEditor.Windows
                 AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
 
                 //First check if the the node is an interface node
-                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
                 {
-                    sourceNode = InterfaceDataNode.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
+                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
                 }
                 else
                 {
-                    sourceNode = EditorUtils.Editor.Nodes[instanceGuids[sourceGuid]];
+                    sourceNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[sourceGuid]];
                 }
 
-                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeUtils.InterfaceGuid)
+                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
                 {
-                    targetNode = InterfaceDataNode.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
+                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
                 }
                 else
                 {
-                    targetNode = EditorUtils.Editor.Nodes[instanceGuids[targetGuid]];
+                    targetNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[targetGuid]];
                 }
 
 
@@ -249,19 +245,17 @@ namespace BlueprintEditor.Windows
                 OutputViewModel sourceOutput = sourceNode.GetOutput(targetField,
                     ConnectionType.Link, true);
                         
-                var connection = EditorUtils.Editor.Connect(sourceOutput, targetInput);
+                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
                 connection.Object = linkConnection;
             }
 
             #endregion
 
-            InterfaceDataNode.InterfaceInputDataNodes.Clear();
-            InterfaceDataNode.InterfaceOutputDataNodes.Clear();
-
             instanceGuids.Clear();
 
             ApplyAutoLayout();
         }
+        
         /// <summary>
         /// Applies auto layout as made & used by LevelEditor
         /// </summary>
@@ -275,13 +269,13 @@ namespace BlueprintEditor.Windows
                 Dictionary<NodeBaseModel, List<NodeBaseModel>> ancestors = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
                 Dictionary<NodeBaseModel, List<NodeBaseModel>> children = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
 
-                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
+                foreach (NodeBaseModel node in EditorUtils.CurrentEditor.Nodes)
                 {
                     ancestors.Add(node, new List<NodeBaseModel>());
                     children.Add(node, new List<NodeBaseModel>());
                 }
 
-                foreach (ConnectionViewModel connection in EditorUtils.Editor.Connections)
+                foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.Connections)
                 {
                     ancestors[connection.TargetNode].Add(connection.SourceNode);
                     children[connection.SourceNode].Add(connection.TargetNode);
@@ -293,7 +287,7 @@ namespace BlueprintEditor.Windows
                 int columnIdx = 1;
                 columns.Add(new List<NodeBaseModel>());
 
-                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
+                foreach (NodeBaseModel node in EditorUtils.CurrentEditor.Nodes)
                 {
                     if (ancestors[node].Count == 0 && children[node].Count == 0)
                     {
@@ -309,7 +303,7 @@ namespace BlueprintEditor.Windows
                 }
 
                 columnIdx = 1;
-                foreach (NodeBaseModel node in EditorUtils.Editor.Nodes)
+                foreach (NodeBaseModel node in EditorUtils.CurrentEditor.Nodes)
                 {
                     if (!alreadyProcessed.Contains(node))
                     {
@@ -349,55 +343,47 @@ namespace BlueprintEditor.Windows
         {
             if (e.Key == Key.Delete)
             {
-                while (EditorUtils.Editor.SelectedNodes.Count != 0)
+                while (EditorUtils.CurrentEditor.SelectedNodes.Count != 0)
                 {
-                    NodeUtils.DeleteNode(EditorUtils.Editor.SelectedNodes[0]);
+                    EditorUtils.CurrentEditor.DeleteNode(EditorUtils.CurrentEditor.SelectedNodes[0]);
                 }
             }
         }
 
         private void BlueprintEditorWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            EditorUtils.Editor = null;
+            //TODO: Save Layouts
+            EditorUtils.Editors.Remove(_file.Filename);
+        }
+        
+        private void BlueprintEditorWindow_OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            App.EditorWindow.OpenAsset(_file);
         }
 
         #endregion
         
-        #region TypesList
-
-        private void TypesList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1)
-            {
-                EditorUtils.TypesViewModelListSelectedItem = null;
-                return;
-            }
-            EditorUtils.TypesViewModelListSelectedItem = (NodeTypeViewModel)e.AddedItems[0];
-        }
-
-        #endregion
-
         #region Buttons
 
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
-            while (EditorUtils.Editor.SelectedNodes.Count != 0)
+            while (EditorUtils.CurrentEditor.SelectedNodes.Count != 0)
             {
-                NodeUtils.DeleteNode(EditorUtils.Editor.SelectedNodes[0]);
+                EditorUtils.CurrentEditor.DeleteNode(EditorUtils.CurrentEditor.SelectedNodes[0]);
             }
         }
 
         private void AddButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (EditorUtils.TypesViewModelListSelectedItem == null) return;
+            if (_selectedType == null) return;
 
-            object obj = TypeLibrary.CreateObject(EditorUtils.TypesViewModelListSelectedItem.NodeType.Name);
-            NodeUtils.CreateNodeFromObject(obj);
+            object obj = TypeLibrary.CreateObject(_selectedType.NodeType.Name);
+            EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
             PointerRef pointerRef = new PointerRef(obj);
             AssetClassGuid guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(
-                EditorUtils.Editor.EditedEbxAsset.Objects,
-                EditorUtils.TypesViewModelListSelectedItem.NodeType,
-                EditorUtils.Editor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
+                EditorUtils.CurrentEditor.EditedEbxAsset.Objects,
+                _selectedType.NodeType,
+                EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
             ((dynamic)pointerRef.Internal).SetInstanceGuid(guid);
             
             //No idea what this does
@@ -408,10 +394,10 @@ namespace BlueprintEditor.Windows
                 pointerRef.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(pointerRef.Internal, value);
             }
             
-            EditorUtils.Editor.EditedEbxAsset.AddObject(pointerRef.Internal);
-            EditorUtils.Editor.EditedProperties.Objects.Add(pointerRef);
+            EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
+            EditorUtils.CurrentEditor.EditedProperties.Objects.Add(pointerRef);
             
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.Editor.EditedEbxAsset.FileGuid).Name, EditorUtils.Editor.EditedEbxAsset);
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
         }
         
@@ -428,7 +414,19 @@ namespace BlueprintEditor.Windows
         }
 
         #endregion
+        
+        #region TypesList
 
+        private void TypesList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1)
+            {
+                _selectedType = null;
+                return;
+            }
+            _selectedType = (NodeTypeViewModel)e.AddedItems[0];
+        }
+        
         #region FilterBox
 
         private void FilterBox_FilterEnter(object sender, KeyEventArgs e)
@@ -450,6 +448,8 @@ namespace BlueprintEditor.Windows
 
             TypesList.Items.Filter = null;
         }
+
+        #endregion
 
         #endregion
     }
