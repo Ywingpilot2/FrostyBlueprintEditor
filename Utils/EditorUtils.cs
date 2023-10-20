@@ -93,7 +93,7 @@ namespace BlueprintEditor.Utils
             MainWindow frosty = Application.Current.MainWindow as MainWindow;
 
             //Get the name of the project(make sure to remove .fbproject)
-            string projectName = frosty.Project.DisplayName.Split()[0];
+            string projectName = frosty.Project.DisplayName.Split('.')[0];
 
             //Replace all occurences of "/" with "\" as to avoid issues with creating the filepath
             string assetPath = file.Name.Replace("/", @"\");
