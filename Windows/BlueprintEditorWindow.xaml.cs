@@ -122,7 +122,6 @@ namespace BlueprintEditor.Windows
             if (_selectedType == null) return;
 
             object obj = TypeLibrary.CreateObject(_selectedType.NodeType.Name);
-            EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
             PointerRef pointerRef = new PointerRef(obj);
             AssetClassGuid guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(
                 EditorUtils.CurrentEditor.EditedEbxAsset.Objects,
@@ -140,6 +139,7 @@ namespace BlueprintEditor.Windows
             
             EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
             EditorUtils.CurrentEditor.EditedProperties.Objects.Add(pointerRef);
+            EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
             
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();

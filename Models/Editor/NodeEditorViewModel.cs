@@ -129,6 +129,7 @@ namespace BlueprintEditor.Models.Editor
             }
             
             newNode.Object = obj;
+            newNode.Guid = ((dynamic)obj).GetInstanceGuid();
             newNode.OnCreation();
 
             EditorUtils.CurrentEditor.Nodes.Add(newNode);

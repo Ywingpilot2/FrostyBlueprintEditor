@@ -41,7 +41,6 @@ namespace BlueprintEditor.Models.Types.BlueprintLoaderTypes
             {
                 object obj = ptr.Internal;
                 NodeBaseModel node = EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
-                node.Guid = ((dynamic)obj).GetInstanceGuid();
                 if (NodeIdCache.ContainsKey(node.Guid))
                 {
                     continue;
