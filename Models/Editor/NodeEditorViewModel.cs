@@ -124,9 +124,9 @@ namespace BlueprintEditor.Models.Editor
             {
                 newNode = new NodeBaseModel();
                 newNode.Inputs = NodeUtils.GenerateNodeInputs(obj.GetType(), newNode);
+                newNode.Name = obj.GetType().Name;
             }
-
-            newNode.Name = obj.GetType().Name;
+            
             newNode.Object = obj;
             newNode.OnCreation();
 
