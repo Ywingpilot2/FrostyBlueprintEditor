@@ -75,9 +75,11 @@ namespace BlueprintEditor.Utils
                     double y = double.Parse(line.Split(',')[2]);
 
                     //If this node is invalid
-                    if (CurrentEditor.Nodes.Count < idx)
+                    if (CurrentEditor.Nodes.Count == idx)
                     {
                         App.Logger.LogError("Node in saved layout was invalid. Issues may occur!");
+                        line = sr.ReadLine();
+                        continue;
                     }
 
                     CurrentEditor.Nodes[idx].Location = new Point(x, y);
