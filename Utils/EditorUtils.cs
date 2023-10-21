@@ -47,6 +47,8 @@ namespace BlueprintEditor.Utils
             }
         }
 
+        #region Layouts
+
         /// <summary>
         /// Applies either an existing layout or if one cannot be found an automatic layout
         /// </summary>
@@ -56,14 +58,14 @@ namespace BlueprintEditor.Utils
             MainWindow frosty = Application.Current.MainWindow as MainWindow;
 
             //Get the name of the project(make sure to remove .fbproject)
-            string projectName = frosty.Project.DisplayName.Split()[0];
+            string projectName = frosty.Project.DisplayName.Split('.')[0];
             
             //Replace all occurences of "/" with "\" as to avoid issues with creating the filepath
             string assetPath = file.Name.Replace("/", @"\");
 
-            if (File.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt"))
+            if (File.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt"))
             {
-                StreamReader sr = new StreamReader($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt");
+                StreamReader sr = new StreamReader($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt");
                 
                 string line = sr.ReadLine();
                 while (line != null)
@@ -71,6 +73,12 @@ namespace BlueprintEditor.Utils
                     int idx = int.Parse(line.Split(',')[0]);
                     double x = double.Parse(line.Split(',')[1]);
                     double y = double.Parse(line.Split(',')[2]);
+
+                    //If this node is invalid
+                    if (CurrentEditor.Nodes.Count < idx)
+                    {
+                        App.Logger.LogError("Node in saved layout was invalid. Issues may occur!");
+                    }
 
                     CurrentEditor.Nodes[idx].Location = new Point(x, y);
                     line = sr.ReadLine();
@@ -99,7 +107,7 @@ namespace BlueprintEditor.Utils
             string assetPath = file.Name.Replace("/", @"\");
             
             //Now we can create the filepath
-            string filePath = $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt";
+            string filePath = $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt";
             
             //First check if filepath exists, if it doesn't we create it
             FileInfo fi = new FileInfo(filePath);
@@ -204,7 +212,7 @@ namespace BlueprintEditor.Utils
             }
         }
 
-        public static int LayoutNodes(NodeBaseModel node, Dictionary<NodeBaseModel, List<NodeBaseModel>> children, List<List<NodeBaseModel>> columns, List<NodeBaseModel> alreadyProcessed, int column)
+        private static int LayoutNodes(NodeBaseModel node, Dictionary<NodeBaseModel, List<NodeBaseModel>> children, List<List<NodeBaseModel>> columns, List<NodeBaseModel> alreadyProcessed, int column)
         {
             if (alreadyProcessed.Contains(node))
             {
@@ -236,5 +244,7 @@ namespace BlueprintEditor.Utils
 
             return column;
         }
+
+        #endregion
     }
 }

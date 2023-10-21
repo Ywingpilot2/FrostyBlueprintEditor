@@ -1,0 +1,6 @@
+﻿Type = SyncedBoolEntityData
+DisplayName = Synced Bool
+InputEvent = SetTrue
+InputEvent = SetFalse
+InputProperty = In
+OutputProperty = Out

@@ -76,20 +76,58 @@ namespace BlueprintEditor.Models.Editor
         public NodeBaseModel CreateNodeFromObject(object obj)
         {
             string key = obj.GetType().Name;
-            if (!NodeUtils.NodeExtensions.ContainsKey(key))
-            {
-                key = "null";
-            }
-
-            var newNode = (NodeBaseModel)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
-            newNode.Name = obj.GetType().Name;
-            newNode.Object = obj;
+            NodeBaseModel newNode = null;
             
-            if (key == "null")
+            if (NodeUtils.NodeExtensions.ContainsKey(key))
             {
+                newNode = (NodeBaseModel)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
+            }
+            else if (NodeUtils.NmcExtensions.ContainsKey(key))
+            {
+                newNode = new NodeBaseModel();
+                foreach (string arg in NodeUtils.NmcExtensions[key])
+                {
+                    switch (arg.Split('=')[0])
+                    {
+                        case "DisplayName":
+                        {
+                            newNode.Name = arg.Split('=')[1];
+                        } break;
+                        case "InputEvent":
+                        {
+                            newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
+                        } break;
+                        case "InputProperty":
+                        {
+                            newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
+                        } break;
+                        case "InputLink":
+                        {
+                            newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
+                        } break;
+                        case "OutputEvent":
+                        {
+                            newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
+                        } break;
+                        case "OutputProperty":
+                        {
+                            newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
+                        } break;
+                        case "OutputLink":
+                        {
+                            newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
+                        } break;
+                    }
+                }
+            }
+            else //We could not find an extension
+            {
+                newNode = new NodeBaseModel();
                 newNode.Inputs = NodeUtils.GenerateNodeInputs(obj.GetType(), newNode);
             }
-            
+
+            newNode.Name = obj.GetType().Name;
+            newNode.Object = obj;
             newNode.OnCreation();
 
             EditorUtils.CurrentEditor.Nodes.Add(newNode);

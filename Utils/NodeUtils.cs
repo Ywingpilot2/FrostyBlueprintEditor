@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Reflection;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types;
@@ -16,6 +17,8 @@ namespace BlueprintEditor.Utils
         /// A list of extensions for nodes
         /// </summary>
         public static Dictionary<string, NodeBaseModel> NodeExtensions = new Dictionary<string, NodeBaseModel>();
+
+        public static Dictionary<string, List<string>> NmcExtensions = new Dictionary<string, List<string>>(); 
 
         private static string[] DataTypes =
         {
@@ -85,6 +88,71 @@ namespace BlueprintEditor.Utils
                 {
                     var extension = (NodeBaseModel)Activator.CreateInstance(type);
                     NodeExtensions.Add(extension.ObjectType, extension);
+                }
+            }
+            
+            //Check if the directory for nmc's exists
+            if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings"))
+            {
+                Directory.CreateDirectory($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings");
+            }
+
+            //Read our xml-style NodeMappings
+            foreach (string file in Directory.GetFiles($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings", "*.nmc", SearchOption.AllDirectories))
+            {
+                StreamReader sr = new StreamReader(@file);
+                string type = null;
+                List<string> args = new List<string>();
+                
+                string currentLine = sr.ReadLine();
+                while (currentLine != null)
+                {
+                    switch (currentLine.Replace(" = ", "=").Split('=')[0])
+                    {
+                        case "Type":
+                        {
+                            type = currentLine.Replace(" = ", "=").Split('=')[1];
+                        } break;
+                        case "DisplayName":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "InputEvent":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "InputProperty":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "InputLink":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "OutputEvent":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "OutputProperty":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "OutputLink":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        default:
+                        {
+                            App.Logger.LogError("{1} contains an invalid argument, {0}", currentLine, file);
+                        } break;
+                    }
+
+                    if (type != null && !NmcExtensions.ContainsKey(type))
+                    {
+                        NmcExtensions.Add(type, args);
+                    }
+
+                    currentLine = sr.ReadLine();
                 }
             }
         }
