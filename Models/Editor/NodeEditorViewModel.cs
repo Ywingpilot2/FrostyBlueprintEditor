@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types;
+using BlueprintEditor.Models.Types.EbxEditorTypes;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Models.Types.NodeTypes.Shared;
 using BlueprintEditor.Utils;
@@ -40,28 +42,36 @@ namespace BlueprintEditor.Models.Editor
         public ICommand DisconnectConnectorCommand { get; }
 
         public string EditorName { get; }
+        private EbxBaseEditor EbxEditor { get; }
         public EbxAsset EditedEbxAsset { get; set; }
-        public AssetClassGuid InterfaceGuid { get; set; }
         public dynamic EditedProperties => EditedEbxAsset.RootObject;
+        public AssetClassGuid InterfaceGuid { get; private set; }
 
         public EditorViewModel()
         {
             EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.EditorWindow.GetOpenedAssetEntry());
             EditorName = App.EditorWindow.GetOpenedAssetEntry().Filename;
             
-            PendingConnection = new PendingConnectionViewModel(this);
+            EbxEditor = new EbxBaseEditor();
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
+            {
+                if (type.IsSubclassOf(typeof(EbxBaseEditor)))
+                {
+                    var extension = (EbxBaseEditor)Activator.CreateInstance(type);
+                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
+                    EbxEditor = extension;
+                    break;
+                }
+            }
+            
+            PendingConnection = new PendingConnectionViewModel(this, EbxEditor);
             
             DisconnectConnectorCommand = new DelegateCommand<Object>(connector =>
             {
                 //ConnectionViewModel connection = connector.GetType().Name == "InputViewModel" ? Connections.First(x => x.Target == connector) : Connections.First(x => x.Source == connector);
-                if (connector.GetType().Name == "InputViewModel")
-                {
-                    Disconnect(Connections.First(x => x.Target == connector));
-                }
-                else
-                {
-                    Disconnect(Connections.First(x => x.Source == connector));
-                }
+                Disconnect(connector.GetType().Name == "InputViewModel"
+                    ? Connections.First(x => x.Target == connector)
+                    : Connections.First(x => x.Source == connector));
             });
 
             EditorUtils.Editors.Add(EditorName, this);
@@ -77,7 +87,7 @@ namespace BlueprintEditor.Models.Editor
         public NodeBaseModel CreateNodeFromObject(object obj)
         {
             string key = obj.GetType().Name;
-            NodeBaseModel newNode = null;
+            NodeBaseModel newNode;
             
             if (NodeUtils.NodeExtensions.ContainsKey(key))
             {
@@ -132,7 +142,7 @@ namespace BlueprintEditor.Models.Editor
             newNode.Guid = ((dynamic)obj).GetInstanceGuid();
             newNode.OnCreation();
 
-            EditorUtils.CurrentEditor.Nodes.Add(newNode);
+            Nodes.Add(newNode);
             return newNode;
         }
 
@@ -293,11 +303,8 @@ namespace BlueprintEditor.Models.Editor
                 EditorUtils.CurrentEditor.Disconnect(connection);
             }
 
-            //Remove the object pointer
-            List<PointerRef> pointerRefs = EditorUtils.CurrentEditor.EditedProperties.Objects;
-            pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == node.Object.GetInstanceGuid());
+            EbxEditor.RemoveNodeObject(node);
             
-            EditorUtils.CurrentEditor.EditedEbxAsset.RemoveObject(node.Object);
             EditorUtils.CurrentEditor.Nodes.Remove(node);
             
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
@@ -395,8 +402,8 @@ namespace BlueprintEditor.Models.Editor
 
             return connection;
         }
-        
-        public void Disconnect(ConnectionViewModel connection)
+
+        private void Disconnect(ConnectionViewModel connection)
         {
             App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid));
             
@@ -419,41 +426,8 @@ namespace BlueprintEditor.Models.Editor
             connection.Source.IsConnected = sourceConnected;
             connection.Target.IsConnected = targetConnected;
             
-            //TODO: This code sucks! Please find a faster way to find the connection and remove it
-            switch (connection.Type)
-            {
-                case ConnectionType.Event:
-                {
-                    foreach (dynamic eventConnection in EditedProperties.EventConnections)
-                    {
-                        if (!connection.Equals(eventConnection)) continue;
-                        EditedProperties.EventConnections.Remove(eventConnection);
-                        break;
-                    }
-                    break;
-                }
-                case ConnectionType.Property:
-                {
-                    foreach (dynamic propertyConnection in EditedProperties.PropertyConnections)
-                    {
-                        if (!connection.Equals(propertyConnection)) continue;
-                        EditedProperties.PropertyConnections.Remove(propertyConnection);
-                        break;
-                    }
-                    break;
-                }
-                case ConnectionType.Link:
-                {
-                    foreach (dynamic linkConnection in EditedProperties.LinkConnections)
-                    {
-                        if (!connection.Equals(linkConnection)) continue;
-                        EditedProperties.LinkConnections.Remove(linkConnection);
-                        break;
-                    }
-                    break;
-                }
-            }
-            
+            EbxEditor.RemoveConnectionObject(connection);
+
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
             Connections.Remove(connection);
@@ -539,12 +513,12 @@ namespace BlueprintEditor.Models.Editor
         public Point SourceAnchor { get; set; }
         public Point TargetAnchor { get; set; }
         
-        public PendingConnectionViewModel(EditorViewModel editor)
+        public PendingConnectionViewModel(EditorViewModel nodeEditor, EbxBaseEditor ebxEditor)
         {
             StartCommand = new DelegateCommand<Object>(source =>
             {
                 //Open the asset when editing in order to ensure the least issues
-                App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(editor.EditedEbxAsset.FileGuid));
+                App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(nodeEditor.EditedEbxAsset.FileGuid));
                 if (source.GetType().Name == "OutputViewModel")
                 {
                     Source = (OutputViewModel)source;
@@ -559,67 +533,20 @@ namespace BlueprintEditor.Models.Editor
                 ConnectionViewModel connection = null;
                 if (target != null && target.GetType().Name != "OutputViewModel" && Source != null && Source.Type == ((InputViewModel)target).Type)
                 {
-                    connection = editor.Connect(Source, (InputViewModel)target);
+                    connection = nodeEditor.Connect(Source, (InputViewModel)target);
                 }
                 else if (target != null && target.GetType().Name == "OutputViewModel" && Target != null && Target.Type == ((OutputViewModel)target).Type)
                 {
-                    connection = editor.Connect((OutputViewModel)target, Target);
+                    connection = nodeEditor.Connect((OutputViewModel)target, Target);
                 }
                 Source = null; //Set these values to null that way they aren't saved in memory
                 Target = null;
 
                 #region Edit Ebx
+                
+                ebxEditor.CreateConnectionObject(connection);
 
-                if (connection != null)
-                    switch (connection.Type)
-                    {
-                        case ConnectionType.Event:
-                        {
-                            dynamic eventConnection = TypeLibrary.CreateObject("EventConnection");
-
-                            eventConnection.Source = new PointerRef(connection.SourceNode.Object);
-                            eventConnection.Target = new PointerRef(connection.TargetNode.Object);
-                            eventConnection.SourceEvent.Name = connection.SourceField;
-                            eventConnection.TargetEvent.Name = connection.TargetField;
-
-                            ((dynamic)editor.EditedEbxAsset.RootObject).EventConnections
-                                .Add(eventConnection);
-                            connection.Object = eventConnection;
-                            break;
-                        }
-                        case ConnectionType.Property:
-                        {
-                            dynamic propertyConnection = TypeLibrary.CreateObject("PropertyConnection");
-
-                            propertyConnection.Source = new PointerRef(connection.SourceNode.Object);
-                            propertyConnection.Target = new PointerRef(connection.TargetNode.Object);
-                            propertyConnection.SourceField = connection.SourceField;
-                            propertyConnection.TargetField = connection.TargetField;
-
-                            ((dynamic)editor.EditedEbxAsset.RootObject).PropertyConnections
-                                .Add(propertyConnection);
-                            connection.Object = propertyConnection;
-
-                            break;
-                        }
-                        case ConnectionType.Link:
-                        {
-                            dynamic linkConnection = TypeLibrary.CreateObject("LinkConnection");
-
-                            linkConnection.Source = new PointerRef(connection.SourceNode.Object);
-                            linkConnection.Target = new PointerRef(connection.TargetNode.Object);
-                            linkConnection.SourceField = connection.SourceField;
-                            linkConnection.TargetField = connection.TargetField;
-
-                            ((dynamic)editor.EditedEbxAsset.RootObject).LinkConnections.Add(
-                                linkConnection);
-                            connection.Object = linkConnection;
-
-                            break;
-                        }
-                    }
-
-                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(editor.EditedEbxAsset.FileGuid).Name, editor.EditedEbxAsset);
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(nodeEditor.EditedEbxAsset.FileGuid).Name, nodeEditor.EditedEbxAsset);
                 App.EditorWindow.DataExplorer.RefreshItems();
 
                 #endregion

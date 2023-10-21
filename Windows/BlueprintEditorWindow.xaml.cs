@@ -15,7 +15,7 @@ using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.BlueprintLoaderTypes;
+using BlueprintEditor.Models.Types.EbxLoaderTypes;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using Frosty.Controls;
@@ -60,16 +60,15 @@ namespace BlueprintEditor.Windows
             EbxAsset openedEbx = App.AssetManager.GetEbx(openedAsset);
             dynamic openedProperties = openedEbx.RootObject as dynamic;
 
-            BlueprintBaseLoader loader = new BlueprintBaseLoader();
+            EbxBaseLoader loader = new EbxBaseLoader();
             foreach (var type in Assembly.GetCallingAssembly().GetTypes())
             {
-                if (type.IsSubclassOf(typeof(BlueprintBaseLoader)))
+                if (type.IsSubclassOf(typeof(EbxBaseLoader)))
                 {
-                    var extension = (BlueprintBaseLoader)Activator.CreateInstance(type);
-                    if (extension.AssetType == App.EditorWindow.GetOpenedAssetEntry().Type)
-                    {
-                        loader = extension;
-                    }
+                    var extension = (EbxBaseLoader)Activator.CreateInstance(type);
+                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
+                    loader = extension;
+                    break;
                 }
             }
             

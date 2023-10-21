@@ -10,12 +10,15 @@ using BlueprintEditor.Utils;
 using FrostySdk;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.BlueprintLoaderTypes
+namespace BlueprintEditor.Models.Types.EbxLoaderTypes
 {
-    public class ScalableEmitterDocumentLoader : BlueprintBaseLoader
+    /// <summary>
+    /// For documentation please see <see cref="EbxBaseLoader"/>
+    /// </summary>
+    public class ScalableEmitterDocumentLoader : EbxBaseLoader
     {
-        public override string AssetType { get; } = "ScalableEmitterDocument";
-        
+        public override string AssetType => "ScalableEmitterDocument";
+
         public override void PopulateTypesList(ItemCollection itemsCollection)
         {
             //populate types list

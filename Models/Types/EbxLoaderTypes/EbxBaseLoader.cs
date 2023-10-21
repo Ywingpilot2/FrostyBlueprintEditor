@@ -9,16 +9,30 @@ using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.BlueprintLoaderTypes
+namespace BlueprintEditor.Models.Types.EbxLoaderTypes
 {
-    public class BlueprintBaseLoader
+    /// <summary>
+    /// This is the base class for a Blueprint Loader
+    /// If you ever wish to create a graphed form of a specific asset type(which this does not support)
+    /// you would want to make an extension of this
+    /// </summary>
+    public class EbxBaseLoader
     {
+        /// <summary>
+        /// This is the asset type that the Blueprint Loader uses
+        /// In this case its set to null, but you would want to set it to the asset type
+        /// e.g, LogicPrefabBlueprint
+        /// </summary>
         public virtual string AssetType { get; } = "null";
 
+        /// <summary>
+        /// Contains a list of AssetClassGuid's and the EditorViewModel.Nodes[] index
+        /// </summary>
         public Dictionary<AssetClassGuid, int> NodeIdCache = new Dictionary<AssetClassGuid, int>();
 
         /// <summary>
-        /// Populates the Types List with a list of addable types
+        /// This method is used to fill the Types list with types
+        /// TODO: Update this to instead be for something closer to LevelEditor's ToolBox
         /// </summary>
         /// <param name="itemsCollection"></param>
         public virtual void PopulateTypesList(ItemCollection itemsCollection)
@@ -33,7 +47,7 @@ namespace BlueprintEditor.Models.Types.BlueprintLoaderTypes
         /// <summary>
         /// This loads all of the nodes from the RootObject(so whats seen in the property grid) into the graph.
         /// </summary>
-        /// <param name="properties"></param>
+        /// <param name="properties">The properties from the RootObject. These are what you would see from the property grid when opening an asset</param>
         public virtual void PopulateNodes(dynamic properties)
         {
             //Create object nodes
