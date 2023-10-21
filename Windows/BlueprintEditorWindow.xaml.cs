@@ -15,7 +15,8 @@ using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.Shared;
+using BlueprintEditor.Models.Types.BlueprintLoaderTypes;
+using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using Frosty.Controls;
 using Frosty.Core.Windows;
@@ -44,12 +45,6 @@ namespace BlueprintEditor.Windows
             //Setup UI methods
             TypesList_FilterBox.KeyUp += FilterBox_FilterEnter;
             Editor.KeyUp += Editor_ControlInput;
-            
-            //populate types list
-            foreach (Type type in TypeLibrary.GetTypes("GameDataContainer"))
-            {
-                TypesList.Items.Add(new NodeTypeViewModel(type));
-            }
         }
 
         #region Editor
@@ -65,195 +60,22 @@ namespace BlueprintEditor.Windows
             EbxAsset openedEbx = App.AssetManager.GetEbx(openedAsset);
             dynamic openedProperties = openedEbx.RootObject as dynamic;
 
-            //Create object nodes
-            foreach (PointerRef ptr in openedProperties.Objects) 
+            BlueprintBaseLoader loader = new BlueprintBaseLoader();
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
             {
-                object obj = ptr.Internal;
-                NodeBaseModel node = EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
-                node.Guid = ((dynamic)obj).GetInstanceGuid();
+                if (type.IsSubclassOf(typeof(BlueprintBaseLoader)))
+                {
+                    var extension = (BlueprintBaseLoader)Activator.CreateInstance(type);
+                    if (extension.AssetType == App.EditorWindow.GetOpenedAssetEntry().Type)
+                    {
+                        loader = extension;
+                    }
+                }
             }
-
-            // cache shit
-            Dictionary<AssetClassGuid, int> instanceGuids = new Dictionary<AssetClassGuid, int>();
-
-            for (int i = 0; i < EditorUtils.CurrentEditor.Nodes.Count; i++)
-            {
-                if (instanceGuids.ContainsKey(EditorUtils.CurrentEditor.Nodes[i].Guid))
-                {
-                    continue;
-                }
-                instanceGuids.Add(EditorUtils.CurrentEditor.Nodes[i].Guid, i);
-            }
-
-            #region Create interface node
-
-            PointerRef interfaceRef = (PointerRef) openedProperties.Interface;
-
-            EditorUtils.CurrentEditor.CreateInterfaceNodes(interfaceRef.Internal);
-
-            #endregion
-                
-            #region Create Connections
-
-            //Create property connections
-            foreach (dynamic propertyConnection in openedProperties.PropertyConnections)
-            {
-                //TODO: Update to check if external ref
-                if (propertyConnection.Source.Internal == null || propertyConnection.Target.Internal == null) continue; 
-
-                NodeBaseModel sourceNode = null;
-                NodeBaseModel targetNode = null;
-
-                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
-                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
-
-                //First check if the the node is an interface node
-                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
-                {
-                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
-                }
-                else
-                {
-                    sourceNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[sourceGuid]];
-                }
-
-
-                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
-                {
-                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
-                }
-                else
-                {
-                    targetNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[targetGuid]];
-                }
-
-                //We encountered an error
-                if (sourceNode == null || targetNode == null)
-                {
-                    App.Logger.LogError("Node was null!");
-                    continue;
-                }
-                
-                InputViewModel targetInput =
-                    targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(propertyConnection.SourceField,
-                    ConnectionType.Property, true);
-
-                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
-                connection.Object = propertyConnection;
-            }
-                
-            //Create event connections
-            foreach (dynamic eventConnection in openedProperties.EventConnections)
-            {
-
-                if (eventConnection.Source.Internal == null || eventConnection.Target.Internal == null) continue;
-
-                NodeBaseModel sourceNode = null;
-                NodeBaseModel targetNode = null;
-
-                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
-                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
-
-                //First check if the the node is an interface node
-                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
-                {
-                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
-                }
-                else
-                {
-                    sourceNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[sourceGuid]];
-                }
-
-                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
-                {
-                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
-                }
-                else
-                {
-                    targetNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[targetGuid]];
-                }
-
-
-                //We encountered an error
-                if (sourceNode == null || targetNode == null)
-                {
-                    App.Logger.LogError("Node was null!");
-                    continue;
-                }
-                
-                InputViewModel targetInput =
-                    targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name,
-                    ConnectionType.Event, true);
-                        
-                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
-                connection.Object = eventConnection;
-            }
-                
-            //Create link connections
-            foreach (dynamic linkConnection in openedProperties.LinkConnections)
-            {
-                //TODO: Update to check if external ref
-                if (linkConnection.Source.Internal == null || linkConnection.Target.Internal == null) continue; 
-
-                NodeBaseModel sourceNode = null;
-                NodeBaseModel targetNode = null;
-
-                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)linkConnection.Source.Internal).GetInstanceGuid();
-                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
-
-                //First check if the the node is an interface node
-                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
-                {
-                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
-                }
-                else
-                {
-                    sourceNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[sourceGuid]];
-                }
-
-                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
-                {
-                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
-                }
-                else
-                {
-                    targetNode = EditorUtils.CurrentEditor.Nodes[instanceGuids[targetGuid]];
-                }
-
-
-                //We encountered an error
-                if (sourceNode == null || targetNode == null)
-                {
-                    App.Logger.LogError("Node was null!");
-                    continue;
-                }
-                
-                string sourceField = linkConnection.SourceField;
-                string targetField = linkConnection.TargetField;
-                if (sourceField == "0x00000000")
-                {
-                    sourceField = "self";
-                }
-
-                if (targetField == "0x00000000")
-                {
-                    targetField = "self";
-                }
-                        
-                InputViewModel targetInput =
-                    targetNode.GetInput(sourceField, ConnectionType.Link, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(targetField,
-                    ConnectionType.Link, true);
-                        
-                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
-                connection.Object = linkConnection;
-            }
-
-            #endregion
-
-            instanceGuids.Clear();
+            
+            loader.PopulateTypesList(TypesList.Items);
+            loader.PopulateNodes(openedProperties);
+            loader.CreateConnections(openedProperties);
 
             EditorUtils.ApplyLayouts(_file);
         }

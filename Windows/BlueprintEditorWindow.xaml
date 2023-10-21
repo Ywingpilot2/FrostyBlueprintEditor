@@ -11,6 +11,7 @@
                    xmlns:types="clr-namespace:BlueprintEditor.Models.Types"
                    xmlns:connections="clr-namespace:BlueprintEditor.Models.Connections"
                    xmlns:editor="clr-namespace:BlueprintEditor.Models.Editor"
+                   xmlns:nodeTypes="clr-namespace:BlueprintEditor.Models.Types.NodeTypes"
                    mc:Ignorable="d"
                    Title="Blueprint Graph" 
                    Height="480" Width="720"
@@ -83,7 +84,7 @@
 
                     <!--Node Definition(Changes how nodes are displayed in ui)-->
                     <nodify:NodifyEditor.ItemTemplate>
-                        <DataTemplate DataType="{x:Type types:NodeBaseModel}">
+                        <DataTemplate DataType="{x:Type nodeTypes:NodeBaseModel}">
                             <nodify:Node Header="{Binding Name}"
                                          Input="{Binding Inputs}"
                                          Output="{Binding Outputs}"
@@ -95,7 +96,7 @@
                                          FontFamily="Consolas">
 
                                 <nodify:Node.InputConnectorTemplate>
-                                    <DataTemplate DataType="{x:Type types:InputViewModel}">
+                                    <DataTemplate DataType="{x:Type nodeTypes:InputViewModel}">
                                         <nodify:NodeInput Header="{Binding Title}"
                                                           IsConnected="{Binding IsConnected}"
                                                           Anchor="{Binding Anchor, Mode=OneWayToSource}"
@@ -106,7 +107,7 @@
                                 </nodify:Node.InputConnectorTemplate>
 
                                 <nodify:Node.OutputConnectorTemplate>
-                                    <DataTemplate DataType="{x:Type types:OutputViewModel}">
+                                    <DataTemplate DataType="{x:Type nodeTypes:OutputViewModel}">
                                         <nodify:NodeOutput Header="{Binding Title}"
                                                            IsConnected="{Binding IsConnected}"
                                                            Anchor="{Binding Anchor, Mode=OneWayToSource}"

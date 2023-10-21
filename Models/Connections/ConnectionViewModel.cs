@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Media;
 using BlueprintEditor.Models.Types;
+using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using FrostySdk.Ebx;
 

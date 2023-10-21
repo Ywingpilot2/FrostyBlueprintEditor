@@ -69,13 +69,9 @@
     <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Types\GameSpecific\starwarsii" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)$(OutDir)Plugins\" />
-    <Exec Command="xcopy /Y $(ProjectDir)Models\Types\NodeMappingConfigs\ $(SolutionDir)$(OutDir)BlueprintEditor\NodeMappings\" />
+    <Exec Command="xcopy /Y $(ProjectDir)Models\Types\NodeTypes\NodeMappingConfigs\ $(SolutionDir)$(OutDir)BlueprintEditor\NodeMappings\" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />

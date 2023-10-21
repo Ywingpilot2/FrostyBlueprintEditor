@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.Shared;
+using BlueprintEditor.Models.Types.NodeTypes;
 using Frosty.Core;
 using FrostySdk.Ebx;
 
