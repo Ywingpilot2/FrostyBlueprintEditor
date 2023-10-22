@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using BlueprintEditor.Models.Connections;
+using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using FrostySdk;
@@ -21,6 +22,8 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
         /// e.g, LogicPrefabBlueprint
         /// </summary>
         public virtual string AssetType { get; } = "null";
+        
+        public EditorViewModel NodeEditor { get; set; }
 
         /// <summary>
         /// Used to add a new Object to ebx
@@ -32,9 +35,9 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
             dynamic obj = TypeLibrary.CreateObject(type.Name);
             PointerRef pointerRef = new PointerRef(obj);
             AssetClassGuid guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(
-                EditorUtils.CurrentEditor.EditedEbxAsset.Objects,
+                NodeEditor.EditedEbxAsset.Objects,
                 type,
-                EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
+                NodeEditor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
             ((dynamic)pointerRef.Internal).SetInstanceGuid(guid);
             
             //No idea what this does
@@ -45,8 +48,8 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
                 pointerRef.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(pointerRef.Internal, value);
             }
             
-            EditorUtils.CurrentEditor.EditedProperties.Objects.Add(pointerRef);
-            EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
+            NodeEditor.EditedProperties.Objects.Add(pointerRef);
+            NodeEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
             return obj;
         }
 
@@ -56,9 +59,9 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
         /// <param name="nodeToRemove"></param>
         public virtual void RemoveNodeObject(NodeBaseModel nodeToRemove)
         {
-            List<PointerRef> pointerRefs = EditorUtils.CurrentEditor.EditedProperties.Objects;
+            List<PointerRef> pointerRefs = NodeEditor.EditedProperties.Objects;
             pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == nodeToRemove.Guid);
-            EditorUtils.CurrentEditor.EditedEbxAsset.RemoveObject(nodeToRemove.Object);
+            NodeEditor.EditedEbxAsset.RemoveObject(nodeToRemove.Object);
         }
 
         /// <summary>
@@ -72,30 +75,30 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
             {
                 case ConnectionType.Event:
                 {
-                    foreach (dynamic eventConnection in EditorUtils.CurrentEditor.EditedProperties.EventConnections)
+                    foreach (dynamic eventConnection in NodeEditor.EditedProperties.EventConnections)
                     {
                         if (!connection.Equals(eventConnection)) continue;
-                        EditorUtils.CurrentEditor.EditedProperties.EventConnections.Remove(eventConnection);
+                        NodeEditor.EditedProperties.EventConnections.Remove(eventConnection);
                         break;
                     }
                     break;
                 }
                 case ConnectionType.Property:
                 {
-                    foreach (dynamic propertyConnection in EditorUtils.CurrentEditor.EditedProperties.PropertyConnections)
+                    foreach (dynamic propertyConnection in NodeEditor.EditedProperties.PropertyConnections)
                     {
                         if (!connection.Equals(propertyConnection)) continue;
-                        EditorUtils.CurrentEditor.EditedProperties.PropertyConnections.Remove(propertyConnection);
+                        NodeEditor.EditedProperties.PropertyConnections.Remove(propertyConnection);
                         break;
                     }
                     break;
                 }
                 case ConnectionType.Link:
                 {
-                    foreach (dynamic linkConnection in EditorUtils.CurrentEditor.EditedProperties.LinkConnections)
+                    foreach (dynamic linkConnection in NodeEditor.EditedProperties.LinkConnections)
                     {
                         if (!connection.Equals(linkConnection)) continue;
-                        EditorUtils.CurrentEditor.EditedProperties.LinkConnections.Remove(linkConnection);
+                        NodeEditor.EditedProperties.LinkConnections.Remove(linkConnection);
                         break;
                     }
                     break;
@@ -121,7 +124,7 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
                     eventConnection.SourceEvent.Name = connection.SourceField;
                     eventConnection.TargetEvent.Name = connection.TargetField;
 
-                    ((dynamic)EditorUtils.CurrentEditor.EditedEbxAsset.RootObject).EventConnections
+                    ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections
                         .Add(eventConnection);
                     connection.Object = eventConnection;
                 } break;
@@ -135,7 +138,7 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
                     propertyConnection.SourceField = connection.SourceField;
                     propertyConnection.TargetField = connection.TargetField;
 
-                    ((dynamic)EditorUtils.CurrentEditor.EditedEbxAsset.RootObject).PropertyConnections
+                    ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections
                         .Add(propertyConnection);
                     connection.Object = propertyConnection;
                 } break;
@@ -149,7 +152,7 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
                     linkConnection.SourceField = connection.SourceField;
                     linkConnection.TargetField = connection.TargetField;
 
-                    ((dynamic)EditorUtils.CurrentEditor.EditedEbxAsset.RootObject).LinkConnections.Add(
+                    ((dynamic)NodeEditor.EditedEbxAsset.RootObject).LinkConnections.Add(
                         linkConnection);
                     connection.Object = linkConnection;
                 } break;

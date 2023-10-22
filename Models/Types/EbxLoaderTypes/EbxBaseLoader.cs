@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using BlueprintEditor.Models.Connections;
+using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
@@ -24,6 +25,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
         /// e.g, LogicPrefabBlueprint
         /// </summary>
         public virtual string AssetType { get; } = "null";
+        public EditorViewModel NodeEditor { get; set; }
 
         /// <summary>
         /// Contains a list of AssetClassGuid's and the EditorViewModel.Nodes[] index
@@ -54,16 +56,16 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
             foreach (PointerRef ptr in properties.Objects) 
             {
                 object obj = ptr.Internal;
-                NodeBaseModel node = EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
+                NodeBaseModel node = NodeEditor.CreateNodeFromObject(obj);
                 if (NodeIdCache.ContainsKey(node.Guid))
                 {
                     continue;
                 }
-                NodeIdCache.Add(node.Guid, EditorUtils.CurrentEditor.Nodes.IndexOf(node));
+                NodeIdCache.Add(node.Guid, NodeEditor.Nodes.IndexOf(node));
             }
             
             PointerRef interfaceRef = (PointerRef) properties.Interface;
-            EditorUtils.CurrentEditor.CreateInterfaceNodes(interfaceRef.Internal);
+            NodeEditor.CreateInterfaceNodes(interfaceRef.Internal);
         }
 
         /// <summary>
@@ -85,23 +87,23 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
 
                 //First check if the the node is an interface node
-                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
+                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                 {
-                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
+                    sourceNode = NodeEditor.InterfaceOutputDataNodes[(string)propertyConnection.SourceField.ToString()];
                 }
                 else
                 {
-                    sourceNode = EditorUtils.CurrentEditor.Nodes[NodeIdCache[sourceGuid]];
+                    sourceNode = NodeEditor.Nodes[NodeIdCache[sourceGuid]];
                 }
 
 
-                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
+                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                 {
-                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
+                    targetNode = NodeEditor.InterfaceInputDataNodes[(string)propertyConnection.TargetField.ToString()];
                 }
                 else
                 {
-                    targetNode = EditorUtils.CurrentEditor.Nodes[NodeIdCache[targetGuid]];
+                    targetNode = NodeEditor.Nodes[NodeIdCache[targetGuid]];
                 }
 
                 //We encountered an error
@@ -116,7 +118,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 OutputViewModel sourceOutput = sourceNode.GetOutput(propertyConnection.SourceField,
                     ConnectionType.Property, true);
 
-                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
+                var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = propertyConnection;
             }
                 
@@ -133,22 +135,22 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
 
                 //First check if the the node is an interface node
-                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
+                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                 {
-                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
+                    sourceNode = NodeEditor.InterfaceOutputDataNodes[(string)eventConnection.SourceEvent.Name.ToString()];
                 }
                 else
                 {
-                    sourceNode = EditorUtils.CurrentEditor.Nodes[NodeIdCache[sourceGuid]];
+                    sourceNode = NodeEditor.Nodes[NodeIdCache[sourceGuid]];
                 }
 
-                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
+                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                 {
-                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
+                    targetNode = NodeEditor.InterfaceInputDataNodes[(string)eventConnection.TargetEvent.Name.ToString()];
                 }
                 else
                 {
-                    targetNode = EditorUtils.CurrentEditor.Nodes[NodeIdCache[targetGuid]];
+                    targetNode = NodeEditor.Nodes[NodeIdCache[targetGuid]];
                 }
 
 
@@ -164,7 +166,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name,
                     ConnectionType.Event, true);
                         
-                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
+                var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = eventConnection;
             }
                 
@@ -181,22 +183,22 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
 
                 //First check if the the node is an interface node
-                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
+                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                 {
-                    sourceNode = EditorUtils.CurrentEditor.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
+                    sourceNode = NodeEditor.InterfaceOutputDataNodes[(string)linkConnection.SourceField.ToString()];
                 }
                 else
                 {
-                    sourceNode = EditorUtils.CurrentEditor.Nodes[NodeIdCache[sourceGuid]];
+                    sourceNode = NodeEditor.Nodes[NodeIdCache[sourceGuid]];
                 }
 
-                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == EditorUtils.CurrentEditor.InterfaceGuid)
+                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                 {
-                    targetNode = EditorUtils.CurrentEditor.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
+                    targetNode = NodeEditor.InterfaceInputDataNodes[(string)linkConnection.TargetField.ToString()];
                 }
                 else
                 {
-                    targetNode = EditorUtils.CurrentEditor.Nodes[NodeIdCache[targetGuid]];
+                    targetNode = NodeEditor.Nodes[NodeIdCache[targetGuid]];
                 }
 
 
@@ -224,7 +226,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 OutputViewModel sourceOutput = sourceNode.GetOutput(targetField,
                     ConnectionType.Link, true);
                         
-                var connection = EditorUtils.CurrentEditor.Connect(sourceOutput, targetInput);
+                var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = linkConnection;
             }
         }

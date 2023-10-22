@@ -59,6 +59,7 @@ namespace BlueprintEditor.Models.Editor
                     }
                 }
 
+                ebxEditor.NodeEditor = this;
                 return ebxEditor;
             }
         }
@@ -170,9 +171,9 @@ namespace BlueprintEditor.Models.Editor
                 {
                     var input = node.Inputs[0];
                     
-                    foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(input))
+                    foreach (ConnectionViewModel connection in GetConnections(input))
                     {
-                        EditorUtils.CurrentEditor.Disconnect(connection);
+                        Disconnect(connection);
                     }
                     
                     switch (input.Type)
@@ -180,7 +181,7 @@ namespace BlueprintEditor.Models.Editor
                         case ConnectionType.Property:
                         {
                             dynamic objToRemove = null;
-                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields)
+                            foreach (dynamic field in EditedProperties.Interface.Internal.Fields)
                             {
                                 if (field.Name.ToString() == input.Title)
                                 {
@@ -190,14 +191,14 @@ namespace BlueprintEditor.Models.Editor
 
                             if (objToRemove != null)
                             {
-                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields.Remove(objToRemove);
+                                EditedProperties.Interface.Internal.Fields.Remove(objToRemove);
                             }
                             break;
                         }
                         case ConnectionType.Event:
                         {
                             dynamic objToRemove = null;
-                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputEvents)
+                            foreach (dynamic field in EditedProperties.Interface.Internal.OutputEvents)
                             {
                                 if (field.Name.ToString() == input.Title)
                                 {
@@ -207,14 +208,14 @@ namespace BlueprintEditor.Models.Editor
 
                             if (objToRemove != null)
                             {
-                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputEvents.Remove(objToRemove);
+                                EditedProperties.Interface.Internal.OutputEvents.Remove(objToRemove);
                             }
                             break;
                         }
                         case ConnectionType.Link:
                         {
                             dynamic objToRemove = null;
-                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputLinks)
+                            foreach (dynamic field in EditedProperties.Interface.Internal.OutputLinks)
                             {
                                 if (field.Name.ToString() == input.Title)
                                 {
@@ -224,7 +225,7 @@ namespace BlueprintEditor.Models.Editor
 
                             if (objToRemove != null)
                             {
-                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.OutputLinks.Remove(objToRemove);
+                                EditedProperties.Interface.Internal.OutputLinks.Remove(objToRemove);
                             }
                             break;
                         }
@@ -235,9 +236,9 @@ namespace BlueprintEditor.Models.Editor
                 {
                     var output = node.Outputs[0];
                     
-                    foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(output))
+                    foreach (ConnectionViewModel connection in GetConnections(output))
                     {
-                        EditorUtils.CurrentEditor.Disconnect(connection);
+                        Disconnect(connection);
                     }
                     
                     switch (output.Type)
@@ -245,7 +246,7 @@ namespace BlueprintEditor.Models.Editor
                         case ConnectionType.Property:
                         {
                             dynamic objToRemove = null;
-                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields)
+                            foreach (dynamic field in EditedProperties.Interface.Internal.Fields)
                             {
                                 if (field.Name.ToString() == output.Title)
                                 {
@@ -255,14 +256,14 @@ namespace BlueprintEditor.Models.Editor
 
                             if (objToRemove != null)
                             {
-                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.Fields.Remove(objToRemove);
+                                EditedProperties.Interface.Internal.Fields.Remove(objToRemove);
                             }
                             break;
                         }
                         case ConnectionType.Event:
                         {
                             dynamic objToRemove = null;
-                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputEvents)
+                            foreach (dynamic field in EditedProperties.Interface.Internal.InputEvents)
                             {
                                 if (field.Name.ToString() == output.Title)
                                 {
@@ -272,14 +273,14 @@ namespace BlueprintEditor.Models.Editor
 
                             if (objToRemove != null)
                             {
-                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputEvents.Remove(objToRemove);
+                                EditedProperties.Interface.Internal.InputEvents.Remove(objToRemove);
                             }
                             break;
                         }
                         case ConnectionType.Link:
                         {
                             dynamic objToRemove = null;
-                            foreach (dynamic field in EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputLinks)
+                            foreach (dynamic field in EditedProperties.Interface.Internal.InputLinks)
                             {
                                 if (field.Name.ToString() == output.Title)
                                 {
@@ -289,16 +290,16 @@ namespace BlueprintEditor.Models.Editor
 
                             if (objToRemove != null)
                             {
-                                EditorUtils.CurrentEditor.EditedProperties.Interface.Internal.InputLinks.Remove(objToRemove);
+                                EditedProperties.Interface.Internal.InputLinks.Remove(objToRemove);
                             }
                             break;
                         }
                     }
                 }
 
-                EditorUtils.CurrentEditor.Nodes.Remove(node);
+                Nodes.Remove(node);
                 
-                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
                 App.EditorWindow.DataExplorer.RefreshItems();
                 return;
             }
@@ -307,16 +308,16 @@ namespace BlueprintEditor.Models.Editor
 
             #region Object Removal
             
-            foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(node))
+            foreach (ConnectionViewModel connection in GetConnections(node))
             {
-                EditorUtils.CurrentEditor.Disconnect(connection);
+                Disconnect(connection);
             }
 
             EbxEditor.RemoveNodeObject(node);
             
-            EditorUtils.CurrentEditor.Nodes.Remove(node);
+            Nodes.Remove(node);
             
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
 
             #endregion
@@ -341,23 +342,23 @@ namespace BlueprintEditor.Models.Editor
                 {
                     NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
                     node.Object = obj;
-                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                    Nodes.Add(node);
                 }
                 else if (field.AccessType.ToString() == "FieldAccessType_Target") //Target
                 {
                     NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
                     node.Object = obj;
-                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                    Nodes.Add(node);
                 }
                 else //Source and Target
                 {
                     NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
                     node.Object = obj;
-                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                    Nodes.Add(node);
                     
                     node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
                     node.Object = obj;
-                    EditorUtils.CurrentEditor.Nodes.Add(node);
+                    Nodes.Add(node);
                 }
             }
 
@@ -365,28 +366,28 @@ namespace BlueprintEditor.Models.Editor
             {
                 NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(inputEvent, true, InterfaceGuid);
                 node.Object = obj;
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                Nodes.Add(node);
             }
                 
             foreach (dynamic outputEvent in ((dynamic)obj).OutputEvents)
             {
                 NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(outputEvent, false, InterfaceGuid);
                 node.Object = obj;
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                Nodes.Add(node);
             }
                 
             foreach (dynamic inputLink in ((dynamic)obj).InputLinks)
             {
                 NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(inputLink, true, InterfaceGuid);
                 node.Object = obj;
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                Nodes.Add(node);
             }
                 
             foreach (dynamic outputLink in ((dynamic)obj).OutputLinks)
             {
                 NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(outputLink, false, InterfaceGuid);
                 node.Object = obj;
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                Nodes.Add(node);
             }
         }
 

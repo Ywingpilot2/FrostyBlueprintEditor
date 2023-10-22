@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
+using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types;
 using BlueprintEditor.Models.Types.EbxLoaderTypes;
@@ -34,10 +35,13 @@ namespace BlueprintEditor.Windows
         private readonly Random _rng = new Random();
         private readonly EbxAssetEntry _file;
         private NodeTypeViewModel _selectedType;
+        private readonly EditorViewModel _editor;
 
         public BlueprintEditorWindow()
         {
             InitializeComponent();
+            _editor = EditorUtils.CurrentEditor;
+            
             Owner = Application.Current.MainWindow;
             Title = $"Ebx Graph({App.EditorWindow.GetOpenedAssetEntry().Filename})";
             _file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
@@ -71,6 +75,8 @@ namespace BlueprintEditor.Windows
                     break;
                 }
             }
+
+            loader.NodeEditor = _editor;
             
             loader.PopulateTypesList(TypesList.Items);
             loader.PopulateNodes(openedProperties);
@@ -84,9 +90,9 @@ namespace BlueprintEditor.Windows
         {
             if (e.Key == Key.Delete)
             {
-                while (EditorUtils.CurrentEditor.SelectedNodes.Count != 0)
+                while (_editor.SelectedNodes.Count != 0)
                 {
-                    EditorUtils.CurrentEditor.DeleteNode(EditorUtils.CurrentEditor.SelectedNodes[0]);
+                    _editor.DeleteNode(_editor.SelectedNodes[0]);
                 }
             }
         }
@@ -110,9 +116,9 @@ namespace BlueprintEditor.Windows
 
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
-            while (EditorUtils.CurrentEditor.SelectedNodes.Count != 0)
+            while (_editor.SelectedNodes.Count != 0)
             {
-                EditorUtils.CurrentEditor.DeleteNode(EditorUtils.CurrentEditor.SelectedNodes[0]);
+                _editor.DeleteNode(_editor.SelectedNodes[0]);
             }
         }
 
@@ -120,11 +126,11 @@ namespace BlueprintEditor.Windows
         {
             if (_selectedType == null) return;
 
-            object obj = EditorUtils.CurrentEditor.CreateNodeObject(_selectedType.NodeType);
+            object obj = _editor.CreateNodeObject(_selectedType.NodeType);
             
-            EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
+            _editor.CreateNodeFromObject(obj);
             
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);
+            App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
         }
         

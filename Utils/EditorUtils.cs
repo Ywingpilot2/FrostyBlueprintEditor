@@ -31,6 +31,7 @@ namespace BlueprintEditor.Utils
         /// </summary>
         public static Dictionary<string, EditorViewModel> Editors = new Dictionary<string, EditorViewModel>();
 
+        private static EditorViewModel _lastEditor;
         /// <summary>
         /// This gets the currently open <see cref="EditorViewModel"/>
         /// </summary>
@@ -42,7 +43,16 @@ namespace BlueprintEditor.Utils
                 //So frosty task window doesn't fucksplode
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    editor = Editors[App.EditorWindow.GetOpenedAssetEntry().Filename];
+                    if (Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
+                    {
+                        editor = Editors[App.EditorWindow.GetOpenedAssetEntry().Filename];
+                        _lastEditor = editor;
+                    }
+                    else
+                    {
+                        editor = _lastEditor;
+                        App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(editor.EditedEbxAsset.FileGuid));
+                    }
                 });
                 return editor;
             }

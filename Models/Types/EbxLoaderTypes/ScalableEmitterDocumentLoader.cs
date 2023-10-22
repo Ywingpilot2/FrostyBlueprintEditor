@@ -35,7 +35,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataLow.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = EditorUtils.CurrentEditor.CreateNodeFromObject(properties.TemplateDataLow.Internal);
+                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataLow.Internal);
                 emitter.Name = "Emitter Template(Low)";
                 emitters.Add(emitter.Guid);
 
@@ -61,10 +61,10 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 };
             
                 node.OnCreation();
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                NodeEditor.Nodes.Add(node);
             
                 //Connect the Template to the RootProcessor
-                EditorUtils.CurrentEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
+                NodeEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
 
                 //Now we create the rest of the file.
                 object nextProcessor = ((dynamic)currentProcessor).NextProcessor.Internal;
@@ -90,7 +90,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                         }
                     };
                     nextNode.OnCreation(); //So that extensions don't break
-                    EditorUtils.CurrentEditor.Nodes.Add(nextNode);
+                    NodeEditor.Nodes.Add(nextNode);
                 
                     //If this has Pre(Compute?) stuff we create a node out of it then connect it too
                     if (processorProperties.Pre.Internal != null)
@@ -108,14 +108,14 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                             }
                         };
                         preComputeNode.OnCreation(); //So that extensions don't break
-                        EditorUtils.CurrentEditor.Nodes.Add(preComputeNode);
+                        NodeEditor.Nodes.Add(preComputeNode);
                     
                         //Connect the last node with this current node
-                        EditorUtils.CurrentEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
+                        NodeEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
                     }
 
                     //Connect the last node with this current node
-                    EditorUtils.CurrentEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
+                    NodeEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
                     node = nextNode; //Assign the last node as this current node
                     nextProcessor = processorProperties.NextProcessor.Internal as dynamic; //Get the next processor, so we can enumerate over it
                 }
@@ -124,7 +124,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataMedium.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = EditorUtils.CurrentEditor.CreateNodeFromObject(properties.TemplateDataMedium.Internal);
+                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataMedium.Internal);
                 emitter.Name = "Emitter Template(Medium)";
                 emitters.Add(emitter.Guid);
 
@@ -150,10 +150,10 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 };
             
                 node.OnCreation();
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                NodeEditor.Nodes.Add(node);
             
                 //Connect the Template to the RootProcessor
-                EditorUtils.CurrentEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
+                NodeEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
 
                 //Now we create the rest of the file.
                 object nextProcessor = ((dynamic)currentProcessor).NextProcessor.Internal;
@@ -179,7 +179,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                         }
                     };
                     nextNode.OnCreation(); //So that extensions don't break
-                    EditorUtils.CurrentEditor.Nodes.Add(nextNode);
+                    NodeEditor.Nodes.Add(nextNode);
                 
                     //If this has Pre(Compute?) stuff we create a node out of it then connect it too
                     if (processorProperties.Pre.Internal != null)
@@ -197,14 +197,14 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                             }
                         };
                         preComputeNode.OnCreation(); //So that extensions don't break
-                        EditorUtils.CurrentEditor.Nodes.Add(preComputeNode);
+                        NodeEditor.Nodes.Add(preComputeNode);
                     
                         //Connect the last node with this current node
-                        EditorUtils.CurrentEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
+                        NodeEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
                     }
 
                     //Connect the last node with this current node
-                    EditorUtils.CurrentEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
+                    NodeEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
                     node = nextNode; //Assign the last node as this current node
                     nextProcessor = processorProperties.NextProcessor.Internal as dynamic; //Get the next processor, so we can enumerate over it
                 }
@@ -213,7 +213,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataHigh.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = EditorUtils.CurrentEditor.CreateNodeFromObject(properties.TemplateDataHigh.Internal);
+                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataHigh.Internal);
                 emitter.Name = "Emitter Template(High)";
                 emitters.Add(emitter.Guid);
 
@@ -239,10 +239,10 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 };
             
                 node.OnCreation();
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                NodeEditor.Nodes.Add(node);
             
                 //Connect the Template to the RootProcessor
-                EditorUtils.CurrentEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
+                NodeEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
 
                 //Now we create the rest of the file.
                 object nextProcessor = ((dynamic)currentProcessor).NextProcessor.Internal;
@@ -268,7 +268,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                         }
                     };
                     nextNode.OnCreation(); //So that extensions don't break
-                    EditorUtils.CurrentEditor.Nodes.Add(nextNode);
+                    NodeEditor.Nodes.Add(nextNode);
                 
                     //If this has Pre(Compute?) stuff we create a node out of it then connect it too
                     if (processorProperties.Pre.Internal != null)
@@ -286,14 +286,14 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                             }
                         };
                         preComputeNode.OnCreation(); //So that extensions don't break
-                        EditorUtils.CurrentEditor.Nodes.Add(preComputeNode);
+                        NodeEditor.Nodes.Add(preComputeNode);
                     
                         //Connect the last node with this current node
-                        EditorUtils.CurrentEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
+                        NodeEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
                     }
 
                     //Connect the last node with this current node
-                    EditorUtils.CurrentEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
+                    NodeEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
                     node = nextNode; //Assign the last node as this current node
                     nextProcessor = processorProperties.NextProcessor.Internal as dynamic; //Get the next processor, so we can enumerate over it
                 }
@@ -302,7 +302,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataUltra.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = EditorUtils.CurrentEditor.CreateNodeFromObject(properties.TemplateDataUltra.Internal);
+                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataUltra.Internal);
                 emitter.Name = "Emitter Template(Ultra)";
                 emitters.Add(emitter.Guid);
 
@@ -328,10 +328,10 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 };
             
                 node.OnCreation();
-                EditorUtils.CurrentEditor.Nodes.Add(node);
+                NodeEditor.Nodes.Add(node);
             
                 //Connect the Template to the RootProcessor
-                EditorUtils.CurrentEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
+                NodeEditor.Connect(emitter.Outputs[0], node.Inputs[2]);
 
                 //Now we create the rest of the file.
                 object nextProcessor = ((dynamic)currentProcessor).NextProcessor.Internal;
@@ -357,7 +357,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                         }
                     };
                     nextNode.OnCreation(); //So that extensions don't break
-                    EditorUtils.CurrentEditor.Nodes.Add(nextNode);
+                    NodeEditor.Nodes.Add(nextNode);
                 
                     //If this has Pre(Compute?) stuff we create a node out of it then connect it too
                     if (processorProperties.Pre.Internal != null)
@@ -375,14 +375,14 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                             }
                         };
                         preComputeNode.OnCreation(); //So that extensions don't break
-                        EditorUtils.CurrentEditor.Nodes.Add(preComputeNode);
+                        NodeEditor.Nodes.Add(preComputeNode);
                     
                         //Connect the last node with this current node
-                        EditorUtils.CurrentEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
+                        NodeEditor.Connect(preComputeNode.Outputs[0], nextNode.Inputs[1]);
                     }
 
                     //Connect the last node with this current node
-                    EditorUtils.CurrentEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
+                    NodeEditor.Connect(node.Outputs[0], nextNode.Inputs[0]);
                     node = nextNode; //Assign the last node as this current node
                     nextProcessor = processorProperties.NextProcessor.Internal as dynamic; //Get the next processor, so we can enumerate over it
                 }
