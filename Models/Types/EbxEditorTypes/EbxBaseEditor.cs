@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
@@ -19,6 +21,34 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
         /// e.g, LogicPrefabBlueprint
         /// </summary>
         public virtual string AssetType { get; } = "null";
+
+        /// <summary>
+        /// Used to add a new Object to ebx
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public virtual object AddNodeObject(Type type)
+        {
+            dynamic obj = TypeLibrary.CreateObject(type.Name);
+            PointerRef pointerRef = new PointerRef(obj);
+            AssetClassGuid guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(
+                EditorUtils.CurrentEditor.EditedEbxAsset.Objects,
+                type,
+                EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
+            ((dynamic)pointerRef.Internal).SetInstanceGuid(guid);
+            
+            //No idea what this does
+            if (TypeLibrary.IsSubClassOf(pointerRef.Internal, "DataBusPeer"))
+            {
+                byte[] b = guid.ExportedGuid.ToByteArray();
+                uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
+                pointerRef.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(pointerRef.Internal, value);
+            }
+            
+            EditorUtils.CurrentEditor.EditedProperties.Objects.Add(pointerRef);
+            EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
+            return obj;
+        }
 
         /// <summary>
         /// This method is used to remove a node from the Ebx
@@ -73,6 +103,10 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
             }
         }
 
+        /// <summary>
+        /// This method is used to create new connections and add them to the ebx
+        /// </summary>
+        /// <param name="connection"></param>
         public virtual void CreateConnectionObject(ConnectionViewModel connection)
         {
             if (connection == null) return;

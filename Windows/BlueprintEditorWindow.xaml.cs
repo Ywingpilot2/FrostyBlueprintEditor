@@ -120,24 +120,8 @@ namespace BlueprintEditor.Windows
         {
             if (_selectedType == null) return;
 
-            object obj = TypeLibrary.CreateObject(_selectedType.NodeType.Name);
-            PointerRef pointerRef = new PointerRef(obj);
-            AssetClassGuid guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(
-                EditorUtils.CurrentEditor.EditedEbxAsset.Objects,
-                _selectedType.NodeType,
-                EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
-            ((dynamic)pointerRef.Internal).SetInstanceGuid(guid);
+            object obj = EditorUtils.CurrentEditor.CreateNodeObject(_selectedType.NodeType);
             
-            //No idea what this does
-            if (TypeLibrary.IsSubClassOf(pointerRef.Internal, "DataBusPeer"))
-            {
-                byte[] b = guid.ExportedGuid.ToByteArray();
-                uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
-                pointerRef.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(pointerRef.Internal, value);
-            }
-            
-            EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
-            EditorUtils.CurrentEditor.EditedProperties.Objects.Add(pointerRef);
             EditorUtils.CurrentEditor.CreateNodeFromObject(obj);
             
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid).Name, EditorUtils.CurrentEditor.EditedEbxAsset);

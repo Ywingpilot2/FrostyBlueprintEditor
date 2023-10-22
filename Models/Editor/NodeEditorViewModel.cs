@@ -42,7 +42,26 @@ namespace BlueprintEditor.Models.Editor
         public ICommand DisconnectConnectorCommand { get; }
 
         public string EditorName { get; }
-        private EbxBaseEditor EbxEditor { get; }
+
+        private EbxBaseEditor EbxEditor
+        {
+            get
+            {
+                var ebxEditor = new EbxBaseEditor();
+                foreach (var type in Assembly.GetCallingAssembly().GetTypes())
+                {
+                    if (type.IsSubclassOf(typeof(EbxBaseEditor)))
+                    {
+                        var extension = (EbxBaseEditor)Activator.CreateInstance(type);
+                        if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
+                        ebxEditor = extension;
+                        break;
+                    }
+                }
+
+                return ebxEditor;
+            }
+        }
         public EbxAsset EditedEbxAsset { get; set; }
         public dynamic EditedProperties => EditedEbxAsset.RootObject;
         public AssetClassGuid InterfaceGuid { get; private set; }
@@ -51,19 +70,7 @@ namespace BlueprintEditor.Models.Editor
         {
             EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.EditorWindow.GetOpenedAssetEntry());
             EditorName = App.EditorWindow.GetOpenedAssetEntry().Filename;
-            
-            EbxEditor = new EbxBaseEditor();
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
-            {
-                if (type.IsSubclassOf(typeof(EbxBaseEditor)))
-                {
-                    var extension = (EbxBaseEditor)Activator.CreateInstance(type);
-                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
-                    EbxEditor = extension;
-                    break;
-                }
-            }
-            
+
             PendingConnection = new PendingConnectionViewModel(this, EbxEditor);
             
             DisconnectConnectorCommand = new DelegateCommand<Object>(connector =>
@@ -145,6 +152,8 @@ namespace BlueprintEditor.Models.Editor
             Nodes.Add(newNode);
             return newNode;
         }
+
+        public object CreateNodeObject(Type type) => EbxEditor.AddNodeObject(type);
 
         /// <summary>
         /// Deletes a node(and by extension all of its connections).

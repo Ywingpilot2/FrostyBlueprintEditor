@@ -104,7 +104,7 @@ namespace BlueprintEditor.Models.Connections
         public override bool Equals(object obj)
         {
             dynamic connectionB = null;
-            if (obj != null)
+            if (obj != null && Object != null)
             {
                 if (obj.GetType() == GetType())
                 {
