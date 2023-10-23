@@ -51,179 +51,250 @@
                           Viewport="0 0 720 720"
                           Transform="{Binding ViewportTransform, ElementName=Editor}"
                           Drawing="{StaticResource LargeGridGeometry}" />
-            
-            <!--No idea how this works
-                This is meant to allow drop down items in a ListView-->
         </ResourceDictionary>
     </Window.Resources>
-    
-    <Grid Background="{StaticResource CanvasBackground}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="450"/>
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        
-        <!--Blueprint Editor(for editing connections)-->
-        <Grid Grid.Column="0" Background="{StaticResource SmallGridLinesDrawingBrush}">
-            <Grid Background="{StaticResource LargeGridLinesDrawingBrush}">
-                <!--Definition for the node editor itself-->
-                <nodify:NodifyEditor BorderBrush="{StaticResource ListBackground}" 
-                                     Grid.Column="0"
-                                     BorderThickness="4"
-                                     ItemsSource="{Binding Nodes}"
-                                     Connections="{Binding Connections}"
-                                     PendingConnection="{Binding PendingConnection}"
-                                     DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
-                                     Background="{StaticResource LargerGridLinesDrawingBrush}"
-                                     SelectedItems="{Binding SelectedNodes}"
-                                     x:Name="Editor">
 
-                    <nodify:NodifyEditor.DataContext>
-                        <editor:EditorViewModel />
-                    </nodify:NodifyEditor.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                    <!--Node Definition(Changes how nodes are displayed in ui)-->
-                    <nodify:NodifyEditor.ItemTemplate>
-                        <DataTemplate DataType="{x:Type nodeTypes:NodeBaseModel}">
-                            <nodify:Node Header="{Binding Name}"
-                                         Input="{Binding Inputs}"
-                                         Output="{Binding Outputs}"
-                                         HeaderBrush="{Binding HeaderColor}"
-                                         ContentBrush="{StaticResource Background}"
-                                         Background="{StaticResource Background}"
-                                         Width="{Binding _width}"
-                                         BorderBrush="#555555"
-                                         FontFamily="Consolas">
+        <!--Toolbox and Blueprint Editor-->
+        <Border Grid.Row="1" BorderBrush="{StaticResource SubItemPressed}" BorderThickness="2">
+            <Grid Background="{StaticResource CanvasBackground}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="ToolboxCollum" Width="140" />
+                    <ColumnDefinition />
+                    <!--<ColumnDefinition x:Name="PropertyGridCollum" Width="180" />-->
+                </Grid.ColumnDefinitions>
 
-                                <nodify:Node.InputConnectorTemplate>
-                                    <DataTemplate DataType="{x:Type nodeTypes:InputViewModel}">
-                                        <nodify:NodeInput Header="{Binding Title}"
-                                                          IsConnected="{Binding IsConnected}"
-                                                          Anchor="{Binding Anchor, Mode=OneWayToSource}"
-                                                          Background="{StaticResource Background}"
-                                                          BorderBrush="{Binding ConnectionColor}" 
-                                                          Foreground="#000000"/>
-                                    </DataTemplate>
-                                </nodify:Node.InputConnectorTemplate>
+                <!--Blueprint Editor(for editing connections)-->
+                <Grid Grid.Column="1" Background="{StaticResource SmallGridLinesDrawingBrush}">
+                    <Grid Background="{StaticResource LargeGridLinesDrawingBrush}">
+                        <!--Definition for the node editor itself-->
+                        <nodify:NodifyEditor Grid.Column="0"
+                                             ItemsSource="{Binding Nodes}"
+                                             Connections="{Binding Connections}"
+                                             PendingConnection="{Binding PendingConnection}"
+                                             DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
+                                             Background="{StaticResource LargerGridLinesDrawingBrush}"
+                                             SelectedItems="{Binding SelectedNodes}"
+                                             x:Name="Editor">
 
-                                <nodify:Node.OutputConnectorTemplate>
-                                    <DataTemplate DataType="{x:Type nodeTypes:OutputViewModel}">
-                                        <nodify:NodeOutput Header="{Binding Title}"
-                                                           IsConnected="{Binding IsConnected}"
-                                                           Anchor="{Binding Anchor, Mode=OneWayToSource}"
-                                                           Background="{StaticResource Background}"
-                                                           BorderBrush="{Binding ConnectionColor}"
-                                                           Foreground="#000000" />
-                                    </DataTemplate>
-                                </nodify:Node.OutputConnectorTemplate>
+                            <nodify:NodifyEditor.DataContext>
+                                <editor:EditorViewModel />
+                            </nodify:NodifyEditor.DataContext>
 
-                            </nodify:Node>
-                        </DataTemplate>
-                    </nodify:NodifyEditor.ItemTemplate>
+                            <!--Node Definition(Changes how nodes are displayed in ui)-->
+                            <nodify:NodifyEditor.ItemTemplate>
+                                <DataTemplate DataType="{x:Type nodeTypes:NodeBaseModel}">
+                                    <nodify:Node Header="{Binding Name}"
+                                                 Input="{Binding Inputs}"
+                                                 Output="{Binding Outputs}"
+                                                 HeaderBrush="{Binding HeaderColor}"
+                                                 ContentBrush="{StaticResource Background}"
+                                                 Background="{StaticResource Background}"
+                                                 Width="{Binding _width}"
+                                                 BorderBrush="#555555"
+                                                 FontFamily="Consolas">
 
-                    <!--Connection Definition(Changes how connections are displayed)-->
-                    <nodify:NodifyEditor.ConnectionTemplate>
-                        <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                            <nodify:Connection Source="{Binding Source.Anchor}"
-                                                   Target="{Binding Target.Anchor}"
-                                                   Fill="{Binding ConnectionColor}"
-                                                   Stroke="{Binding ConnectionColor}" 
-                                                   ArrowSize="0,0"
-                                                   SourceOffset="0,0"
-                                                   TargetOffset="0,0"
-                                                   Spacing="0"
-                                                   />
-                        </DataTemplate>
-                    </nodify:NodifyEditor.ConnectionTemplate>
+                                        <nodify:Node.InputConnectorTemplate>
+                                            <DataTemplate DataType="{x:Type nodeTypes:InputViewModel}">
+                                                <nodify:NodeInput Header="{Binding Title}"
+                                                                  IsConnected="{Binding IsConnected}"
+                                                                  Anchor="{Binding Anchor, Mode=OneWayToSource}"
+                                                                  Background="{StaticResource Background}"
+                                                                  BorderBrush="{Binding ConnectionColor}"
+                                                                  Foreground="#000000" />
+                                            </DataTemplate>
+                                        </nodify:Node.InputConnectorTemplate>
 
-                    <!--This displays whenever the user is attempting to create a new connection-->
-                    <nodify:NodifyEditor.PendingConnectionTemplate>
-                        <DataTemplate DataType="{x:Type editor:PendingConnectionViewModel}">
-                            <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
-                                                          CompletedCommand="{Binding FinishCommand}"
-                                                          AllowOnlyConnectors="True" 
-                                                          EnableSnapping="True"
-                                                          SourceAnchor="{Binding SourceAnchor}"
-                                                          TargetAnchor="{Binding TargetAnchor}">
-                            </nodify:PendingConnection>
-                        </DataTemplate>
-                    </nodify:NodifyEditor.PendingConnectionTemplate>
+                                        <nodify:Node.OutputConnectorTemplate>
+                                            <DataTemplate DataType="{x:Type nodeTypes:OutputViewModel}">
+                                                <nodify:NodeOutput Header="{Binding Title}"
+                                                                   IsConnected="{Binding IsConnected}"
+                                                                   Anchor="{Binding Anchor, Mode=OneWayToSource}"
+                                                                   Background="{StaticResource Background}"
+                                                                   BorderBrush="{Binding ConnectionColor}"
+                                                                   Foreground="#000000" />
+                                            </DataTemplate>
+                                        </nodify:Node.OutputConnectorTemplate>
 
-                    <!--Defines a variety of stylistic things relating to nodes(e.g border color)-->
-                    <nodify:NodifyEditor.ItemContainerStyle>
-                        <Style TargetType="{x:Type nodify:ItemContainer}"
-                               BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
-                            <Setter Property="Location"
-                                    Value="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Setter Property="BorderThickness"
-                                    Value="2"></Setter>
-                            <Setter Property="HighlightBrush"
-                                    Value="{StaticResource NodeSelectedColor}"></Setter>
-                            <Setter Property="BorderBrush"
-                                    Value="{StaticResource NodeBorderColor}"></Setter>
-                            <Setter Property="SelectedBrush"
-                                    Value="{StaticResource NodeSelectedColor}"></Setter>
-                        </Style>
-                    </nodify:NodifyEditor.ItemContainerStyle>
+                                    </nodify:Node>
+                                </DataTemplate>
+                            </nodify:NodifyEditor.ItemTemplate>
 
-                </nodify:NodifyEditor>
-            </Grid>
-        </Grid>
-        
-        <!--This through what I presume to be black magic
-            Allows the user to change the size of the Nodes window-->
-        <GridSplitter Grid.Column="0" 
-                      Background="{StaticResource ListBackground}" 
-                      Width="5"
-                      ResizeDirection="Columns"
-                      />
-        
-        <!--Toolbox(for adding and removing nodes)-->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-                
-            <!--Add and remove buttons, very important!-->
-            <Border Grid.Row="0" 
-                    Background="{StaticResource WindowBackground}" 
-                    BorderBrush="{StaticResource ScrollbarBackground}" 
-                    BorderThickness="3"
-                    HorizontalAlignment="Left">
-                <Grid Margin="3">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Button x:Name="AddButton" Content="Add" Width="85" Margin="0,0,5,0" HorizontalAlignment="Left" Click="AddButton_OnClick"/>
-                        <Button x:Name="RemoveButton" Content="Remove" Width="85" Margin="0,0,5,0" HorizontalAlignment="Center" Click="RemoveButton_OnClick"/>
-                        <Button x:Name="OrganizeButton" Content="Auto-Sort" Width="75" Margin="0,0,5,0" HorizontalAlignment="Right" Click="OrganizeButton_OnClick"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                            <!--Connection Definition(Changes how connections are displayed)-->
+                            <nodify:NodifyEditor.ConnectionTemplate>
+                                <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
+                                    <nodify:Connection Source="{Binding Source.Anchor}"
+                                                       Target="{Binding Target.Anchor}"
+                                                       Fill="{Binding ConnectionColor}"
+                                                       Stroke="{Binding ConnectionColor}"
+                                                       ArrowSize="0,0"
+                                                       SourceOffset="0,0"
+                                                       TargetOffset="0,0"
+                                                       Spacing="0" />
+                                </DataTemplate>
+                            </nodify:NodifyEditor.ConnectionTemplate>
 
-            <!--This contains a list of all of the types we can use and a filter box-->
-            <Border Grid.Row="1"
-                    BorderBrush="{StaticResource ScrollbarBackground}"
-                    BorderThickness="2">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <Grid Grid.Row="0" Background="{StaticResource WindowBackground}">
-                        <ctrl:FrostyWatermarkTextBox x:Name="TypesList_FilterBox" Margin="1,0,1,1" WatermarkText="Filter" BorderThickness="1"/>
-                    </Grid>      
-                    
-                    <!--The list of items-->
-                    <Grid Grid.Row="1" Margin="1">
-                        <ListBox Name="TypesList" SelectionChanged="TypesList_OnSelectionChanged"
-                                 SelectionMode="Single" 
-                                 Background="{StaticResource ListBackground}">
-                        </ListBox>
+                            <!--This displays whenever the user is attempting to create a new connection-->
+                            <nodify:NodifyEditor.PendingConnectionTemplate>
+                                <DataTemplate DataType="{x:Type editor:PendingConnectionViewModel}">
+                                    <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
+                                                              CompletedCommand="{Binding FinishCommand}"
+                                                              AllowOnlyConnectors="True"
+                                                              EnableSnapping="True"
+                                                              SourceAnchor="{Binding SourceAnchor}"
+                                                              TargetAnchor="{Binding TargetAnchor}">
+                                    </nodify:PendingConnection>
+                                </DataTemplate>
+                            </nodify:NodifyEditor.PendingConnectionTemplate>
+
+                            <!--Defines a variety of stylistic things relating to nodes(e.g border color)-->
+                            <nodify:NodifyEditor.ItemContainerStyle>
+                                <Style TargetType="{x:Type nodify:ItemContainer}"
+                                       BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
+                                    <Setter Property="Location"
+                                            Value="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Setter Property="BorderThickness"
+                                            Value="2">
+                                    </Setter>
+                                    <Setter Property="HighlightBrush"
+                                            Value="{StaticResource NodeSelectedColor}">
+                                    </Setter>
+                                    <Setter Property="BorderBrush"
+                                            Value="{StaticResource NodeBorderColor}">
+                                    </Setter>
+                                    <Setter Property="SelectedBrush"
+                                            Value="{StaticResource NodeSelectedColor}">
+                                    </Setter>
+                                </Style>
+                            </nodify:NodifyEditor.ItemContainerStyle>
+
+                        </nodify:NodifyEditor>
                     </Grid>
                 </Grid>
-            </Border>
-        </Grid>
+
+                <!--Toolbox(for adding and removing nodes)-->
+                <Grid Grid.Column="0" x:Name="Toolbox">
+
+                    <!--This contains a list of all of the types we can use and a filter box-->
+                    <Border BorderBrush="{StaticResource ScrollbarBackground}"
+                            BorderThickness="0">
+                        <controls:FrostyClassSelector x:Name="ClassSelector" 
+                                                      SelectedItemChanged="TypesList_OnSelectionChanged" 
+                                                      ItemDoubleClicked="ToolboxClassSelector_OnItemDoubleClicked"/>
+                        
+                        <!--Legacy-->
+                        <!--<Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border BorderBrush="{StaticResource CanvasBackground}"
+                                    BorderThickness="1">
+                                <Grid Grid.Row="0" Background="{StaticResource WindowBackground}">
+                                    <ctrl:FrostyWatermarkTextBox x:Name="TypesList_FilterBox" Margin="0.7,0,4,-1"
+                                                                 WatermarkText="Filter" BorderThickness="1" />
+                                </Grid>
+                            </Border>
+
+                            ~1~The list of items@1@
+                            <Grid Grid.Row="1" Margin="1, 1, 3.9, 1">
+                                <ListBox Name="TypesList" SelectionChanged="TypesList_OnSelectionChanged"
+                                         SelectionMode="Single"
+                                         Background="{StaticResource ListBackground}">
+                                </ListBox>
+                            </Grid>
+                        </Grid>-->
+                    </Border>
+                </Grid>
+                
+                <!--TODO: Property grid-->
+                <!--<ctrl:FrostyTabControl Grid.Column="2" x:Name="TabControl">
+                    
+                </ctrl:FrostyTabControl>-->
+
+                <!--This through what I presume to be black magic
+            Allows the user to change the size of the Nodes window-->
+                <GridSplitter Grid.Column="0"
+                              Background="{StaticResource SubItemPressed}"
+                              Width="3"
+                              ResizeDirection="Columns"
+                              />
+                <!--<GridSplitter Grid.Column="1"
+                              Background="{StaticResource SubItemPressed}"
+                              Width="3"
+                              ResizeDirection="Columns"
+                />-->
+            </Grid>
+        </Border>
+
+        <!--Header with buttons-->
+        <Border Grid.Row="0" BorderBrush="{StaticResource SubItemPressed}" BorderThickness="1">
+            <Grid Background="{StaticResource ControlBackground}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                
+                <!--Toolbox buttons-->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
+                    <Button x:Name="AddButton"
+                            Width="20"
+                            Height="20"
+                            Margin="4,-2,0,0"
+                            HorizontalAlignment="Left"
+                            Click="AddButton_OnClick"
+                            ToolTip="Add a new node(Object) to the Blueprint">
+                        <Image Source="pack://application:,,,/BlueprintEditor;component/Images/AddObjectButton.png"
+                               Width="16" />
+                    </Button>
+                    <Button x:Name="RemoveButton"
+                            Width="20"
+                            Height="20"
+                            Margin="4,-2,0,0"
+                            HorizontalAlignment="Left"
+                            Click="RemoveButton_OnClick"
+                            ToolTip="Remove the selected node(s) from the Blueprint">
+                        <Image Source="pack://application:,,,/BlueprintEditor;component/Images/RemoveObjectButton.png"
+                               Width="16" />
+                    </Button>
+                    <Button x:Name="OrganizeButton"
+                            Width="20"
+                            Height="20"
+                            Margin="4,-2,0,0"
+                            HorizontalAlignment="Left"
+                            Click="OrganizeButton_OnClick"
+                            ToolTip="Automatically organize the Blueprint's nodes">
+                        <Image Source="pack://application:,,,/BlueprintEditor;component/Images/AutoSortButton.png"
+                               Width="16" />
+                    </Button>
+                </StackPanel>
+                
+                <!--UI Control buttons-->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
+                    <Button x:Name="ToolboxVisible"
+                            Width="20"
+                            Height="20"
+                            Margin="4,-2,0,0"
+                            HorizontalAlignment="Left"
+                            Click="ToolboxVisible_OnClick"
+                            ToolTip="Open/Close the toolbox window">
+                        <Image Source="/FrostyEditor;component/Images/Open.png"
+                               Width="20" />
+                    </Button>
+                </StackPanel>
+                
+                <GridSplitter Grid.Column="0"
+                              Background="{StaticResource SubItemHighlight}"
+                              Width="3"
+                              ResizeDirection="Columns" />
+            </Grid>
+        </Border>
     </Grid>
     
 </ctrl:FrostyWindow>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
-using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using Frosty.Core;
@@ -34,15 +33,13 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
 
         /// <summary>
         /// This method is used to fill the Types list with types
-        /// TODO: Update this to instead be for something closer to LevelEditor's ToolBox
         /// </summary>
-        /// <param name="itemsCollection"></param>
-        public virtual void PopulateTypesList(ItemCollection itemsCollection)
+        public virtual void PopulateTypesList(List<Type> typesList)
         {
             //populate types list
             foreach (Type type in TypeLibrary.GetTypes("GameDataContainer"))
             {
-                itemsCollection.Add(new NodeTypeViewModel(type));
+                typesList.Add(type);
             }
         }
         

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
@@ -14,12 +15,12 @@ using System.Windows.Input;
 using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
-using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types;
 using BlueprintEditor.Models.Types.EbxLoaderTypes;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using Frosty.Controls;
+using Frosty.Core.Controls;
 using Frosty.Core.Windows;
 using FrostyEditor;
 using FrostySdk;
@@ -32,10 +33,14 @@ namespace BlueprintEditor.Windows
 {
     public partial class BlueprintEditorWindow : FrostyWindow
     {
+        private readonly EditorViewModel _editor;
+        private readonly EbxBaseLoader _loader;
+        
         private readonly Random _rng = new Random();
         private readonly EbxAssetEntry _file;
-        private NodeTypeViewModel _selectedType;
-        private readonly EditorViewModel _editor;
+
+        private Type _selectedType;
+        private List<Type> _types = new List<Type>();
 
         public BlueprintEditorWindow()
         {
@@ -45,10 +50,26 @@ namespace BlueprintEditor.Windows
             Owner = Application.Current.MainWindow;
             Title = $"Ebx Graph({App.EditorWindow.GetOpenedAssetEntry().Filename})";
             _file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
-            
+
+            EbxBaseLoader loader = new EbxBaseLoader();
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
+            {
+                if (type.IsSubclassOf(typeof(EbxBaseLoader)))
+                {
+                    var extension = (EbxBaseLoader)Activator.CreateInstance(type);
+                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
+                    loader = extension;
+                    break;
+                }
+            }
+
+            _loader = loader;
+            _loader.PopulateTypesList(_types);
+            ClassSelector.Types = _types;
+
             //Setup UI methods
-            TypesList_FilterBox.KeyUp += FilterBox_FilterEnter;
             Editor.KeyUp += Editor_ControlInput;
+            _editor.SelectedNodes.CollectionChanged += UpdatePropertyGrid;
         }
 
         #region Editor
@@ -64,23 +85,10 @@ namespace BlueprintEditor.Windows
             EbxAsset openedEbx = App.AssetManager.GetEbx(openedAsset);
             dynamic openedProperties = openedEbx.RootObject as dynamic;
 
-            EbxBaseLoader loader = new EbxBaseLoader();
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
-            {
-                if (type.IsSubclassOf(typeof(EbxBaseLoader)))
-                {
-                    var extension = (EbxBaseLoader)Activator.CreateInstance(type);
-                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
-                    loader = extension;
-                    break;
-                }
-            }
-
-            loader.NodeEditor = _editor;
+            _loader.NodeEditor = _editor;
             
-            loader.PopulateTypesList(TypesList.Items);
-            loader.PopulateNodes(openedProperties);
-            loader.CreateConnections(openedProperties);
+            _loader.PopulateNodes(openedProperties);
+            _loader.CreateConnections(openedProperties);
 
             EditorUtils.ApplyLayouts(_file);
         }
@@ -126,7 +134,7 @@ namespace BlueprintEditor.Windows
         {
             if (_selectedType == null) return;
 
-            object obj = _editor.CreateNodeObject(_selectedType.NodeType);
+            object obj = _editor.CreateNodeObject(_selectedType);
             
             _editor.CreateNodeFromObject(obj);
             
@@ -148,41 +156,40 @@ namespace BlueprintEditor.Windows
 
         #endregion
         
-        #region TypesList
+        #region Toolbox
 
-        private void TypesList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TypesList_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
-            if (e.AddedItems.Count != 1)
-            {
-                _selectedType = null;
-                return;
-            }
-            _selectedType = (NodeTypeViewModel)e.AddedItems[0];
+            _selectedType = ClassSelector.SelectedClass;
         }
         
-        #region FilterBox
-
-        private void FilterBox_FilterEnter(object sender, KeyEventArgs e)
+        private void ToolboxVisible_OnClick(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (Toolbox.Visibility != Visibility.Collapsed)
             {
-                TypesList_UpdateFilter();
+                Toolbox.Visibility = Visibility.Collapsed;
+                ToolboxCollum.Width = new GridLength(0, GridUnitType.Pixel);
+            }
+            else
+            {
+                Toolbox.Visibility = Visibility.Visible;
+                ToolboxCollum.Width = new GridLength(180, GridUnitType.Pixel);
             }
         }
-        
-        private void TypesList_UpdateFilter()
-        {
-            if (TypesList_FilterBox.Text != "")
-            {
-                string filterText = TypesList_FilterBox.Text;
-                TypesList.Items.Filter = a => ((NodeTypeViewModel)a).Name.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0;
-                return;
-            }
 
-            TypesList.Items.Filter = null;
+        private void ToolboxClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            AddButton_OnClick(this, new RoutedEventArgs());
         }
 
         #endregion
+
+        #region Property Grid
+
+        private void UpdatePropertyGrid(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            
+        }
 
         #endregion
     }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Models.Types.NodeTypes.Shared.ScalableEmitterDocument;
 using BlueprintEditor.Utils;
@@ -19,12 +18,12 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
     {
         public override string AssetType => "ScalableEmitterDocument";
 
-        public override void PopulateTypesList(ItemCollection itemsCollection)
+        public override void PopulateTypesList(List<Type> typesList)
         {
             //populate types list
             foreach (Type type in TypeLibrary.GetTypes("ProcessorData"))
             {
-                itemsCollection.Add(new NodeTypeViewModel(type));
+                typesList.Add(type);
             }
         }
 

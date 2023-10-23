@@ -9,7 +9,6 @@ using System.Windows.Data;
 using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
-using BlueprintEditor.Models.MenuItems;
 using BlueprintEditor.Models.Types;
 using BlueprintEditor.Models.Types.NodeTypes;
 using FrostyEditor;
