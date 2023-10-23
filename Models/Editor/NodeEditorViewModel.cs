@@ -104,38 +104,42 @@ namespace BlueprintEditor.Models.Editor
             else if (NodeUtils.NmcExtensions.ContainsKey(key))
             {
                 newNode = new NodeBaseModel();
-                foreach (string arg in NodeUtils.NmcExtensions[key])
+                if (NodeUtils.NmcExtensions[key].All(arg => arg.Split('=')[0] != "ValidGameExecutableName")
+                    || NodeUtils.NmcExtensions[key].Any(arg => arg == $"ValidGameExecutableName={ProfilesLibrary.ProfileName}"))
                 {
-                    switch (arg.Split('=')[0])
+                    foreach (string arg in NodeUtils.NmcExtensions[key])
                     {
-                        case "DisplayName":
+                        switch (arg.Split('=')[0])
                         {
-                            newNode.Name = arg.Split('=')[1];
-                        } break;
-                        case "InputEvent":
-                        {
-                            newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
-                        } break;
-                        case "InputProperty":
-                        {
-                            newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
-                        } break;
-                        case "InputLink":
-                        {
-                            newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
-                        } break;
-                        case "OutputEvent":
-                        {
-                            newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
-                        } break;
-                        case "OutputProperty":
-                        {
-                            newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
-                        } break;
-                        case "OutputLink":
-                        {
-                            newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
-                        } break;
+                            case "DisplayName":
+                            {
+                                newNode.Name = arg.Split('=')[1];
+                            } break;
+                            case "InputEvent":
+                            {
+                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
+                            } break;
+                            case "InputProperty":
+                            {
+                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
+                            } break;
+                            case "InputLink":
+                            {
+                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
+                            } break;
+                            case "OutputEvent":
+                            {
+                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
+                            } break;
+                            case "OutputProperty":
+                            {
+                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
+                            } break;
+                            case "OutputLink":
+                            {
+                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
+                            } break;
+                        }
                     }
                 }
             }

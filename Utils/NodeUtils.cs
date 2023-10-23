@@ -7,6 +7,7 @@ using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types;
 using BlueprintEditor.Models.Types.NodeTypes;
 using Frosty.Core;
+using FrostySdk;
 using FrostySdk.Ebx;
 
 namespace BlueprintEditor.Utils
@@ -39,7 +40,7 @@ namespace BlueprintEditor.Utils
         {
             foreach (string dataType in DataTypes)
             {
-                if (typeName.Contains(dataType))
+                if (typeName.Contains(dataType) && typeName != dataType)
                 {
                     return typeName.Replace(dataType, "");
                 }
@@ -87,7 +88,10 @@ namespace BlueprintEditor.Utils
                 if (type.IsSubclassOf(typeof(NodeBaseModel)))
                 {
                     var extension = (NodeBaseModel)Activator.CreateInstance(type);
-                    NodeExtensions.Add(extension.ObjectType, extension);
+                    if (extension.ValidForGames == null || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName))
+                    {
+                        NodeExtensions.Add(extension.ObjectType, extension);
+                    }
                 }
             }
             
@@ -138,6 +142,10 @@ namespace BlueprintEditor.Utils
                             args.Add(currentLine.Replace(" = ", "="));
                         } break;
                         case "OutputLink":
+                        {
+                            args.Add(currentLine.Replace(" = ", "="));
+                        } break;
+                        case "ValidGameExecutableName":
                         {
                             args.Add(currentLine.Replace(" = ", "="));
                         } break;

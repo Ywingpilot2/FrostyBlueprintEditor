@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using BlueprintEditor.Models.Connections;
+using FrostySdk;
 using FrostySdk.Ebx;
 
 namespace BlueprintEditor.Models.Types.NodeTypes
@@ -13,6 +15,12 @@ namespace BlueprintEditor.Models.Types.NodeTypes
     public class NodeBaseModel : INotifyPropertyChanged
     {
         public virtual string Name { get; set; }
+        
+        /// <summary>
+        /// The games this node is valid for. If this node is valid for all games, don't override.
+        /// This should be the name as seen in <see cref="ProfilesLibrary"/>
+        /// </summary>
+        public virtual List<string> ValidForGames { get; set; } = null; 
 
         public virtual SolidColorBrush HeaderColor { get; set; } =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3F3F3F"));
