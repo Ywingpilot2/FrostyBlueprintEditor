@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using BlueprintEditor.Models.Connections;
@@ -6,6 +7,7 @@ using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
 using Frosty.Core;
+using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 
@@ -52,6 +54,35 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
             NodeEditor.EditedProperties.Objects.Add(pointerRef);
             NodeEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
             return obj;
+        }
+        
+        /// <summary>
+        /// Used to add a new Object to ebx
+        /// </summary>
+        /// <returns></returns>
+        public virtual object AddNodeObject(object obj)
+        {
+            FrostyClipboard.Current.SetData(obj);
+            object copy = FrostyClipboard.Current.GetData();
+            
+            PointerRef pointerRef = new PointerRef(copy);
+            AssetClassGuid guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(
+                NodeEditor.EditedEbxAsset.Objects,
+                obj.GetType(),
+                NodeEditor.EditedEbxAsset.FileGuid), -1); //TODO: THIS CODE SUCKS! PLEASE UPDATE!
+            ((dynamic)pointerRef.Internal).SetInstanceGuid(guid);
+            
+            //No idea what this does
+            if (TypeLibrary.IsSubClassOf(pointerRef.Internal, "DataBusPeer"))
+            {
+                byte[] b = guid.ExportedGuid.ToByteArray();
+                uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
+                pointerRef.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(pointerRef.Internal, value);
+            }
+            
+            NodeEditor.EditedProperties.Objects.Add(pointerRef);
+            NodeEditor.EditedEbxAsset.AddObject(pointerRef.Internal);
+            return copy;
         }
 
         /// <summary>

@@ -160,6 +160,7 @@ namespace BlueprintEditor.Models.Editor
         }
 
         public object CreateNodeObject(Type type) => EbxEditor.AddNodeObject(type);
+        public object CreateNodeObject(object obj) => EbxEditor.AddNodeObject(obj);
 
         /// <summary>
         /// Deletes a node(and by extension all of its connections).

@@ -76,6 +76,7 @@ namespace BlueprintEditor.Windows
             TabControl.Items.Add(ti);
 
             //Setup UI methods
+            Editor.KeyDown += Editor_ControlInput;
             Editor.KeyUp += Editor_ControlInput;
             _editor.SelectedNodes.CollectionChanged += UpdatePropertyGrid;
         }
@@ -109,6 +110,35 @@ namespace BlueprintEditor.Windows
                 while (_editor.SelectedNodes.Count != 0)
                 {
                     _editor.DeleteNode(_editor.SelectedNodes[0]);
+                }
+            }
+            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                if (Keyboard.IsKeyDown(Key.D))
+                {
+                    if (_editor.SelectedNodes.Count != 0)
+                    {
+                        List<NodeBaseModel> nodesToDupe = new List<NodeBaseModel>(_editor.SelectedNodes);
+                        _editor.SelectedNodes.Clear();
+                        while (nodesToDupe.Count != 0)
+                        {
+                            var nodeToDupe = nodesToDupe[0];
+                            if (nodeToDupe.ObjectType != "EditorInterfaceNode")
+                            {
+                                object dupedObj = _editor.CreateNodeObject(nodeToDupe.Object);
+                                NodeBaseModel dupe = _editor.CreateNodeFromObject(dupedObj);
+                                dupe.Location = new Point(nodeToDupe.Location.X + 10, nodeToDupe.Location.Y + 10);
+                                _editor.SelectedNodes.Add(dupe);
+                            }
+                            else
+                            {
+                                App.Logger.LogError("Cannot dupe Interface nodes!");
+                            }
+
+                            nodesToDupe.Remove(nodeToDupe);
+                        }
+                        App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+                    }
                 }
             }
         }
