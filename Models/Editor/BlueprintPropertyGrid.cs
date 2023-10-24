@@ -688,6 +688,13 @@ namespace BlueprintEditor.Models.Editor
             else
             {
                 PropertyValueBinding binding = e.Item.Binding as PropertyValueBinding;
+
+                var parent = e.Item;
+                while (binding == null)
+                {
+                    binding = parent.Binding as PropertyValueBinding;
+                    parent = parent.Parent;
+                }
                 nodeObj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(binding);
             }
 

@@ -41,9 +41,7 @@ namespace BlueprintEditor.Models.Types.NodeTypes.ExampleTypes
         /// And its type, so Event, Property, and Link
         /// </summary>
         public override ObservableCollection<OutputViewModel> Outputs { get; set; } =
-            new ObservableCollection<OutputViewModel>()
-            {
-            };
+            new ObservableCollection<OutputViewModel>();
 
         /// <summary>
         /// Don't use an initializer when working with these, instead, override the OnCreation method.
@@ -52,7 +50,23 @@ namespace BlueprintEditor.Models.Types.NodeTypes.ExampleTypes
         /// </summary>
         public override void OnCreation()
         {
-            base.OnCreation(); //Always make sure to have this here. Otherwise things will break
+            base.OnCreation();
+            foreach (CString eventName in Object.Events) //Go through all of the Events this SelectEvent has
+            {
+                //And for each one, add it to our Outputs
+                Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
+                Inputs.Add(new InputViewModel() {Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event});
+            }
+        }
+
+        /// <summary>
+        /// This will trigger whenever the SelectEvent is modified
+        /// Since we want to make sure our SelectEvent is in sync with the property grid, we redo our OnCreation
+        /// </summary>
+        public override void OnModified()
+        {
+            Outputs.Clear();
+            Inputs.Clear();
             foreach (CString eventName in Object.Events) //Go through all of the Events this SelectEvent has
             {
                 //And for each one, add it to our Outputs

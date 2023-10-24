@@ -23,7 +23,7 @@ using BlueprintEditor.Extensions;
 [assembly: Guid("4b612468-9b6a-4304-88a5-055c3575eb3d")]
 
 [assembly: PluginDisplayName("Blueprint Editor")]
-[assembly: PluginAuthor("Y wingpilot2, CadeEvs, Galaxyman2015")]
-[assembly: PluginVersion("0.1.0")]
+[assembly: PluginAuthor("Y wingpilot2, CadeEvs, Galaxyman2015, MagixGames, Dyvinia")]
+[assembly: PluginVersion("1.0.0")]
 
 [assembly: RegisterMenuExtension(typeof(ViewBlueprintMenuExtension))]
