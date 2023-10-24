@@ -14,7 +14,15 @@ namespace BlueprintEditor.Models.Types.NodeTypes
     /// </summary>
     public class NodeBaseModel : INotifyPropertyChanged
     {
+        /// <summary>
+        /// The name that will be displayed
+        /// </summary>
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// The documentation for this node
+        /// </summary>
+        public virtual string Documentation => "";
         
         /// <summary>
         /// The games this node is valid for. If this node is valid for all games, don't override.
@@ -162,6 +170,14 @@ namespace BlueprintEditor.Models.Types.NodeTypes
         /// </summary>
         /// <param name="output">The output that was updated</param>
         public virtual void OnOutputUpdated(OutputViewModel output)
+        {
+            
+        }
+
+        /// <summary>
+        /// This method executes whenever the node is modified
+        /// </summary>
+        public virtual void OnModified()
         {
             
         }

@@ -5,6 +5,7 @@ using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
+using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
 
@@ -156,6 +157,31 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
                         linkConnection);
                     connection.Object = linkConnection;
                 } break;
+            }
+        }
+
+        /// <summary>
+        /// This method is triggered whenever something is edited in the property grid.
+        /// It is one of the most important parts of the EbxEditor, ensuring that the Nodes, Property grid, and the actual Ebx stay in sync.
+        /// </summary>
+        /// <param name="nodeObj"></param>
+        public virtual void EditEbx(object nodeObj)
+        {
+            dynamic nodeProperties = nodeObj;
+            AssetClassGuid nodeGuid = nodeProperties.GetInstanceGuid();
+            NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
+            node.Object = nodeObj;
+            node.OnModified();
+            
+            //TODO: Update this so we aren't enumerating over ever single asset in the entire file
+            for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
+            {
+                PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
+                if (((dynamic)pointerRef.Internal).GetInstanceGuid() == nodeGuid)
+                {
+                    NodeEditor.EditedProperties.Objects[i] = new PointerRef(nodeObj);
+                    break;
+                }
             }
         }
     }

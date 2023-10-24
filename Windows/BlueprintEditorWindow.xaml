@@ -25,6 +25,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/BlueprintEditor;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/BlueprintEditor;component/Windows/PropertyGridWindow.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Nodify;component/Themes/Dark.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
@@ -66,7 +67,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition x:Name="ToolboxCollum" Width="140" />
                     <ColumnDefinition />
-                    <!--<ColumnDefinition x:Name="PropertyGridCollum" Width="180" />-->
+                    <ColumnDefinition x:Name="PropertyGridCollum" Width="180" />
                 </Grid.ColumnDefinitions>
 
                 <!--Blueprint Editor(for editing connections)-->
@@ -179,9 +180,13 @@
 
                 <!--Toolbox(for adding and removing nodes)-->
                 <Grid Grid.Column="0" x:Name="Toolbox">
-
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="85"/>
+                    </Grid.RowDefinitions>
+                    
                     <!--This contains a list of all of the types we can use and a filter box-->
-                    <Border BorderBrush="{StaticResource ScrollbarBackground}"
+                    <Border Grid.Row="0" BorderBrush="{StaticResource ScrollbarBackground}"
                             BorderThickness="0">
                         <controls:FrostyClassSelector x:Name="ClassSelector" 
                                                       SelectedItemChanged="TypesList_OnSelectionChanged" 
@@ -211,13 +216,38 @@
                             </Grid>
                         </Grid>-->
                     </Border>
+                    
+                    <!--Documentation on the type-->
+                    <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Border Background="#454545">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="18"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock FontWeight="Bold" Margin="7 0 0 0" VerticalAlignment="Top" x:Name="DocBoxName" Foreground="{StaticResource FontColor}"></TextBlock>
+                                        <Path Grid.Column="1" Fill="White" Width="11" Height="11" Data="m 4 9 h 2 v 2 H 4 Z M 1 4 V 1 H 2 V 0 H 8 V 1 H 9 V 6 H 8 V 7 H 6 V 8 H 4 V 6 H 5 V 5 H 7 V 2 H 3 v 2 z"/>
+                                    </Grid>
+                                </Border>
+
+                                <Grid Grid.Row="1">
+                                    <TextBox Padding="4" IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" x:Name="DocBoxText" Foreground="{StaticResource FontColor}"></TextBox>
+                                </Grid>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Column="2" x:Name="PropertyGrid">
+                    <ctrl:FrostyTabControl x:Name="TabControl">
+
+                    </ctrl:FrostyTabControl>
                 </Grid>
                 
-                <!--TODO: Property grid-->
-                <!--<ctrl:FrostyTabControl Grid.Column="2" x:Name="TabControl">
-                    
-                </ctrl:FrostyTabControl>-->
-
                 <!--This through what I presume to be black magic
             Allows the user to change the size of the Nodes window-->
                 <GridSplitter Grid.Column="0"
@@ -225,11 +255,11 @@
                               Width="3"
                               ResizeDirection="Columns"
                               />
-                <!--<GridSplitter Grid.Column="1"
+                <GridSplitter Grid.Column="1"
                               Background="{StaticResource SubItemPressed}"
                               Width="3"
                               ResizeDirection="Columns"
-                />-->
+                />
             </Grid>
         </Border>
 
@@ -284,7 +314,17 @@
                             HorizontalAlignment="Left"
                             Click="ToolboxVisible_OnClick"
                             ToolTip="Open/Close the toolbox window">
-                        <Image Source="/FrostyEditor;component/Images/Open.png"
+                        <Image Source="/FrostyEditor;component/Images/ClassRef.png"
+                               Width="20" />
+                    </Button>
+                    <Button x:Name="PropertyGridVisible"
+                            Width="20"
+                            Height="20"
+                            Margin="4,-2,0,0"
+                            HorizontalAlignment="Left"
+                            Click="PropertyGridVisible_OnClick"
+                            ToolTip="Open/Close the property grid">
+                        <Image Source="/FrostyEditor;component/Images/Grid.png"
                                Width="20" />
                     </Button>
                 </StackPanel>

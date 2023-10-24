@@ -63,6 +63,7 @@ namespace BlueprintEditor.Models.Editor
                 return ebxEditor;
             }
         }
+        public BlueprintPropertyGrid PropertyGrid { get; set; }
         public EbxAsset EditedEbxAsset { get; set; }
         public dynamic EditedProperties => EditedEbxAsset.RootObject;
         public AssetClassGuid InterfaceGuid { get; private set; }
@@ -327,6 +328,13 @@ namespace BlueprintEditor.Models.Editor
             #endregion
         }
 
+        public void EditNodeProperties(object nodeObj)
+        {
+            EbxEditor.EditEbx(nodeObj);
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
+            App.EditorWindow.DataExplorer.RefreshItems();
+        }
+
         #endregion
 
         #region Interfaces
@@ -503,6 +511,48 @@ namespace BlueprintEditor.Models.Editor
                 }
             });
             return connections;
+        }
+
+        #endregion
+
+        #region Getting Nodes
+
+        /// <summary>
+        /// Get a node from an Object
+        /// </summary>
+        /// <param name="nodeObj"></param>
+        /// <returns></returns>
+        public NodeBaseModel GetNode(object nodeObj)
+        {
+            NodeBaseModel got = null;
+            Parallel.ForEach(Nodes, (node, state) =>
+            {
+                if (node.Equals(nodeObj))
+                {
+                    got = node;
+                    state.Break();
+                }
+            });
+            return got;
+        }
+        
+        /// <summary>
+        /// Get a node from a guid
+        /// </summary>
+        /// <param name="nodeGuid"></param>
+        /// <returns></returns>
+        public NodeBaseModel GetNode(AssetClassGuid nodeGuid)
+        {
+            NodeBaseModel got = null;
+            Parallel.ForEach(Nodes, (node, state) =>
+            {
+                if (node.Guid == nodeGuid)
+                {
+                    got = node;
+                    state.Break();
+                }
+            });
+            return got;
         }
 
         #endregion

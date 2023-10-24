@@ -67,6 +67,14 @@ namespace BlueprintEditor.Windows
             _loader.PopulateTypesList(_types);
             ClassSelector.Types = _types;
 
+            _editor.PropertyGrid = new BlueprintPropertyGrid() { NodeEditor = _editor };
+            FrostyTabItem ti = new FrostyTabItem()
+            {
+                Header = "Property Grid",
+                Content = _editor.PropertyGrid
+            };
+            TabControl.Items.Add(ti);
+
             //Setup UI methods
             Editor.KeyUp += Editor_ControlInput;
             _editor.SelectedNodes.CollectionChanged += UpdatePropertyGrid;
@@ -161,6 +169,18 @@ namespace BlueprintEditor.Windows
         private void TypesList_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             _selectedType = ClassSelector.SelectedClass;
+            if (_selectedType != null)
+            {
+                DocBoxName.Text = _selectedType.Name;
+                if (NodeUtils.NodeExtensions.ContainsKey(_selectedType.Name))
+                {
+                    DocBoxText.Text = NodeUtils.NodeExtensions[_selectedType.Name].Documentation;
+                }
+                else if (NodeUtils.NmcExtensions.ContainsKey(_selectedType.Name) && NodeUtils.NmcExtensions[_selectedType.Name].Any(x => x.StartsWith("Documentation")))
+                {
+                    DocBoxText.Text = NodeUtils.NmcExtensions[_selectedType.Name].Find(x => x.StartsWith("Documentation")).Split('=')[1];
+                }
+            }
         }
         
         private void ToolboxVisible_OnClick(object sender, RoutedEventArgs e)
@@ -173,7 +193,7 @@ namespace BlueprintEditor.Windows
             else
             {
                 Toolbox.Visibility = Visibility.Visible;
-                ToolboxCollum.Width = new GridLength(180, GridUnitType.Pixel);
+                ToolboxCollum.Width = new GridLength(140, GridUnitType.Pixel);
             }
         }
 
@@ -188,7 +208,27 @@ namespace BlueprintEditor.Windows
 
         private void UpdatePropertyGrid(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_editor.SelectedNodes.Count == 0)
+            {
+                _editor.PropertyGrid.Object = null;
+                return;
+            }
             
+            _editor.PropertyGrid.Object = _editor.SelectedNodes.First().Object;
+        }
+        
+        private void PropertyGridVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (PropertyGrid.Visibility != Visibility.Collapsed)
+            {
+                PropertyGrid.Visibility = Visibility.Collapsed;
+                PropertyGridCollum.Width = new GridLength(0, GridUnitType.Pixel);
+            }
+            else
+            {
+                PropertyGrid.Visibility = Visibility.Visible;
+                PropertyGridCollum.Width = new GridLength(180, GridUnitType.Pixel);
+            }
         }
 
         #endregion

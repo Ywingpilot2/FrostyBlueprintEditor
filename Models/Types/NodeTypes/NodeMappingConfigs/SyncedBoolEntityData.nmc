@@ -4,3 +4,4 @@ InputEvent = SetTrue
 InputEvent = SetFalse
 InputProperty = In
 OutputProperty = Out
+Documentation = This node allows you to transfer a server side boolean to client side. Used for things like objective progress UI.
