@@ -14,6 +14,7 @@ using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Models.Types.NodeTypes.Shared;
 using BlueprintEditor.Utils;
 using Frosty.Core;
+using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -33,8 +34,6 @@ namespace BlueprintEditor.Models.Editor
     {
         public ObservableCollection<NodeBaseModel> Nodes { get; } = new ObservableCollection<NodeBaseModel>();
         
-        public Dictionary<string, InterfaceDataNode> InterfaceInputDataNodes = new Dictionary<string, InterfaceDataNode>();
-        public Dictionary<string, InterfaceDataNode> InterfaceOutputDataNodes = new Dictionary<string, InterfaceDataNode>();
         public ObservableCollection<NodeBaseModel> SelectedNodes { get; } = new ObservableCollection<NodeBaseModel>();
         public ObservableCollection<ConnectionViewModel> Connections { get; } = new ObservableCollection<ConnectionViewModel>();
         public PendingConnectionViewModel PendingConnection { get; }
@@ -43,27 +42,9 @@ namespace BlueprintEditor.Models.Editor
 
         public string EditorName { get; }
 
-        private EbxBaseEditor EbxEditor
-        {
-            get
-            {
-                var ebxEditor = new EbxBaseEditor();
-                foreach (var type in Assembly.GetCallingAssembly().GetTypes())
-                {
-                    if (type.IsSubclassOf(typeof(EbxBaseEditor)))
-                    {
-                        var extension = (EbxBaseEditor)Activator.CreateInstance(type);
-                        if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
-                        ebxEditor = extension;
-                        break;
-                    }
-                }
-
-                ebxEditor.NodeEditor = this;
-                return ebxEditor;
-            }
-        }
-        public BlueprintPropertyGrid PropertyGrid { get; set; }
+        private readonly EbxBaseEditor _ebxEditor;
+        public BlueprintPropertyGrid NodePropertyGrid { get; set; }
+        public BlueprintPropertyGrid InterfacePropertyGrid { get; set; }
         public EbxAsset EditedEbxAsset { get; set; }
         public dynamic EditedProperties => EditedEbxAsset.RootObject;
         public AssetClassGuid InterfaceGuid { get; private set; }
@@ -72,8 +53,23 @@ namespace BlueprintEditor.Models.Editor
         {
             EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.EditorWindow.GetOpenedAssetEntry());
             EditorName = App.EditorWindow.GetOpenedAssetEntry().Filename;
+            
+            EbxBaseEditor ebxEditor = new EbxBaseEditor();
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
+            {
+                if (type.IsSubclassOf(typeof(EbxBaseEditor)))
+                {
+                    EbxBaseEditor extension = (EbxBaseEditor)Activator.CreateInstance(type);
+                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
+                    ebxEditor = extension;
+                    break;
+                }
+            }
 
-            PendingConnection = new PendingConnectionViewModel(this, EbxEditor);
+            ebxEditor.NodeEditor = this;
+            _ebxEditor = ebxEditor;
+
+            PendingConnection = new PendingConnectionViewModel(this, _ebxEditor);
             
             DisconnectConnectorCommand = new DelegateCommand<Object>(connector =>
             {
@@ -82,8 +78,32 @@ namespace BlueprintEditor.Models.Editor
                     ? Connections.First(x => x.Target == connector)
                     : Connections.First(x => x.Source == connector));
             });
-
+            
             EditorUtils.Editors.Add(EditorName, this);
+        }
+
+        public event EventHandler<EditorStatusArgs> EditorStatusChanged;
+        
+        /// <summary>
+        /// Sets the Editor's problem status.
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="id"></param>
+        /// <param name="toolTip"></param>
+        public void SetEditorStatus(EditorStatus status, int id, string toolTip = null)
+        {
+            EditorStatusChanged?.Invoke(this, new EditorStatusArgs(status, id, toolTip));
+        }
+        
+        public event EventHandler<EditorStatusArgs> RemoveEditorStatus;
+        /// <summary>
+        /// Removes a problem ID of a certain status from the list of problems.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="status"></param>
+        public void ResetEditorStatus(int id, EditorStatus status)
+        {
+            RemoveEditorStatus?.Invoke(this, new EditorStatusArgs(status, id));
         }
 
         #region Node Editing
@@ -159,8 +179,8 @@ namespace BlueprintEditor.Models.Editor
             return newNode;
         }
 
-        public object CreateNodeObject(Type type) => EbxEditor.AddNodeObject(type);
-        public object CreateNodeObject(object obj) => EbxEditor.AddNodeObject(obj);
+        public object CreateNodeObject(Type type) => _ebxEditor.AddNodeObject(type);
+        public object CreateNodeObject(object obj) => _ebxEditor.AddNodeObject(obj);
 
         /// <summary>
         /// Deletes a node(and by extension all of its connections).
@@ -319,7 +339,7 @@ namespace BlueprintEditor.Models.Editor
                 Disconnect(connection);
             }
 
-            EbxEditor.RemoveNodeObject(node);
+            _ebxEditor.RemoveNodeObject(node);
             
             Nodes.Remove(node);
             
@@ -329,11 +349,12 @@ namespace BlueprintEditor.Models.Editor
             #endregion
         }
 
-        public void EditNodeProperties(object nodeObj)
+        public bool EditNodeProperties(object nodeObj, ItemModifiedEventArgs args)
         {
-            EbxEditor.EditEbx(nodeObj);
+            bool worked = _ebxEditor.EditEbx(nodeObj, args);
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
+            return worked;
         }
 
         #endregion
@@ -353,56 +374,125 @@ namespace BlueprintEditor.Models.Editor
             {
                 if (field.AccessType.ToString() == "FieldAccessType_Source") //Source
                 {
-                    NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
+                    InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
                     node.Object = obj;
-                    Nodes.Add(node);
+                    if (!InterfaceInputDataNodes.ContainsKey(node.Inputs[0].Title))
+                    {
+                        Nodes.Add(node);
+                        InterfaceInputDataNodes.Add(node.Inputs[0].Title, node);
+                    }
                 }
                 else if (field.AccessType.ToString() == "FieldAccessType_Target") //Target
                 {
-                    NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
+                    InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
                     node.Object = obj;
-                    Nodes.Add(node);
+                    if (!InterfaceOutputDataNodes.ContainsKey(node.Outputs[0].Title))
+                    {
+                        Nodes.Add(node);
+                        InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                    }
                 }
                 else //Source and Target
                 {
-                    NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
+                    InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(field, true, InterfaceGuid);
                     node.Object = obj;
-                    Nodes.Add(node);
+                    if (!InterfaceOutputDataNodes.ContainsKey(node.Outputs[0].Title))
+                    {
+                        Nodes.Add(node);
+                        InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                    }
                     
                     node = InterfaceDataNode.CreateInterfaceDataNode(field, false, InterfaceGuid);
                     node.Object = obj;
-                    Nodes.Add(node);
+                    if (!InterfaceInputDataNodes.ContainsKey(node.Inputs[0].Title))
+                    {
+                        Nodes.Add(node);
+                        InterfaceInputDataNodes.Add(node.Inputs[0].Title, node);
+                    }
                 }
             }
 
             foreach (dynamic inputEvent in ((dynamic)obj).InputEvents)
             {
-                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(inputEvent, true, InterfaceGuid);
+                InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(inputEvent, true, InterfaceGuid);
                 node.Object = obj;
-                Nodes.Add(node);
+                if (!InterfaceOutputDataNodes.ContainsKey(node.Outputs[0].Title))
+                {
+                    Nodes.Add(node);
+                    InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                }
             }
                 
             foreach (dynamic outputEvent in ((dynamic)obj).OutputEvents)
             {
-                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(outputEvent, false, InterfaceGuid);
+                InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(outputEvent, false, InterfaceGuid);
                 node.Object = obj;
-                Nodes.Add(node);
+                if (!InterfaceInputDataNodes.ContainsKey(node.Inputs[0].Title))
+                {
+                    Nodes.Add(node);
+                    InterfaceInputDataNodes.Add(node.Inputs[0].Title, node);
+                }
             }
                 
             foreach (dynamic inputLink in ((dynamic)obj).InputLinks)
             {
-                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(inputLink, true, InterfaceGuid);
+                InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(inputLink, true, InterfaceGuid);
                 node.Object = obj;
-                Nodes.Add(node);
+                if (!InterfaceOutputDataNodes.ContainsKey(node.Outputs[0].Title))
+                {
+                    Nodes.Add(node);
+                    InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                }
             }
                 
             foreach (dynamic outputLink in ((dynamic)obj).OutputLinks)
             {
-                NodeBaseModel node = InterfaceDataNode.CreateInterfaceDataNode(outputLink, false, InterfaceGuid);
+                InterfaceDataNode node = InterfaceDataNode.CreateInterfaceDataNode(outputLink, false, InterfaceGuid);
                 node.Object = obj;
-                Nodes.Add(node);
+                if (!InterfaceInputDataNodes.ContainsKey(node.Inputs[0].Title))
+                {
+                    Nodes.Add(node);
+                    InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                }
             }
         }
+        
+        /// <summary>
+        /// Recreates the list of interface nodes based off of the old and new interface
+        /// </summary>
+        /// <param name="newObj">InterfaceDescriptorData</param>
+        /// <returns></returns>
+        public void RefreshInterfaceNodes(object newObj)
+        {
+            CreateInterfaceNodes(newObj);
+
+            List<string> interfaceNodesToRemove = new List<string>();
+            foreach (InterfaceDataNode interfaceDataNode in InterfaceInputDataNodes.Values.Where(interfaceDataNode =>
+                         (interfaceDataNode.InterfaceItem.GetType().Name == "DataField" && !((dynamic)newObj).Fields.Contains(interfaceDataNode.InterfaceItem))
+                         || (interfaceDataNode.InterfaceItem.GetType().Name == "DynamicEvent" && !((dynamic)newObj).OutputEvents.Contains(interfaceDataNode.InterfaceItem))
+                         || (interfaceDataNode.InterfaceItem.GetType().Name == "DynamicLink" && !((dynamic)newObj).OutputLinks.Contains(interfaceDataNode.InterfaceItem))))
+            {
+                DeleteNode(interfaceDataNode);
+                interfaceNodesToRemove.Add(interfaceDataNode.Inputs[0].Title);
+            }
+            foreach (InterfaceDataNode interfaceDataNode in InterfaceOutputDataNodes.Values.Where(interfaceDataNode =>
+                         (interfaceDataNode.InterfaceItem.GetType().Name == "DataField" && !((dynamic)newObj).Fields.Contains(interfaceDataNode.InterfaceItem))
+                         || (interfaceDataNode.InterfaceItem.GetType().Name == "DynamicEvent" && !((dynamic)newObj).InputEvents.Contains(interfaceDataNode.InterfaceItem))
+                         || (interfaceDataNode.InterfaceItem.GetType().Name == "DynamicLink" && !((dynamic)newObj).InputLinks.Contains(interfaceDataNode.InterfaceItem))))
+            {
+                DeleteNode(interfaceDataNode);
+                interfaceNodesToRemove.Add(interfaceDataNode.Outputs[0].Title);
+            }
+
+            foreach (var remove in interfaceNodesToRemove)
+            {
+                InterfaceInputDataNodes.Remove(remove);
+                InterfaceOutputDataNodes.Remove(remove);
+            }
+        }
+        
+        public Dictionary<string, InterfaceDataNode> InterfaceInputDataNodes = new Dictionary<string, InterfaceDataNode>();
+        public Dictionary<string, InterfaceDataNode> InterfaceOutputDataNodes = new Dictionary<string, InterfaceDataNode>();
 
         #endregion
 
@@ -426,7 +516,13 @@ namespace BlueprintEditor.Models.Editor
             return connection;
         }
 
-        private void Disconnect(ConnectionViewModel connection)
+        public void CreateConnectionObject(ConnectionViewModel connection) => _ebxEditor.CreateConnectionObject(connection);
+
+        /// <summary>
+        /// Removes a connection
+        /// </summary>
+        /// <param name="connection"></param>
+        public void Disconnect(ConnectionViewModel connection)
         {
             App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid));
             
@@ -449,7 +545,7 @@ namespace BlueprintEditor.Models.Editor
             connection.Source.IsConnected = sourceConnected;
             connection.Target.IsConnected = targetConnected;
             
-            EbxEditor.RemoveConnectionObject(connection);
+            _ebxEditor.RemoveConnectionObject(connection);
 
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
@@ -554,6 +650,27 @@ namespace BlueprintEditor.Models.Editor
                 }
             });
             return got;
+        }
+
+        /// <summary>
+        /// Gets an interface node(s) from its name. Normally there can only be 1 of these, but Fields can be both Source and Target, meaning 2 can have the same name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>A list of all of the nodes found</returns>
+        public List<InterfaceDataNode> GetNode(string name)
+        {
+            List<InterfaceDataNode> nodes = new List<InterfaceDataNode>();
+            if (InterfaceInputDataNodes.ContainsKey(name))
+            {
+                nodes.Add(InterfaceInputDataNodes[name]);
+            }
+
+            if (InterfaceOutputDataNodes.ContainsKey(name))
+            {
+                nodes.Add(InterfaceOutputDataNodes[name]);
+            }
+
+            return nodes;
         }
 
         #endregion

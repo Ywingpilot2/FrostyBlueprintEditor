@@ -24,6 +24,11 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
         /// e.g, LogicPrefabBlueprint
         /// </summary>
         public virtual string AssetType { get; } = "null";
+
+        /// <summary>
+        /// Whether or not this type has an Interface
+        /// </summary>
+        public virtual bool HasInterface => true;
         public EditorViewModel NodeEditor { get; set; }
 
         /// <summary>
@@ -56,6 +61,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 NodeBaseModel node = NodeEditor.CreateNodeFromObject(obj);
                 if (NodeIdCache.ContainsKey(node.Guid))
                 {
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{node.Guid}_identical"), $"Multiple nodes share the guid {node.Guid}");
                     continue;
                 }
                 NodeIdCache.Add(node.Guid, NodeEditor.Nodes.IndexOf(node));
@@ -75,7 +81,11 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
             foreach (dynamic propertyConnection in properties.PropertyConnections)
             {
                 //TODO: Update to check if external ref
-                if (propertyConnection.Source.Internal == null || propertyConnection.Target.Internal == null) continue; 
+                if (propertyConnection.Source.Internal == null || propertyConnection.Target.Internal == null)
+                {
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
+                    continue;
+                } 
 
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
@@ -107,6 +117,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 if (sourceNode == null || targetNode == null)
                 {
                     App.Logger.LogError("Node was null!");
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file are invalid, certain connections maybe missing from this ui as a result.");
                     continue;
                 }
                 
@@ -155,6 +166,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 if (sourceNode == null || targetNode == null)
                 {
                     App.Logger.LogError("Node was null!");
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, $"Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
                 }
                 
@@ -203,6 +215,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
                 if (sourceNode == null || targetNode == null)
                 {
                     App.Logger.LogError("Node was null!");
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, $"Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
                 }
                 

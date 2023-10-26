@@ -242,7 +242,7 @@
                     </Grid>
                 </Grid>
 
-                <Grid Grid.Column="2" x:Name="PropertyGrid">
+                <Grid Grid.Column="2" x:Name="PropertyGrid" GotMouseCapture="BlueprintEditorWindow_OnGotFocus">
                     <ctrl:FrostyTabControl x:Name="TabControl">
 
                     </ctrl:FrostyTabControl>
@@ -263,12 +263,13 @@
             </Grid>
         </Border>
 
-        <!--Header with buttons-->
+        <!--Header with buttons and status-->
         <Border Grid.Row="0" BorderBrush="{StaticResource SubItemPressed}" BorderThickness="1">
             <Grid Background="{StaticResource ControlBackground}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80" />
                     <ColumnDefinition />
+                    <ColumnDefinition Width="35" />
                 </Grid.ColumnDefinitions>
                 
                 <!--Toolbox buttons-->
@@ -327,6 +328,23 @@
                         <Image Source="/FrostyEditor;component/Images/Grid.png"
                                Width="20" />
                     </Button>
+                </StackPanel>
+                
+                <!--Status-->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Image x:Name="StatusGoodImage" 
+                           Source="/FrostyCore;component/Images/Tick.png"
+                           Width="20" />
+                    <Image x:Name="StatusBadImage" 
+                           Source="/FrostyCore;component/Images/Warning.png"
+                           ToolTip="An unknown problem has been found with the blueprint"
+                           Width="20" 
+                           Visibility="Collapsed"/>
+                    <Image x:Name="StatusOhShitImage" 
+                           Source="/FrostyCore;component/Images/Cross.png"
+                           ToolTip="An unknown error has been found with the blueprint"
+                           Width="20" 
+                           Visibility="Collapsed"/>
                 </StackPanel>
                 
                 <GridSplitter Grid.Column="0"

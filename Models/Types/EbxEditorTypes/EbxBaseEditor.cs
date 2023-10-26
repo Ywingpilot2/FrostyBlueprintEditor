@@ -2,10 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Windows;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.Types.NodeTypes;
+using BlueprintEditor.Models.Types.NodeTypes.Shared;
 using BlueprintEditor.Utils;
+using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
@@ -195,25 +198,213 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
         /// This method is triggered whenever something is edited in the property grid.
         /// It is one of the most important parts of the EbxEditor, ensuring that the Nodes, Property grid, and the actual Ebx stay in sync.
         /// </summary>
-        /// <param name="nodeObj"></param>
-        public virtual void EditEbx(object nodeObj)
+        /// <param name="newObj"></param>
+        public virtual bool EditEbx(object newObj, ItemModifiedEventArgs args)
         {
-            dynamic nodeProperties = nodeObj;
-            AssetClassGuid nodeGuid = nodeProperties.GetInstanceGuid();
-            NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
-            node.Object = nodeObj;
-            node.OnModified();
-            
-            //TODO: Update this so we aren't enumerating over ever single asset in the entire file
-            for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
+            if (newObj.GetType().Name != "InterfaceDescriptorData" && newObj.GetType().Name != "DataField" && newObj.GetType().Name != "DynamicEvent" && newObj.GetType().Name != "DynamicLink")
             {
-                PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
-                if (((dynamic)pointerRef.Internal).GetInstanceGuid() == nodeGuid)
+                dynamic nodeProperties = newObj;
+                AssetClassGuid nodeGuid = nodeProperties.GetInstanceGuid();
+                NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
+                node.Object = newObj;
+                node.OnModified();
+            
+                //TODO: Update this so we aren't enumerating over every single asset in the entire file
+                for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
                 {
-                    NodeEditor.EditedProperties.Objects[i] = new PointerRef(nodeObj);
-                    break;
+                    PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
+                    if (((dynamic)pointerRef.Internal).GetInstanceGuid() == nodeGuid)
+                    {
+                        NodeEditor.EditedProperties.Objects[i] = new PointerRef(newObj);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                switch (newObj.GetType().Name)
+                {
+                    case "InterfaceDescriptorData":
+                    {
+                        NodeEditor.RefreshInterfaceNodes(newObj);
+                        NodeEditor.EditedProperties.Interface = new PointerRef(newObj);
+                        return true;
+                    } break;
+                    
+                    case "DataField":
+                    {
+                        string name;
+                        
+                        //If we aren't editing the name then we can just check for the name of the object
+                        if (args.Item.Name != "Name")
+                        {
+                            name = ((dynamic)newObj).Name.ToString();
+                        }
+                        //If we are editing the name we need to know the old name, that way we can find what to rename
+                        else
+                        {
+                            name = args.OldValue.ToString();
+                            
+                            //If the new name and the old name are the same, we can just move on
+                            if (name == ((dynamic)newObj).Name.ToString())
+                            {
+                                return true;
+                            }
+                        }
+
+                        switch (args.Item.Name)
+                        {
+                            case "AccessType":
+                            {
+                                List<InterfaceDataNode> list = NodeEditor.GetNode(name);
+                                foreach (InterfaceDataNode node in list)
+                                {
+                                    foreach (ConnectionViewModel connection in NodeEditor.GetConnections(node))
+                                    {
+                                        NodeEditor.Disconnect(connection);
+                                    }
+
+                                    NodeEditor.Nodes.Remove(node);
+                                    NodeEditor.InterfaceInputDataNodes.Remove(name);
+                                    NodeEditor.InterfaceOutputDataNodes.Remove(name);
+                                }
+
+                                FrostyPropertyGridItemData item = args.Item.Parent.Parent;
+                                dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
+                                NodeEditor.EditedProperties.Interface = new PointerRef(obj); //Recreate the interface in the Ebx
+                                NodeEditor.RefreshInterfaceNodes(obj);
+
+                                return true;
+                            } break;
+                            case "Name":
+                            {
+                                FrostyPropertyGridItemData item = args.Item.Parent.Parent;
+                                dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
+                                
+                                NodeEditor.EditedProperties.Interface = new PointerRef(obj); //Recreate the interface in the Ebx
+                                
+                                if (!NodeEditor.InterfaceInputDataNodes.ContainsKey(((dynamic)newObj).Name.ToString()) 
+                                    &&
+                                    !NodeEditor.InterfaceOutputDataNodes.ContainsKey(((dynamic)newObj).Name.ToString()))
+                                {
+                                    //Its possible for a DataField to be SourceAndTarget so we enumerate over all of the nodes with this name
+                                    foreach (InterfaceDataNode interfaceDataNode in NodeEditor.GetNode(name))
+                                    {
+                                        interfaceDataNode.OnModified();
+                                        if (interfaceDataNode.Inputs.Count != 0)
+                                        {
+                                            NodeEditor.InterfaceInputDataNodes.Remove(name);
+                                            NodeEditor.InterfaceInputDataNodes.Add(interfaceDataNode.Inputs[0].Title, interfaceDataNode);
+                                        }
+                                        else
+                                        {
+                                            NodeEditor.InterfaceOutputDataNodes.Remove(name);
+                                            NodeEditor.InterfaceOutputDataNodes.Add(interfaceDataNode.Outputs[0].Title, interfaceDataNode);
+                                        }
+                                    }
+                                    
+                                    NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString($"{args.OldValue}"), EditorStatus.Error);
+                                    return true;
+                                }
+                            } break;
+                            default:
+                            {
+                                FrostyPropertyGridItemData item = args.Item.Parent.Parent;
+                                dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
+                            } break;
+                        }
+
+                        //If both of these fail and we make it to this point, then something has gone wrong
+                        if (NodeEditor.InterfaceInputDataNodes.ContainsKey(((dynamic)newObj).Name.ToString()) || NodeEditor.InterfaceOutputDataNodes.ContainsKey(((dynamic)newObj).Name.ToString()))
+                        {
+                            App.Logger.LogError("Cannot have multiple interfaces of the same name");
+                            NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString($"{args.OldValue}"), $"Unable to change interface {name} to {((dynamic)newObj).Name.ToString()}");
+
+                            foreach (InterfaceDataNode interfaceDataNode in NodeEditor.GetNode(name))
+                            {
+                                interfaceDataNode.InterfaceItem.Name = new CString(name);
+                            }
+
+                            NodeEditor.InterfacePropertyGrid.Object = new object();
+                            NodeEditor.InterfacePropertyGrid.Object = NodeEditor.EditedProperties.Interface.Internal;
+                            return false;
+                        }
+                        else
+                        {
+                            App.Logger.LogError("An unknown error has occured. Info: {0}, {1}, {2}, {3}, {4}. Please restart the editor.", args.Item.Name, args.OldValue.ToString(), args.NewValue.ToString(), name, ((dynamic)newObj).Name.ToString());
+                            NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString($"{args.OldValue}"), "Unknown error; Check frosty log for more info.");
+                        }
+
+                    } break;
+                    
+                    case "DynamicLink":
+                    case "DynamicEvent":
+                    {
+                        string name = args.OldValue.ToString(); //Get the original name
+                        InterfaceDataNode node = NodeEditor.GetNode(name)[0];
+
+                        //Whether this is an output or input
+                        if (node.Inputs.Count != 0)
+                        {
+                            //Double check that this name isn't taken
+                            if (!NodeEditor.InterfaceInputDataNodes.ContainsKey(((dynamic)newObj).Name.ToString()))
+                            {
+                                FrostyPropertyGridItemData item = args.Item.Parent.Parent;
+                                dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
+                                NodeEditor.EditedProperties.Interface = new PointerRef(obj); //Recreate the interface in the Ebx
+
+                                node.OnModified();
+                                NodeEditor.InterfaceInputDataNodes.Remove(name);
+                                NodeEditor.InterfaceInputDataNodes.Add(node.Inputs[0].Title, node);
+                                NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString($"{args.OldValue}"), EditorStatus.Error);
+                            }
+                            else
+                            {
+                                App.Logger.LogError("Cannot have multiple interfaces of the same name");
+                                NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString($"{args.OldValue}"), $"Unable to change interface {name} to {((dynamic)newObj).Name.ToString()}");
+                                foreach (InterfaceDataNode interfaceDataNode in NodeEditor.GetNode(name))
+                                {
+                                    interfaceDataNode.InterfaceItem.Name = new CString(name);
+                                }
+                                
+                                NodeEditor.InterfacePropertyGrid.Object = new object();
+                                NodeEditor.InterfacePropertyGrid.Object = NodeEditor.EditedProperties.Interface.Internal;
+                            }
+                        }
+                        else
+                        {
+                            //Double check that this name isn't taken
+                            if (!NodeEditor.InterfaceOutputDataNodes.ContainsKey(((dynamic)newObj).Name.ToString()))
+                            {
+                                FrostyPropertyGridItemData item = args.Item.Parent.Parent;
+                                dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
+                                NodeEditor.EditedProperties.Interface = new PointerRef(obj); //Recreate the interface in the Ebx
+
+                                node.OnModified();
+                                NodeEditor.InterfaceOutputDataNodes.Remove(name);
+                                NodeEditor.InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                                NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString($"{args.OldValue}"), EditorStatus.Error);
+                            }
+                            else
+                            {
+                                App.Logger.LogError("Cannot have multiple interfaces of the same name");
+                                NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString($"{args.OldValue}"), $"Unable to change interface {name} to {((dynamic)newObj).Name.ToString()}");
+                                foreach (InterfaceDataNode interfaceDataNode in NodeEditor.GetNode(name))
+                                {
+                                    interfaceDataNode.InterfaceItem.Name = new CString(name);
+                                }
+                                
+                                NodeEditor.InterfacePropertyGrid.Object = new object();
+                                NodeEditor.InterfacePropertyGrid.Object = NodeEditor.EditedProperties.Interface.Internal;
+                            }
+                        }
+                    } break;
                 }
             }
+
+            return false;
         }
     }
 }

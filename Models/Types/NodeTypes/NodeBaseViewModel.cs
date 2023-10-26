@@ -224,7 +224,16 @@ namespace BlueprintEditor.Models.Types.NodeTypes
     /// </summary>
     public class InputViewModel : INotifyPropertyChanged
     {
-        public string Title { get; set; }
+        private string _title;
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+            }
+        }
         public ConnectionType Type { get; set; } = ConnectionType.Property;
 
         public SolidColorBrush ConnectionColor
@@ -280,7 +289,16 @@ namespace BlueprintEditor.Models.Types.NodeTypes
     /// </summary>
     public class OutputViewModel : INotifyPropertyChanged
     {
-        public string Title { get; set; }
+        private string _title;
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+            }
+        }
         public ConnectionType Type { get; set; } = ConnectionType.Property;
         public SolidColorBrush ConnectionColor
         {

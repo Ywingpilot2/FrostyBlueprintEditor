@@ -7,7 +7,6 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Frosty.Controls;
 using Frosty.Core.Controls;
-using Frosty.Hash;
 
 namespace BlueprintEditor.Models.Editor.Items
 {
@@ -162,7 +161,7 @@ namespace BlueprintEditor.Models.Editor.Items
                 else
                 {
                     value = value.Trim('\"');
-                    return Fnv1.HashString(value);
+                    return FrostySdk.Utils.HashString(value);
                 }
             }
         }

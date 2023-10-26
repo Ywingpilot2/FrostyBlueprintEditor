@@ -363,7 +363,7 @@ namespace BlueprintEditor.Models.Editor
             BlueprintPropertyGrid pg = sender as BlueprintPropertyGrid;
             EbxAsset asset = args.NewValue as EbxAsset;
             pg.asset = asset;
-            EditorUtils.CurrentEditor.PropertyGrid = pg;
+            EditorUtils.CurrentEditor.NodePropertyGrid = pg;
             pg.NodeEditor = EditorUtils.CurrentEditor;
         }
         #endregion
@@ -712,7 +712,8 @@ namespace BlueprintEditor.Models.Editor
             OnModifiedCommand?.Execute(e);
             OnModified?.Invoke(sender, e);
 
-            NodeEditor.EditNodeProperties(nodeObj);
+            //Edit node properties, then check if our edit worked
+            NodeEditor.EditNodeProperties(nodeObj, e);
         }
     }
 

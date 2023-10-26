@@ -12,10 +12,12 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using BlueprintEditor.Models;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Editor;
 using BlueprintEditor.Models.Types;
+using BlueprintEditor.Models.Types.EbxEditorTypes;
 using BlueprintEditor.Models.Types.EbxLoaderTypes;
 using BlueprintEditor.Models.Types.NodeTypes;
 using BlueprintEditor.Utils;
@@ -67,11 +69,12 @@ namespace BlueprintEditor.Windows
             _loader.PopulateTypesList(_types);
             ClassSelector.Types = _types;
 
-            _editor.PropertyGrid = new BlueprintPropertyGrid() { NodeEditor = _editor };
+            _editor.NodePropertyGrid = new BlueprintPropertyGrid() { NodeEditor = _editor };
             FrostyTabItem ti = new FrostyTabItem()
             {
                 Header = "Property Grid",
-                Content = _editor.PropertyGrid
+                Icon = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Properties.png") as ImageSource,
+                Content = _editor.NodePropertyGrid
             };
             TabControl.Items.Add(ti);
 
@@ -79,6 +82,15 @@ namespace BlueprintEditor.Windows
             Editor.KeyDown += Editor_ControlInput;
             Editor.KeyUp += Editor_ControlInput;
             _editor.SelectedNodes.CollectionChanged += UpdatePropertyGrid;
+            
+            //Mouse capture
+            _editor.NodePropertyGrid.GotMouseCapture += BlueprintEditorWindow_OnGotFocus;
+            _editor.NodePropertyGrid.GotKeyboardFocus += BlueprintEditorWindow_OnGotFocus;
+            ClassSelector.GotMouseCapture += BlueprintEditorWindow_OnGotFocus;
+            
+            //Editor status
+            _editor.EditorStatusChanged += SetEditorStatus;
+            _editor.RemoveEditorStatus += RemoveEditorMessage;
         }
 
         #region Editor
@@ -98,6 +110,21 @@ namespace BlueprintEditor.Windows
             
             _loader.PopulateNodes(openedProperties);
             _loader.CreateConnections(openedProperties);
+            if (_loader.HasInterface)
+            {
+                _editor.InterfacePropertyGrid = new BlueprintPropertyGrid()
+                {
+                    Object = openedProperties.Interface.Internal, 
+                    NodeEditor = _editor
+                };
+                FrostyTabItem ti = new FrostyTabItem()
+                {
+                    Header = "Interface",
+                    Icon = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Interface.png") as ImageSource,
+                    Content = _editor.InterfacePropertyGrid
+                };
+                TabControl.Items.Add(ti);
+            }
 
             EditorUtils.ApplyLayouts(_file);
         }
@@ -154,6 +181,100 @@ namespace BlueprintEditor.Windows
         private void BlueprintEditorWindow_OnGotFocus(object sender, RoutedEventArgs e)
         {
             App.EditorWindow.OpenAsset(_file);
+        }
+
+        #endregion
+
+        #region Editor Status
+
+        private Dictionary<int, string> _errorProblems = new Dictionary<int, string>();
+        private Dictionary<int, string> _warningProblems = new Dictionary<int, string>();
+
+        private void SetEditorStatus(object sender, EditorStatusArgs args)
+        {
+            EditorStatus status = args.Status;
+            if (status == EditorStatus.Warning)
+            {
+                string message = (args.Tooltip ?? "A problem has been found with the blueprint");
+                if (!_warningProblems.ContainsKey(args.Identifier))
+                {
+                    _warningProblems.Add(args.Identifier, message);
+                }
+            }
+            else //Error
+            {
+                string message = (args.Tooltip ?? "A problem has been found with the blueprint");
+                if (!_errorProblems.ContainsKey(args.Identifier))
+                {
+                    _errorProblems.Add(args.Identifier, message);
+                }
+            }
+
+            string tooltip = "";
+            for (var index = 0; index < _errorProblems.Count; index++)
+            {
+                var problem = _errorProblems.Values.ElementAt(index);
+                tooltip += $"Error: {problem}\n";
+            }
+            
+            for (var index = 0; index < _warningProblems.Count; index++)
+            {
+                var problem = _warningProblems.Values.ElementAt(index);
+                tooltip += $"Warning: {problem}\n";
+            }
+            
+            UpdateEditorStatus(tooltip);
+        }
+
+        private void RemoveEditorMessage(object sender, EditorStatusArgs args)
+        {
+            if (args.Status == EditorStatus.Warning)
+            {
+                _warningProblems.Remove(args.Identifier);
+            }
+            else //Error
+            {
+                _errorProblems.Remove(args.Identifier);
+            }
+
+            string tooltip = "";
+            for (var index = 0; index < _errorProblems.Count; index++)
+            {
+                var problem = _errorProblems.Values.ElementAt(index);
+                tooltip += $"Error: {problem}\n";
+            }
+            
+            for (var index = 0; index < _warningProblems.Count; index++)
+            {
+                var problem = _warningProblems.Values.ElementAt(index);
+                tooltip += $"Warning: {problem}\n";
+            }
+            UpdateEditorStatus(tooltip);
+        }
+
+        private void UpdateEditorStatus(string tooltip)
+        {
+            if (_warningProblems.Count == 0 && _errorProblems.Count == 0)
+            {
+                StatusOhShitImage.Visibility = Visibility.Collapsed;
+                StatusBadImage.Visibility = Visibility.Collapsed;
+                StatusGoodImage.Visibility = Visibility.Visible;
+            }
+            else if (_errorProblems.Count != 0)
+            {
+                StatusBadImage.Visibility = Visibility.Collapsed;
+                StatusGoodImage.Visibility = Visibility.Collapsed;
+                    
+                StatusOhShitImage.Visibility = Visibility.Visible;
+                StatusOhShitImage.ToolTip = new ToolTip() { Foreground = new SolidColorBrush(Colors.White), Content = tooltip };
+            }
+            else
+            {
+                StatusOhShitImage.Visibility = Visibility.Collapsed;
+                StatusGoodImage.Visibility = Visibility.Collapsed;
+                StatusBadImage.Visibility = Visibility.Visible;
+                StatusBadImage.ToolTip = new ToolTip() { Foreground = new SolidColorBrush(Colors.White), Content = tooltip };
+            }
         }
 
         #endregion
@@ -229,6 +350,7 @@ namespace BlueprintEditor.Windows
 
         private void ToolboxClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
         {
+            BlueprintEditorWindow_OnGotFocus(this, new RoutedEventArgs());
             AddButton_OnClick(this, new RoutedEventArgs());
         }
 
@@ -240,11 +362,19 @@ namespace BlueprintEditor.Windows
         {
             if (_editor.SelectedNodes.Count == 0)
             {
-                _editor.PropertyGrid.Object = null;
+                _editor.NodePropertyGrid.Object = null;
                 return;
             }
-            
-            _editor.PropertyGrid.Object = _editor.SelectedNodes.First().Object;
+
+            if (_editor.SelectedNodes.First().ObjectType != "EditorInterfaceNode")
+            {
+                TabControl.SelectedIndex = 0;
+                _editor.NodePropertyGrid.Object = _editor.SelectedNodes.First().Object;
+            }
+            else
+            {
+                TabControl.SelectedIndex = 1;
+            }
         }
         
         private void PropertyGridVisible_OnClick(object sender, RoutedEventArgs e)

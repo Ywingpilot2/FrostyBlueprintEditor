@@ -17,6 +17,7 @@ namespace BlueprintEditor.Models.Types.EbxLoaderTypes
     public class ScalableEmitterDocumentLoader : EbxBaseLoader
     {
         public override string AssetType => "ScalableEmitterDocument";
+        public override bool HasInterface => false;
 
         public override void PopulateTypesList(List<Type> typesList)
         {
