@@ -184,8 +184,16 @@ namespace BlueprintEditor.Models.Types.EbxEditorTypes
 
                     linkConnection.Source = new PointerRef(connection.SourceNode.Object);
                     linkConnection.Target = new PointerRef(connection.TargetNode.Object);
-                    linkConnection.SourceField = connection.SourceField;
-                    linkConnection.TargetField = connection.TargetField;
+                    
+                    if (connection.SourceField != "self")
+                    {
+                        linkConnection.SourceField = connection.SourceField;
+                    }
+
+                    if (connection.TargetField != "self")
+                    {
+                        linkConnection.TargetField = connection.TargetField;
+                    }
 
                     ((dynamic)NodeEditor.EditedEbxAsset.RootObject).LinkConnections.Add(
                         linkConnection);
