@@ -164,6 +164,31 @@ namespace BlueprintEditor.Windows
                     {
                         object dupedObj = _editor.CreateNodeObject(nodeToDupe.Object);
                         NodeBaseModel dupe = _editor.CreateNodeFromObject(dupedObj);
+                        
+                        //This means we need to copy over the inputs/outputs
+                        if (dupe.ObjectType == "null")
+                        {
+                            dupe.Inputs.Clear();
+                            dupe.Outputs.Clear();
+                            foreach (InputViewModel input in nodeToDupe.Inputs)
+                            {
+                                InputViewModel dupedInput = new InputViewModel()
+                                {
+                                    Title = input.Title,
+                                    Type = input.Type
+                                };
+                                dupe.Inputs.Add(dupedInput);
+                            }
+                            foreach (InputViewModel input in nodeToDupe.Inputs)
+                            {
+                                InputViewModel dupedInput = new InputViewModel()
+                                {
+                                    Title = input.Title,
+                                    Type = input.Type
+                                };
+                                dupe.Inputs.Add(dupedInput);
+                            }
+                        }
                         dupe.Location = new Point(nodeToDupe.Location.X + 10, nodeToDupe.Location.Y + 10);
                         _editor.SelectedNodes.Add(dupe);
                     }

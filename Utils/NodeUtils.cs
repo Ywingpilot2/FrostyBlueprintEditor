@@ -93,33 +93,23 @@ namespace BlueprintEditor.Utils
                 Directory.CreateDirectory(fi.DirectoryName); 
             }
 
-            //Now we can create the file with stream writer
-            StreamWriter sw = new StreamWriter($"{NodeMappingConfigsPath}{node.Object.GetType().Name}.nmc");
-            
-            //First we check if the file exists
-            if (!fi.Exists)
-            {
-                //If it doesn't, we need to create basic stuff
-                sw.WriteLine($"Type = {node.Object.GetType().Name}");
-                sw.WriteLine($"DisplayName = {CleanNodeName(node.Object.GetType().Name)}");
-            }
-            else //The file exists so we should prompt the user
+            if (fi.Exists)
             {
                 MessageBoxResult result = FrostyMessageBox.Show(
                     "A Node Mapping Config for this type already exists, are you sure you want to overwrite this?",
                     "Blueprint Editor", MessageBoxButton.YesNo);
-                if (result == MessageBoxResult.Yes)
+                if (result == MessageBoxResult.No)
                 {
-                    sw.WriteLine($"Type = {node.Object.GetType().Name}");
-                    sw.WriteLine($"DisplayName = {CleanNodeName(node.Object.GetType().Name)}");
-                }
-                else
-                {
-                    sw.Close();
                     return;
                 }
             }
+
+            //Now we can create the file with stream writer
+            StreamWriter sw = new StreamWriter($"{NodeMappingConfigsPath}{node.Object.GetType().Name}.nmc");
             
+            sw.WriteLine($"Type = {node.Object.GetType().Name}");
+            sw.WriteLine($"DisplayName = {CleanNodeName(node.Object.GetType().Name)}");
+
             //Now we create the inputs
             for (var index = 0; index < node.Inputs.Count; index++)
             {
