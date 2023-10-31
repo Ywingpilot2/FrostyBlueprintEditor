@@ -1,0 +1,7 @@
+﻿Type = UIntEntityData
+DisplayName = UInt
+InputProperty = Value
+InputEvent = Increment
+InputEvent = Decrement
+OutputProperty = Value
+Documentation = This node stores a simple Uint value, which can also be incremented and decremented.

@@ -1,0 +1,11 @@
+﻿Type = AutoPlayerInteractObjectiveEntityData
+DisplayName = Auto Players Interact with Objective
+InputEvent = Activate
+InputProperty = Players
+InputProperty = MoveModeOverrideInt
+InputProperty = InteractionEntityPosition
+InputProperty = InteractionPosition
+OutputEvent = OnActivated
+OutputEvent = OnTargetReached
+OutputEvent = 0x9519963a
+Documentation = This node when activated tells the Autoplayers to interact with an objective, so hold down the Interact button on an objective with a button interaction, for a specified amount of time and within a certain distance. OnTargetReached triggers when they enter the position where they start interacting, OnInteracted triggers when they have interacted successfully.

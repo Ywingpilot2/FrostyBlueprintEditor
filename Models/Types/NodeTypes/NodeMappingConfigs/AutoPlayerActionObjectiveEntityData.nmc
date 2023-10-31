@@ -1,0 +1,12 @@
+﻿Type = AutoPlayerActionObjectiveEntityData
+DisplayName = Auto Players Input Action Objective
+InputEvent = Activate
+InputProperty = Players
+InputProperty = MoveModeOverrideInt
+InputProperty = ActionTargetPosition
+InputProperty = ActionPosition
+OutputEvent = OnActivated
+OutputEvent = OnTargetReached
+OutputEvent = 0x9519963a
+OutputEvent = 0x64041b17
+Documentation = Similar to AutoPlayerInteractObjectiveEntityData, this will tell the Autoplayers to hold down an input(or button) for a specified duration at a specific position. Though unlike it, this node allows you to specify the input to hold down.  

@@ -1,0 +1,11 @@
+﻿Type = AutoPlayerDefendObjectiveEntityData
+DisplayName = Auto Players Defend Position Objective
+InputEvent = Activate
+InputProperty = Players
+InputProperty = MoveModeOverrideInt
+InputProperty = TargetPosition
+OutputEvent = OnActivated
+OutputEvent = OnTargetReached
+OutputEvent = 0x9519963a
+OutputEvent = 0x48d0abbe
+Documentation = This node will tell the selected Autoplayers to move to a position, then(until assigned another objective) defend the position. If DefendCurrentPosition is true, they will always defend the current position.

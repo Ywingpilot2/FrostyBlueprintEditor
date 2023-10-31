@@ -46,37 +46,43 @@ namespace BlueprintEditor.Windows
 
         public BlueprintEditorWindow()
         {
+            //This happens before InitializeComponent() explicitly because it needs to be set as early as possible, and InitializeComponent is slow.
+            _file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
+            
             InitializeComponent();
-            _editor = EditorUtils.CurrentEditor;
+            _editor = EditorUtils.Editors[_file.Filename]; //Get the editor based on what our filename is
             
             Owner = Application.Current.MainWindow;
-            Title = $"Ebx Graph({App.EditorWindow.GetOpenedAssetEntry().Filename})";
-            _file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
+            Title = $"Ebx Graph({_file.Filename})";
 
-            EbxBaseLoader loader = new EbxBaseLoader();
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
+            //Create a new loader
+            EbxBaseLoader loader = new EbxBaseLoader(); //Base loader will be used if no extensions are found
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes()) //Iterate over all of the loader extensions
             {
                 if (type.IsSubclassOf(typeof(EbxBaseLoader)))
                 {
                     var extension = (EbxBaseLoader)Activator.CreateInstance(type);
-                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
-                    loader = extension;
+                    
+                    //If the extension type doesn't match our file type then we continue
+                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;  
+                    loader = extension; //If it does, we set the loader to be this extension instead and stop searching
                     break;
                 }
             }
 
             _loader = loader;
-            _loader.PopulateTypesList(_types);
+            _loader.PopulateTypesList(_types); //Populate the types list with our types
             ClassSelector.Types = _types;
 
+            //The NodeEditor needs to access the property grid, and vice versa. It's a weird setup to ensure they are in sync, but it works.
             _editor.NodePropertyGrid = new BlueprintPropertyGrid() { NodeEditor = _editor };
-            FrostyTabItem ti = new FrostyTabItem()
+            FrostyTabItem ti = new FrostyTabItem //Now we create a tab item which contains our property grid
             {
                 Header = "Property Grid",
                 Icon = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Properties.png") as ImageSource,
                 Content = _editor.NodePropertyGrid
             };
-            TabControl.Items.Add(ti);
+            PropertiesTabControl.Items.Add(ti);
 
             //Setup UI methods
             Editor.KeyDown += Editor_ControlInput;
@@ -110,6 +116,9 @@ namespace BlueprintEditor.Windows
             
             _loader.PopulateNodes(openedProperties);
             _loader.CreateConnections(openedProperties);
+            
+            //If this loader lacks an interface(e.g ScalableEmitterDocuments) we don't want to try and load the interface
+            //So we check with the loader before adding the interface editor
             if (_loader.HasInterface)
             {
                 _editor.InterfacePropertyGrid = new BlueprintPropertyGrid()
@@ -123,13 +132,18 @@ namespace BlueprintEditor.Windows
                     Icon = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Interface.png") as ImageSource,
                     Content = _editor.InterfacePropertyGrid
                 };
-                TabControl.Items.Add(ti);
+                PropertiesTabControl.Items.Add(ti);
             }
 
-            EditorUtils.ApplyLayouts(_file);
+            EditorUtils.ApplyLayouts(_file, _editor); //Organize the file
         }
         
-
+        /// <summary>
+        /// This method executes whenever a button is inputted into the Editor
+        /// To be used for things like keybinds 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The key that was pressed</param>
         private void Editor_ControlInput(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
@@ -139,37 +153,36 @@ namespace BlueprintEditor.Windows
                     _editor.DeleteNode(_editor.SelectedNodes[0]);
                 }
             }
-            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift && Keyboard.IsKeyDown(Key.D) && _editor.SelectedNodes.Count != 0)
             {
-                if (Keyboard.IsKeyDown(Key.D))
+                List<NodeBaseModel> nodesToDupe = new List<NodeBaseModel>(_editor.SelectedNodes);
+                _editor.SelectedNodes.Clear();
+                while (nodesToDupe.Count != 0)
                 {
-                    if (_editor.SelectedNodes.Count != 0)
+                    var nodeToDupe = nodesToDupe[0];
+                    if (nodeToDupe.ObjectType != "EditorInterfaceNode")
                     {
-                        List<NodeBaseModel> nodesToDupe = new List<NodeBaseModel>(_editor.SelectedNodes);
-                        _editor.SelectedNodes.Clear();
-                        while (nodesToDupe.Count != 0)
-                        {
-                            var nodeToDupe = nodesToDupe[0];
-                            if (nodeToDupe.ObjectType != "EditorInterfaceNode")
-                            {
-                                object dupedObj = _editor.CreateNodeObject(nodeToDupe.Object);
-                                NodeBaseModel dupe = _editor.CreateNodeFromObject(dupedObj);
-                                dupe.Location = new Point(nodeToDupe.Location.X + 10, nodeToDupe.Location.Y + 10);
-                                _editor.SelectedNodes.Add(dupe);
-                            }
-                            else
-                            {
-                                App.Logger.LogError("Cannot dupe Interface nodes!");
-                            }
-
-                            nodesToDupe.Remove(nodeToDupe);
-                        }
-                        App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+                        object dupedObj = _editor.CreateNodeObject(nodeToDupe.Object);
+                        NodeBaseModel dupe = _editor.CreateNodeFromObject(dupedObj);
+                        dupe.Location = new Point(nodeToDupe.Location.X + 10, nodeToDupe.Location.Y + 10);
+                        _editor.SelectedNodes.Add(dupe);
                     }
+                    else
+                    {
+                        App.Logger.LogError("Cannot dupe Interface nodes!");
+                    }
+
+                    nodesToDupe.Remove(nodeToDupe);
                 }
+                App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
             }
         }
 
+        /// <summary>
+        /// Executes whenever the editor closes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BlueprintEditorWindow_OnClosing(object sender, CancelEventArgs e)
         {
             App.EditorWindow.OpenAsset(_file);
@@ -178,6 +191,11 @@ namespace BlueprintEditor.Windows
             EditorUtils.Editors.Remove(_file.Filename);
         }
         
+        /// <summary>
+        /// Executes whenever this window is focused
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BlueprintEditorWindow_OnGotFocus(object sender, RoutedEventArgs e)
         {
             App.EditorWindow.OpenAsset(_file);
@@ -190,26 +208,41 @@ namespace BlueprintEditor.Windows
         private Dictionary<int, string> _errorProblems = new Dictionary<int, string>();
         private Dictionary<int, string> _warningProblems = new Dictionary<int, string>();
 
+        /// <summary>
+        /// Sets the editor's problem status
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void SetEditorStatus(object sender, EditorStatusArgs args)
         {
             EditorStatus status = args.Status;
-            if (status == EditorStatus.Warning)
+
+            //Check if we are setting it to a warning or error. If it's being set to good, we don't need to add anything in this regard
+            switch (status)
             {
-                string message = (args.Tooltip ?? "A problem has been found with the blueprint");
-                if (!_warningProblems.ContainsKey(args.Identifier))
+                case EditorStatus.Warning:
                 {
-                    _warningProblems.Add(args.Identifier, message);
+                    string message = (args.Tooltip ?? "A problem has been found with the blueprint");
+                    if (!_warningProblems.ContainsKey(args.Identifier))
+                    {
+                        _warningProblems.Add(args.Identifier, message);
+                    }
+
+                    break;
                 }
-            }
-            else //Error
-            {
-                string message = (args.Tooltip ?? "A problem has been found with the blueprint");
-                if (!_errorProblems.ContainsKey(args.Identifier))
+                case EditorStatus.Error:
                 {
-                    _errorProblems.Add(args.Identifier, message);
+                    string message = (args.Tooltip ?? "A problem has been found with the blueprint");
+                    if (!_errorProblems.ContainsKey(args.Identifier))
+                    {
+                        _errorProblems.Add(args.Identifier, message);
+                    }
+
+                    break;
                 }
             }
 
+            //Create the new tooltip(text that is displayed when hovered over)
             string tooltip = "";
             for (var index = 0; index < _errorProblems.Count; index++)
             {
@@ -226,17 +259,29 @@ namespace BlueprintEditor.Windows
             UpdateEditorStatus(tooltip);
         }
 
+        /// <summary>
+        /// This will remove a status error/warning message from the editor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args">the args.Status must be set to Warning or Error, otherwise this will do nothing. </param>
         private void RemoveEditorMessage(object sender, EditorStatusArgs args)
         {
-            if (args.Status == EditorStatus.Warning)
+            switch (args.Status)
             {
-                _warningProblems.Remove(args.Identifier);
-            }
-            else //Error
-            {
-                _errorProblems.Remove(args.Identifier);
+                case EditorStatus.Warning:
+                {
+                    _warningProblems.Remove(args.Identifier);
+                    break;
+                }
+                //Error
+                case EditorStatus.Error:
+                {
+                    _errorProblems.Remove(args.Identifier);
+                    break;
+                }
             }
 
+            //Update the tooltip
             string tooltip = "";
             for (var index = 0; index < _errorProblems.Count; index++)
             {
@@ -249,6 +294,8 @@ namespace BlueprintEditor.Windows
                 var problem = _warningProblems.Values.ElementAt(index);
                 tooltip += $"Warning: {problem}\n";
             }
+            
+            //Update the EditorStatus
             UpdateEditorStatus(tooltip);
         }
 
@@ -281,6 +328,11 @@ namespace BlueprintEditor.Windows
         
         #region Buttons
 
+        /// <summary>
+        /// This method executes whenever the Remove Node button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
             while (_editor.SelectedNodes.Count != 0)
@@ -289,6 +341,11 @@ namespace BlueprintEditor.Windows
             }
         }
 
+        /// <summary>
+        /// This method executes whenever the Add Node button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (_selectedType == null) return;
@@ -302,21 +359,47 @@ namespace BlueprintEditor.Windows
         }
         
         /// <summary>
-        /// This is all I was able to think of for auto organization for now
-        /// its not great, and it breaks easily
-        /// so the button is hidden for now.
+        /// This executes the AutoLayout when pressed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            EditorUtils.ApplyAutoLayout();
+            EditorUtils.ApplyAutoLayout(_editor);
+        }
+        
+        private void ImportOrganizationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            //Open a file dialog so the user can select a file
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Layout", "Blueprint Layout (*.lyt)|*.lyt|Text File (*.txt)|*.txt", "BlueprintLayout");
+            if (!ofd.ShowDialog()) return; //I think this means it was cancelled though I don't actually know
+
+            EditorUtils.ApplyExistingLayout(ofd.FileName, _editor);
+        }
+
+        private void SaveOrganizationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            EditorUtils.SaveLayouts(_file);
+            App.Logger.Log("Saved layout!");
+        }
+        
+        private void AutoMapButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            foreach (NodeBaseModel selectedNode in _editor.SelectedNodes)
+            {
+                NodeUtils.GenerateNodeMapping(selectedNode);
+            }
         }
 
         #endregion
         
         #region Toolbox
 
+        /// <summary>
+        /// This executes whenever the selected item in the TypesList changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TypesList_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             _selectedType = ClassSelector.SelectedClass;
@@ -331,9 +414,18 @@ namespace BlueprintEditor.Windows
                 {
                     DocBoxText.Text = NodeUtils.NmcExtensions[_selectedType.Name].Find(x => x.StartsWith("Documentation")).Split('=')[1];
                 }
+                else
+                {
+                    DocBoxText.Text = "";
+                }
             }
         }
         
+        /// <summary>
+        /// This executes whenever the button to turn toolbox visibility on/off is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ToolboxVisible_OnClick(object sender, RoutedEventArgs e)
         {
             if (Toolbox.Visibility != Visibility.Collapsed)
@@ -348,16 +440,26 @@ namespace BlueprintEditor.Windows
             }
         }
 
+        /// <summary>
+        /// This executes whenever an item is double clicked in the toolbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ToolboxClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
         {
             BlueprintEditorWindow_OnGotFocus(this, new RoutedEventArgs());
-            AddButton_OnClick(this, new RoutedEventArgs());
+            AddButton_OnClick(this, new RoutedEventArgs()); //We just send this over to the AddButton lol
         }
 
         #endregion
 
         #region Property Grid
 
+        /// <summary>
+        /// This method executes whenever the property grid needs to be changed, so e.g when the selected node changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UpdatePropertyGrid(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (_editor.SelectedNodes.Count == 0)
@@ -368,15 +470,20 @@ namespace BlueprintEditor.Windows
 
             if (_editor.SelectedNodes.First().ObjectType != "EditorInterfaceNode")
             {
-                TabControl.SelectedIndex = 0;
+                PropertiesTabControl.SelectedIndex = 0;
                 _editor.NodePropertyGrid.Object = _editor.SelectedNodes.First().Object;
             }
             else
             {
-                TabControl.SelectedIndex = 1;
+                PropertiesTabControl.SelectedIndex = 1;
             }
         }
         
+        /// <summary>
+        /// This executes whenever the property grid visibility button is pressed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PropertyGridVisible_OnClick(object sender, RoutedEventArgs e)
         {
             if (PropertyGrid.Visibility != Visibility.Collapsed)

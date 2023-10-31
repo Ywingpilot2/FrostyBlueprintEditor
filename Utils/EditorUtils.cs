@@ -59,47 +59,45 @@ namespace BlueprintEditor.Utils
 
         #region Layouts
 
+        private static string LayoutsPath
+        {
+            get
+            {
+                //Get the MainWindow so we can grab the Project File
+                MainWindow frosty = null;
+                
+                //Do this to ensure task windows work correctly
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    frosty = Application.Current.MainWindow as MainWindow;
+                });
+                
+                //Get the name of the project(make sure to remove .fbproject)
+                string projectName = frosty.Project.DisplayName.Split('.')[0];
+                return $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\";
+            }
+        }
+
         /// <summary>
         /// Applies either an existing layout or if one cannot be found an automatic layout
         /// </summary>
-        public static void ApplyLayouts(EbxAssetEntry file)
+        public static void ApplyLayouts(EbxAssetEntry file, EditorViewModel nodeEditor)
         {
-            //Get the MainWindow so we can grab the Project File
-            MainWindow frosty = Application.Current.MainWindow as MainWindow;
-
-            //Get the name of the project(make sure to remove .fbproject)
-            string projectName = frosty.Project.DisplayName.Split('.')[0];
-            
             //Replace all occurences of "/" with "\" as to avoid issues with creating the filepath
             string assetPath = file.Name.Replace("/", @"\");
 
-            if (File.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt"))
+            if (File.Exists($@"{LayoutsPath}{assetPath}_Layout.lyt"))
             {
-                StreamReader sr = new StreamReader($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt");
-                
-                string line = sr.ReadLine();
-                while (line != null)
+                //Import our layout and check if it has failed
+                if (!ApplyExistingLayout($@"{LayoutsPath}{assetPath}_Layout.lyt", nodeEditor))
                 {
-                    int idx = int.Parse(line.Split(',')[0]);
-                    double x = double.Parse(line.Split(',')[1]);
-                    double y = double.Parse(line.Split(',')[2]);
-
-                    //If this node is invalid
-                    if (CurrentEditor.Nodes.Count <= idx)
-                    {
-                        App.Logger.LogError("Node in saved layout was invalid. Issues may occur!");
-                        line = sr.ReadLine();
-                        continue;
-                    }
-
-                    CurrentEditor.Nodes[idx].Location = new Point(x, y);
-                    line = sr.ReadLine();
+                    //If the layout importing failed, then we just apply the auto layout
+                    ApplyAutoLayout(nodeEditor);
                 }
-                sr.Close();
             }
             else
             {
-                ApplyAutoLayout();
+                ApplyAutoLayout(nodeEditor);
             }
         }
         
@@ -109,17 +107,11 @@ namespace BlueprintEditor.Utils
         /// <param name="file"></param>
         public static void SaveLayouts(EbxAssetEntry file)
         {
-            //Get the MainWindow so we can grab the Project File
-            MainWindow frosty = Application.Current.MainWindow as MainWindow;
-
-            //Get the name of the project(make sure to remove .fbproject)
-            string projectName = frosty.Project.DisplayName.Split('.')[0];
-
             //Replace all occurences of "/" with "\" as to avoid issues with creating the filepath
             string assetPath = file.Name.Replace("/", @"\");
             
             //Now we can create the filepath
-            string filePath = $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\{assetPath}_Layout.txt";
+            string filePath = $@"{LayoutsPath}{assetPath}_Layout.lyt";
             
             //First check if filepath exists, if it doesn't we create it
             FileInfo fi = new FileInfo(filePath);
@@ -136,6 +128,9 @@ namespace BlueprintEditor.Utils
             //TODO: Find way to account for Property grid modifications(so when the index has changed)
             Dictionary<int, Point> points = new Dictionary<int, Point>();
 
+            //Write down the version
+            sw.WriteLine("layver=1");
+            
             //Now we populate it
             for (var i = 0; i < CurrentEditor.Nodes.Count; i++)
             {
@@ -143,11 +138,65 @@ namespace BlueprintEditor.Utils
             }
             sw.Close();
         }
+
+        /// <summary>
+        /// This will import a layout from a layout file
+        /// </summary>
+        /// <param name="filePath">The path to the file. This path must be valid</param>
+        /// <param name="nodeEditor"></param>
+        /// <returns>A bool indicating whether the operation was successful</returns>
+        public static bool ApplyExistingLayout(string filePath, EditorViewModel nodeEditor)
+        {
+            StreamReader sr = new StreamReader($@"{filePath}");
+            
+            string line = sr.ReadLine(); //The first line will always be layver={LayoutVersion}, we have this so that we know what version of layouts we are working with
+            if (line == null) //First check if the file is empty
+            {
+                nodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString($"{filePath}_null"), $"There was a problem loading the layout, please check the log for details.");
+                App.Logger.LogError("Unable to load layout at {0}, are you sure the layout is properly formatted?", filePath);
+                return false;
+            }
+            
+            //The first line will always be the layout version, we need to do different things depending on the layout version in order to support legacy layouts
+            switch (line.Split('=')[1])
+            {
+                case "1":
+                {
+                    line = sr.ReadLine();
+                    while (line != null)
+                    {
+                        int idx = int.Parse(line.Split(',')[0]);
+                        
+                        //If this node is invalid
+                        if (CurrentEditor.Nodes.Count <= idx)
+                        {
+                            App.Logger.LogError("Node in saved layout was invalid. Issues may occur!");
+                            line = sr.ReadLine();
+                            continue;
+                        }
+                        
+                        double x = double.Parse(line.Split(',')[1]);
+                        double y = double.Parse(line.Split(',')[2]);
+
+                        CurrentEditor.Nodes[idx].Location = new Point(x, y);
+                        line = sr.ReadLine();
+                    }
+                    sr.Close();
+                    return true;
+                }
+                default:
+                {
+                    nodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString($"{filePath}_inver"), $"There was a problem loading the layout, please check the log for details.");
+                    App.Logger.LogError("Unable to load the layout due to version number {0} being invalid, are you sure the layout is properly formatted?", line);
+                    return false;
+                }
+            }
+        }
         
         /// <summary>
         /// Applies auto layout as made & used by LevelEditor
         /// </summary>
-        public static void ApplyAutoLayout()
+        public static void ApplyAutoLayout(EditorViewModel nodeEditor)
         {
             // TODO: Find a more precise way to do this
             // Credit to github.com/CadeEvs for source(is temp, and will be replaced, though is a good placeholder)
@@ -155,13 +204,13 @@ namespace BlueprintEditor.Utils
             Dictionary<NodeBaseModel, List<NodeBaseModel>> ancestors = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
             Dictionary<NodeBaseModel, List<NodeBaseModel>> children = new Dictionary<NodeBaseModel, List<NodeBaseModel>>();
 
-            foreach (NodeBaseModel node in CurrentEditor.Nodes)
+            foreach (NodeBaseModel node in nodeEditor.Nodes)
             {
                 ancestors.Add(node, new List<NodeBaseModel>());
                 children.Add(node, new List<NodeBaseModel>());
             }
 
-            foreach (ConnectionViewModel connection in CurrentEditor.Connections)
+            foreach (ConnectionViewModel connection in nodeEditor.Connections)
             {
                 ancestors[connection.TargetNode].Add(connection.SourceNode);
                 children[connection.SourceNode].Add(connection.TargetNode);
@@ -173,7 +222,7 @@ namespace BlueprintEditor.Utils
             int columnIdx = 1;
             columns.Add(new List<NodeBaseModel>());
 
-            foreach (NodeBaseModel node in CurrentEditor.Nodes)
+            foreach (NodeBaseModel node in nodeEditor.Nodes)
             {
                 if (ancestors[node].Count == 0 && children[node].Count == 0)
                 {
@@ -184,16 +233,16 @@ namespace BlueprintEditor.Utils
 
                 if (ancestors[node].Count == 0)
                 {
-                    LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
+                    AutoLayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
                 }
             }
 
             columnIdx = 1;
-            foreach (NodeBaseModel node in CurrentEditor.Nodes)
+            foreach (NodeBaseModel node in nodeEditor.Nodes)
             {
                 if (!alreadyProcessed.Contains(node))
                 {
-                    LayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
+                    AutoLayoutNodes(node, children, columns, alreadyProcessed, columnIdx);
                 }
             }
 
@@ -210,7 +259,7 @@ namespace BlueprintEditor.Utils
                     node.Location = new Point(x, y);
 
                     double curWidth = Math.Floor((node.RealWidth + 40.0) / 4.0) * 8.0;
-                    double curHeight = Math.Floor(((node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
+                    double curHeight = Math.Floor(((15 + node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
 
                     y += curHeight + 56.0;
 
@@ -224,7 +273,7 @@ namespace BlueprintEditor.Utils
             }
         }
 
-        private static int LayoutNodes(NodeBaseModel node, Dictionary<NodeBaseModel, List<NodeBaseModel>> children, List<List<NodeBaseModel>> columns, List<NodeBaseModel> alreadyProcessed, int column)
+        private static int AutoLayoutNodes(NodeBaseModel node, Dictionary<NodeBaseModel, List<NodeBaseModel>> children, List<List<NodeBaseModel>> columns, List<NodeBaseModel> alreadyProcessed, int column)
         {
             if (alreadyProcessed.Contains(node))
             {
@@ -243,7 +292,7 @@ namespace BlueprintEditor.Utils
             int minimumColumn = 0;
             foreach (NodeBaseModel child in children[node])
             {
-                int tmp = LayoutNodes(child, children, columns, alreadyProcessed, column);
+                int tmp = AutoLayoutNodes(child, children, columns, alreadyProcessed, column);
                 if (tmp < minimumColumn || minimumColumn == 0)
                     minimumColumn = tmp;
             }

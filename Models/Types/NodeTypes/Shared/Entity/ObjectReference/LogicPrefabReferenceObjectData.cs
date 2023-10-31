@@ -5,7 +5,7 @@ using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.Shared.Entity
+namespace BlueprintEditor.Models.Types.NodeTypes.Shared.Entity.ObjectReference
 {
     public class LogicPrefabReferenceObjectData : NodeBaseModel
     {
@@ -102,5 +102,7 @@ namespace BlueprintEditor.Models.Types.NodeTypes.Shared.Entity
                 });
             }            
         }
+        
+        public override void OnModified() => OnCreation();
     }
 }

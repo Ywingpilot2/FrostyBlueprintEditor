@@ -582,7 +582,6 @@ namespace BlueprintEditor.Models.Editor
 
             PropertyInfo[] pis = value.GetType().GetProperties();
 
-            //TODO: Type Override support
             Type overrideType = App.PluginManager.GetTypeOverride(value.GetType().Name);
             object typeOverrideDefaultValue = null;
 

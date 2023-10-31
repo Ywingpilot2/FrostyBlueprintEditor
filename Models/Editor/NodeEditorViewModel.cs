@@ -327,6 +327,9 @@ namespace BlueprintEditor.Models.Editor
                 
                 App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
                 App.EditorWindow.DataExplorer.RefreshItems();
+                
+                InterfacePropertyGrid.Object = new object();
+                InterfacePropertyGrid.Object = EditedProperties.Interface.Internal;
                 return;
             }
 
@@ -452,7 +455,7 @@ namespace BlueprintEditor.Models.Editor
                 if (!InterfaceInputDataNodes.ContainsKey(node.Inputs[0].Title))
                 {
                     Nodes.Add(node);
-                    InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                    InterfaceInputDataNodes.Add(node.Inputs[0].Title, node);
                 }
             }
         }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using BlueprintEditor.Models.Connections;
 using BlueprintEditor.Models.Types;
 using BlueprintEditor.Models.Types.NodeTypes;
+using Frosty.Controls;
 using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
@@ -78,6 +80,104 @@ namespace BlueprintEditor.Utils
             }
 
             return inputs;
+        }
+
+        private static string NodeMappingConfigsPath => $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings\";
+        
+        public static void GenerateNodeMapping(NodeBaseModel node)
+        {
+            //First check if filepath exists, if it doesn't we create it
+            FileInfo fi = new FileInfo($"{NodeMappingConfigsPath}{node.Object.GetType().Name}.nmc");
+            if (fi.Directory != null && !fi.Directory.Exists) 
+            { 
+                Directory.CreateDirectory(fi.DirectoryName); 
+            }
+
+            //Now we can create the file with stream writer
+            StreamWriter sw = new StreamWriter($"{NodeMappingConfigsPath}{node.Object.GetType().Name}.nmc");
+            
+            //First we check if the file exists
+            if (!fi.Exists)
+            {
+                //If it doesn't, we need to create basic stuff
+                sw.WriteLine($"Type = {node.Object.GetType().Name}");
+                sw.WriteLine($"DisplayName = {CleanNodeName(node.Object.GetType().Name)}");
+            }
+            else //The file exists so we should prompt the user
+            {
+                MessageBoxResult result = FrostyMessageBox.Show(
+                    "A Node Mapping Config for this type already exists, are you sure you want to overwrite this?",
+                    "Blueprint Editor", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    sw.WriteLine($"Type = {node.Object.GetType().Name}");
+                    sw.WriteLine($"DisplayName = {CleanNodeName(node.Object.GetType().Name)}");
+                }
+                else
+                {
+                    sw.Close();
+                    return;
+                }
+            }
+            
+            //Now we create the inputs
+            for (var index = 0; index < node.Inputs.Count; index++)
+            {
+                InputViewModel input = node.Inputs[index];
+                if (!input.IsConnected)
+                {
+                    node.Inputs.RemoveAt(index);
+                    index -= 1;
+                    continue;
+                }
+                switch (input.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        sw.WriteLine($"InputEvent = {input.Title}");
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        sw.WriteLine($"InputProperty = {input.Title}");
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        sw.WriteLine($"InputLink = {input.Title}");
+                    } break;
+                }
+            }
+
+            //Create the outputs
+            for (var index = 0; index < node.Outputs.Count; index++)
+            {
+                OutputViewModel output = node.Outputs[index];
+                if (!output.IsConnected)
+                {
+                    node.Inputs.RemoveAt(index);
+                    index -= 1;
+                    continue;
+                }
+                switch (output.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        sw.WriteLine($"OutputEvent = {output.Title}");
+                    }
+                        break;
+                    case ConnectionType.Property:
+                    {
+                        sw.WriteLine($"OutputProperty = {output.Title}");
+                    }
+                        break;
+                    case ConnectionType.Link:
+                    {
+                        sw.WriteLine($"OutputLink = {output.Title}");
+                    }
+                        break;
+                }
+            }
+
+            sw.Close();
         }
 
         static NodeUtils()

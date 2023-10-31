@@ -1,0 +1,7 @@
+﻿Type = FloatEntityData
+DisplayName = Float
+InputProperty = Value
+InputEvent = Increment
+InputEvent = Decrement
+OutputProperty = Value
+Documentation = This node stores a simple Float value, which can also be incremented and decremented.

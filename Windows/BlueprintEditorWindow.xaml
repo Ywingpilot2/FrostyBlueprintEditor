@@ -33,7 +33,7 @@
             <DrawingBrush x:Key="SmallGridLinesDrawingBrush"
                           TileMode="Tile"
                           ViewportUnits="Absolute"
-                          Viewport="0 0 18 18"
+                          Viewport="0 0 22 22"
                           Transform="{Binding ViewportTransform, ElementName=Editor}"
                           Drawing="{StaticResource SmallGridGeometry}" />
 
@@ -41,7 +41,7 @@
                           TileMode="Tile"
                           ViewportUnits="Absolute"
                           Opacity="0.6"
-                          Viewport="0 0 72 72"
+                          Viewport="0 0 110 110"
                           Transform="{Binding ViewportTransform, ElementName=Editor}"
                           Drawing="{StaticResource LargeGridGeometry}" />
             
@@ -49,7 +49,7 @@
                           TileMode="Tile"
                           ViewportUnits="Absolute"
                           Opacity="0.3"
-                          Viewport="0 0 720 720"
+                          Viewport="0 0 880 880"
                           Transform="{Binding ViewportTransform, ElementName=Editor}"
                           Drawing="{StaticResource LargeGridGeometry}" />
         </ResourceDictionary>
@@ -188,33 +188,17 @@
                     <!--This contains a list of all of the types we can use and a filter box-->
                     <Border Grid.Row="0" BorderBrush="{StaticResource ScrollbarBackground}"
                             BorderThickness="0">
-                        <controls:FrostyClassSelector x:Name="ClassSelector" 
-                                                      SelectedItemChanged="TypesList_OnSelectionChanged" 
-                                                      ItemDoubleClicked="ToolboxClassSelector_OnItemDoubleClicked"/>
-                        
-                        <!--Legacy-->
-                        <!--<Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="24" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <Border BorderBrush="{StaticResource CanvasBackground}"
-                                    BorderThickness="1">
-                                <Grid Grid.Row="0" Background="{StaticResource WindowBackground}">
-                                    <ctrl:FrostyWatermarkTextBox x:Name="TypesList_FilterBox" Margin="0.7,0,4,-1"
-                                                                 WatermarkText="Filter" BorderThickness="1" />
-                                </Grid>
-                            </Border>
-
-                            ~1~The list of items@1@
-                            <Grid Grid.Row="1" Margin="1, 1, 3.9, 1">
-                                <ListBox Name="TypesList" SelectionChanged="TypesList_OnSelectionChanged"
-                                         SelectionMode="Single"
-                                         Background="{StaticResource ListBackground}">
-                                </ListBox>
-                            </Grid>
-                        </Grid>-->
+                        <ctrl:FrostyTabControl SelectedIndex="0">
+                            <ctrl:FrostyTabControl.Items>
+                                <ctrl:FrostyTabItem Header="Toolbox" Icon="pack://application:,,,/FrostyEditor;component/Images/ThreeD.png">
+                                    <ctrl:FrostyTabItem.Content>
+                                        <controls:FrostyClassSelector x:Name="ClassSelector"
+                                                                      SelectedItemChanged="TypesList_OnSelectionChanged"
+                                                                      ItemDoubleClicked="ToolboxClassSelector_OnItemDoubleClicked" />
+                                        </ctrl:FrostyTabItem.Content>
+                                </ctrl:FrostyTabItem>
+                            </ctrl:FrostyTabControl.Items>
+                        </ctrl:FrostyTabControl>
                     </Border>
                     
                     <!--Documentation on the type-->
@@ -243,7 +227,7 @@
                 </Grid>
 
                 <Grid Grid.Column="2" x:Name="PropertyGrid" GotMouseCapture="BlueprintEditorWindow_OnGotFocus">
-                    <ctrl:FrostyTabControl x:Name="TabControl">
+                    <ctrl:FrostyTabControl x:Name="PropertiesTabControl">
 
                     </ctrl:FrostyTabControl>
                 </Grid>
@@ -267,65 +251,103 @@
         <Border Grid.Row="0" BorderBrush="{StaticResource SubItemPressed}" BorderThickness="1">
             <Grid Background="{StaticResource ControlBackground}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition />
                     <ColumnDefinition />
                     <ColumnDefinition Width="35" />
                 </Grid.ColumnDefinitions>
                 
-                <!--Toolbox buttons-->
+                <!--Buttons-->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
+                    
+                    <!--Interaction Buttons-->
                     <Button x:Name="AddButton"
                             Width="20"
                             Height="20"
-                            Margin="4,-2,0,0"
+                            Margin="4,0,2,0"
                             HorizontalAlignment="Left"
                             Click="AddButton_OnClick"
                             ToolTip="Add a new node(Object) to the Blueprint">
-                        <Image Source="pack://application:,,,/BlueprintEditor;component/Images/AddObjectButton.png"
-                               Width="16" />
+                        <Image Source="pack://application:,,,/FrostyEditor;component/Images/Add.png"
+                               Width="20" />
                     </Button>
                     <Button x:Name="RemoveButton"
                             Width="20"
                             Height="20"
-                            Margin="4,-2,0,0"
+                            Margin="2,0,2,0"
                             HorizontalAlignment="Left"
                             Click="RemoveButton_OnClick"
                             ToolTip="Remove the selected node(s) from the Blueprint">
-                        <Image Source="pack://application:,,,/BlueprintEditor;component/Images/RemoveObjectButton.png"
-                               Width="16" />
+                        <Image Source="pack://application:,,,/FrostyEditor;component/Images/Remove.png"
+                               Width="20" />
                     </Button>
+                    <Button x:Name="AutoMapButton"
+                            Width="20"
+                            Height="20"
+                            Margin="2,0,4,0"
+                            HorizontalAlignment="Left"
+                            Click="AutoMapButton_OnClick"
+                            ToolTip="Automatically generates a Node Mapping Config based off of the selected node">
+                        <Image Source="pack://application:,,,/FrostyEditor;component/Images/Compile.png"
+                               Width="20" />
+                    </Button>
+                    
+                    <Grid Background="{StaticResource SubMenuItemHighlight}" Width="3"/>
+                    
+                    <!--Organization Buttons-->
                     <Button x:Name="OrganizeButton"
                             Width="20"
                             Height="20"
-                            Margin="4,-2,0,0"
+                            Margin="4,0,2,0"
                             HorizontalAlignment="Left"
                             Click="OrganizeButton_OnClick"
                             ToolTip="Automatically organize the Blueprint's nodes">
                         <Image Source="pack://application:,,,/BlueprintEditor;component/Images/AutoSortButton.png"
-                               Width="16" />
+                               Width="20" />
                     </Button>
-                </StackPanel>
-                
-                <!--UI Control buttons-->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
+                    
+                    <Button x:Name="SaveOrganizationButton"
+                            Width="20"
+                            Height="20"
+                            Margin="2,0,2,0"
+                            HorizontalAlignment="Left"
+                            Click="SaveOrganizationButton_OnClick"
+                            ToolTip="Save the current layout">
+                        <Image Source="pack://application:,,,/FrostyEditor;component/Images/Save.png"
+                               Width="20" />
+                    </Button>
+                    
+                    <Button x:Name="ImportOrganizationButton"
+                            Width="20"
+                            Height="20"
+                            Margin="2,0,4,0"
+                            HorizontalAlignment="Left"
+                            Click="ImportOrganizationButton_OnClick"
+                            ToolTip="Import a different layout">
+                        <Image Source="pack://application:,,,/FrostyEditor;component/Images/Import.png"
+                               Width="20" />
+                    </Button>
+                    
+                    <Grid Background="{StaticResource SubMenuItemHighlight}" Width="3"/>
+                    
+                    <!--Visibility Buttons-->
                     <Button x:Name="ToolboxVisible"
                             Width="20"
                             Height="20"
-                            Margin="4,-2,0,0"
+                            Margin="4,0,2,0"
                             HorizontalAlignment="Left"
                             Click="ToolboxVisible_OnClick"
                             ToolTip="Open/Close the toolbox window">
-                        <Image Source="/FrostyEditor;component/Images/ClassRef.png"
+                        <Image Source="/FrostyEditor;component/Images/Database.png"
                                Width="20" />
                     </Button>
                     <Button x:Name="PropertyGridVisible"
                             Width="20"
                             Height="20"
-                            Margin="4,-2,0,0"
+                            Margin="2,0,2,0"
                             HorizontalAlignment="Left"
                             Click="PropertyGridVisible_OnClick"
                             ToolTip="Open/Close the property grid">
-                        <Image Source="/FrostyEditor;component/Images/Grid.png"
+                        <Image Source="/FrostyEditor;component/Images/Properties.png"
                                Width="20" />
                     </Button>
                 </StackPanel>
@@ -346,11 +368,6 @@
                            Width="20" 
                            Visibility="Collapsed"/>
                 </StackPanel>
-                
-                <GridSplitter Grid.Column="0"
-                              Background="{StaticResource SubItemHighlight}"
-                              Width="3"
-                              ResizeDirection="Columns" />
             </Grid>
         </Border>
     </Grid>
