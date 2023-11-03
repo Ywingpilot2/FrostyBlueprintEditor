@@ -9,12 +9,14 @@ This tool is still unfinished, with many things relating to optimization and add
 - loading blueprints into graphed form
 - layout saving
 - xml style configs for node mappings
-- 
+
 ## What needs to be worked on:
-- Optimization across the board; things are currently slow, so changes(and some refactoring) need to be done to speed things up
 - Additional support for more situations(e.g external pointerrefs in say subworlds being used in connections)
-- Improvements to automatic sorting
-- Additional UX/UI Features
+- Layered Graph Drawing algorithm for sorting nodes
+- Options for customizing the look and functionality of the editor
+- Proper setup for transient nodes
+- Comment, Redirect, and shortcut transient nodes
+- Python API
 
 # For developers
 if you wish to contribute to this project, please read this before doing so.
@@ -37,7 +39,5 @@ There is a lot to this plugin so if you wish to make PRs these notes are importa
 - Please do not in the core of the plugin(so anything that isn't for mapping out the connections of a specific type essentially) design things with 1 game in mind specifically. This plugin is designed to work with ALL games with full functionality, so if there is something game specific implemented, at the very least ensure that it only triggers when that games profile is loaded.
   
 - It would be appreciated if you could at the very least add documentation to any methods/classes you create, though full comments explaining the process of what code is doing is the most strongly preferred. I know I am guilty of not doing this a lot in the code, though it makes managing PRs and code much easier. If I have any problems with how you are doing it, I will likely bring it up, though its not like I will strike you down like Zeus for not having enough comments keep in mind... At least hopefully for your sakes.
-  
-- Please try to keep things inside the EditorViewModel class(Models/Editor/NodeEditorViewModel) or adjacent, again I am guilty of not doing this a lot since I put a lot of stuff in static classes, though I want in the future for the user to be able to have more then 1 blueprint editor window open at a time, so the more stuff that is done per Editor the easier it will be for me to do.
 
 - This requires both [Nodify](https://github.com/miroiu/nodify) and [Prism](https://www.nuget.org/packages/Prism.Wpf/), which are both avaliable as Nuget packages. In the future I would like to merge Nodify's source into this instead of having it as a independent DLL, idk what I will do about prism.
