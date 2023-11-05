@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using BlueprintEditor.Models.Connections;
+using BlueprintEditorPlugin.Models.Connections;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.ExampleTypes
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
 {
     /// <summary>
     /// This is a more advanced demonstration, for a simple demonstration <see cref="CompareBoolEntityData"/>

@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using BlueprintEditor.Models.Connections;
+using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.ExampleTypes
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
 {
     /// <summary>
     /// In order to apply, this class needs to be an extension to NodeBaseModel

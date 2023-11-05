@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -22,7 +22,7 @@ using FrostySdk.Managers;
 
 //using System.IO;
 
-namespace BlueprintEditor.Models.Editor.Items
+namespace BlueprintEditorPlugin.Models.Editor.Items
 {
     internal class RefTypeToStringConverter : IValueConverter
     {

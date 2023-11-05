@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using BlueprintEditor.Models.Connections;
+using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.Shared.ScalableEmitterDocument
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.ScalableEmitterDocument
 {
     public class EmitterTemplateData : NodeBaseModel
     {

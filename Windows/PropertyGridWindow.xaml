@@ -1,13 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:editors="clr-namespace:BlueprintEditor.Models.Editor.Items"
                     xmlns:converters="clr-namespace:Frosty.Core.Converters;assembly=FrostyCore"
                     xmlns:editors1="clr-namespace:Frosty.Core.Controls.Editors;assembly=FrostyCore"
                     xmlns:controls="clr-namespace:Frosty.Controls;assembly=FrostyControls"
-                    xmlns:editor="clr-namespace:BlueprintEditor.Models.Editor"
-                    xmlns:controls1="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore">
+                    xmlns:controls1="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
+                    xmlns:editors="clr-namespace:BlueprintEditorPlugin.Models.Editor.Items"
+                    xmlns:editor="clr-namespace:BlueprintEditorPlugin.Models.Editor">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/BlueprintEditor;component/Themes/Generic.xaml"/>
+        <ResourceDictionary Source="/BlueprintEditorPlugin;component/Themes/Generic.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
     <!--Pointer ref editor control-->

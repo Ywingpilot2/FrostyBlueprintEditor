@@ -1,14 +1,13 @@
-﻿using System;
-using System.Windows.Media;
-using BlueprintEditor.Utils;
-using BlueprintEditor.Windows;
+﻿using System.Windows.Media;
+using BlueprintEditorPlugin.Utils;
+using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 
-namespace BlueprintEditor.Extensions
+namespace BlueprintEditorPlugin.Extensions
 {
     public class ViewBlueprintMenuExtension : MenuExtension
     {
-        public static ImageSource iconImageSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/BlueprintEditor;component/Images/BlueprintEdit.png") as ImageSource;
+        public static ImageSource iconImageSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/BlueprintEditorPlugin;component/Images/BlueprintEdit.png") as ImageSource;
 
         public override string TopLevelMenuName => "View";
         public override string SubLevelMenuName => null;
@@ -22,7 +21,6 @@ namespace BlueprintEditor.Extensions
             {
                 BlueprintEditorWindow blueprintEditor = new BlueprintEditorWindow();
                 blueprintEditor.Show();
-                blueprintEditor.Initiate();
 
             }
             else if (App.EditorWindow.GetOpenedAssetEntry() == null)
@@ -30,6 +28,28 @@ namespace BlueprintEditor.Extensions
                 App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
             }
             else if (EditorUtils.Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
+            {
+                App.Logger.LogError("This editor is already open.");
+            }
+        });
+    }
+
+    public class ViewBlueprintContextMenuItem : DataExplorerContextMenuExtension
+    {
+        public override string ContextItemName => "Open as Graph...";
+        public override ImageSource Icon => ViewBlueprintMenuExtension.iconImageSource;
+
+        public override RelayCommand ContextItemClicked => new RelayCommand((o) =>
+        {
+            if (App.SelectedAsset != null && !EditorUtils.Editors.ContainsKey(App.SelectedAsset.Filename))
+            {
+                App.EditorWindow.OpenEditor($"Ebx Graph({App.SelectedAsset.Filename})", new BlueprintEditor());
+            }
+            else if (App.SelectedAsset == null)
+            {
+                App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
+            }
+            else if (EditorUtils.Editors.ContainsKey(App.SelectedAsset.Filename))
             {
                 App.Logger.LogError("This editor is already open.");
             }

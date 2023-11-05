@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Media;
-using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.NodeTypes;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Utils;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Connections
+namespace BlueprintEditorPlugin.Models.Connections
 {
     #region Connections
 

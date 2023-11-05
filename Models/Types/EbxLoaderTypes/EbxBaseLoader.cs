@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.Editor;
-using BlueprintEditor.Models.Types.NodeTypes;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Editor;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.EbxLoaderTypes
+namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
 {
     /// <summary>
     /// This is the base class for a Blueprint Loader

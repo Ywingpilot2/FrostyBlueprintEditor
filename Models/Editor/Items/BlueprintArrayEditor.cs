@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Frosty.Core.Controls;
 
-namespace BlueprintEditor.Models.Editor.Items
+namespace BlueprintEditorPlugin.Models.Editor.Items
 {
     [TemplatePart(Name = "PART_RemoveButton", Type = typeof(Button))]
     [TemplatePart(Name = "PART_AddButton", Type = typeof(Button))]

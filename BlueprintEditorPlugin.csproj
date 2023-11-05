@@ -1,0 +1,91 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <Configurations>Developer - Debug;Release - Alpha;Release - Beta;Release - Final</Configurations>
+    <Platforms>x64</Platforms>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyTitle>BlueprintEditor</AssemblyTitle>
+    <Product>BlueprintEditor</Product>
+    <Copyright>Copyright ©  2020</Copyright>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <UseWPF>true</UseWPF>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Developer - Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Developer\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release - Alpha|x64' ">
+    <OutputPath>bin\Release\Alpha\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Beta|x64'">
+    <OutputPath>bin\Release\Beta\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'">
+    <OutputPath>bin\Release\Final\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FrostyControls\FrostyControls.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FrostyEditor\FrostyEditor.csproj" />
+    <ProjectReference Include="..\..\FrostyHash\FrostyHash.vcxproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FrostyPlugin\FrostyCore.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FrostySdk\FrostySdk.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Images\BlueprintEdit.png" />
+    <Resource Include="Images\BlueprintEdit.png" />
+    <None Remove="Images\AddObjectButton.png" />
+    <Resource Include="Images\AddObjectButton.png" />
+    <None Remove="Images\AutoSortButton.png" />
+    <Resource Include="Images\AutoSortButton.png" />
+    <None Remove="Images\RemoveObjectButton.png" />
+    <Resource Include="Images\RemoveObjectButton.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nodify" Version="5.0.2" />
+    <PackageReference Include="Prism.Core" Version="8.1.97" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)$(OutDir)Plugins\" />
+    <Exec Command="xcopy /Y $(ProjectDir)Models\Types\NodeTypes\NodeMappingConfigs\ $(SolutionDir)$(OutDir)BlueprintEditor\NodeMappings\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
+  </Target>
+
+  <PropertyGroup>
+    <EmitLegacyAssetsFileItems>True</EmitLegacyAssetsFileItems>
+  </PropertyGroup>
+
+</Project>

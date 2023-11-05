@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:fdev="FrostyDeveloper"
     xmlns:nodify="https://miroiu.github.io/nodify"
-    xmlns:connections="clr-namespace:BlueprintEditor.Models.Connections">
+    xmlns:blueprintEditor="clr-namespace:BlueprintEditorPlugin"
+    xmlns:windows="clr-namespace:BlueprintEditorPlugin.Windows">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
@@ -42,5 +43,18 @@
     <GeometryDrawing x:Key="LargeGridGeometry"
                      Geometry="M0,0 L0,1 0.015,1 0.015,0.015 1,0.015 1,0 Z"
                      Brush="{StaticResource CanvasGridMajor}" />
+    
+    <!--Blueprint Editor-->
+    <Style TargetType="{x:Type blueprintEditor:BlueprintEditor}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type blueprintEditor:BlueprintEditor}">
+                    <Grid Background="Aqua">
+                        <windows:BlueprintGraphEditor x:Name="GraphEditor" IsEnabled="True"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
 </ResourceDictionary>

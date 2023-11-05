@@ -4,15 +4,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using Frosty.Controls;
 using Frosty.Core;
 using FrostySdk;
-using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Utils
+namespace BlueprintEditorPlugin.Utils
 {
     public static class NodeUtils
     {

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using BlueprintEditor.Models.Connections;
+﻿using System.Collections.ObjectModel;
+using BlueprintEditorPlugin.Models.Connections;
 using Frosty.Core;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.Shared.Entity
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity
 {
     public class SchematicChannelEntityData : NodeBaseModel
     {

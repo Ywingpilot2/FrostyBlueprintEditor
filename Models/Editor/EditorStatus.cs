@@ -1,4 +1,4 @@
-﻿namespace BlueprintEditor.Models.Editor
+﻿namespace BlueprintEditorPlugin.Models.Editor
 {
     public enum EditorStatus
     {

@@ -3,21 +3,30 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
-using BlueprintEditor.Models.Connections;
+using BlueprintEditorPlugin.Models.Connections;
 using FrostySdk;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.NodeTypes
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes
 {
     /// <summary>
     /// A single node
     /// </summary>
     public class NodeBaseModel : INotifyPropertyChanged
     {
+        private string _name;
         /// <summary>
         /// The name that will be displayed
         /// </summary>
-        public virtual string Name { get; set; }
+        public virtual string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                NotifyPropertyChanged(nameof(Name));
+            }
+        }
 
         /// <summary>
         /// The documentation for this node

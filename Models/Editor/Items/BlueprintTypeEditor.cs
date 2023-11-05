@@ -3,10 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Frosty.Core.Controls;
 using Frosty.Core.Controls.Editors;
-using FrostySdk;
-using FrostySdk.Attributes;
 
-namespace BlueprintEditor.Models.Editor.Items
+namespace BlueprintEditorPlugin.Models.Editor.Items
 {
     public abstract class BlueprintTypeEditor<T> : FrostyBaseTypeEditor where T : FrameworkElement, new()
     {

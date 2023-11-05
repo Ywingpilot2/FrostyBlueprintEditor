@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using BlueprintEditor.Models.Connections;
+using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.Shared.Entity
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity
 {
     public class AndEntityData : NodeBaseModel
     {
@@ -18,6 +18,8 @@ namespace BlueprintEditor.Models.Types.NodeTypes.Shared.Entity
 
         public override void OnCreation()
         {
+            if ((int)Object.InputCount == 0) return;
+            
             for (int i = 1; i != (int)Object.InputCount; i++)
             {
                 Outputs.Add(new OutputViewModel() {Title = $"In{i}", Type = ConnectionType.Property});

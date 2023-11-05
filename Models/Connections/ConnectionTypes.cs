@@ -1,4 +1,4 @@
-﻿namespace BlueprintEditor.Models.Connections
+﻿namespace BlueprintEditorPlugin.Models.Connections
 {
     public enum ConnectionType
     {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Utils;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.NodeTypes.Shared
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared
 {
     public class InterfaceDataNode : NodeBaseModel
     {

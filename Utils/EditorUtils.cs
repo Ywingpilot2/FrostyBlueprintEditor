@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Data;
-using BlueprintEditor.Models;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.Editor;
-using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Editor;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using FrostyEditor;
 using FrostySdk;
-using FrostySdk.IO;
 using FrostySdk.Managers;
-using Nodify;
 using App = Frosty.Core.App;
 
-namespace BlueprintEditor.Utils
+namespace BlueprintEditorPlugin.Utils
 {
     /// <summary>
     /// A bunch of random utilities for Blueprints
@@ -30,32 +22,10 @@ namespace BlueprintEditor.Utils
         /// </summary>
         public static Dictionary<string, EditorViewModel> Editors = new Dictionary<string, EditorViewModel>();
 
-        private static EditorViewModel _lastEditor;
         /// <summary>
         /// This gets the currently open <see cref="EditorViewModel"/>
         /// </summary>
-        public static EditorViewModel CurrentEditor
-        {
-            get
-            {
-                EditorViewModel editor = null;
-                //So frosty task window doesn't fucksplode
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    if (Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
-                    {
-                        editor = Editors[App.EditorWindow.GetOpenedAssetEntry().Filename];
-                        _lastEditor = editor;
-                    }
-                    else
-                    {
-                        editor = _lastEditor;
-                        App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(editor.EditedEbxAsset.FileGuid));
-                    }
-                });
-                return editor;
-            }
-        }
+        public static EditorViewModel CurrentEditor { get; set; }
 
         #region Layouts
 

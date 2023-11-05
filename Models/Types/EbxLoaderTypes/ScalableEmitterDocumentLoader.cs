@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Controls;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.Types.NodeTypes;
-using BlueprintEditor.Models.Types.NodeTypes.Shared.ScalableEmitterDocument;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.ScalableEmitterDocument;
 using FrostySdk;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.EbxLoaderTypes
+namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
 {
     /// <summary>
     /// For documentation please see <see cref="EbxBaseLoader"/>

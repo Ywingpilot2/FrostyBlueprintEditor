@@ -7,22 +7,20 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.Types;
-using BlueprintEditor.Models.Types.EbxEditorTypes;
-using BlueprintEditor.Models.Types.NodeTypes;
-using BlueprintEditor.Models.Types.NodeTypes.Shared;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Shared;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
-using Nodify;
 using Prism.Commands;
 
-namespace BlueprintEditor.Models.Editor
+namespace BlueprintEditorPlugin.Models.Editor
 {
 
     #region Editor
@@ -51,8 +49,8 @@ namespace BlueprintEditor.Models.Editor
 
         public EditorViewModel()
         {
-            EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.EditorWindow.GetOpenedAssetEntry());
-            EditorName = App.EditorWindow.GetOpenedAssetEntry().Filename;
+            EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.SelectedAsset);
+            EditorName = App.SelectedAsset.Filename;
             
             EbxBaseEditor ebxEditor = new EbxBaseEditor();
             foreach (var type in Assembly.GetCallingAssembly().GetTypes())
@@ -60,7 +58,7 @@ namespace BlueprintEditor.Models.Editor
                 if (type.IsSubclassOf(typeof(EbxBaseEditor)))
                 {
                     EbxBaseEditor extension = (EbxBaseEditor)Activator.CreateInstance(type);
-                    if (extension.AssetType != App.EditorWindow.GetOpenedAssetEntry().Type) continue;
+                    if (extension.AssetType != App.SelectedAsset.Type) continue;
                     ebxEditor = extension;
                     break;
                 }
@@ -80,7 +78,10 @@ namespace BlueprintEditor.Models.Editor
             });
             
             EditorUtils.Editors.Add(EditorName, this);
+            EditorUtils.CurrentEditor = this;
         }
+
+        #region Editor Status
 
         public event EventHandler<EditorStatusArgs> EditorStatusChanged;
         
@@ -105,6 +106,8 @@ namespace BlueprintEditor.Models.Editor
         {
             RemoveEditorStatus?.Invoke(this, new EditorStatusArgs(status, id));
         }
+
+        #endregion
 
         #region Node Editing
 
@@ -527,8 +530,6 @@ namespace BlueprintEditor.Models.Editor
         /// <param name="connection"></param>
         public void Disconnect(ConnectionViewModel connection)
         {
-            App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid));
-            
             bool sourceConnected = false;
             bool targetConnected = false;
             foreach (ConnectionViewModel connectionViewModel in Connections)
@@ -702,8 +703,6 @@ namespace BlueprintEditor.Models.Editor
         {
             StartCommand = new DelegateCommand<Object>(source =>
             {
-                //Open the asset when editing in order to ensure the least issues
-                App.EditorWindow.OpenAsset(App.AssetManager.GetEbxEntry(nodeEditor.EditedEbxAsset.FileGuid));
                 if (source.GetType().Name == "OutputViewModel")
                 {
                     Source = (OutputViewModel)source;

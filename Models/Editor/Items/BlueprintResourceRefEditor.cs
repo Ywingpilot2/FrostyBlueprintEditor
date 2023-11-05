@@ -10,7 +10,7 @@ using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 using FrostySdk.Managers;
 
-namespace BlueprintEditor.Models.Editor.Items
+namespace BlueprintEditorPlugin.Models.Editor.Items
 {
     class BlueprintResourceRefEditor : BlueprintTypeEditor<TextBox>
     {

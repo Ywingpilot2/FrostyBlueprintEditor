@@ -7,7 +7,7 @@ using System.Windows.Media;
 using Frosty.Controls;
 using Frosty.Core.Controls;
 
-namespace BlueprintEditor.Models.Editor.Items
+namespace BlueprintEditorPlugin.Models.Editor.Items
 {
     class BlueprintGuidEditor : BlueprintTypeEditor<TextBox>
     {

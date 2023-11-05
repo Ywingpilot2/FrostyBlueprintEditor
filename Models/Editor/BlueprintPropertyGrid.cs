@@ -10,8 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using BlueprintEditor.Models.Editor.Items;
-using BlueprintEditor.Utils;
+using BlueprintEditorPlugin.Models.Editor.Items;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -22,7 +22,7 @@ using FrostySdk.Attributes;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 
-namespace BlueprintEditor.Models.Editor
+namespace BlueprintEditorPlugin.Models.Editor
 { 
     public class BlueprintPropertyGridItem : FrostyPropertyGridItem
     {

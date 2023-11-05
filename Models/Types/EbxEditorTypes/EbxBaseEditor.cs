@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Windows;
-using BlueprintEditor.Models.Connections;
-using BlueprintEditor.Models.Editor;
-using BlueprintEditor.Models.Types.NodeTypes;
-using BlueprintEditor.Models.Types.NodeTypes.Shared;
-using BlueprintEditor.Utils;
-using Frosty.Controls;
+using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Editor;
+using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Shared;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditor.Models.Types.EbxEditorTypes
+namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
 {
     /// <summary>
     /// This class is used to edit the EBX itself
