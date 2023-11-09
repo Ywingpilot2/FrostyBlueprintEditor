@@ -10,7 +10,8 @@ using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
-using BlueprintEditorPlugin.Models.Types.NodeTypes.Shared;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -46,6 +47,9 @@ namespace BlueprintEditorPlugin.Models.Editor
         public EbxAsset EditedEbxAsset { get; set; }
         public dynamic EditedProperties => EditedEbxAsset.RootObject;
         public AssetClassGuid InterfaceGuid { get; private set; }
+        public Point ViewportLocation { get; set; }
+        public double ViewportZoom { get; set; } = 0.75;
+        public Point MouseLocation { get; set; }
 
         public EditorViewModel()
         {
@@ -110,77 +114,6 @@ namespace BlueprintEditorPlugin.Models.Editor
         #endregion
 
         #region Node Editing
-
-        /// <summary>
-        /// This will create a new node from an object
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public NodeBaseModel CreateNodeFromObject(object obj)
-        {
-            string key = obj.GetType().Name;
-            NodeBaseModel newNode;
-            
-            if (NodeUtils.NodeExtensions.ContainsKey(key))
-            {
-                newNode = (NodeBaseModel)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
-            }
-            else if (NodeUtils.NmcExtensions.ContainsKey(key))
-            {
-                newNode = new NodeBaseModel();
-                if (NodeUtils.NmcExtensions[key].All(arg => arg.Split('=')[0] != "ValidGameExecutableName")
-                    || NodeUtils.NmcExtensions[key].Any(arg => arg == $"ValidGameExecutableName={ProfilesLibrary.ProfileName}"))
-                {
-                    foreach (string arg in NodeUtils.NmcExtensions[key])
-                    {
-                        switch (arg.Split('=')[0])
-                        {
-                            case "DisplayName":
-                            {
-                                newNode.Name = arg.Split('=')[1];
-                            } break;
-                            case "InputEvent":
-                            {
-                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
-                            } break;
-                            case "InputProperty":
-                            {
-                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
-                            } break;
-                            case "InputLink":
-                            {
-                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
-                            } break;
-                            case "OutputEvent":
-                            {
-                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
-                            } break;
-                            case "OutputProperty":
-                            {
-                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
-                            } break;
-                            case "OutputLink":
-                            {
-                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
-                            } break;
-                        }
-                    }
-                }
-            }
-            else //We could not find an extension
-            {
-                newNode = new NodeBaseModel();
-                newNode.Inputs = NodeUtils.GenerateNodeInputs(obj.GetType(), newNode);
-                newNode.Name = obj.GetType().Name;
-            }
-            
-            newNode.Object = obj;
-            newNode.Guid = ((dynamic)obj).GetInstanceGuid();
-            newNode.OnCreation();
-
-            Nodes.Add(newNode);
-            return newNode;
-        }
 
         public object CreateNodeObject(Type type) => _ebxEditor.AddNodeObject(type);
         public object CreateNodeObject(object obj) => _ebxEditor.AddNodeObject(obj);
@@ -339,20 +272,43 @@ namespace BlueprintEditorPlugin.Models.Editor
             #endregion
 
             #region Object Removal
-            
-            foreach (ConnectionViewModel connection in GetConnections(node))
+
+            if (!node.IsTransient)
             {
-                Disconnect(connection);
+                EntityNode entityNode = node as EntityNode;
+
+                foreach (ConnectionViewModel connection in GetConnections(entityNode))
+                {
+                    Disconnect(connection);
+                }
+
+                _ebxEditor.RemoveNodeObject(entityNode);
+            
+                Nodes.Remove(entityNode);
+            
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
+                App.EditorWindow.DataExplorer.RefreshItems();
             }
-
-            _ebxEditor.RemoveNodeObject(node);
             
-            Nodes.Remove(node);
-            
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
-            App.EditorWindow.DataExplorer.RefreshItems();
-
             #endregion
+            
+            else //Transient nodes need to handle removal themselves
+            {
+                TransientNode transientNode = node as TransientNode;
+
+                foreach (ConnectionViewModel connection in GetConnections(node))
+                {
+                    Disconnect(connection);
+                }
+
+                if (transientNode == null) return;
+                
+                transientNode.RemoveNodeObject();
+                Nodes.Remove(transientNode);
+                
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(EditedEbxAsset.FileGuid).Name, EditedEbxAsset);
+                App.EditorWindow.DataExplorer.RefreshItems();
+            }
         }
 
         public bool EditNodeProperties(object nodeObj, ItemModifiedEventArgs args)
@@ -638,18 +594,19 @@ namespace BlueprintEditorPlugin.Models.Editor
         }
         
         /// <summary>
-        /// Get a node from a guid
+        /// Get an entity node from a guid
         /// </summary>
         /// <param name="nodeGuid"></param>
         /// <returns></returns>
-        public NodeBaseModel GetNode(AssetClassGuid nodeGuid)
+        public EntityNode GetNode(AssetClassGuid nodeGuid)
         {
-            NodeBaseModel got = null;
+            EntityNode got = null;
             Parallel.ForEach(Nodes, (node, state) =>
             {
-                if (node.Guid == nodeGuid)
+                EntityNode entityNode = node as EntityNode;
+                if (entityNode != null && entityNode.Guid == nodeGuid)
                 {
-                    got = node;
+                    got = entityNode;
                     state.Break();
                 }
             });

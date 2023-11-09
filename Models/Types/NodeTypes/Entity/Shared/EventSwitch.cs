@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 {
-    public class EventSwitchEntityData : NodeBaseModel
+    public class EventSwitchEntityData : EntityNode
     {
         public override string Name { get; set; } = "Switch(Event)";
-        public override string ObjectType { get; } = "EventSwitchEntityData";
+        public override string ObjectType { get; set; } = "EventSwitchEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>()

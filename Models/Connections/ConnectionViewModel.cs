@@ -28,8 +28,7 @@ namespace BlueprintEditorPlugin.Models.Connections
             }
         }
 
-        private NodeBaseModel _sourceNode;
-        public NodeBaseModel SourceNode => _sourceNode;
+        public NodeBaseModel SourceNode { get; private set; }
 
         public InputViewModel Target { get; }
         public string TargetField
@@ -45,8 +44,7 @@ namespace BlueprintEditorPlugin.Models.Connections
             }
         }
 
-        private NodeBaseModel _targetNode;
-        public NodeBaseModel TargetNode => _targetNode;
+        public NodeBaseModel TargetNode { get; private set; }
 
         public dynamic Object { get; set; }
         
@@ -81,11 +79,11 @@ namespace BlueprintEditorPlugin.Models.Connections
             {
                 if (node.Inputs.Contains(Target))
                 {
-                    _targetNode = node;
+                    TargetNode = node;
                 }
                 if (node.Outputs.Contains(Source))
                 {
-                    _sourceNode = node;
+                    SourceNode = node;
                 }
             });
 

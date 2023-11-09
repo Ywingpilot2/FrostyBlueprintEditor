@@ -2,13 +2,13 @@
 using BlueprintEditorPlugin.Models.Connections;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
 {
     /// <summary>
     /// This is a more advanced demonstration, for a simple demonstration <see cref="CompareBoolEntityData"/>
     /// This demonstrates creating events and properties based off of the property grid
     /// </summary>
-    public class SelectEventEntityData : NodeBaseModel
+    public class SelectEventEntityData : EntityNode
     {
         /// <summary>
         /// This is the name that will be displayed in the editor.
@@ -21,7 +21,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
         /// This HAS to be the exact name of the type, so in this case, CompareBoolEntityData
         /// This value is static.
         /// </summary>
-        public override string ObjectType { get; } = "SelectEventEntityData";
+        public override string ObjectType { get; set; } = "SelectEventEntityData";
 
         /// <summary>
         /// These are all of the inputs this has.

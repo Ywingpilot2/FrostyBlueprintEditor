@@ -32,17 +32,11 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         /// The documentation for this node
         /// </summary>
         public virtual string Documentation => "";
-        
-        /// <summary>
-        /// The games this node is valid for. If this node is valid for all games, don't override.
-        /// This should be the name as seen in <see cref="ProfilesLibrary"/>
-        /// </summary>
-        public virtual List<string> ValidForGames { get; set; } = null; 
 
         public virtual SolidColorBrush HeaderColor { get; set; } =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3F3F3F"));
-        public virtual string ObjectType { get; } = "null";
-        public AssetClassGuid Guid { get; set; }
+        public virtual string ObjectType { get; set; } = "null";
+        public virtual bool IsTransient => false;
 
         /// <summary>
         /// The object this node belongs to.

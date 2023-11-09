@@ -5,38 +5,30 @@ using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity.ObjectReference
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectReference
 {
-    public class CharacterSpawnReferenceObjectData : NodeBaseModel
+    public class ObjectReferenceObjectData : EntityNode
     {
-        public override string Name { get; set; } = "Character (null ref)";
-        public override string ObjectType { get; } = "CharacterSpawnReferenceObjectData";
+        public override string Name { get; set; } = "Object (null ref)";
+        public override string ObjectType { get; set; } = "ObjectReferenceObjectData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>()
             {
-                new InputViewModel() {Title = "self", Type = ConnectionType.Link},
                 new InputViewModel() {Title = "BlueprintTransform", Type = ConnectionType.Property},
-                new InputViewModel() {Title = "Spawn", Type = ConnectionType.Event}
             };
 
         public override ObservableCollection<OutputViewModel> Outputs { get; set; } =
-            new ObservableCollection<OutputViewModel>()
-            {
-                new OutputViewModel() {Title = "OnSpawned", Type = ConnectionType.Event},
-                new OutputViewModel() {Title = "OnKilled", Type = ConnectionType.Event},
-                new OutputViewModel() {Title = "AlternativeSpawnPoints", Type = ConnectionType.Link}
-            };
+            new ObservableCollection<OutputViewModel>();
 
         public override void OnCreation()
         {
             PointerRef ptr = Object.Blueprint;
-            if (ptr.External.FileGuid == System.Guid.Empty) return;
-            
+
             EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
             EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
 
-            Name = $"Character ({blueprintAssetEntry.Filename})";
+            Name = $"Object ({blueprintAssetEntry.Filename})";
 
             PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
                            
@@ -108,18 +100,9 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity.ObjectRefer
                     Title = outputLink.Name,
                     Type = ConnectionType.Link
                 });
-            }
-                
-            if (Object.GetType().GetProperty("Template") != null)
-            {
-                PointerRef templatePointer = Object.Template;
-
-                if (templatePointer.External.FileGuid == System.Guid.Empty) return;
-                EbxAssetEntry templateAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
-                Name = $"Character ({blueprintAssetEntry.Filename}, {templateAssetEntry.Filename})";
-            }
+            }            
         }
-
+        
         public override void OnModified() => OnCreation();
     }
 }

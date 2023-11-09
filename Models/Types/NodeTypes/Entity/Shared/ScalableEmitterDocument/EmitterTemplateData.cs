@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.ScalableEmitterDocument
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ScalableEmitterDocument
 {
-    public class EmitterTemplateData : NodeBaseModel
+    public class EmitterTemplateData : EntityNode
     {
         public override string Name { get; set; } = "Emitter Core";
-        public override string ObjectType { get; } = "EmitterTemplateData";
+        public override string ObjectType { get; set; } = "EmitterTemplateData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>();

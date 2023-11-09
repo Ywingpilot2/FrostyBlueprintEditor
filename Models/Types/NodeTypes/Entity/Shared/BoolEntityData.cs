@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 {
-    public class BoolEntityData : NodeBaseModel
+    public class BoolEntityData : EntityNode
     {
         public override string Name { get; set; } = "Bool";
-        public override string ObjectType { get; } = "BoolEntityData";
+        public override string ObjectType { get; set; } = "BoolEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>()

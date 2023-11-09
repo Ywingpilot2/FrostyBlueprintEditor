@@ -4,7 +4,8 @@ using System.Reflection;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
-using BlueprintEditorPlugin.Models.Types.NodeTypes.Shared;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
@@ -88,7 +89,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         /// This method is used to remove a node from the Ebx
         /// </summary>
         /// <param name="nodeToRemove"></param>
-        public virtual void RemoveNodeObject(NodeBaseModel nodeToRemove)
+        public virtual void RemoveNodeObject(EntityNode nodeToRemove)
         {
             List<PointerRef> pointerRefs = NodeEditor.EditedProperties.Objects;
             pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == nodeToRemove.Guid);
@@ -101,38 +102,59 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         /// <param name="connection"></param>
         public virtual void RemoveConnectionObject(ConnectionViewModel connection)
         {
-            //TODO: This code sucks! Please find a faster way to find the connection and remove it
-            switch (connection.Type)
+            //Check if the nodes are transient
+            if (connection.SourceNode.IsTransient || connection.TargetNode.IsTransient)
             {
-                case ConnectionType.Event:
+                //If they are we need them to handle this for us
+                if (connection.SourceNode.IsTransient)
                 {
-                    foreach (dynamic eventConnection in NodeEditor.EditedProperties.EventConnections)
-                    {
-                        if (!connection.Equals(eventConnection)) continue;
-                        NodeEditor.EditedProperties.EventConnections.Remove(eventConnection);
-                        break;
-                    }
-                    break;
+                    TransientNode transientNode = connection.SourceNode as TransientNode;
+                    transientNode?.RemoveConnectionObject(connection);
                 }
-                case ConnectionType.Property:
+                else
                 {
-                    foreach (dynamic propertyConnection in NodeEditor.EditedProperties.PropertyConnections)
-                    {
-                        if (!connection.Equals(propertyConnection)) continue;
-                        NodeEditor.EditedProperties.PropertyConnections.Remove(propertyConnection);
-                        break;
-                    }
-                    break;
+                    TransientNode transientNode = connection.TargetNode as TransientNode;
+                    transientNode?.RemoveConnectionObject(connection);
                 }
-                case ConnectionType.Link:
+            }
+            else
+            {
+                //Otherwise we just do what we normally do for connections
+                switch (connection.Type)
                 {
-                    foreach (dynamic linkConnection in NodeEditor.EditedProperties.LinkConnections)
+                    case ConnectionType.Event:
                     {
-                        if (!connection.Equals(linkConnection)) continue;
-                        NodeEditor.EditedProperties.LinkConnections.Remove(linkConnection);
+                        foreach (dynamic eventConnection in NodeEditor.EditedProperties.EventConnections)
+                        {
+                            if (!connection.Equals(eventConnection)) continue;
+                            NodeEditor.EditedProperties.EventConnections.Remove(eventConnection);
+                            break;
+                        }
+
                         break;
                     }
-                    break;
+                    case ConnectionType.Property:
+                    {
+                        foreach (dynamic propertyConnection in NodeEditor.EditedProperties.PropertyConnections)
+                        {
+                            if (!connection.Equals(propertyConnection)) continue;
+                            NodeEditor.EditedProperties.PropertyConnections.Remove(propertyConnection);
+                            break;
+                        }
+
+                        break;
+                    }
+                    case ConnectionType.Link:
+                    {
+                        foreach (dynamic linkConnection in NodeEditor.EditedProperties.LinkConnections)
+                        {
+                            if (!connection.Equals(linkConnection)) continue;
+                            NodeEditor.EditedProperties.LinkConnections.Remove(linkConnection);
+                            break;
+                        }
+
+                        break;
+                    }
                 }
             }
         }
@@ -144,57 +166,75 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         public virtual void CreateConnectionObject(ConnectionViewModel connection)
         {
             if (connection == null) return;
-            switch (connection.Type)
+            
+            if (!connection.SourceNode.IsTransient && !connection.TargetNode.IsTransient)
             {
-                case ConnectionType.Event:
+                switch (connection.Type)
                 {
-                    dynamic eventConnection = TypeLibrary.CreateObject("EventConnection");
+                    case ConnectionType.Event:
+                    {
+                        dynamic eventConnection = TypeLibrary.CreateObject("EventConnection");
 
-                    eventConnection.Source = new PointerRef(connection.SourceNode.Object);
-                    eventConnection.Target = new PointerRef(connection.TargetNode.Object);
-                    eventConnection.SourceEvent.Name = connection.SourceField;
-                    eventConnection.TargetEvent.Name = connection.TargetField;
+                        eventConnection.Source = new PointerRef(connection.SourceNode.Object);
+                        eventConnection.Target = new PointerRef(connection.TargetNode.Object);
+                        eventConnection.SourceEvent.Name = connection.SourceField;
+                        eventConnection.TargetEvent.Name = connection.TargetField;
 
-                    ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections
-                        .Add(eventConnection);
-                    connection.Object = eventConnection;
-                } break;
+                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections
+                            .Add(eventConnection);
+                        connection.Object = eventConnection;
+                    } break;
                 
-                case ConnectionType.Property:
-                {
-                    dynamic propertyConnection = TypeLibrary.CreateObject("PropertyConnection");
+                    case ConnectionType.Property:
+                    {
+                        dynamic propertyConnection = TypeLibrary.CreateObject("PropertyConnection");
 
-                    propertyConnection.Source = new PointerRef(connection.SourceNode.Object);
-                    propertyConnection.Target = new PointerRef(connection.TargetNode.Object);
-                    propertyConnection.SourceField = connection.SourceField;
-                    propertyConnection.TargetField = connection.TargetField;
+                        propertyConnection.Source = new PointerRef(connection.SourceNode.Object);
+                        propertyConnection.Target = new PointerRef(connection.TargetNode.Object);
+                        propertyConnection.SourceField = connection.SourceField;
+                        propertyConnection.TargetField = connection.TargetField;
 
-                    ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections
-                        .Add(propertyConnection);
-                    connection.Object = propertyConnection;
-                } break;
+                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections
+                            .Add(propertyConnection);
+                        connection.Object = propertyConnection;
+                    } break;
                 
-                case ConnectionType.Link:
-                {
-                    dynamic linkConnection = TypeLibrary.CreateObject("LinkConnection");
+                    case ConnectionType.Link:
+                    {
+                        dynamic linkConnection = TypeLibrary.CreateObject("LinkConnection");
 
-                    linkConnection.Source = new PointerRef(connection.SourceNode.Object);
-                    linkConnection.Target = new PointerRef(connection.TargetNode.Object);
+                        linkConnection.Source = new PointerRef(connection.SourceNode.Object);
+                        linkConnection.Target = new PointerRef(connection.TargetNode.Object);
                     
-                    if (connection.SourceField != "self")
-                    {
-                        linkConnection.SourceField = connection.SourceField;
-                    }
+                        if (connection.SourceField != "self")
+                        {
+                            linkConnection.SourceField = connection.SourceField;
+                        }
 
-                    if (connection.TargetField != "self")
-                    {
-                        linkConnection.TargetField = connection.TargetField;
-                    }
+                        if (connection.TargetField != "self")
+                        {
+                            linkConnection.TargetField = connection.TargetField;
+                        }
 
-                    ((dynamic)NodeEditor.EditedEbxAsset.RootObject).LinkConnections.Add(
-                        linkConnection);
-                    connection.Object = linkConnection;
-                } break;
+                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).LinkConnections.Add(
+                            linkConnection);
+                        connection.Object = linkConnection;
+                    } break;
+                }
+            }
+            else
+            {
+                //If they are we need them to handle this for us
+                if (connection.SourceNode.IsTransient)
+                {
+                    TransientNode transientNode = connection.SourceNode as TransientNode;
+                    transientNode?.RemoveConnectionObject(connection);
+                }
+                else
+                {
+                    TransientNode transientNode = connection.TargetNode as TransientNode;
+                    transientNode?.RemoveConnectionObject(connection);
+                }
             }
         }
 
@@ -211,6 +251,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                 AssetClassGuid nodeGuid = nodeProperties.GetInstanceGuid();
                 NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
                 node.Object = newObj;
+                node.Name = node.Object.__Id.ToString();
                 node.OnModified();
             
                 //TODO: Update this so we aren't enumerating over every single asset in the entire file

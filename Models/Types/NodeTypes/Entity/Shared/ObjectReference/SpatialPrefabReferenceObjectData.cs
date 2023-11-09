@@ -5,12 +5,12 @@ using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity.ObjectReference
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectReference
 {
-    public class LogicPrefabReferenceObjectData : NodeBaseModel
+    public class SpatialPrefabReferenceObjectData : EntityNode
     {
-        public override string Name { get; set; } = "LogicPrefab (null ref)";
-        public override string ObjectType { get; } = "LogicPrefabReferenceObjectData";
+        public override string Name { get; set; } = "SpatialPrefab (null ref)";
+        public override string ObjectType { get; set; } = "SpatialPrefabReferenceObjectData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>()
@@ -28,7 +28,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity.ObjectRefer
             EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
             EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
 
-            Name = $"LogicPrefab ({blueprintAssetEntry.Filename})";
+            Name = $"SpatialPrefab ({blueprintAssetEntry.Filename})";
 
             PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
                            

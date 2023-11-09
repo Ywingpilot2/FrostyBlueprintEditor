@@ -21,7 +21,6 @@ namespace BlueprintEditorPlugin.Extensions
             {
                 BlueprintEditorWindow blueprintEditor = new BlueprintEditorWindow();
                 blueprintEditor.Show();
-
             }
             else if (App.EditorWindow.GetOpenedAssetEntry() == null)
             {
@@ -43,7 +42,7 @@ namespace BlueprintEditorPlugin.Extensions
         {
             if (App.SelectedAsset != null && !EditorUtils.Editors.ContainsKey(App.SelectedAsset.Filename))
             {
-                App.EditorWindow.OpenEditor($"Ebx Graph({App.SelectedAsset.Filename})", new BlueprintEditor());
+                App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", new BlueprintEditor());
             }
             else if (App.SelectedAsset == null)
             {

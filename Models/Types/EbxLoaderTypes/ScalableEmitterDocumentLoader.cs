@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
-using BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.ScalableEmitterDocument;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ScalableEmitterDocument;
 using FrostySdk;
 using FrostySdk.Ebx;
 
@@ -33,7 +34,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataLow.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataLow.Internal);
+                EmitterTemplateData emitter = GetNodeFromObject(properties.TemplateDataLow.Internal);
                 emitter.Name = "Emitter Template(Low)";
                 emitters.Add(emitter.Guid);
 
@@ -41,7 +42,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 object currentProcessor = ((dynamic)properties.TemplateDataUltra.Internal).RootProcessor.Internal;
                 dynamic currentProperties = currentProcessor as dynamic;
             
-                NodeBaseModel node = new NodeBaseModel()
+                EntityNode node = new EntityNode()
                 {
                     Guid = currentProperties.GetInstanceGuid(), 
                     Object = currentProcessor,
@@ -71,7 +72,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     dynamic processorProperties = nextProcessor as dynamic;
                 
                     //Create the next processor as a node
-                    NodeBaseModel nextNode = new NodeBaseModel()
+                    EntityNode nextNode = new EntityNode()
                     {
                         Guid = processorProperties.GetInstanceGuid(), 
                         Object = nextProcessor,
@@ -94,7 +95,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     if (processorProperties.Pre.Internal != null)
                     {
                         dynamic precompute = processorProperties.Pre.Internal;
-                        NodeBaseModel preComputeNode = new NodeBaseModel()
+                        EntityNode preComputeNode = new EntityNode()
                         {
                             Guid = precompute.GetInstanceGuid(), 
                             Object = precompute,
@@ -122,7 +123,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataMedium.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataMedium.Internal);
+                EmitterTemplateData emitter = GetNodeFromObject(properties.TemplateDataMedium.Internal);
                 emitter.Name = "Emitter Template(Medium)";
                 emitters.Add(emitter.Guid);
 
@@ -130,7 +131,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 object currentProcessor = ((dynamic)properties.TemplateDataUltra.Internal).RootProcessor.Internal;
                 dynamic currentProperties = currentProcessor as dynamic;
             
-                NodeBaseModel node = new NodeBaseModel()
+                EntityNode node = new EntityNode()
                 {
                     Guid = currentProperties.GetInstanceGuid(), 
                     Object = currentProcessor,
@@ -160,7 +161,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     dynamic processorProperties = nextProcessor as dynamic;
                 
                     //Create the next processor as a node
-                    NodeBaseModel nextNode = new NodeBaseModel()
+                    EntityNode nextNode = new EntityNode()
                     {
                         Guid = processorProperties.GetInstanceGuid(), 
                         Object = nextProcessor,
@@ -183,7 +184,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     if (processorProperties.Pre.Internal != null)
                     {
                         dynamic precompute = processorProperties.Pre.Internal;
-                        NodeBaseModel preComputeNode = new NodeBaseModel()
+                        EntityNode preComputeNode = new EntityNode()
                         {
                             Guid = precompute.GetInstanceGuid(), 
                             Object = precompute,
@@ -211,7 +212,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataHigh.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataHigh.Internal);
+                EmitterTemplateData emitter = GetNodeFromObject(properties.TemplateDataHigh.Internal);
                 emitter.Name = "Emitter Template(High)";
                 emitters.Add(emitter.Guid);
 
@@ -219,7 +220,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 object currentProcessor = ((dynamic)properties.TemplateDataUltra.Internal).RootProcessor.Internal;
                 dynamic currentProperties = currentProcessor as dynamic;
             
-                NodeBaseModel node = new NodeBaseModel()
+                EntityNode node = new EntityNode()
                 {
                     Guid = currentProperties.GetInstanceGuid(), 
                     Object = currentProcessor,
@@ -249,7 +250,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     dynamic processorProperties = nextProcessor as dynamic;
                 
                     //Create the next processor as a node
-                    NodeBaseModel nextNode = new NodeBaseModel()
+                    EntityNode nextNode = new EntityNode()
                     {
                         Guid = processorProperties.GetInstanceGuid(), 
                         Object = nextProcessor,
@@ -272,7 +273,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     if (processorProperties.Pre.Internal != null)
                     {
                         dynamic precompute = processorProperties.Pre.Internal;
-                        NodeBaseModel preComputeNode = new NodeBaseModel()
+                        EntityNode preComputeNode = new EntityNode()
                         {
                             Guid = precompute.GetInstanceGuid(), 
                             Object = precompute,
@@ -300,7 +301,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             if (!emitters.Contains(properties.TemplateDataUltra.Internal.GetInstanceGuid()))
             {
                 //Create the template
-                EmitterTemplateData emitter = NodeEditor.CreateNodeFromObject(properties.TemplateDataUltra.Internal);
+                EmitterTemplateData emitter = GetNodeFromObject(properties.TemplateDataUltra.Internal);
                 emitter.Name = "Emitter Template(Ultra)";
                 emitters.Add(emitter.Guid);
 
@@ -308,7 +309,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 object currentProcessor = ((dynamic)properties.TemplateDataUltra.Internal).RootProcessor.Internal;
                 dynamic currentProperties = currentProcessor as dynamic;
             
-                NodeBaseModel node = new NodeBaseModel()
+                EntityNode node = new EntityNode()
                 {
                     Guid = currentProperties.GetInstanceGuid(), 
                     Object = currentProcessor,
@@ -338,7 +339,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     dynamic processorProperties = nextProcessor as dynamic;
                 
                     //Create the next processor as a node
-                    NodeBaseModel nextNode = new NodeBaseModel()
+                    EntityNode nextNode = new EntityNode()
                     {
                         Guid = processorProperties.GetInstanceGuid(), 
                         Object = nextProcessor,
@@ -361,7 +362,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     if (processorProperties.Pre.Internal != null)
                     {
                         dynamic precompute = processorProperties.Pre.Internal;
-                        NodeBaseModel preComputeNode = new NodeBaseModel()
+                        EntityNode preComputeNode = new EntityNode()
                         {
                             Guid = precompute.GetInstanceGuid(), 
                             Object = precompute,

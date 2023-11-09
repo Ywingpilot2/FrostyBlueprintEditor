@@ -5,12 +5,12 @@ using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared.Entity
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 {
-    public class SchematicChannelEntityData : NodeBaseModel
+    public class SchematicChannelEntityData : EntityNode
     {
         public override string Name { get; set; } = "Schematic Channel (null ref, 0 events)";
-        public override string ObjectType { get; } = "SchematicChannelEntityData";
+        public override string ObjectType { get; set; } = "SchematicChannelEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } = new ObservableCollection<InputViewModel>();
 

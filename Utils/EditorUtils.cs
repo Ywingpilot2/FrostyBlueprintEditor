@@ -92,11 +92,6 @@ namespace BlueprintEditorPlugin.Utils
             
             //Now we can FINALLY create the file with stream writer
             StreamWriter sw = new StreamWriter(filePath);
-            
-            //Create a dictionary which stores the index of the node and the position of the node
-            //The index *should* be the same on each startup, unless the file was modified.
-            //TODO: Find way to account for Property grid modifications(so when the index has changed)
-            Dictionary<int, Point> points = new Dictionary<int, Point>();
 
             //Write down the version
             sw.WriteLine("layver=1");

@@ -26,7 +26,7 @@
             <DrawingBrush x:Key="SmallGridLinesDrawingBrush"
                           TileMode="Tile"
                           ViewportUnits="Absolute"
-                          Viewport="0 0 22 22"
+                          Viewport="0 0 32 32"
                           Transform="{Binding ViewportTransform, ElementName=Editor}"
                           Drawing="{StaticResource SmallGridGeometry}" />
 
@@ -65,6 +65,8 @@
                                          DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                          SelectedItems="{Binding SelectedNodes}"
                                          Background="{StaticResource SmallGridLinesDrawingBrush}"
+                                         ViewportLocation="{Binding ViewportLocation}"
+                                         ViewportZoom="{Binding ViewportZoom}"
                                          x:Name="Editor">
                         <nodify:NodifyEditor.DataContext>
                             <editor:EditorViewModel/>
@@ -177,7 +179,15 @@
                                     <ctrl:FrostyTabItem.Content>
                                         <controls:FrostyClassSelector x:Name="ClassSelector"
                                                                       SelectedItemChanged="TypesList_OnSelectionChanged"
-                                                                      ItemDoubleClicked="ToolboxClassSelector_OnItemDoubleClicked" />
+                                                                      ItemDoubleClicked="ToolboxClassSelector_OnItemDoubleClicked"/>
+                                    </ctrl:FrostyTabItem.Content>
+                                </ctrl:FrostyTabItem>
+                                <ctrl:FrostyTabItem Header="Trans Toolbox"
+                                                    Icon="pack://application:,,,/FrostyEditor;component/Images/ThreeD.png">
+                                    <ctrl:FrostyTabItem.Content>
+                                        <controls:FrostyClassSelector x:Name="TransientClassSelector"
+                                                                      SelectedItemChanged="TransientClassSelector_OnSelectedItemChanged"
+                                                                      ItemDoubleClicked="TransientClassSelector_OnItemDoubleClicked" />
                                     </ctrl:FrostyTabItem.Content>
                                 </ctrl:FrostyTabItem>
                             </ctrl:FrostyTabControl.Items>
@@ -290,7 +300,7 @@
                                 Click="OrganizeButton_OnClick"
                                 ToolTip="Automatically organize the Blueprint's nodes">
                             <Image
-                                Source="pack://application:,,,/BlueprintEditor;component/Images/AutoSortButton.png"
+                                Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/AutoSortButton.png"
                                 Width="20" />
                         </Button>
 

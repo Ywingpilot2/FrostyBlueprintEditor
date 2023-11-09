@@ -1,15 +1,18 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
 using BlueprintEditorPlugin.Utils;
+using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
 {
-    public class InterfaceDataNode : NodeBaseModel
+    public class InterfaceDataNode : EntityNode
     {
         public override string Name { get; set; } = "";
-        public override string ObjectType { get; } = "EditorInterfaceNode"; //Not a real type
+        public override string ObjectType { get; set; } = "EditorInterfaceNode"; //Not a real type
+        public AssetClassGuid Guid { get; set; }
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>()
@@ -21,7 +24,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Shared
             {
             };
         
-        public dynamic InterfaceItem { get; set; }
+        public dynamic InterfaceItem { get; private set; }
 
         /// <summary>
         /// Creates an interface data node from an item in an InterfaceDescriptorData

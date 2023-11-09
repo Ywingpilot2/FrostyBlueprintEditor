@@ -11,6 +11,8 @@ using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.EbxLoaderTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Controls;
 using Frosty.Core;
@@ -38,11 +40,12 @@ namespace BlueprintEditorPlugin.Windows
         }
 
         private Type _selectedType;
+        private Type _selectedTransType;
         private List<Type> _types = new List<Type>();
-        
+        private List<Type> _transTypes = new List<Type>();
+
         public BlueprintGraphEditor()
         {
-            //This happens before InitializeComponent() explicitly because it needs to be set as early as possible, and InitializeComponent is slow.
             InitializeComponent();
         }
         
@@ -55,25 +58,34 @@ namespace BlueprintEditorPlugin.Windows
         public void Initiate()
         {
             _editor = EditorUtils.Editors[_file.Filename]; //Get the editor based on what our filename is
+            _editor.MouseLocation = Editor.MouseLocation;
 
             //Create a new loader
             EbxBaseLoader loader = new EbxBaseLoader(); //Base loader will be used if no extensions are found
             foreach (var type in Assembly.GetCallingAssembly().GetTypes()) //Iterate over all of the loader extensions
             {
-                if (type.IsSubclassOf(typeof(EbxBaseLoader)))
-                {
-                    var extension = (EbxBaseLoader)Activator.CreateInstance(type);
+                if (!type.IsSubclassOf(typeof(EbxBaseLoader))) continue;
+                var extension = (EbxBaseLoader)Activator.CreateInstance(type);
                     
-                    //If the extension type doesn't match our file type then we continue
-                    if (extension.AssetType != App.SelectedAsset.Type) continue;  
-                    loader = extension; //If it does, we set the loader to be this extension instead and stop searching
-                    break;
-                }
+                //If the extension type doesn't match our file type then we continue
+                if (extension.AssetType != _file.Type) continue;  
+                loader = extension; //If it does, we set the loader to be this extension instead and stop searching
+                break;
             }
 
             _loader = loader;
             _loader.PopulateTypesList(_types); //Populate the types list with our types
             ClassSelector.Types = _types;
+            
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes()) //Iterate over all of the transient extensions
+            {
+                if (type.IsSubclassOf(typeof(TransientNode)))
+                {
+                    _transTypes.Add(type);
+                }
+            }
+
+            TransientClassSelector.Types = _transTypes;
 
             //The NodeEditor needs to access the property grid, and vice versa. It's a weird setup to ensure they are in sync, but it works.
             _editor.NodePropertyGrid = new BlueprintPropertyGrid() { NodeEditor = _editor };
@@ -152,7 +164,7 @@ namespace BlueprintEditorPlugin.Windows
                     if (nodeToDupe.ObjectType != "EditorInterfaceNode")
                     {
                         object dupedObj = _editor.CreateNodeObject(nodeToDupe.Object);
-                        NodeBaseModel dupe = _editor.CreateNodeFromObject(dupedObj);
+                        NodeBaseModel dupe = _loader.GetNodeFromObject(dupedObj);
                         
                         //This means we need to copy over the inputs/outputs
                         if (dupe.ObjectType == "null")
@@ -199,10 +211,9 @@ namespace BlueprintEditorPlugin.Windows
         /// <param name="e"></param>
         public void BlueprintEditorWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            App.EditorWindow.OpenAsset(_file); //TODO: Make this a profile option
             EditorUtils.SaveLayouts(_file);
-
             EditorUtils.Editors.Remove(_file.Filename);
+            App.EditorWindow.OpenAsset(_file); //TODO: Make this a profile option
         }
         
         /// <summary>
@@ -362,11 +373,20 @@ namespace BlueprintEditorPlugin.Windows
         /// <param name="e"></param>
         private void AddButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_selectedType == null) return;
-
-            object obj = _editor.CreateNodeObject(_selectedType);
+            if (_selectedType != null && !_selectedType.IsSubclassOf(typeof(TransientNode)))
+            {
+                object obj = _editor.CreateNodeObject(_selectedType);
             
-            _editor.CreateNodeFromObject(obj);
+                var node = _loader.GetNodeFromObject(obj);
+                node.Location = new Point(_editor.ViewportLocation.X + (575 / _editor.ViewportZoom), _editor.ViewportLocation.Y + 287.5 / _editor.ViewportZoom);
+            }
+            else if (_selectedType != null) //Stuff for adding transients
+            {
+                TransientNode node = (TransientNode)Activator.CreateInstance(_selectedType);
+                node.OnCreation();
+                node.Location = new Point(_editor.ViewportLocation.X + (575 / _editor.ViewportZoom), _editor.ViewportLocation.Y + 287.5 / _editor.ViewportZoom);
+                _editor.Nodes.Add(node);
+            }
             
             App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
@@ -513,5 +533,25 @@ namespace BlueprintEditorPlugin.Windows
         }
 
         #endregion
+
+        private void TransientClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            _selectedType = TransientClassSelector.SelectedClass;
+            if (_selectedType == null) return;
+            
+            DocBoxName.Text = _selectedType.Name;
+            DocBoxText.Text = NodeUtils.NodeExtensions.ContainsKey(_selectedType.Name) ? NodeUtils.NodeExtensions[_selectedType.Name].Documentation : "";
+        }
+
+        private void TransientClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            BlueprintEditorWindow_OnGotFocus(this, new RoutedEventArgs());
+            AddButton_OnClick(this, new RoutedEventArgs()); //We just send this over to the AddButton lol
+        }
+
+        // private void ClassSelector_OnItemBeginDrag(object sender, RoutedEventArgs e)
+        // {
+        //     
+        // }
     }
 }

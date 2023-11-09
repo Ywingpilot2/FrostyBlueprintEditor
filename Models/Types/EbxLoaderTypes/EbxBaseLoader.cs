@@ -4,6 +4,8 @@ using System.Linq;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
@@ -46,6 +48,81 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 typesList.Add(type);
             }
         }
+
+        /// <summary>
+        /// This gets an Object and turns it into a node which we can manipulate with <see cref="EbxEditorTypes"/>
+        /// </summary>
+        /// <param name="obj">The object we are using to create this node, e.g compare bool entity</param>
+        /// <returns></returns>
+        public virtual EntityNode GetNodeFromObject(object obj)
+        {
+            //We need to ensure that there isn't a node extension for this type, so we first get this object's type and see if there is an extension for it
+            string key = obj.GetType().Name;
+            EntityNode newNode;
+            
+            //Check if a C# extension exists
+            if (NodeUtils.NodeExtensions.ContainsKey(key))
+            {
+                newNode = (EntityNode)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
+            }
+            //If not, check if a NMC exists
+            else if (NodeUtils.NmcExtensions.ContainsKey(key))
+            {
+                newNode = new EntityNode();
+                if (NodeUtils.NmcExtensions[key].All(arg => arg.Split('=')[0] != "ValidGameExecutableName")
+                    || NodeUtils.NmcExtensions[key].Any(arg => arg == $"ValidGameExecutableName={ProfilesLibrary.ProfileName}"))
+                {
+                    newNode.ObjectType = key;
+                    foreach (string arg in NodeUtils.NmcExtensions[key])
+                    {
+                        switch (arg.Split('=')[0])
+                        {
+                            case "DisplayName":
+                            {
+                                newNode.Name = arg.Split('=')[1];
+                            } break;
+                            case "InputEvent":
+                            {
+                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
+                            } break;
+                            case "InputProperty":
+                            {
+                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
+                            } break;
+                            case "InputLink":
+                            {
+                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
+                            } break;
+                            case "OutputEvent":
+                            {
+                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
+                            } break;
+                            case "OutputProperty":
+                            {
+                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
+                            } break;
+                            case "OutputLink":
+                            {
+                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
+                            } break;
+                        }
+                    }
+                }
+            }
+            else //We could not find an extension, so we just arbitrarily determine inputs and set its name
+            {
+                newNode = new EntityNode();
+                newNode.Inputs = NodeUtils.GenerateNodeInputs(obj.GetType(), newNode);
+                newNode.Name = ((dynamic)obj).__Id.ToString(); //Set the name to be the nodes __Id
+            }
+            
+            newNode.Object = obj;
+            newNode.Guid = ((dynamic)obj).GetInstanceGuid();
+            newNode.OnCreation();
+            
+            NodeEditor.Nodes.Add(newNode);
+            return newNode;
+        }
         
         /// <summary>
         /// This loads all of the nodes from the RootObject(so whats seen in the property grid) into the graph.
@@ -57,7 +134,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             foreach (PointerRef ptr in properties.Objects) 
             {
                 object obj = ptr.Internal;
-                NodeBaseModel node = NodeEditor.CreateNodeFromObject(obj);
+                EntityNode node = GetNodeFromObject(obj);
                 if (NodeIdCache.ContainsKey(node.Guid))
                 {
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{node.Guid}_identical"), $"Multiple nodes share the guid {node.Guid}");

@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Editor.Items;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Controls;
 using Frosty.Core;
@@ -711,8 +712,18 @@ namespace BlueprintEditorPlugin.Models.Editor
             OnModifiedCommand?.Execute(e);
             OnModified?.Invoke(sender, e);
 
-            //Edit node properties, then check if our edit worked
-            NodeEditor.EditNodeProperties(nodeObj, e);
+            //Check if our selected node is transient
+            if (!NodeEditor.SelectedNodes[0].IsTransient)
+            {
+                //If it isn't transient, then we just use Ebx Editor
+                NodeEditor.EditNodeProperties(nodeObj, e);
+            }
+            else
+            {
+                //If it is transient, then we need to let it handle the modification
+                TransientNode transientNode = NodeEditor.SelectedNodes[0] as TransientNode;
+                transientNode.ModifyTransientData(nodeObj, e);
+            }
         }
     }
 

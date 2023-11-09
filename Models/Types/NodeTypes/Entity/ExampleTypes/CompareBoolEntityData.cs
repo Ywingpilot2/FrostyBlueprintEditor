@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
 {
     /// <summary>
     /// In order to apply, this class needs to be an extension to NodeBaseModel
@@ -10,7 +10,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
     /// It will also have the name be whatever the Id is set to in the Property Grid
     /// For a more advanced demonstration, <see cref="SelectEventEntityData"/>
     /// </summary>
-    public class CompareBoolEntityData : NodeBaseModel
+    public class CompareBoolEntityData : EntityNode
     {
         /// <summary>
         /// This is the name that will be displayed in the editor.
@@ -23,7 +23,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.ExampleTypes
         /// This HAS to be the exact name of the type, so in this case, CompareBoolEntityData
         /// This value is static.
         /// </summary>
-        public override string ObjectType { get; } = "CompareBoolEntityData";
+        public override string ObjectType { get; set; } = "CompareBoolEntityData";
 
         /// <summary>
         /// These are all of the inputs this has.

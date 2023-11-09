@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Windows;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using Frosty.Controls;
 using Frosty.Core;
 using FrostySdk;
@@ -170,16 +172,33 @@ namespace BlueprintEditorPlugin.Utils
 
         static NodeUtils()
         {
-            NodeExtensions.Add("null", new NodeBaseModel());
+            NodeExtensions.Add("null", new EntityNode());
             foreach (var type in Assembly.GetCallingAssembly().GetTypes())
             {
-                if (type.IsSubclassOf(typeof(NodeBaseModel)))
+                if (type.IsSubclassOf(typeof(EntityNode)))
                 {
-                    var extension = (NodeBaseModel)Activator.CreateInstance(type);
-                    if (extension.ValidForGames == null || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName))
+                    var extension = (EntityNode)Activator.CreateInstance(type);
+                    if ((extension.ValidForGames == null 
+                         || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName)) 
+                         && extension.ObjectType != null 
+                         && !NodeExtensions.ContainsKey(extension.ObjectType))
                     {
                         NodeExtensions.Add(extension.ObjectType, extension);
                     }
+                    else
+                    {
+                        App.Logger.LogError("Node Extension {0} is invalid, as its ObjectType was either null or is already taken.", extension.GetType().Name);
+                    }
+                }
+                else if (type.IsSubclassOf(typeof(TransientNode)))
+                {
+                    var extension = (TransientNode)Activator.CreateInstance(type);
+                    if (extension.Name == null || NodeExtensions.ContainsKey(extension.Name))
+                    {
+                        App.Logger.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                        continue;
+                    }
+                    NodeExtensions.Add(extension.Name, extension);
                 }
             }
             
