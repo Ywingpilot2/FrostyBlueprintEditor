@@ -9,6 +9,7 @@ using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
+using FrostySdk.IO;
 
 namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
 {
@@ -143,8 +144,12 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 NodeIdCache.Add(node.Guid, NodeEditor.Nodes.IndexOf(node));
             }
             
-            PointerRef interfaceRef = (PointerRef) properties.Interface;
-            NodeEditor.CreateInterfaceNodes(interfaceRef.Internal);
+            PointerRef interfaceRef = (PointerRef)properties.Interface;
+            // Some blueprints might not have an interface
+            if(interfaceRef.Type != PointerRefType.Null)
+            {
+                NodeEditor.CreateInterfaceNodes(interfaceRef.Internal);
+            }
         }
 
         /// <summary>
