@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Utils;
+using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 
 namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
@@ -57,14 +59,25 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
                 Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
                 Inputs.Add(new InputViewModel() {Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event});
             }
+            
+            foreach (InputViewModel input in Inputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, input);
+            }
+
+            foreach (OutputViewModel output in Outputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, output);
+            }
         }
 
         /// <summary>
         /// This will trigger whenever the SelectEvent is modified
         /// Since we want to make sure our SelectEvent is in sync with the property grid, we redo our OnCreation
         /// </summary>
-        public override void OnModified()
+        public override void OnModified(ItemModifiedEventArgs args)
         {
+            //TODO: Fix this. This will remove all of the connections(since we are removing the inputs/outputs) and cause bugs
             Outputs.Clear();
             Inputs.Clear();
             foreach (CString eventName in Object.Events) //Go through all of the Events this SelectEvent has
@@ -72,6 +85,17 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
                 //And for each one, add it to our Outputs
                 Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
                 Inputs.Add(new InputViewModel() {Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event});
+            }
+            
+            //We want to make sure our Inputs and Outputs are the same realm as us, that way our flags compute properly
+            foreach (InputViewModel input in Inputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, input);
+            }
+
+            foreach (OutputViewModel output in Outputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, output);
             }
         }
     }

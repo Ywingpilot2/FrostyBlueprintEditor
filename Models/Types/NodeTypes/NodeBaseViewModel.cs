@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
+using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 
@@ -25,6 +28,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             {
                 _name = value;
                 NotifyPropertyChanged(nameof(Name));
+                NotifyPropertyChanged(nameof(Width)); //Need to update the width
             }
         }
 
@@ -55,17 +59,12 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             get => _location;
         }
 
-        public double RealWidth { get; private set; }
-        
-        /// <summary>
-        /// Don't use this, instead use <see cref="RealWidth"/> (I fucked something up in WPF so this is the result).
-        /// TODO: Fix this so DataBinding is to RealWidth instead(WPF should only set the value, but not get from it)
-        /// </summary>
-        public double _width
+        private double _width = 25;
+        public double Width
         {
-            set => RealWidth = value;
+            get => _width;
         }
-        
+
         public virtual ObservableCollection<InputViewModel> Inputs { get; set; } = new ObservableCollection<InputViewModel>();
         public virtual ObservableCollection<OutputViewModel> Outputs { get; set; } = new ObservableCollection<OutputViewModel>();
         
@@ -76,12 +75,32 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public NodeBaseModel()
+        {
+            //We need to update the width and height of our nodes whenever we add a new Input/Output
+            Inputs.CollectionChanged += UpdateWidthAndHeight;
+            Outputs.CollectionChanged += UpdateWidthAndHeight;
+        }
+
+        private void UpdateWidthAndHeight(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            //TODO: Adjust width and height for removed items
+            if (notifyCollectionChangedEventArgs.NewItems.Count == 0) return;
+            
+            if (notifyCollectionChangedEventArgs.NewItems[0] is PortBaseModel port && port.DisplayName.Length * 1.3 > _width)
+            {
+                _width = port.DisplayName.Length * 1.3;
+                NotifyPropertyChanged(nameof(Width));
+            }
+        }
+
         #region Get Methods
 
         /// <summary>
         /// Gets the input of the specified name from the node
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="type"></param>
         /// <param name="createIfNotFound">If set to true, if the method cannot find the specified input then it will create a new input of the name</param>
         /// <returns></returns>
         public InputViewModel GetInput(string name, ConnectionType type, bool createIfNotFound = false)
@@ -180,7 +199,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         /// <summary>
         /// This method executes whenever the node is modified
         /// </summary>
-        public virtual void OnModified()
+        public virtual void OnModified(ItemModifiedEventArgs args)
         {
             
         }
@@ -192,6 +211,11 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
+
+            if (Object == null)
+            {
+                return base.Equals(obj);
+            }
 
             dynamic objectNode = null;
             if (obj.GetType() == GetType())
@@ -222,12 +246,27 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
     
     #region Inputs and Outputs
 
-    /// <summary>
-    /// A port you can plug in/out of
-    /// </summary>
-    public class InputViewModel : INotifyPropertyChanged
+    public class PortBaseModel : INotifyPropertyChanged
     {
+        private string _displayname;
+        
+        /// <summary>
+        /// The name of this input that is displayed in the UI
+        /// </summary>
+        public string DisplayName
+        {
+            get => !string.IsNullOrEmpty(_displayname) ? _displayname : Title;
+            set
+            {
+                _displayname = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayName)));
+            }
+        }
+
         private string _title;
+        /// <summary>
+        /// The actual name of this input
+        /// </summary>
         public string Title
         {
             get => _title;
@@ -235,9 +274,12 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             {
                 _title = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayName)));
             }
         }
+        
         public ConnectionType Type { get; set; } = ConnectionType.Property;
+        public ConnectionRealm Realm { get; set; } = ConnectionRealm.Invalid;
 
         public SolidColorBrush ConnectionColor
         {
@@ -283,71 +325,23 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             }
             get => _isConnected;
         }
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    /// <summary>
+    /// A port you can plug into
+    /// </summary>
+    public class InputViewModel : PortBaseModel
+    {
+        public PropertyType PropertyConnectionType { get; set; }
     }
     
     /// <summary>
-    /// A port you can plug in/out of
+    /// A port you can get an output from
     /// </summary>
-    public class OutputViewModel : INotifyPropertyChanged
+    public class OutputViewModel : PortBaseModel
     {
-        private string _title;
-        public string Title
-        {
-            get => _title;
-            set
-            {
-                _title = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
-            }
-        }
-        public ConnectionType Type { get; set; } = ConnectionType.Property;
-        public SolidColorBrush ConnectionColor
-        {
-            get
-            {
-                switch (Type)
-                {
-                    case ConnectionType.Event:
-                        return new SolidColorBrush(Colors.White); 
-                        break;
-                    case ConnectionType.Property:
-                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF21"));
-                        break;
-                    case ConnectionType.Link:
-                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0094FF"));
-                        break;
-                    default:
-                        return new SolidColorBrush(Colors.White);
-                        break;
-                }
-            }
-        }
-        
-        private Point _anchor;
-        public Point Anchor
-        {
-            set
-            {
-                _anchor = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Anchor)));
-            }
-            get => _anchor;
-        }
-        
-        private bool _isConnected;
-        public bool IsConnected
-        {
-            set
-            {
-                _isConnected = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsConnected)));
-            }
-            get => _isConnected;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     #endregion

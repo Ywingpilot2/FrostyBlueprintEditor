@@ -81,13 +81,12 @@
                                              HeaderBrush="{Binding HeaderColor}"
                                              ContentBrush="{StaticResource Background}"
                                              Background="{StaticResource Background}"
-                                             Width="{Binding _width}"
                                              BorderBrush="#555555"
                                              FontFamily="Consolas">
 
                                     <nodify:Node.InputConnectorTemplate>
                                         <DataTemplate DataType="{x:Type nodeTypes:InputViewModel}">
-                                            <nodify:NodeInput Header="{Binding Title}"
+                                            <nodify:NodeInput Header="{Binding DisplayName}"
                                                               IsConnected="{Binding IsConnected}"
                                                               Anchor="{Binding Anchor, Mode=OneWayToSource}"
                                                               Background="{StaticResource Background}"
@@ -98,7 +97,7 @@
 
                                     <nodify:Node.OutputConnectorTemplate>
                                         <DataTemplate DataType="{x:Type nodeTypes:OutputViewModel}">
-                                            <nodify:NodeOutput Header="{Binding Title}"
+                                            <nodify:NodeOutput Header="{Binding DisplayName}"
                                                                IsConnected="{Binding IsConnected}"
                                                                Anchor="{Binding Anchor, Mode=OneWayToSource}"
                                                                Background="{StaticResource Background}"

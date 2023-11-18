@@ -5,6 +5,7 @@ using System.Windows;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Managers;
@@ -99,7 +100,15 @@ namespace BlueprintEditorPlugin.Utils
             //Now we populate it
             for (var i = 0; i < CurrentEditor.Nodes.Count; i++)
             {
-                sw.WriteLine($"{i},{CurrentEditor.Nodes[i].Location.X.ToString()},{CurrentEditor.Nodes[i].Location.Y.ToString()}");
+                if (!CurrentEditor.Nodes[i].IsTransient)
+                {
+                    sw.WriteLine($"{i},{CurrentEditor.Nodes[i].Location.X.ToString()},{CurrentEditor.Nodes[i].Location.Y.ToString()}");
+                }
+                else
+                {
+                    TransientNode transientNode = CurrentEditor.Nodes[i] as TransientNode;
+                    transientNode.SaveTransientData(sw);
+                }
             }
             sw.Close();
         }
@@ -223,7 +232,7 @@ namespace BlueprintEditorPlugin.Utils
                     y -= (y % 8);
                     node.Location = new Point(x, y);
 
-                    double curWidth = Math.Floor((node.RealWidth + 40.0) / 4.0) * 8.0;
+                    double curWidth = node.Width * 2;
                     double curHeight = Math.Floor(((15 + node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
 
                     y += curHeight + 56.0;

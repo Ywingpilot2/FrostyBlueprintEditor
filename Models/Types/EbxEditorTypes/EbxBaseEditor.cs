@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
@@ -128,22 +130,96 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         {
                             if (!connection.Equals(eventConnection)) continue;
                             NodeEditor.EditedProperties.EventConnections.Remove(eventConnection);
+                            
+                            //Update object flags
+                            Type targetType = connection.TargetNode.Object.GetType();
+                            if (targetType.GetProperty("Flags") != null && !NodeEditor.GetConnections(connection.Target).Any(x =>
+                                    !x.Equals(connection) 
+                                    && x.Source.Realm != connection.Source.Realm))
+                            {
+                                var helper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                                switch (connection.Target.Realm)
+                                {
+                                    case ConnectionRealm.Client:
+                                    {
+                                        helper.ClientEvent = false;
+                                    } break;
+                                    case ConnectionRealm.Server:
+                                    {
+                                        helper.ServerEvent = false;
+                                    } break;
+                                    case ConnectionRealm.ClientAndServer:
+                                    {
+                                        helper.ClientEvent = false;
+                                        helper.ServerEvent = false;
+                                    } break;
+                                    case ConnectionRealm.NetworkedClient:
+                                    {
+                                        helper.ClientEvent = false;
+                                    } break;
+                                    case ConnectionRealm.NetworkedClientAndServer:
+                                    {
+                                        helper.ClientEvent = false;
+                                        helper.ServerEvent = false;
+                                    } break;
+                                }
+                                
+                                connection.TargetNode.Object.Flags = helper.GetAsFlags();
+                                EditEbx(connection.TargetNode.Object,
+                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
+                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                            }
                             break;
                         }
-
-                        break;
-                    }
+                    } break;
                     case ConnectionType.Property:
                     {
                         foreach (dynamic propertyConnection in NodeEditor.EditedProperties.PropertyConnections)
                         {
                             if (!connection.Equals(propertyConnection)) continue;
                             NodeEditor.EditedProperties.PropertyConnections.Remove(propertyConnection);
+                            
+                            //Update object flags
+                            Type targetType = connection.TargetNode.Object.GetType();
+                            if (targetType.GetProperty("Flags") != null && !NodeEditor.GetConnections(connection.Target).Any(x =>
+                                    !x.Equals(connection) 
+                                    && x.Source.Realm != connection.Source.Realm))
+                            {
+                                var helper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                                switch (connection.Target.Realm)
+                                {
+                                    case ConnectionRealm.Client:
+                                    {
+                                        helper.ClientProperty = false;
+                                    } break;
+                                    case ConnectionRealm.Server:
+                                    {
+                                        helper.ServerProperty = false;
+                                    } break;
+                                    case ConnectionRealm.ClientAndServer:
+                                    {
+                                        helper.ClientProperty = false;
+                                        helper.ServerProperty = false;
+                                    } break;
+                                    case ConnectionRealm.NetworkedClient:
+                                    {
+                                        helper.ClientProperty = false;
+                                    } break;
+                                    case ConnectionRealm.NetworkedClientAndServer:
+                                    {
+                                        helper.ClientProperty = false;
+                                        helper.ServerProperty = false;
+                                    } break;
+                                }
+                                
+                                connection.TargetNode.Object.Flags = helper.GetAsFlags();
+                                EditEbx(connection.TargetNode.Object,
+                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
+                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                            }
                             break;
                         }
-
-                        break;
-                    }
+                    } break;
                     case ConnectionType.Link:
                     {
                         foreach (dynamic linkConnection in NodeEditor.EditedProperties.LinkConnections)
@@ -152,9 +228,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                             NodeEditor.EditedProperties.LinkConnections.Remove(linkConnection);
                             break;
                         }
-
-                        break;
-                    }
+                    } break;
                 }
             }
         }
@@ -179,9 +253,101 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         eventConnection.Target = new PointerRef(connection.TargetNode.Object);
                         eventConnection.SourceEvent.Name = connection.SourceField;
                         eventConnection.TargetEvent.Name = connection.TargetField;
+                        
+                        //Setup flags
+                        var helper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                        
+                        //TODO: THIS CODE FUCKING SUCKS, PLEASE FIX
+                        //This is the only way I've found to get the Enum values of a dynamic type, IT SUCKS
+                        //This runs really slowly because of heavy reflection usage, the only thing I can think of to speed this up is maybe caching the result?
+                        Array realmArray = ((object)TypeLibrary.CreateObject("EventConnectionTargetType")).GetType().GetEnumValues();
+                        List<dynamic> realmEnum = new List<dynamic>(realmArray.Cast<dynamic>());
 
-                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections
-                            .Add(eventConnection);
+                        if (NodeUtils.RealmsAreValid(connection.Source, connection.Target))
+                        {
+                            switch (connection.Target.Realm)
+                            {
+                                case ConnectionRealm.Client:
+                                {
+                                    helper.ClientEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.Client];
+                                } break;
+                                case ConnectionRealm.ClientAndServer:
+                                {
+                                    helper.ClientEvent = true;
+                                    helper.ServerEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.ClientAndServer];
+                                } break;
+                                case ConnectionRealm.Server:
+                                {
+                                    helper.ServerEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.Server];
+                                } break;
+                                case ConnectionRealm.NetworkedClient:
+                                {
+                                    helper.ClientEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.NetworkedClient];
+                                } break;
+                                case ConnectionRealm.NetworkedClientAndServer:
+                                {
+                                    helper.ClientEvent = true;
+                                    helper.ServerEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.NetworkedClientAndServer];
+                                } break;
+                            }
+
+                            Type objType = connection.TargetNode.Object.GetType();
+                            if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
+                            {
+                                connection.TargetNode.Object.Flags = helper.GetAsFlags();
+                                EditEbx(connection.TargetNode.Object,
+                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
+                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                            }
+                        }
+                        else //If realms on either Target or source are invalid, we should create a warning and guess.
+                        {
+                            ConnectionRealm potentialRealm = connection.Target.Realm != ConnectionRealm.Invalid ? connection.Target.Realm : connection.Source.Realm;
+
+                            switch (potentialRealm)
+                            {
+                                case ConnectionRealm.Client:
+                                {
+                                    helper.ClientEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.Client];
+                                } break;
+                                case ConnectionRealm.ClientAndServer:
+                                {
+                                    helper.ClientEvent = true;
+                                    helper.ServerEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.ClientAndServer];
+                                } break;
+                                case ConnectionRealm.Server:
+                                {
+                                    helper.ServerEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.Server];
+                                } break;
+                                case ConnectionRealm.NetworkedClient:
+                                {
+                                    helper.ClientEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.NetworkedClient];
+                                } break;
+                                case ConnectionRealm.NetworkedClientAndServer:
+                                {
+                                    helper.ClientEvent = true;
+                                    helper.ServerEvent = true;
+                                    eventConnection.TargetType = realmEnum[(int)ConnectionRealm.NetworkedClientAndServer];
+                                } break;
+                                case ConnectionRealm.Invalid:
+                                {
+                                    App.Logger.LogError("Unable to determine the realm of a connection");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "Unable to determine the realm of a connection");
+                                } break;
+                            }
+                        }
+
+                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections.Add(eventConnection);
                         connection.Object = eventConnection;
                     } break;
                 
@@ -193,9 +359,93 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         propertyConnection.Target = new PointerRef(connection.TargetNode.Object);
                         propertyConnection.SourceField = connection.SourceField;
                         propertyConnection.TargetField = connection.TargetField;
+                        
+                        //Go through and set our flags
+                        var flagsHelper = new PropertyFlagsHelper((uint)propertyConnection.Flags);
+                        var objectFlagsHelper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                        
+                        if (NodeUtils.RealmsAreValid(connection.Source, connection.Target))
+                        {
+                            flagsHelper.Realm = connection.Target.Realm;
+                            flagsHelper.InputType = connection.Target.PropertyConnectionType;
+                            //TODO: Figure out SourceCantBeStatic
+                            
+                            switch (flagsHelper.Realm)
+                            {
+                                case ConnectionRealm.Client:
+                                {
+                                    objectFlagsHelper.ClientProperty = true;
+                                } break;
+                                case ConnectionRealm.Server:
+                                {
+                                    objectFlagsHelper.ServerProperty = true;
+                                } break;
+                                case ConnectionRealm.ClientAndServer:
+                                {
+                                    objectFlagsHelper.ClientProperty = true;
+                                    objectFlagsHelper.ServerProperty = true;
+                                } break;
+                                case ConnectionRealm.NetworkedClient:
+                                {
+                                    objectFlagsHelper.ClientProperty = true;
+                                } break;
+                                case ConnectionRealm.NetworkedClientAndServer:
+                                {
+                                    objectFlagsHelper.ClientProperty = true;
+                                    objectFlagsHelper.ServerProperty = true;
+                                } break;
+                            }
 
-                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections
-                            .Add(propertyConnection);
+                            propertyConnection.Flags = (uint)flagsHelper;
+
+                            Type objType = connection.TargetNode.Object.GetType();
+                            if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
+                            {
+                                connection.TargetNode.Object.Flags = objectFlagsHelper.GetAsFlags();
+                                EditEbx(connection.TargetNode.Object,
+                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
+                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                            }
+                        }
+                        else //If realms on either Target or source are invalid, we should create a warning and guess.
+                        {
+                            ConnectionRealm potentialRealm = connection.Target.Realm != ConnectionRealm.Invalid ? connection.Target.Realm : connection.Source.Realm;
+
+                            flagsHelper.Realm = potentialRealm;
+                            switch (potentialRealm)
+                            {
+                                case ConnectionRealm.Client:
+                                {
+                                    objectFlagsHelper.ClientEvent = true;
+                                } break;
+                                case ConnectionRealm.ClientAndServer:
+                                {
+                                    objectFlagsHelper.ClientEvent = true;
+                                    objectFlagsHelper.ServerEvent = true;
+                                } break;
+                                case ConnectionRealm.Server:
+                                {
+                                    objectFlagsHelper.ServerEvent = true;
+                                } break;
+                                case ConnectionRealm.NetworkedClient:
+                                {
+                                    objectFlagsHelper.ClientEvent = true;
+                                } break;
+                                case ConnectionRealm.NetworkedClientAndServer:
+                                {
+                                    objectFlagsHelper.ClientEvent = true;
+                                    objectFlagsHelper.ServerEvent = true;
+                                } break;
+                                case ConnectionRealm.Invalid:
+                                {
+                                    App.Logger.LogError("Unable to determine the realm of a connection");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "Unable to determine the realm of a connection");
+                                } break;
+                            }
+                        }
+
+                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections.Add(propertyConnection);
                         connection.Object = propertyConnection;
                     } break;
                 
@@ -216,8 +466,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                             linkConnection.TargetField = connection.TargetField;
                         }
 
-                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).LinkConnections.Add(
-                            linkConnection);
+                        ((dynamic)NodeEditor.EditedEbxAsset.RootObject).LinkConnections.Add(linkConnection);
                         connection.Object = linkConnection;
                     } break;
                 }
@@ -252,7 +501,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                 NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
                 node.Object = newObj;
                 node.Name = node.Object.__Id.ToString();
-                node.OnModified();
+                node.OnModified(args);
             
                 //TODO: Update this so we aren't enumerating over every single asset in the entire file
                 for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
@@ -337,16 +586,16 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     //Its possible for a DataField to be SourceAndTarget so we enumerate over all of the nodes with this name
                                     foreach (InterfaceDataNode interfaceDataNode in NodeEditor.GetNode(name))
                                     {
-                                        interfaceDataNode.OnModified();
+                                        interfaceDataNode.OnModified(args);
                                         if (interfaceDataNode.Inputs.Count != 0)
                                         {
                                             NodeEditor.InterfaceInputDataNodes.Remove(name);
-                                            NodeEditor.InterfaceInputDataNodes.Add(interfaceDataNode.Inputs[0].Title, interfaceDataNode);
+                                            NodeEditor.InterfaceInputDataNodes.Add(interfaceDataNode.Inputs[0].DisplayName, interfaceDataNode);
                                         }
                                         else
                                         {
                                             NodeEditor.InterfaceOutputDataNodes.Remove(name);
-                                            NodeEditor.InterfaceOutputDataNodes.Add(interfaceDataNode.Outputs[0].Title, interfaceDataNode);
+                                            NodeEditor.InterfaceOutputDataNodes.Add(interfaceDataNode.Outputs[0].DisplayName, interfaceDataNode);
                                         }
                                     }
                                     
@@ -400,9 +649,9 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
                                 NodeEditor.EditedProperties.Interface = new PointerRef(obj); //Recreate the interface in the Ebx
 
-                                node.OnModified();
+                                node.OnModified(args);
                                 NodeEditor.InterfaceInputDataNodes.Remove(name);
-                                NodeEditor.InterfaceInputDataNodes.Add(node.Inputs[0].Title, node);
+                                NodeEditor.InterfaceInputDataNodes.Add(node.Inputs[0].DisplayName, node);
                                 NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString($"{args.OldValue}"), EditorStatus.Error);
                             }
                             else
@@ -427,9 +676,9 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 dynamic obj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(item.Binding);
                                 NodeEditor.EditedProperties.Interface = new PointerRef(obj); //Recreate the interface in the Ebx
 
-                                node.OnModified();
+                                node.OnModified(args);
                                 NodeEditor.InterfaceOutputDataNodes.Remove(name);
-                                NodeEditor.InterfaceOutputDataNodes.Add(node.Outputs[0].Title, node);
+                                NodeEditor.InterfaceOutputDataNodes.Add(node.Outputs[0].DisplayName, node);
                                 NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString($"{args.OldValue}"), EditorStatus.Error);
                             }
                             else

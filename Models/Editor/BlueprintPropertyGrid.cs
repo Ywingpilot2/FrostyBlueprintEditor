@@ -713,7 +713,7 @@ namespace BlueprintEditorPlugin.Models.Editor
             OnModified?.Invoke(sender, e);
 
             //Check if our selected node is transient
-            if (!NodeEditor.SelectedNodes[0].IsTransient)
+            if (NodeEditor.SelectedNodes.Count == 0 || !NodeEditor.SelectedNodes[0].IsTransient)
             {
                 //If it isn't transient, then we just use Ebx Editor
                 NodeEditor.EditNodeProperties(nodeObj, e);

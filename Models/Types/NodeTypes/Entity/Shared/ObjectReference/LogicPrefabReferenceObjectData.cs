@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 using Frosty.Core;
+using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
@@ -103,6 +104,6 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             }            
         }
         
-        public override void OnModified() => OnCreation();
+        public override void OnModified(ItemModifiedEventArgs args) => OnCreation();
     }
 }

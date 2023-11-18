@@ -1,7 +1,7 @@
 ﻿Type = SyncedBoolEntityData
 DisplayName = Synced Bool
-InputEvent = SetTrue
-InputEvent = SetFalse
-InputProperty = In
-OutputProperty = Out
+InputEvent = SetTrue, Server
+InputEvent = SetFalse, Server
+InputProperty = In, Server
+OutputProperty = Out, ClientAndServer
 Documentation = This node allows you to transfer a server side boolean to client side. Used for things like objective progress UI.

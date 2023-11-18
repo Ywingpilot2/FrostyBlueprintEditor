@@ -92,15 +92,21 @@ namespace BlueprintEditorPlugin.Models.Connections
 
         /// <summary>
         /// Compares if a connection object or <see cref="ConnectionViewModel"/> is equal to this.
-        /// NOTICE: DO NOT USE THIS METHOD FOR THINGS OTHER THEN EVENT CONNECTIONS, PROPERTY CONNECTIONS, OR LINK CONNECTIONS
-        /// (so e.g, if you are editing a file that isn't a blueprint, such as a ScalableEmitterDocument)
         /// </summary>
         /// <param name="obj">any connection(property link or event) or <see cref="ConnectionViewModel"/></param>
         /// <returns></returns>
         public override bool Equals(object obj)
         {
             dynamic connectionB = null;
-            if (obj != null && Object != null)
+            
+            //Some transient connections may have their objects as null
+            if (Object == null)
+            {
+                //In which case we need to call the base equals
+                return base.Equals(obj);
+            }
+            
+            if (obj != null)
             {
                 if (obj.GetType() == GetType())
                 {

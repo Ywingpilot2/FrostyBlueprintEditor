@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Utils;
+using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 {
@@ -21,5 +23,20 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             {
                 new OutputViewModel() {Title = "Value", Type = ConnectionType.Property}
             };
+
+        public override void OnCreation()
+        {
+            foreach (InputViewModel input in Inputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, input);
+            }
+
+            foreach (OutputViewModel output in Outputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, output);
+            }
+        }
+
+        public override void OnModified(ItemModifiedEventArgs args) => OnCreation();
     }
 }

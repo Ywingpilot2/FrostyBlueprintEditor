@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 using Frosty.Core;
+using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
@@ -26,6 +27,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             Name = $"Schematic Channel ({blueprintAssetEntry.Filename}, {((dynamic)blueprint.RootObject).Events.Count} events)";
 
             //Populate interface outpts/inputs
+            //TODO: Enumerate over links too
+            //TODO: Add in proper support for getting realms of inputs/outputs
             for (int i = 0; i < ((dynamic)blueprint.RootObject).Properties.Count; i++)
             {
                 dynamic property = ((dynamic)blueprint.RootObject).Properties[i];
@@ -40,6 +43,6 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             }
         }
         
-        public override void OnModified() => OnCreation();
+        public override void OnModified(ItemModifiedEventArgs args) => OnCreation();
     }
 }

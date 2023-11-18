@@ -65,7 +65,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                                 InterfaceItem = interfaceItem,
                                 Inputs = new ObservableCollection<InputViewModel>()
                             {
-                                new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property }
+                                new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property, PropertyConnectionType = PropertyType.Interface }
                             }
                             };
                             return interfaceNode;
@@ -102,7 +102,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                                 InterfaceItem = interfaceItem,
                                 Inputs = new ObservableCollection<InputViewModel>()
                             {
-                                new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event }
+                                new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event, PropertyConnectionType = PropertyType.Interface }
                             },
                             };
                             return interfaceNode;
@@ -148,7 +148,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
             }
         }
 
-        public override void OnModified()
+        public override void OnModified(ItemModifiedEventArgs args)
         {
             if (Inputs.Count != 0)
             {

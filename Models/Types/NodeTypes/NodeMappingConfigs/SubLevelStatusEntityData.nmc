@@ -1,0 +1,3 @@
+Type = SubLevelStatusEntityData
+DisplayName = SubLevelStatus
+OutputProperty = IsLoaded, ObjectRealm

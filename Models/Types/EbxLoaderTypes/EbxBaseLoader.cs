@@ -64,62 +64,45 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             if (NodeUtils.NodeExtensions.ContainsKey(key))
             {
                 newNode = (EntityNode)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
+                newNode.Object = obj;
             }
             //If not, check if a NMC exists
             else if (NodeUtils.NmcExtensions.ContainsKey(key))
             {
-                newNode = new EntityNode();
-                if (NodeUtils.NmcExtensions[key].All(arg => arg.Split('=')[0] != "ValidGameExecutableName")
-                    || NodeUtils.NmcExtensions[key].Any(arg => arg == $"ValidGameExecutableName={ProfilesLibrary.ProfileName}"))
+                newNode = new EntityNode
                 {
-                    newNode.ObjectType = key;
-                    foreach (string arg in NodeUtils.NmcExtensions[key])
-                    {
-                        switch (arg.Split('=')[0])
-                        {
-                            case "DisplayName":
-                            {
-                                newNode.Name = arg.Split('=')[1];
-                            } break;
-                            case "InputEvent":
-                            {
-                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
-                            } break;
-                            case "InputProperty":
-                            {
-                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
-                            } break;
-                            case "InputLink":
-                            {
-                                newNode.Inputs.Add(new InputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
-                            } break;
-                            case "OutputEvent":
-                            {
-                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Event });
-                            } break;
-                            case "OutputProperty":
-                            {
-                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Property });
-                            } break;
-                            case "OutputLink":
-                            {
-                                newNode.Outputs.Add(new OutputViewModel() { Title = arg.Split('=')[1], Type = ConnectionType.Link });
-                            } break;
-                        }
-                    }
-                }
+                    ObjectType = key,
+                    Object = obj
+                };
+                NodeUtils.ApplyNodeMapping(newNode);
             }
             else //We could not find an extension, so we just arbitrarily determine inputs and set its name
             {
-                newNode = new EntityNode();
+                newNode = new EntityNode() {Object = obj};
                 newNode.Inputs = NodeUtils.GenerateNodeInputs(obj.GetType(), newNode);
                 newNode.Name = ((dynamic)obj).__Id.ToString(); //Set the name to be the nodes __Id
             }
             
-            newNode.Object = obj;
             newNode.Guid = ((dynamic)obj).GetInstanceGuid();
             newNode.OnCreation();
+
+            //Add the realm to the port names(if they do not already have it)
+            foreach (InputViewModel input in newNode.Inputs)
+            {
+                if (!input.DisplayName.EndsWith(")"))
+                {
+                    input.DisplayName += $"({input.Realm})";
+                }
+            }
             
+            foreach (OutputViewModel output in newNode.Outputs)
+            {
+                if (!output.DisplayName.EndsWith(")"))
+                {
+                    output.DisplayName += $"({output.Realm})";
+                }
+            }
+
             NodeEditor.Nodes.Add(newNode);
             return newNode;
         }
@@ -161,7 +144,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 {
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
-                } 
+                }
 
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
@@ -225,12 +208,40 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
                 
-                InputViewModel targetInput =
-                    targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(propertyConnection.SourceField,
-                    ConnectionType.Property, true);
+                InputViewModel targetInput = targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property, true);
 
-                var connection = NodeEditor.Connect(sourceOutput, targetInput);
+                OutputViewModel sourceOutput = sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property, true);
+
+                //Setup the flags
+                var flagHelper = new PropertyFlagsHelper(propertyConnection.Flags);
+
+                if (NodeUtils.RealmsAreValid(flagHelper))
+                {
+                    if (targetInput.Realm == ConnectionRealm.Invalid)
+                    {
+                        targetInput.Realm = flagHelper.Realm;
+                    }
+                
+                    if (sourceOutput.Realm == ConnectionRealm.Invalid)
+                    {
+                        sourceOutput.Realm = flagHelper.Realm;
+                    }
+                    SetupPortRealms(sourceOutput, targetInput);
+                }
+                else
+                {
+                    //TODO: Update this problem ID so that it specifically references this connection
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
+                }
+
+                //Check that the realms of the source and target objects are valid
+                if (!NodeUtils.RealmsAreValid(sourceNode.Object, targetNode.Object))
+                {
+                    //TODO: Update this problem ID so that it specifically references this connection
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
+                }
+
+                ConnectionViewModel connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = propertyConnection;
             }
                 
@@ -302,11 +313,29 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
                 
-                InputViewModel targetInput =
-                    targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name,
-                    ConnectionType.Event, true);
-                        
+                InputViewModel targetInput = targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event, true);
+
+                OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event, true);
+
+                if (NodeUtils.RealmsAreValid(eventConnection.TargetType.ToString()))
+                {
+                    targetInput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
+                    sourceOutput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
+                    SetupPortRealms(sourceOutput, targetInput);
+                }
+                else
+                {
+                    //TODO: Update this problem ID so that it specifically references this connection
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
+                }
+                
+                //Check that the realms of the source and target objects are valid
+                if (!NodeUtils.RealmsAreValid(sourceNode.Object, targetNode.Object))
+                {
+                    //TODO: Update this problem ID so that it specifically references this connection
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
+                }
+
                 var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = eventConnection;
             }
@@ -399,6 +428,33 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         
                 var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = linkConnection;
+            }
+        }
+
+        private void SetupPortRealms(OutputViewModel sourceOutput, InputViewModel targetInput)
+        {
+            if (!targetInput.DisplayName.EndsWith(")"))
+            {
+                targetInput.DisplayName += $"({targetInput.Realm})";
+            }
+            else if (targetInput.DisplayName.EndsWith("(Invalid)"))
+            {
+                targetInput.DisplayName = targetInput.DisplayName.Replace("(Invalid)", $"({targetInput.Realm})");
+            }
+                
+            if (!sourceOutput.DisplayName.EndsWith(")"))
+            {
+                sourceOutput.DisplayName += $"({sourceOutput.Realm})";
+            }
+            else if (sourceOutput.DisplayName.EndsWith("(Invalid)"))
+            {
+                sourceOutput.DisplayName = targetInput.DisplayName.Replace("(Invalid)", $"({sourceOutput.Realm})");
+            }
+
+            if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput))
+            {
+                //TODO: Update this problem ID so that it specifically references this connection
+                NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
             }
         }
     }

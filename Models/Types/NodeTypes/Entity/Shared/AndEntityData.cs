@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Utils;
+using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 {
@@ -25,9 +26,19 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             {
                 Inputs.Add(new InputViewModel() {Title = $"In{i}", Type = ConnectionType.Property});
             }
+            
+            foreach (InputViewModel input in Inputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, input);
+            }
+
+            foreach (OutputViewModel output in Outputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, output);
+            }
         }
 
-        public override void OnModified()
+        public override void OnModified(ItemModifiedEventArgs args)
         {
             if ((int)Object.InputCount == 0)
             {
@@ -55,6 +66,17 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 
                     Inputs.Remove(input);
                 }
+            }
+            
+            //We want to make sure our Inputs and Outputs are the same realm as us, that way our flags compute properly
+            foreach (InputViewModel input in Inputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, input);
+            }
+
+            foreach (OutputViewModel output in Outputs)
+            {
+                NodeUtils.PortRealmFromObject(Object, output);
             }
         }
     }
