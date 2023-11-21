@@ -324,8 +324,17 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 if (NodeUtils.RealmsAreValid(eventConnection.TargetType.ToString()))
                 {
-                    targetInput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
-                    sourceOutput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
+                    ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
+                    if (targetInput.Realm == ConnectionRealm.Invalid)
+                    {
+                        targetInput.Realm = connectionRealm;
+                    }
+                
+                    if (sourceOutput.Realm == ConnectionRealm.Invalid)
+                    {
+                        sourceOutput.Realm = connectionRealm;
+                    }
+                    
                     SetupPortRealms(sourceOutput, targetInput);
                     if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput))
                     {
