@@ -23,16 +23,20 @@ if you wish to contribute to this project, please read this before doing so.
 
 ## Terminology 
 Here is a basic overview of the Terminology used in this project:
-- Object: an instance of a type or class which can be found in an asset
-- Node: also known as a Verticie, is an item which contains inputs and outputs
+- Object: An instance of a type or class which can be found in an asset
+- Node: Also known as a Verticie, is an item which contains inputs and outputs
+- Entity Node: A node which has an Object associated with it, and can be found embedded in the EBX
+- Transient Node: A node which is not stored in the EBX and is instead stored externally in layouts. This through code creates the EBX form of connections and Objects
 - Node Object: An object stored inside of a Node, this represents the original object this node is based on and it's properties are what is displayed in the property grid.
-- Connection: also commonly known as an edge, this connects an input and output together transferring a property or sending an event.
+- Port: An input/output you can plug into and out of on a node
+- Connection: Also commonly known as an edge, this connects an input and output together transferring a property or sending an event.
 - Connection Object: An object stored inside the connection, this represents the original object of this connection.
-- Node Mapping: a node mapping is a configuration of a type or class which details the inputs and outputs, among other details, it should have
-- Node Editor: also commonly referred to as EditorViewModel or Editor, this refers to the EditorViewModel class which is used to edit and create connections and objects
-- Editor Window: this refers to the window which contains the UI of the editor
-- Ebx Loader: a class which is designed to load EBX, or an asset found in frosty's file browser, into a graphed representation
-- Ebx Editor: a class which edits the loaded EBX or asset, converting the graphed representation into actual data
+- Node Mapping: A configuration of a type or class which details the inputs and outputs, among other details, it should have
+- Layout: A file which stores all of the information regarding the current node layout. So e.g, node positions or transient node data
+- Node Editor: Also commonly referred to as EditorViewModel or Editor, this refers to the EditorViewModel class which is used to edit and create connections and nodes
+- Editor Window: The window which contains the UI of the editor
+- Ebx Loader: A class which is designed to load EBX, or an asset found in frosty's file browser, into a graphed representation
+- Ebx Editor: A class which edits the loaded EBX or asset, converting the graphed representation into actual data
 
 ## Contribution Guidelines
 There is a lot to this plugin so if you wish to make PRs these notes are important to keep in mind:
