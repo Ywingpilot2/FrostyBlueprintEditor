@@ -515,7 +515,7 @@ namespace BlueprintEditorPlugin.Utils
 
         #region Realm Utilities
 
-        public static List<(ConnectionRealm, ConnectionRealm)> ImplicitConnectionCombos = new List<(ConnectionRealm, ConnectionRealm)>
+        private static readonly List<(ConnectionRealm, ConnectionRealm)> ImplicitConnectionCombos = new List<(ConnectionRealm, ConnectionRealm)>
             {
                 (ConnectionRealm.ClientAndServer, ConnectionRealm.Server),
                 (ConnectionRealm.ClientAndServer, ConnectionRealm.Client),
@@ -530,7 +530,7 @@ namespace BlueprintEditorPlugin.Utils
         {
             if (source.Realm == ConnectionRealm.Invalid || target.Realm == ConnectionRealm.Invalid) return false;
 
-            return source.Realm == target.Realm || NodeUtils.ImplicitConnectionCombos.Contains((source.Realm, target.Realm));
+            return source.Realm == target.Realm || ImplicitConnectionCombos.Contains((source.Realm, target.Realm));
         }
         
         public static bool RealmsAreValid(PropertyFlagsHelper flagsHelper)

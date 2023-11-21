@@ -1,0 +1,7 @@
+﻿Type = DelayEntityData
+DisplayName = Delay
+InputEvent = In, ObjectRealm
+InputEvent = Reset, ObjectRealm
+InputProperty = Delay, ObjectRealm
+OutputEvent = Out, ObjectRealm
+Documentation = This node when the In event is triggered will wait for the specified amount of time(in seconds) before sending the output event, Out

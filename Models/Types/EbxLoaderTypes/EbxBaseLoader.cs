@@ -239,13 +239,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
                 }
 
-                //Check that the realms of the source and target objects are valid
-                if (!NodeUtils.RealmsAreValid(sourceNode.Object, targetNode.Object))
-                {
-                    //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
-                }
-
                 ConnectionViewModel connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = propertyConnection;
             }
@@ -322,6 +315,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
 
                 OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event, true);
 
+                var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 if (NodeUtils.RealmsAreValid(eventConnection.TargetType.ToString()))
                 {
                     targetInput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
@@ -333,15 +327,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     //TODO: Update this problem ID so that it specifically references this connection
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
                 }
-                
-                //Check that the realms of the source and target objects are valid
-                if (!NodeUtils.RealmsAreValid(sourceNode.Object, targetNode.Object))
-                {
-                    //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
-                }
-
-                var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = eventConnection;
             }
                 
@@ -453,13 +438,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             }
             else if (sourceOutput.DisplayName.EndsWith("(Invalid)"))
             {
-                sourceOutput.DisplayName = targetInput.DisplayName.Replace("(Invalid)", $"({sourceOutput.Realm})");
-            }
-
-            if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput))
-            {
-                //TODO: Update this problem ID so that it specifically references this connection
-                NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
+                sourceOutput.DisplayName = sourceOutput.DisplayName.Replace("(Invalid)", $"({sourceOutput.Realm})");
             }
         }
     }

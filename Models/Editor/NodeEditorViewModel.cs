@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -645,7 +647,7 @@ namespace BlueprintEditorPlugin.Models.Editor
     /// This executes <see cref="StartCommand"/> when we first drag an output
     /// Then executes <see cref="FinishCommand"/> when we let go of the output
     /// </summary>
-    public class PendingConnectionViewModel
+    public class PendingConnectionViewModel : INotifyPropertyChanged
     {
         public OutputViewModel Source { get; set; }
         public InputViewModel Target { get; set; }
@@ -655,7 +657,7 @@ namespace BlueprintEditorPlugin.Models.Editor
         
         public Point SourceAnchor { get; set; }
         public Point TargetAnchor { get; set; }
-        
+
         public PendingConnectionViewModel(EditorViewModel nodeEditor, EbxBaseEditor ebxEditor)
         {
             StartCommand = new DelegateCommand<Object>(source =>
@@ -692,6 +694,18 @@ namespace BlueprintEditorPlugin.Models.Editor
 
                 #endregion
             });
+        }
+        
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

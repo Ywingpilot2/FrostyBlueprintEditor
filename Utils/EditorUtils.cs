@@ -45,7 +45,7 @@ namespace BlueprintEditorPlugin.Utils
                 
                 //Get the name of the project(make sure to remove .fbproject)
                 string projectName = frosty.Project.DisplayName.Split('.')[0];
-                return $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\";
+                return $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\";
             }
         }
 

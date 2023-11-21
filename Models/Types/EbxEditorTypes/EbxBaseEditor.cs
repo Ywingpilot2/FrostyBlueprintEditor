@@ -255,7 +255,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         eventConnection.TargetEvent.Name = connection.TargetField;
                         
                         //Setup flags
-                        var helper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                        Type objType = connection.TargetNode.Object.GetType();
+                        ObjectFlagsHelper helper = objType.GetProperty("Flags") != null ? new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags) : new ObjectFlagsHelper(0);
                         
                         //TODO: THIS CODE FUCKING SUCKS, PLEASE FIX
                         //This is the only way I've found to get the Enum values of a dynamic type, IT SUCKS
@@ -295,15 +296,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     eventConnection.TargetType = realmEnum[(int)ConnectionRealm.NetworkedClientAndServer];
                                 } break;
                             }
-
-                            Type objType = connection.TargetNode.Object.GetType();
-                            if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
-                            {
-                                connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                                EditEbx(connection.TargetNode.Object,
-                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
-                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
-                            }
                         }
                         else //If realms on either Target or source are invalid, we should create a warning and guess.
                         {
@@ -343,10 +335,19 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     App.Logger.LogError("Unable to determine the realm of a connection");
                                     //TODO: Make problem ID specific to connection
                                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "Unable to determine the realm of a connection");
+                                    connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                             }
                         }
 
+                        if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
+                        {
+                            connection.TargetNode.Object.Flags = helper.GetAsFlags();
+                            EditEbx(connection.TargetNode.Object,
+                                new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
+                                    new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                        }
+                        
                         ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections.Add(eventConnection);
                         connection.Object = eventConnection;
                     } break;
@@ -362,7 +363,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         
                         //Go through and set our flags
                         var flagsHelper = new PropertyFlagsHelper((uint)propertyConnection.Flags);
-                        var objectFlagsHelper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                        Type objType = connection.TargetNode.Object.GetType();
+                        ObjectFlagsHelper objectFlagsHelper = objType.GetProperty("Flags") != null ? new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags) : new ObjectFlagsHelper(0);
                         
                         if (NodeUtils.RealmsAreValid(connection.Source, connection.Target))
                         {
@@ -395,17 +397,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     objectFlagsHelper.ServerProperty = true;
                                 } break;
                             }
-
-                            propertyConnection.Flags = (uint)flagsHelper;
-
-                            Type objType = connection.TargetNode.Object.GetType();
-                            if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
-                            {
-                                connection.TargetNode.Object.Flags = objectFlagsHelper.GetAsFlags();
-                                EditEbx(connection.TargetNode.Object,
-                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
-                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
-                            }
                         }
                         else //If realms on either Target or source are invalid, we should create a warning and guess.
                         {
@@ -417,32 +408,67 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 case ConnectionRealm.Client:
                                 {
                                     objectFlagsHelper.ClientEvent = true;
+                                    
+                                    App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.ClientAndServer:
                                 {
                                     objectFlagsHelper.ClientEvent = true;
                                     objectFlagsHelper.ServerEvent = true;
+                                    
+                                    App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.Server:
                                 {
                                     objectFlagsHelper.ServerEvent = true;
+                                    
+                                    App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.NetworkedClient:
                                 {
                                     objectFlagsHelper.ClientEvent = true;
+                                    
+                                    App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.NetworkedClientAndServer:
                                 {
                                     objectFlagsHelper.ClientEvent = true;
                                     objectFlagsHelper.ServerEvent = true;
+                                    
+                                    App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    //TODO: Make problem ID specific to connection
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.Invalid:
                                 {
                                     App.Logger.LogError("Unable to determine the realm of a connection");
                                     //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "Unable to determine the realm of a connection");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Error, 2, "Unable to determine the realm of a connection");
+                                    connection.ConnectionStatus = EditorStatus.Error;
                                 } break;
                             }
+                        }
+                        propertyConnection.Flags = (uint)flagsHelper;
+                        
+                        if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
+                        {
+                            connection.TargetNode.Object.Flags = objectFlagsHelper.GetAsFlags();
+                            EditEbx(connection.TargetNode.Object,
+                                new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
+                                    new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
                         }
 
                         ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections.Add(propertyConnection);
@@ -501,7 +527,10 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                 NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
                 node.Object = newObj;
                 node.Name = node.Object.__Id.ToString();
-                node.OnModified(args);
+                if (args.Item != null)
+                {
+                    node.OnModified(args);
+                }
             
                 //TODO: Update this so we aren't enumerating over every single asset in the entire file
                 for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)

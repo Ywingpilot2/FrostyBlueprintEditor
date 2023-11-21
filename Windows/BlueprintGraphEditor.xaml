@@ -113,14 +113,27 @@
                         <!--Connection Definition(Changes how connections are displayed)-->
                         <nodify:NodifyEditor.ConnectionTemplate>
                             <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                                <nodify:Connection Source="{Binding Source.Anchor}"
-                                                   Target="{Binding Target.Anchor}"
-                                                   Fill="{Binding ConnectionColor}"
-                                                   Stroke="{Binding ConnectionColor}"
-                                                   ArrowSize="0,0"
-                                                   SourceOffset="0,0"
-                                                   TargetOffset="0,0"
-                                                   Spacing="0" />
+                                <Path Stroke="{Binding ConnectionColor}"
+                                      StrokeThickness="4">
+                                    <Path.Data>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <PathFigure StartPoint="{Binding Source.Anchor}" IsClosed="False">
+                                                    <BezierSegment Point1="{Binding CurvePoint1}"
+                                                                            Point2="{Binding CurvePoint2}"
+                                                                            Point3="{Binding Target.Anchor}"/>
+                                                </PathFigure>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </Path.Data>
+                                    <Path.Effect>
+                                        <DropShadowEffect ShadowDepth="2"
+                                                          Direction="270"
+                                                          BlurRadius="2"
+                                                          Color="{Binding ShadowColor}"
+                                                          Opacity="{Binding ShadowOpacity}"/>
+                                    </Path.Effect>
+                                </Path>
                             </DataTemplate>
                         </nodify:NodifyEditor.ConnectionTemplate>
 
@@ -132,7 +145,26 @@
                                                           AllowOnlyConnectors="True"
                                                           EnableSnapping="True"
                                                           SourceAnchor="{Binding SourceAnchor}"
-                                                          TargetAnchor="{Binding TargetAnchor}">
+                                                          TargetAnchor="{Binding TargetAnchor}"
+                                                          IsVisible="False">
+                                    <!--<nodify:PendingConnection.Template>
+                                        <ControlTemplate TargetType="{x:Type nodify:PendingConnection}">
+                                            <Path Stroke="White"
+                                                  StrokeThickness="4">
+                                                <Path.Data>
+                                                    <LineGeometry StartPoint="{Binding SourceAnchor}"
+                                                                  EndPoint="{Binding TargetAnchor}"/>
+                                                </Path.Data>
+                                                <Path.Effect>
+                                                    <DropShadowEffect ShadowDepth="2"
+                                                                      Direction="270"
+                                                                      BlurRadius="2"
+                                                                      Color="Black"
+                                                                      Opacity="0.25"/>
+                                                </Path.Effect>
+                                            </Path>
+                                        </ControlTemplate>
+                                    </nodify:PendingConnection.Template>-->
                                 </nodify:PendingConnection>
                             </DataTemplate>
                         </nodify:NodifyEditor.PendingConnectionTemplate>

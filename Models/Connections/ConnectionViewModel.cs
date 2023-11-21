@@ -1,5 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using BlueprintEditorPlugin.Utils;
 using FrostySdk.Ebx;
@@ -11,8 +16,14 @@ namespace BlueprintEditorPlugin.Models.Connections
     /// <summary>
     /// A connection.
     /// </summary>
-    public class ConnectionViewModel
+    public class ConnectionViewModel : INotifyPropertyChanged
     {
+        #region Properties
+
+        public dynamic Object { get; set; }
+        
+        #region Source & Target
+
         public OutputViewModel Source { get; }
 
         public string SourceField
@@ -46,8 +57,10 @@ namespace BlueprintEditorPlugin.Models.Connections
 
         public NodeBaseModel TargetNode { get; private set; }
 
-        public dynamic Object { get; set; }
-        
+        #endregion
+
+        #region Connection Type
+
         public ConnectionType Type { get; }
         public SolidColorBrush ConnectionColor
         {
@@ -66,6 +79,106 @@ namespace BlueprintEditorPlugin.Models.Connections
                 }
             }
         }
+
+        #endregion
+
+        #region Connection Status
+
+        private EditorStatus _status;
+
+        public EditorStatus ConnectionStatus
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                OnPropertyChanged(nameof(ConnectionStatus));
+                OnPropertyChanged(nameof(ShadowColor));
+                OnPropertyChanged(nameof(ShadowOpacity));
+            }
+        }
+
+        public SolidColorBrush ShadowColor
+        {
+            get
+            {
+                switch (_status)
+                {
+                    case EditorStatus.Good:
+                    {
+                        return new SolidColorBrush(Colors.Black);
+                    }
+                    case EditorStatus.Warning:
+                    {
+                        return new SolidColorBrush(Colors.Orange);
+                    }
+                    case EditorStatus.Error:
+                    {
+                        return new SolidColorBrush(Colors.Red);
+                    }
+                    default:
+                    {
+                        return new SolidColorBrush(Colors.Black);
+                    }
+                }
+            }
+        }
+
+        public double ShadowOpacity
+        {
+            get
+            {
+                switch (_status)
+                {
+                    case EditorStatus.Good:
+                    {
+                        return 0.15;
+                    }
+                    case EditorStatus.Warning:
+                    {
+                        return 0.35;
+                    }
+                    case EditorStatus.Error:
+                    {
+                        return 0.5;
+                    }
+                    default:
+                    {
+                        return 0.25;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Curve
+
+        public Point CurvePoint1
+        {
+            get
+            {
+                //The curve point is just the average of the 2 points
+                return new Point(Source.Anchor.X + 85,
+                    Source.Anchor.Y);
+            }
+        }
+
+        public Point CurvePoint2
+        {
+            get
+            {
+                //The curve point is just the average of the 2 points
+                return new Point((Target.Anchor.X - 85),
+                    (Target.Anchor.Y));
+            }
+        }
+
+#endregion
+
+        #endregion
+
+        #region Comparison & Constructor
 
         public ConnectionViewModel(OutputViewModel source, InputViewModel target, ConnectionType type = ConnectionType.Property)
         {
@@ -88,6 +201,11 @@ namespace BlueprintEditorPlugin.Models.Connections
             });
 
             Type = type;
+            
+            Source.PropertyChanged += OnPropertyChanged;
+            Target.PropertyChanged += OnPropertyChanged;
+            SourceNode.PropertyChanged += OnPropertyChanged;
+            TargetNode.PropertyChanged += OnPropertyChanged;
         }
 
         /// <summary>
@@ -188,7 +306,38 @@ namespace BlueprintEditorPlugin.Models.Connections
                 return hash;
             }
         }
+
+        #endregion
+
+        #region Property Changing
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        
+        /// <summary>
+        /// Basically just a way to update CurvePoint
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Anchor")
+            {
+                OnPropertyChanged(nameof(CurvePoint1));
+                OnPropertyChanged(nameof(CurvePoint2));
+            }
+            else
+            {
+                PropertyChanged?.Invoke(sender, e);
+            }
+        }
+        
+        #endregion
     }
-    
+
     #endregion
 }
