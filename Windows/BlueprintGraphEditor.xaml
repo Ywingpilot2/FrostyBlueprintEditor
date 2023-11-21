@@ -130,8 +130,8 @@
                                         <DropShadowEffect ShadowDepth="2"
                                                           Direction="270"
                                                           BlurRadius="2"
-                                                          Color="{Binding ShadowColor}"
-                                                          Opacity="{Binding ShadowOpacity}"/>
+                                                          Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                     </Path.Effect>
                                 </Path>
                             </DataTemplate>

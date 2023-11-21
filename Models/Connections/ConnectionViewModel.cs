@@ -98,7 +98,7 @@ namespace BlueprintEditorPlugin.Models.Connections
             }
         }
 
-        public SolidColorBrush ShadowColor
+        public Color ShadowColor
         {
             get
             {
@@ -106,19 +106,19 @@ namespace BlueprintEditorPlugin.Models.Connections
                 {
                     case EditorStatus.Good:
                     {
-                        return new SolidColorBrush(Colors.Black);
+                        return Colors.Black;
                     }
                     case EditorStatus.Warning:
                     {
-                        return new SolidColorBrush(Colors.Orange);
+                        return Colors.Goldenrod;
                     }
                     case EditorStatus.Error:
                     {
-                        return new SolidColorBrush(Colors.Red);
+                        return Colors.Red;
                     }
                     default:
                     {
-                        return new SolidColorBrush(Colors.Black);
+                        return Colors.Red;
                     }
                 }
             }
@@ -140,7 +140,7 @@ namespace BlueprintEditorPlugin.Models.Connections
                     }
                     case EditorStatus.Error:
                     {
-                        return 0.5;
+                        return 0.75;
                     }
                     default:
                     {

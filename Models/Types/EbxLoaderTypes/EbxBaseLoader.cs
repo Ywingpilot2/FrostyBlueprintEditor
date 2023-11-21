@@ -233,20 +233,26 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     }
                     SetupPortRealms(sourceOutput, targetInput);
                 }
-                else
-                {
-                    //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
-                }
 
                 ConnectionViewModel connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = propertyConnection;
+                if (!NodeUtils.RealmsAreValid(flagHelper)) //If the connection realm itself is invalid
+                {
+                    connection.ConnectionStatus = EditorStatus.Error;
+                    //TODO: Update this problem ID so that it specifically references this connection
+                    NodeEditor.SetEditorStatus(EditorStatus.Error, 1, "Some connections in this file have invalid realms");
+                }
+                else if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput)) //If the realms of the ports aren't valid
+                {
+                    connection.ConnectionStatus = EditorStatus.Warning;
+                    //TODO: Update this problem ID so that it specifically references this connection
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have improper realms");
+                }
             }
                 
             //Create event connections
             foreach (dynamic eventConnection in properties.EventConnections)
             {
-
                 if (eventConnection.Source.Internal == null || eventConnection.Target.Internal == null) continue;
 
                 NodeBaseModel sourceNode = null;
@@ -321,11 +327,17 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     targetInput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
                     sourceOutput.Realm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
                     SetupPortRealms(sourceOutput, targetInput);
+                    if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput))
+                    {
+                        connection.ConnectionStatus = EditorStatus.Warning;
+                        NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have improper realms");
+                    }
                 }
                 else
                 {
                     //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have invalid realms");
+                    NodeEditor.SetEditorStatus(EditorStatus.Error, 1, "Some connections in this file have invalid realms");
+                    connection.ConnectionStatus = EditorStatus.Error;
                 }
                 connection.Object = eventConnection;
             }
