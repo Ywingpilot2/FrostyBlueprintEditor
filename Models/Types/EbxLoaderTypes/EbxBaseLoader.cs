@@ -434,8 +434,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 }
                         
                 InputViewModel targetInput =
-                    targetNode.GetInput(sourceField, ConnectionType.Link, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(targetField,
+                    targetNode.GetInput(targetField, ConnectionType.Link, true);
+                OutputViewModel sourceOutput = sourceNode.GetOutput(sourceField,
                     ConnectionType.Link, true);
                         
                 var connection = NodeEditor.Connect(sourceOutput, targetInput);

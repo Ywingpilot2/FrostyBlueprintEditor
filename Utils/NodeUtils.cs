@@ -688,6 +688,42 @@ namespace BlueprintEditorPlugin.Utils
             return sourceRealm == targetRealm || ImplicitConnectionCombos.Contains((sourceRealm, targetRealm));
         }
 
+        public static bool RealmsAreValid(ConnectionViewModel connection)
+        {
+            switch (connection.Type)
+            {
+                case ConnectionType.Event:
+                {
+                    ConnectionRealm connectionRealm = ParseRealmFromString(connection.Object.TargetType.ToString());
+                    if (connectionRealm == ConnectionRealm.Invalid) return false;
+
+                    return (connection.Source.Realm == connection.Target.Realm && connectionRealm == connection.Target.Realm)
+                           ||
+                           ImplicitConnectionCombos.Contains((connection.Source.Realm, connection.Target.Realm));
+                }
+                case ConnectionType.Property:
+                {
+                    var helper = new PropertyFlagsHelper((uint)connection.Object.Flags);
+                    if (helper.Realm == ConnectionRealm.Invalid) return false;
+                    
+                    return (connection.Source.Realm == connection.Target.Realm && helper.Realm == connection.Target.Realm)
+                           ||
+                           ImplicitConnectionCombos.Contains((connection.Source.Realm, connection.Target.Realm));
+                }
+                case ConnectionType.Link:
+                {
+                    Type objType = connection.SourceNode.Object.GetType();
+                    if (objType.GetProperty("Flags") == null) return false;
+                    
+                    var sourceHelper = new ObjectFlagsHelper((uint)connection.SourceNode.Object.Flags);
+                    return (sourceHelper.ClientLinkSource && connection.Target.Realm == ConnectionRealm.Client)
+                           || (sourceHelper.ServerLinkSource && connection.Target.Realm == ConnectionRealm.Server);
+                }
+            }
+
+            return false;
+        }
+
         #endregion
         
         static NodeUtils()

@@ -530,6 +530,13 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                 if (args.Item != null)
                 {
                     node.OnModified(args);
+                    if (args.Item.Name == "Realm")
+                    {
+                        foreach (ConnectionViewModel connection in NodeEditor.GetConnections(node))
+                        {
+                            connection.ConnectionStatus = !NodeUtils.RealmsAreValid(connection) ? EditorStatus.Error : EditorStatus.Good;
+                        }
+                    }
                 }
             
                 //TODO: Update this so we aren't enumerating over every single object in the entire file
