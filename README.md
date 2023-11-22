@@ -9,14 +9,13 @@ This tool is still unfinished, with many things relating to optimization and add
 - loading blueprints into graphed form
 - layout saving
 - xml style configs for node mappings
+- Transient node functionality
 
 ## What needs to be worked on:
 - Additional support for more situations(e.g external pointerrefs in say subworlds being used in connections)
 - Layered Graph Drawing algorithm for sorting nodes
 - Options for customizing the look and functionality of the editor
-- Proper setup for transient nodes
 - Comment, Redirect, and shortcut transient nodes
-- Python API
 
 # For developers
 if you wish to contribute to this project, please read this before doing so.
