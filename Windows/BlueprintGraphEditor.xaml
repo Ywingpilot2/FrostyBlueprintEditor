@@ -85,28 +85,42 @@
                                         <Setter Property="ConnectionTemplate">
                                             <Setter.Value>
                                                 <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                                                    <Path Stroke="{Binding ConnectionColor}"
-                                                          StrokeThickness="4">
-                                                        <Path.Data>
-                                                            <PathGeometry>
-                                                                <PathGeometry.Figures>
-                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
-                                                                        IsClosed="False">
-                                                                        <BezierSegment Point1="{Binding CurvePoint1}"
-                                                                            Point2="{Binding CurvePoint2}"
-                                                                            Point3="{Binding Target.Anchor}" />
-                                                                    </PathFigure>
-                                                                </PathGeometry.Figures>
-                                                            </PathGeometry>
-                                                        </Path.Data>
-                                                        <Path.Effect>
-                                                            <DropShadowEffect ShadowDepth="2"
-                                                                              Direction="270"
-                                                                              BlurRadius="2"
-                                                                              Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                              Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        </Path.Effect>
-                                                    </Path>
+                                                    <Canvas>
+                                                        <Path Stroke="{Binding StatusColor}"
+                                                              StrokeThickness="{Binding StatusThickness}">
+                                                            <Path.Data>
+                                                                <PathGeometry>
+                                                                    <PathGeometry.Figures>
+                                                                        <PathFigure
+                                                                            StartPoint="{Binding Source.Anchor}"
+                                                                            IsClosed="False">
+                                                                            <BezierSegment
+                                                                                Point1="{Binding CurvePoint1}"
+                                                                                Point2="{Binding CurvePoint2}"
+                                                                                Point3="{Binding Target.Anchor}" />
+                                                                        </PathFigure>
+                                                                    </PathGeometry.Figures>
+                                                                </PathGeometry>
+                                                            </Path.Data>
+                                                        </Path>
+                                                        <Path Stroke="{Binding ConnectionColor}"
+                                                              StrokeThickness="4">
+                                                            <Path.Data>
+                                                                <PathGeometry>
+                                                                    <PathGeometry.Figures>
+                                                                        <PathFigure
+                                                                            StartPoint="{Binding Source.Anchor}"
+                                                                            IsClosed="False">
+                                                                            <BezierSegment
+                                                                                Point1="{Binding CurvePoint1}"
+                                                                                Point2="{Binding CurvePoint2}"
+                                                                                Point3="{Binding Target.Anchor}" />
+                                                                        </PathFigure>
+                                                                    </PathGeometry.Figures>
+                                                                </PathGeometry>
+                                                            </Path.Data>
+                                                        </Path>
+                                                    </Canvas>
                                                 </DataTemplate>
                                             </Setter.Value>
                                         </Setter>
@@ -117,20 +131,22 @@
                                         <Setter Property="ConnectionTemplate">
                                             <Setter.Value>
                                                 <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                                                    <Path Stroke="{Binding ConnectionColor}"
-                                                          StrokeThickness="4">
-                                                        <Path.Data>
-                                                            <LineGeometry StartPoint="{Binding Source.Anchor}"
-                                                                          EndPoint="{Binding Target.Anchor}"/>
-                                                        </Path.Data>
-                                                        <Path.Effect>
-                                                            <DropShadowEffect ShadowDepth="2"
-                                                                              Direction="270"
-                                                                              BlurRadius="2"
-                                                                              Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                              Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        </Path.Effect>
-                                                    </Path>
+                                                    <Canvas>
+                                                        <Path Stroke="{Binding StatusColor}"
+                                                              StrokeThickness="{Binding StatusThickness}">
+                                                            <Path.Data>
+                                                                <LineGeometry StartPoint="{Binding Source.Anchor}"
+                                                                              EndPoint="{Binding Target.Anchor}" />
+                                                            </Path.Data>
+                                                        </Path>
+                                                        <Path Stroke="{Binding ConnectionColor}"
+                                                              StrokeThickness="4">
+                                                            <Path.Data>
+                                                                <LineGeometry StartPoint="{Binding Source.Anchor}"
+                                                                              EndPoint="{Binding Target.Anchor}" />
+                                                            </Path.Data>
+                                                        </Path>
+                                                    </Canvas>
                                                 </DataTemplate>
                                             </Setter.Value>
                                         </Setter>
@@ -141,31 +157,38 @@
                                         <Setter Property="ConnectionTemplate">
                                             <Setter.Value>
                                                 <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                                                    <Path Stroke="{Binding ConnectionColor}"
-                                                          StrokeThickness="4">
-                                                        <Path.Data>
-                                                            <PathGeometry>
-                                                                <PathGeometry.Figures>
-                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
-                                                                        IsClosed="False">
-                                                                        <!--<BezierSegment Point1="{Binding CurvePoint1}"
-                                                                            Point2="{Binding CurvePoint2}"
-                                                                            Point3="{Binding Target.Anchor}" />-->
-                                                                        <LineSegment Point="{Binding CurvePoint1}"/>
-                                                                        <LineSegment Point="{Binding CurvePoint2}"/>
-                                                                        <LineSegment Point="{Binding Target.Anchor}"/>
-                                                                    </PathFigure>
-                                                                </PathGeometry.Figures>
-                                                            </PathGeometry>
-                                                        </Path.Data>
-                                                        <Path.Effect>
-                                                            <DropShadowEffect ShadowDepth="2"
-                                                                              Direction="270"
-                                                                              BlurRadius="2"
-                                                                              Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                              Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        </Path.Effect>
-                                                    </Path>
+                                                    <Canvas>
+                                                        <Path Stroke="{Binding StatusColor}"
+                                                              StrokeThickness="{Binding StatusThickness}">
+                                                            <Path.Data>
+                                                                <PathGeometry>
+                                                                    <PathGeometry.Figures>
+                                                                        <PathFigure StartPoint="{Binding Source.Anchor}"
+                                                                            IsClosed="False">
+                                                                            <LineSegment Point="{Binding CurvePoint1}"/>
+                                                                            <LineSegment Point="{Binding CurvePoint2}"/>
+                                                                            <LineSegment Point="{Binding Target.Anchor}"/>
+                                                                        </PathFigure>
+                                                                    </PathGeometry.Figures>
+                                                                </PathGeometry>
+                                                            </Path.Data>
+                                                        </Path>
+                                                        <Path Stroke="{Binding ConnectionColor}"
+                                                              StrokeThickness="4">
+                                                            <Path.Data>
+                                                                <PathGeometry>
+                                                                    <PathGeometry.Figures>
+                                                                        <PathFigure StartPoint="{Binding Source.Anchor}"
+                                                                            IsClosed="False">
+                                                                            <LineSegment Point="{Binding CurvePoint1}"/>
+                                                                            <LineSegment Point="{Binding CurvePoint2}"/>
+                                                                            <LineSegment Point="{Binding Target.Anchor}"/>
+                                                                        </PathFigure>
+                                                                    </PathGeometry.Figures>
+                                                                </PathGeometry>
+                                                            </Path.Data>
+                                                        </Path>
+                                                    </Canvas>
                                                 </DataTemplate>
                                             </Setter.Value>
                                         </Setter>

@@ -94,12 +94,12 @@ namespace BlueprintEditorPlugin.Models.Connections
             {
                 _status = value;
                 OnPropertyChanged(nameof(ConnectionStatus));
-                OnPropertyChanged(nameof(ShadowColor));
-                OnPropertyChanged(nameof(ShadowOpacity));
+                OnPropertyChanged(nameof(StatusColor));
+                OnPropertyChanged(nameof(StatusThickness));
             }
         }
 
-        public Color ShadowColor
+        public SolidColorBrush StatusColor
         {
             get
             {
@@ -107,25 +107,25 @@ namespace BlueprintEditorPlugin.Models.Connections
                 {
                     case EditorStatus.Good:
                     {
-                        return Colors.Black;
+                        return new SolidColorBrush(Colors.Black);
                     }
                     case EditorStatus.Warning:
                     {
-                        return Colors.Goldenrod;
+                        return new SolidColorBrush(Colors.Goldenrod);
                     }
                     case EditorStatus.Error:
                     {
-                        return Colors.Red;
+                        return new SolidColorBrush(Colors.Red);
                     }
                     default:
                     {
-                        return Colors.Red;
+                        return new SolidColorBrush(Colors.Red);
                     }
                 }
             }
         }
 
-        public double ShadowOpacity
+        public double StatusThickness
         {
             get
             {
@@ -137,11 +137,11 @@ namespace BlueprintEditorPlugin.Models.Connections
                     }
                     case EditorStatus.Warning:
                     {
-                        return 0.35;
+                        return 7;
                     }
                     case EditorStatus.Error:
                     {
-                        return 0.75;
+                        return 8;
                     }
                     default:
                     {

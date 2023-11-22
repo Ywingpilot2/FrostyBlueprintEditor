@@ -532,7 +532,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     node.OnModified(args);
                 }
             
-                //TODO: Update this so we aren't enumerating over every single asset in the entire file
+                //TODO: Update this so we aren't enumerating over every single object in the entire file
                 for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
                 {
                     PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
