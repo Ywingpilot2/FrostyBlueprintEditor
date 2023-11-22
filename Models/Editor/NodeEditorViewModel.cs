@@ -649,14 +649,110 @@ namespace BlueprintEditorPlugin.Models.Editor
     /// </summary>
     public class PendingConnectionViewModel : INotifyPropertyChanged
     {
+        #region Source and Target
+
         public OutputViewModel Source { get; set; }
         public InputViewModel Target { get; set; }
 
+        #endregion
+
+        #region Commands
+
         public ICommand StartCommand { get; }
         public ICommand FinishCommand { get; }
-        
-        public Point SourceAnchor { get; set; }
-        public Point TargetAnchor { get; set; }
+
+        #endregion
+
+        #region Color
+
+        private ConnectionType _type;
+        public SolidColorBrush ConnectionColor
+        {
+            get
+            {
+                switch (_type)
+                {
+                    case ConnectionType.Event:
+                        return new SolidColorBrush(Colors.White); 
+                    case ConnectionType.Property:
+                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF21"));
+                    case ConnectionType.Link:
+                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0094FF"));
+                    default:
+                        return new SolidColorBrush(Colors.White);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Anchors
+
+        private Point _sAnchor;
+        public Point SourceAnchor
+        {
+            get => _sAnchor;
+            set
+            {
+                _sAnchor = value;
+                NotifyPropertyChanged(nameof(SourceAnchor));
+                NotifyPropertyChanged(nameof(CurvePoint1));
+            }
+        }
+
+        private Point _tAnchor;
+        public Point TargetAnchor
+        {
+            get => _tAnchor;
+            set
+            {
+                _tAnchor = value;
+                NotifyPropertyChanged(nameof(TargetAnchor));
+                NotifyPropertyChanged(nameof(CurvePoint2));
+            }
+        }
+
+        #endregion
+
+        #region Curve Points
+
+        public Point CurvePoint1
+        {
+            get
+            {
+                //The curve point is just the average of the 2 points
+                if (Source != null)
+                {
+                    return new Point(SourceAnchor.X + 85,
+                        SourceAnchor.Y);
+                }
+                else
+                {
+                    return new Point(SourceAnchor.X - 85,
+                        SourceAnchor.Y);
+                }
+            }
+        }
+
+        public Point CurvePoint2
+        {
+            get
+            {
+                //The curve point is just the average of the 2 points
+                if (Source != null)
+                {
+                    return new Point(TargetAnchor.X - 85,
+                        TargetAnchor.Y);
+                }
+                else
+                {
+                    return new Point(TargetAnchor.X + 85,
+                        TargetAnchor.Y);
+                }
+            }
+        }
+
+        #endregion
 
         public PendingConnectionViewModel(EditorViewModel nodeEditor, EbxBaseEditor ebxEditor)
         {
@@ -665,10 +761,18 @@ namespace BlueprintEditorPlugin.Models.Editor
                 if (source.GetType().Name == "OutputViewModel")
                 {
                     Source = (OutputViewModel)source;
+                    _type = Source.Type;
+                    NotifyPropertyChanged(nameof(ConnectionColor));
+                    NotifyPropertyChanged(nameof(CurvePoint1));
+                    NotifyPropertyChanged(nameof(CurvePoint2));
                 }
                 else
                 {
                     Target = (InputViewModel)source;
+                    _type = Target.Type;
+                    NotifyPropertyChanged(nameof(ConnectionColor));
+                    NotifyPropertyChanged(nameof(CurvePoint1));
+                    NotifyPropertyChanged(nameof(CurvePoint2));
                 }
             });
             FinishCommand = new DelegateCommand<Object>(target =>

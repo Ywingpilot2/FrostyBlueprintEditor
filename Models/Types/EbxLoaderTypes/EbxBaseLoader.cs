@@ -236,6 +236,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
 
                 ConnectionViewModel connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = propertyConnection;
+                
                 if (!NodeUtils.RealmsAreValid(flagHelper)) //If the connection realm itself is invalid
                 {
                     connection.ConnectionStatus = EditorStatus.Error;

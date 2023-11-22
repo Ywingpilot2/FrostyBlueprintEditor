@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
+using BlueprintEditorPlugin.Options;
 using BlueprintEditorPlugin.Utils;
 using FrostySdk.Ebx;
 
@@ -158,9 +159,17 @@ namespace BlueprintEditorPlugin.Models.Connections
         {
             get
             {
-                //The curve point is just the average of the 2 points
-                return new Point(Source.Anchor.X + 85,
-                    Source.Anchor.Y);
+                if (EditorUtils.CStyle == ConnectionStyle.Curvy)
+                {
+                    //The curve point is just the average of the 2 points
+                    return new Point(Source.Anchor.X + 85,
+                        Source.Anchor.Y);
+                }
+                else
+                {
+                    return new Point(Source.Anchor.X + 25,
+                        Source.Anchor.Y);
+                }
             }
         }
 
@@ -168,13 +177,21 @@ namespace BlueprintEditorPlugin.Models.Connections
         {
             get
             {
-                //The curve point is just the average of the 2 points
-                return new Point((Target.Anchor.X - 85),
-                    (Target.Anchor.Y));
+                if (EditorUtils.CStyle == ConnectionStyle.Curvy)
+                {
+                    //The curve point is just the average of the 2 points
+                    return new Point(Target.Anchor.X - 85,
+                        Target.Anchor.Y);
+                }
+                else
+                {
+                    return new Point(Target.Anchor.X - 25,
+                        Target.Anchor.Y);
+                }
             }
         }
 
-#endregion
+        #endregion
 
         #endregion
 

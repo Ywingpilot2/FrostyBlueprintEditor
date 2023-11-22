@@ -11,6 +11,8 @@
              xmlns:editor="clr-namespace:BlueprintEditorPlugin.Models.Editor"
              xmlns:nodeTypes="clr-namespace:BlueprintEditorPlugin.Models.Types.NodeTypes"
              xmlns:connections="clr-namespace:BlueprintEditorPlugin.Models.Connections"
+             xmlns:utils="clr-namespace:BlueprintEditorPlugin.Utils"
+             xmlns:options="clr-namespace:BlueprintEditorPlugin.Options"
              mc:Ignorable="d"
              d:DesignHeight="480" d:DesignWidth="720">
     
@@ -71,6 +73,106 @@
                         <nodify:NodifyEditor.DataContext>
                             <editor:EditorViewModel/>
                         </nodify:NodifyEditor.DataContext>
+                        
+                        <nodify:NodifyEditor.Style>
+                            <Style TargetType="{x:Type nodify:NodifyEditor}"
+                                   BasedOn="{StaticResource {x:Type nodify:NodifyEditor}}">
+                                <Style.Triggers>
+                                    
+                                    <!--Connection Definition(Changes how connections are displayed)-->
+                                    <DataTrigger Binding="{Binding Source={x:Static utils:EditorUtils.CStyle}}"
+                                                 Value="{x:Static options:ConnectionStyle.Curvy}">
+                                        <Setter Property="ConnectionTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
+                                                    <Path Stroke="{Binding ConnectionColor}"
+                                                          StrokeThickness="4">
+                                                        <Path.Data>
+                                                            <PathGeometry>
+                                                                <PathGeometry.Figures>
+                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
+                                                                        IsClosed="False">
+                                                                        <BezierSegment Point1="{Binding CurvePoint1}"
+                                                                            Point2="{Binding CurvePoint2}"
+                                                                            Point3="{Binding Target.Anchor}" />
+                                                                    </PathFigure>
+                                                                </PathGeometry.Figures>
+                                                            </PathGeometry>
+                                                        </Path.Data>
+                                                        <Path.Effect>
+                                                            <DropShadowEffect ShadowDepth="2"
+                                                                              Direction="270"
+                                                                              BlurRadius="2"
+                                                                              Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        </Path.Effect>
+                                                    </Path>
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    
+                                    <DataTrigger Binding="{Binding Source={x:Static utils:EditorUtils.CStyle}}"
+                                                 Value="{x:Static options:ConnectionStyle.Straight}">
+                                        <Setter Property="ConnectionTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
+                                                    <Path Stroke="{Binding ConnectionColor}"
+                                                          StrokeThickness="4">
+                                                        <Path.Data>
+                                                            <LineGeometry StartPoint="{Binding Source.Anchor}"
+                                                                          EndPoint="{Binding Target.Anchor}"/>
+                                                        </Path.Data>
+                                                        <Path.Effect>
+                                                            <DropShadowEffect ShadowDepth="2"
+                                                                              Direction="270"
+                                                                              BlurRadius="2"
+                                                                              Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        </Path.Effect>
+                                                    </Path>
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    
+                                    <DataTrigger Binding="{Binding Source={x:Static utils:EditorUtils.CStyle}}"
+                                                 Value="{x:Static options:ConnectionStyle.StartStop}">
+                                        <Setter Property="ConnectionTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
+                                                    <Path Stroke="{Binding ConnectionColor}"
+                                                          StrokeThickness="4">
+                                                        <Path.Data>
+                                                            <PathGeometry>
+                                                                <PathGeometry.Figures>
+                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
+                                                                        IsClosed="False">
+                                                                        <!--<BezierSegment Point1="{Binding CurvePoint1}"
+                                                                            Point2="{Binding CurvePoint2}"
+                                                                            Point3="{Binding Target.Anchor}" />-->
+                                                                        <LineSegment Point="{Binding CurvePoint1}"/>
+                                                                        <LineSegment Point="{Binding CurvePoint2}"/>
+                                                                        <LineSegment Point="{Binding Target.Anchor}"/>
+                                                                    </PathFigure>
+                                                                </PathGeometry.Figures>
+                                                            </PathGeometry>
+                                                        </Path.Data>
+                                                        <Path.Effect>
+                                                            <DropShadowEffect ShadowDepth="2"
+                                                                              Direction="270"
+                                                                              BlurRadius="2"
+                                                                              Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        </Path.Effect>
+                                                    </Path>
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </nodify:NodifyEditor.Style>
 
                         <!--Node Definition(Changes how nodes are displayed in ui)-->
                         <nodify:NodifyEditor.ItemTemplate>
@@ -110,33 +212,6 @@
                             </DataTemplate>
                         </nodify:NodifyEditor.ItemTemplate>
 
-                        <!--Connection Definition(Changes how connections are displayed)-->
-                        <nodify:NodifyEditor.ConnectionTemplate>
-                            <DataTemplate DataType="{x:Type connections:ConnectionViewModel}">
-                                <Path Stroke="{Binding ConnectionColor}"
-                                      StrokeThickness="4">
-                                    <Path.Data>
-                                        <PathGeometry>
-                                            <PathGeometry.Figures>
-                                                <PathFigure StartPoint="{Binding Source.Anchor}" IsClosed="False">
-                                                    <BezierSegment Point1="{Binding CurvePoint1}"
-                                                                            Point2="{Binding CurvePoint2}"
-                                                                            Point3="{Binding Target.Anchor}"/>
-                                                </PathFigure>
-                                            </PathGeometry.Figures>
-                                        </PathGeometry>
-                                    </Path.Data>
-                                    <Path.Effect>
-                                        <DropShadowEffect ShadowDepth="2"
-                                                          Direction="270"
-                                                          BlurRadius="2"
-                                                          Color="{Binding ShadowColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                          Opacity="{Binding ShadowOpacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </Path.Effect>
-                                </Path>
-                            </DataTemplate>
-                        </nodify:NodifyEditor.ConnectionTemplate>
-
                         <!--This displays whenever the user is attempting to create a new connection-->
                         <nodify:NodifyEditor.PendingConnectionTemplate>
                             <DataTemplate DataType="{x:Type editor:PendingConnectionViewModel}">
@@ -144,27 +219,34 @@
                                                           CompletedCommand="{Binding FinishCommand}"
                                                           AllowOnlyConnectors="True"
                                                           EnableSnapping="True"
-                                                          SourceAnchor="{Binding SourceAnchor}"
-                                                          TargetAnchor="{Binding TargetAnchor}"
+                                                          SourceAnchor="{Binding SourceAnchor, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
+                                                          TargetAnchor="{Binding TargetAnchor, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
                                                           IsVisible="False">
-                                    <!--<nodify:PendingConnection.Template>
-                                        <ControlTemplate TargetType="{x:Type nodify:PendingConnection}">
-                                            <Path Stroke="White"
-                                                  StrokeThickness="4">
-                                                <Path.Data>
-                                                    <LineGeometry StartPoint="{Binding SourceAnchor}"
-                                                                  EndPoint="{Binding TargetAnchor}"/>
-                                                </Path.Data>
-                                                <Path.Effect>
-                                                    <DropShadowEffect ShadowDepth="2"
-                                                                      Direction="270"
-                                                                      BlurRadius="2"
-                                                                      Color="Black"
-                                                                      Opacity="0.25"/>
-                                                </Path.Effect>
-                                            </Path>
-                                        </ControlTemplate>
-                                    </nodify:PendingConnection.Template>-->
+                                    <nodify:PendingConnection.Style>
+                                        <Style TargetType="{x:Type nodify:PendingConnection}"
+                                               BasedOn="{StaticResource {x:Type nodify:PendingConnection}}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="nodify:PendingConnection">
+                                                        <Path Stroke="{Binding ConnectionColor}"
+                                                              StrokeThickness="4">
+                                                            <Path.Data>
+                                                                <PathGeometry>
+                                                                    <PathGeometry.Figures>
+                                                                        <PathFigure StartPoint="{Binding SourceAnchor, RelativeSource={RelativeSource TemplatedParent}}" IsClosed="False">
+                                                                            <BezierSegment Point1="{Binding CurvePoint1}"
+                                                                                Point2="{Binding CurvePoint2}"
+                                                                                Point3="{Binding TargetAnchor, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                                        </PathFigure>
+                                                                    </PathGeometry.Figures>
+                                                                </PathGeometry>
+                                                            </Path.Data>
+                                                        </Path>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </nodify:PendingConnection.Style>
                                 </nodify:PendingConnection>
                             </DataTemplate>
                         </nodify:NodifyEditor.PendingConnectionTemplate>

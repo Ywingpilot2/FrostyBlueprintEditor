@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using BlueprintEditorPlugin.Extensions;
+using BlueprintEditorPlugin.Options;
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -28,3 +29,4 @@ using BlueprintEditorPlugin.Extensions;
 
 [assembly: RegisterMenuExtension(typeof(ViewBlueprintMenuExtension))]
 [assembly: RegisterDataExplorerContextMenu(typeof(ViewBlueprintContextMenuItem))]
+[assembly: RegisterOptionsExtension(typeof(BlueprintEditorOptions))]

@@ -6,6 +6,8 @@ using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
+using BlueprintEditorPlugin.Options;
+using Frosty.Core;
 using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Managers;
@@ -278,6 +280,36 @@ namespace BlueprintEditorPlugin.Utils
             }
 
             return column;
+        }
+
+        #endregion
+
+        #region EditorSettings
+
+        public static ConnectionStyle CStyle { get; set; }
+
+        static EditorUtils()
+        {
+            UpdateSettings();
+        }
+
+        public static void UpdateSettings()
+        {
+            switch (Config.Get("ConnectionStyle", "StartStop"))
+            {
+                case "StartStop":
+                {
+                    CStyle = ConnectionStyle.StartStop;
+                } break;
+                case "Straight":
+                {
+                    CStyle = ConnectionStyle.Straight;
+                } break;
+                case "Curvy":
+                {
+                    CStyle = ConnectionStyle.Curvy;
+                } break;
+            }
         }
 
         #endregion
