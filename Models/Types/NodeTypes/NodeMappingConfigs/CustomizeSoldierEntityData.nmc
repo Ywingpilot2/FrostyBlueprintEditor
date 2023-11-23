@@ -1,0 +1,5 @@
+Type = CustomizeSoldierEntityData
+DisplayName = Character Customization
+InputEvent = Apply, Server
+OutputLink = Characters, Server
+Documentation = This controls various things relating to character customization such as weapons or visual unlocks

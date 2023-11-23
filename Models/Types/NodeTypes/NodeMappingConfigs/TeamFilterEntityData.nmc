@@ -1,0 +1,5 @@
+Type = TeamFilterEntityData
+DisplayName = Team Filter
+InputEvent = In, ObjectRealm
+OutputEvent = OnTriggeredByMatchingTeam, ObjectRealm
+Documentation = This will send an event if the inputted Player Event is a part of the specified team

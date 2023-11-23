@@ -1,0 +1,5 @@
+Type = MathIntOpEntityData
+DisplayName = MathIntOp
+InputProperty = In0, ObjectRealm
+InputProperty = In1, ObjectRealm
+OutputProperty = Out, ObjectRealm

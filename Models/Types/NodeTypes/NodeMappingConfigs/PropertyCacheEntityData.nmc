@@ -1,0 +1,5 @@
+Type = PropertyCacheEntityData
+DisplayName = Property Cache
+InputProperty = InValue, ObjectRealm
+InputEvent = Load, ObjectRealm
+OutputProperty = Value, ObjectRealm

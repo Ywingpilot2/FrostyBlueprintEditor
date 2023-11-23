@@ -1,0 +1,4 @@
+Type = LocatorEntityData
+DisplayName = Locator
+InputEvent = SetTransform, ObjectRealm
+OutputProperty = DynamicTransform, ObjectRealm

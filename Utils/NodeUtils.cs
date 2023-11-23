@@ -107,15 +107,21 @@ namespace BlueprintEditorPlugin.Utils
                 {
                     case ConnectionType.Event:
                     {
-                        sw.WriteLine($"InputEvent = {input.Title}, {input.Realm}");
+                        sw.WriteLine(node.Object.GetType().GetProperty("Realm") == null
+                            ? $"InputEvent = {input.Title}, {input.Realm}"
+                            : $"InputEvent = {input.Title}, ObjectRealm");
                     } break;
                     case ConnectionType.Property:
                     {
-                        sw.WriteLine($"InputProperty = {input.Title}, {input.Realm}");
+                        sw.WriteLine(node.Object.GetType().GetProperty("Realm") == null
+                            ? $"InputProperty = {input.Title}, {input.Realm}"
+                            : $"InputProperty = {input.Title}, ObjectRealm");
                     } break;
                     case ConnectionType.Link:
                     {
-                        sw.WriteLine($"InputLink = {input.Title}, {input.Realm}");
+                        sw.WriteLine(node.Object.GetType().GetProperty("Realm") == null
+                            ? $"InputLink = {input.Title}, {input.Realm}"
+                            : $"InputLink = {input.Title}, ObjectRealm");
                     } break;
                 }
             }
@@ -134,19 +140,22 @@ namespace BlueprintEditorPlugin.Utils
                 {
                     case ConnectionType.Event:
                     {
-                        sw.WriteLine($"OutputEvent = {output.Title}, {output.Realm}");
-                    }
-                        break;
+                        sw.WriteLine(node.Object.GetType().GetProperty("Realm") == null
+                            ? $"OutputEvent = {output.Title}, {output.Realm}"
+                            : $"OutputEvent = {output.Title}, ObjectRealm");
+                    } break;
                     case ConnectionType.Property:
                     {
-                        sw.WriteLine($"OutputProperty = {output.Title}, {output.Realm}");
-                    }
-                        break;
+                        sw.WriteLine(node.Object.GetType().GetProperty("Realm") == null
+                            ? $"OutputProperty = {output.Title}, {output.Realm}"
+                            : $"OutputProperty = {output.Title}, ObjectRealm");
+                    } break;
                     case ConnectionType.Link:
                     {
-                        sw.WriteLine($"OutputLink = {output.Title}, {output.Realm}");
-                    }
-                        break;
+                        sw.WriteLine(node.Object.GetType().GetProperty("Realm") == null
+                            ? $"OutputLink = {output.Title}, {output.Realm}"
+                            : $"OutputLink = {output.Title}, ObjectRealm");
+                    } break;
                 }
             }
 
@@ -161,146 +170,160 @@ namespace BlueprintEditorPlugin.Utils
         public static void ApplyNodeMapping(NodeBaseModel newNode)
         {
             List<string> extension = NmcExtensions[newNode.ObjectType];
+            
             foreach (string arg in extension)
             {
-                switch (arg.Split('=')[0])
+                try
                 {
-                    case "DisplayName":
+                    switch (arg.Split('=')[0])
                     {
-                        newNode.Name = arg.Split('=')[1];
-                    } break;
-                    case "InputEvent":
-                    {
-                        string title = arg.Split('=')[1].Split(',')[0];
-                        string realmArg = arg.Split('=')[1].Split(',')[1];
-                        ConnectionRealm realm = ConnectionRealm.Invalid;
-                        if (realmArg == "ObjectRealm")
+                        case "DisplayName":
                         {
-                            if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                            newNode.Name = arg.Replace("DisplayName=", "");
+                        } break;
+                        case "InputEvent":
+                        {
+                            string cleanArg = arg.Replace("InputEvent=", "");
+                            string title = cleanArg.Split(',')[0];
+                            string realmArg = cleanArg.Split(',')[1];
+                            ConnectionRealm realm = ConnectionRealm.Invalid;
+                            if (realmArg == "ObjectRealm")
                             {
-                                realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                                {
+                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                }
+                                else
+                                {
+                                    App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                }
                             }
                             else
                             {
-                                App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                realm = ParseRealmFromString(realmArg);
                             }
-                        }
-                        else
+                            newNode.Inputs.Add(new InputViewModel() { Title = title.Split(',')[0], Type = ConnectionType.Event, Realm = realm});
+                        } break;
+                        case "InputProperty":
                         {
-                            realm = ParseRealmFromString(realmArg);
-                        }
-                        newNode.Inputs.Add(new InputViewModel() { Title = title.Split(',')[0], Type = ConnectionType.Event, Realm = realm});
-                    } break;
-                    case "InputProperty":
-                    {
-                        string title = arg.Split('=')[1].Split(',')[0];
-                        string realmArg = arg.Split('=')[1].Split(',')[1];
-                        ConnectionRealm realm = ConnectionRealm.Invalid;
-                        if (realmArg == "ObjectRealm")
-                        {
-                            if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                            string cleanArg = arg.Replace("InputProperty=", "");
+                            string title = cleanArg.Split(',')[0];
+                            string realmArg = cleanArg.Split(',')[1];
+                            ConnectionRealm realm = ConnectionRealm.Invalid;
+                            if (realmArg == "ObjectRealm")
                             {
-                                realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                                {
+                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                }
+                                else
+                                {
+                                    App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                }
                             }
                             else
                             {
-                                App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                realm = ParseRealmFromString(realmArg);
                             }
-                        }
-                        else
+                            newNode.Inputs.Add(new InputViewModel() { Title = title, Type = ConnectionType.Property, Realm = realm });
+                        } break;
+                        case "InputLink":
                         {
-                            realm = ParseRealmFromString(realmArg);
-                        }
-                        newNode.Inputs.Add(new InputViewModel() { Title = title, Type = ConnectionType.Property, Realm = realm });
-                    } break;
-                    case "InputLink":
-                    {
-                        string title = arg.Split('=')[1].Split(',')[0];
-                        string realmArg = arg.Split('=')[1].Split(',')[1];
-                        ConnectionRealm realm = ConnectionRealm.Invalid;
-                        if (realmArg == "ObjectRealm")
-                        {
-                            if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                            string cleanArg = arg.Replace("InputLink=", "");
+                            string title = cleanArg.Split(',')[0];
+                            string realmArg = cleanArg.Split(',')[1];
+                            ConnectionRealm realm = ConnectionRealm.Invalid;
+                            if (realmArg == "ObjectRealm")
                             {
-                                realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                                {
+                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                }
+                                else
+                                {
+                                    App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                }
                             }
                             else
                             {
-                                App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                realm = ParseRealmFromString(realmArg);
                             }
-                        }
-                        else
+                            newNode.Inputs.Add(new InputViewModel() { Title = title, Type = ConnectionType.Link, Realm = realm });
+                        } break;
+                        case "OutputEvent":
                         {
-                            realm = ParseRealmFromString(realmArg);
-                        }
-                        newNode.Inputs.Add(new InputViewModel() { Title = title, Type = ConnectionType.Link, Realm = realm });
-                    } break;
-                    case "OutputEvent":
-                    {
-                        string title = arg.Split('=')[1].Split(',')[0];
-                        string realmArg = arg.Split('=')[1].Split(',')[1];
-                        ConnectionRealm realm = ConnectionRealm.Invalid;
-                        if (realmArg == "ObjectRealm")
-                        {
-                            if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                            string cleanArg = arg.Replace("OutputEvent=", "");
+                            string title = cleanArg.Split(',')[0];
+                            string realmArg = cleanArg.Split(',')[1];
+                            ConnectionRealm realm = ConnectionRealm.Invalid;
+                            if (realmArg == "ObjectRealm")
                             {
-                                realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                                {
+                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                }
+                                else
+                                {
+                                    App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                }
                             }
                             else
                             {
-                                App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                realm = ParseRealmFromString(realmArg);
                             }
-                        }
-                        else
+                            newNode.Outputs.Add(new OutputViewModel() { Title = title, Type = ConnectionType.Event, Realm = realm });
+                        } break;
+                        case "OutputProperty":
                         {
-                            realm = ParseRealmFromString(realmArg);
-                        }
-                        newNode.Outputs.Add(new OutputViewModel() { Title = title, Type = ConnectionType.Event, Realm = realm });
-                    } break;
-                    case "OutputProperty":
-                    {
-                        string title = arg.Split('=')[1].Split(',')[0];
-                        string realmArg = arg.Split('=')[1].Split(',')[1];
-                        ConnectionRealm realm = ConnectionRealm.Invalid;
-                        if (realmArg == "ObjectRealm")
-                        {
-                            if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                            string cleanArg = arg.Replace("OutputProperty=", "");
+                            string title = cleanArg.Split(',')[0];
+                            string realmArg = cleanArg.Split(',')[1];
+                            ConnectionRealm realm = ConnectionRealm.Invalid;
+                            if (realmArg == "ObjectRealm")
                             {
-                                realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                                {
+                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                }
+                                else
+                                {
+                                    App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                }
                             }
                             else
                             {
-                                App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                realm = ParseRealmFromString(realmArg);
                             }
-                        }
-                        else
+                            newNode.Outputs.Add(new OutputViewModel() { Title = title, Type = ConnectionType.Property, Realm = realm });
+                        } break;
+                        case "OutputLink":
                         {
-                            realm = ParseRealmFromString(realmArg);
-                        }
-                        newNode.Outputs.Add(new OutputViewModel() { Title = title, Type = ConnectionType.Property, Realm = realm });
-                    } break;
-                    case "OutputLink":
-                    {
-                        string title = arg.Split('=')[1].Split(',')[0];
-                        string realmArg = arg.Split('=')[1].Split(',')[1];
-                        ConnectionRealm realm = ConnectionRealm.Invalid;
-                        if (realmArg == "ObjectRealm")
-                        {
-                            if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                            string cleanArg = arg.Replace("OutputLink=", "");
+                            string title = cleanArg.Split(',')[0];
+                            string realmArg = cleanArg.Split(',')[1];
+                            ConnectionRealm realm = ConnectionRealm.Invalid;
+                            if (realmArg == "ObjectRealm")
                             {
-                                realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
+                                {
+                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                }
+                                else
+                                {
+                                    App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                }
                             }
                             else
                             {
-                                App.Logger.LogError("NMC had an ports realm set to ObjectRealm, yet the type {0} has no Realm property", newNode.Object.GetType().Name);
+                                realm = ParseRealmFromString(realmArg);
                             }
-                        }
-                        else
-                        {
-                            realm = ParseRealmFromString(realmArg);
-                        }
-                        newNode.Outputs.Add(new OutputViewModel() { Title = title, Type = ConnectionType.Link, Realm = realm });
-                    } break;
+                            newNode.Outputs.Add(new OutputViewModel() { Title = title, Type = ConnectionType.Link, Realm = realm });
+                        } break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    App.Logger.LogError("Arg {0} in Node Mapping {1} was invalid", arg, newNode.ObjectType);
                 }
             }
         }
@@ -524,7 +547,8 @@ namespace BlueprintEditorPlugin.Utils
                 (ConnectionRealm.Server, ConnectionRealm.NetworkedClient),
                 (ConnectionRealm.NetworkedClient, ConnectionRealm.Client),
                 (ConnectionRealm.Client, ConnectionRealm.NetworkedClient),
-                (ConnectionRealm.Client, ConnectionRealm.ClientAndServer)
+                (ConnectionRealm.Client, ConnectionRealm.ClientAndServer),
+                (ConnectionRealm.Server, ConnectionRealm.ClientAndServer)
             };
         
         public static bool RealmsAreValid(OutputViewModel source, InputViewModel target)

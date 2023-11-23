@@ -1,0 +1,6 @@
+Type = ConditionalTransformEntityData
+DisplayName = ConditionalTransform
+InputProperty = ValueIfTrue, ObjectRealm
+InputProperty = ValueIfFalse, ObjectRealm
+InputProperty = Condition, ObjectRealm
+OutputProperty = Output, ObjectRealm

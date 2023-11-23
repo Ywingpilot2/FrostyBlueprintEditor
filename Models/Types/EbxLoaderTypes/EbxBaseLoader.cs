@@ -115,9 +115,16 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
         public virtual void PopulateNodes(dynamic properties)
         {
             //Create object nodes
-            foreach (PointerRef ptr in properties.Objects) 
+            foreach (object obj in NodeEditor.EditedEbxAsset.Objects) 
             {
-                object obj = ptr.Internal;
+                if (obj == NodeEditor.EditedEbxAsset.RootObject) continue;
+
+                if (obj.GetType().Name == "InterfaceDescriptorData")
+                {
+                    NodeEditor.CreateInterfaceNodes(obj);
+                    continue;
+                }
+                
                 EntityNode node = GetNodeFromObject(obj);
                 if (NodeIdCache.ContainsKey(node.Guid))
                 {
@@ -125,13 +132,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
                 NodeIdCache.Add(node.Guid, NodeEditor.Nodes.IndexOf(node));
-            }
-            
-            PointerRef interfaceRef = (PointerRef)properties.Interface;
-            // Some blueprints might not have an interface
-            if(interfaceRef.Type != PointerRefType.Null)
-            {
-                NodeEditor.CreateInterfaceNodes(interfaceRef.Internal);
             }
         }
 
@@ -145,7 +145,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             foreach (dynamic propertyConnection in properties.PropertyConnections)
             {
                 //TODO: Update to check if external ref
-                if (propertyConnection.Source.Internal == null || propertyConnection.Target.Internal == null)
+                if ((propertyConnection.Source.Internal == null && propertyConnection.Source.Type != PointerRefType.External) 
+                    || (propertyConnection.Target.Internal == null && propertyConnection.Target.Type != PointerRefType.External))
                 {
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
@@ -254,7 +255,13 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             //Create event connections
             foreach (dynamic eventConnection in properties.EventConnections)
             {
-                if (eventConnection.Source.Internal == null || eventConnection.Target.Internal == null) continue;
+                //TODO: Update to check if external ref
+                if ((eventConnection.Source.Internal == null && eventConnection.Source.Type != PointerRefType.External) 
+                    || (eventConnection.Target.Internal == null && eventConnection.Target.Type != PointerRefType.External))
+                {
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
+                    continue;
+                }
 
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
@@ -356,7 +363,12 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             foreach (dynamic linkConnection in properties.LinkConnections)
             {
                 //TODO: Update to check if external ref
-                if (linkConnection.Source.Internal == null || linkConnection.Target.Internal == null) continue;
+                if ((linkConnection.Source.Internal == null && linkConnection.Source.Type != PointerRefType.External) 
+                    || (linkConnection.Target.Internal == null && linkConnection.Target.Type != PointerRefType.External))
+                {
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
+                    continue;
+                }
 
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;
@@ -433,10 +445,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     targetField = "self";
                 }
                         
-                InputViewModel targetInput =
-                    targetNode.GetInput(targetField, ConnectionType.Link, true);
-                OutputViewModel sourceOutput = sourceNode.GetOutput(sourceField,
-                    ConnectionType.Link, true);
+                InputViewModel targetInput = targetNode.GetInput(targetField, ConnectionType.Link, true);
+                OutputViewModel sourceOutput = sourceNode.GetOutput(sourceField, ConnectionType.Link, true);
                         
                 var connection = NodeEditor.Connect(sourceOutput, targetInput);
                 connection.Object = linkConnection;

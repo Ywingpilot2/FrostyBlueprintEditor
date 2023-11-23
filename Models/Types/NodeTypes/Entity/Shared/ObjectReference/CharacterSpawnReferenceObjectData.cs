@@ -25,9 +25,10 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
         public override ObservableCollection<OutputViewModel> Outputs { get; set; } =
             new ObservableCollection<OutputViewModel>()
             {
+                new OutputViewModel() {Title = "AlternativeSpawnPoints", Type = ConnectionType.Link},
+                new OutputViewModel() {Title = "Vehicle", Type = ConnectionType.Link},
                 new OutputViewModel() {Title = "OnSpawned", Type = ConnectionType.Event},
                 new OutputViewModel() {Title = "OnKilled", Type = ConnectionType.Event},
-                new OutputViewModel() {Title = "AlternativeSpawnPoints", Type = ConnectionType.Link}
             };
 
         public override void OnCreation()
@@ -42,7 +43,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 PointerRef templatePointer = Object.Template;
 
                 if (templatePointer.External.FileGuid == System.Guid.Empty) return;
-                EbxAssetEntry templateAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
+                EbxAssetEntry templateAssetEntry = App.AssetManager.GetEbxEntry(templatePointer.External.FileGuid);
                 Name = $"Character ({blueprintAssetEntry.Filename}, {templateAssetEntry.Filename})";
             }
         }

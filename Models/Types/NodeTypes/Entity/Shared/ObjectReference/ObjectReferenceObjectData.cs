@@ -49,7 +49,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             {
                 if (field.AccessType.ToString() == "FieldAccessType_Source") //Source
                 {
-                    this.Outputs.Add(new OutputViewModel()
+                    Outputs.Add(new OutputViewModel()
                     {
                         Title = field.Name,
                         Type = ConnectionType.Property
@@ -57,7 +57,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 }
                 else if (field.AccessType.ToString() == "FieldAccessType_Target") //Target
                 {
-                    this.Inputs.Add(new InputViewModel()
+                    Inputs.Add(new InputViewModel()
                     {
                         Title = field.Name,
                         Type = ConnectionType.Property,
@@ -66,13 +66,13 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 }
                 else //Source and Target
                 {
-                    this.Inputs.Add(new InputViewModel()
+                    Inputs.Add(new InputViewModel()
                     {
                         Title = field.Name,
                         Type = ConnectionType.Property,
                         PropertyConnectionType = PropertyType.Interface
                     });
-                    this.Outputs.Add(new OutputViewModel()
+                    Outputs.Add(new OutputViewModel()
                     {
                         Title = field.Name,
                         Type = ConnectionType.Property
@@ -84,7 +84,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
 
             foreach (dynamic inputEvent in ((dynamic)interfaceRef.Internal).InputEvents)
             {
-                this.Inputs.Add(new InputViewModel()
+                Inputs.Add(new InputViewModel()
                 {
                     Title = inputEvent.Name,
                     Type = ConnectionType.Event
@@ -94,7 +94,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             
             foreach (dynamic outputEvent in ((dynamic)interfaceRef.Internal).OutputEvents)
             {
-                this.Outputs.Add(new OutputViewModel()
+                Outputs.Add(new OutputViewModel()
                 {
                     Title = outputEvent.Name,
                     Type = ConnectionType.Event
@@ -104,7 +104,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 
             foreach (dynamic inputLink in ((dynamic)interfaceRef.Internal).InputLinks)
             {
-                this.Inputs.Add(new InputViewModel()
+                Inputs.Add(new InputViewModel()
                 {
                     Title = inputLink.Name,
                     Type = ConnectionType.Link
@@ -114,7 +114,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 
             foreach (dynamic outputLink in ((dynamic)interfaceRef.Internal).OutputLinks)
             {
-                this.Outputs.Add(new OutputViewModel()
+                Outputs.Add(new OutputViewModel()
                 {
                     Title = outputLink.Name,
                     Type = ConnectionType.Link
@@ -138,7 +138,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     else if (interfaceRef.Internal == connection.Target.Internal)
                     {
                         var helper = new PropertyFlagsHelper(connection.Flags);
-                        GetOutput((string)connection.SourceField.ToString(), ConnectionType.Property).Realm = helper.Realm;
+                        GetOutput((string)connection.TargetField.ToString(), ConnectionType.Property).Realm = helper.Realm;
                     }
                 }
             }

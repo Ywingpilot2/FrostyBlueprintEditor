@@ -1,0 +1,7 @@
+Type = AIUseCoverEntityData
+DisplayName = Use Cover
+InputEvent = Activate, Server
+InputEvent = Deactivate, Server
+OutputLink = Cover, Server
+OutputLink = Spawners, Server
+Documentation = This will when activated tell a character to try to move into cover until this is deactivated

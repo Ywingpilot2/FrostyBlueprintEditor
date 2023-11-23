@@ -1,0 +1,4 @@
+Type = EventSplitterEntityData
+DisplayName = Event Splitter
+InputEvent = Impulse, ObjectRealm
+OutputEvent = OnImpulse, ObjectRealm

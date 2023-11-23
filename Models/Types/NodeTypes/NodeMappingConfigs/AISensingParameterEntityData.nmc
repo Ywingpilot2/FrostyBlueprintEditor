@@ -1,0 +1,3 @@
+Type = AISensingParameterEntityData
+DisplayName = Sensing Parameter
+OutputLink = Spawners, Server

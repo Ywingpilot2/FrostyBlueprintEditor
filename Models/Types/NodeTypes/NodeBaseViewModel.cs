@@ -115,7 +115,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
                 }
                 
                 //Check if the hashes match
-                if (FrostySdk.Utils.HashString(input.Title).ToString() == name)
+                if (FrostySdk.Utils.HashString(input.Title).ToString("x8") == name.Replace("0x", "")
+                    || FrostySdk.Utils.HashString(name).ToString("x8") == input.Title.Replace("0x", ""))
                 {
                     return input;
                 }
@@ -150,7 +151,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
                 }
                 
                 //Check if the hashes match
-                if ($"0x{FrostySdk.Utils.HashString(output.Title):x8}" == name)
+                if (FrostySdk.Utils.HashString(output.Title).ToString("x8") == name.Replace("0x", "")
+                    || FrostySdk.Utils.HashString(name).ToString("x8") == output.Title.Replace("0x", ""))
                 {
                     return output;
                 }

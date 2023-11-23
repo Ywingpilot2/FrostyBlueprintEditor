@@ -1,0 +1,6 @@
+Type = EventGateEntityData
+DisplayName = Event Gate
+InputEvent = In, ObjectRealm
+InputEvent = Close, ObjectRealm
+InputEvent = Open, ObjectRealm
+OutputEvent = Out, ObjectRealm

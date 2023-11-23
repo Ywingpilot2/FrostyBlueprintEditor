@@ -1,0 +1,6 @@
+Type = ConditionalIntEntityData
+DisplayName = ConditionalInt
+InputProperty = Condition, ObjectRealm
+InputProperty = ValueIfTrue, ObjectRealm
+InputProperty = ValueIfFalse, ObjectRealm
+OutputProperty = Output, ObjectRealm

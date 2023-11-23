@@ -1,0 +1,5 @@
+﻿Type = AICombatBehaviorEntityData
+DisplayName = Combat Behavior
+OutputLink = Spawners, Server
+OutputLink = Vehicles, Server
+Documentation = This node modifies how a character behaves in combat

@@ -1,0 +1,10 @@
+Type = CompareIntEntityData
+DisplayName = Compare Int
+InputProperty = A, ObjectRealm
+InputProperty = B, ObjectRealm
+InputEvent = In, ObjectRealm
+OutputEvent = A>B, ObjectRealm
+OutputEvent = A<B, ObjectRealm
+OutputEvent = A<=B, ObjectRealm
+OutputEvent = A>=B, ObjectRealm
+OutputEvent = A=B, ObjectRealm
