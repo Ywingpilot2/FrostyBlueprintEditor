@@ -17,6 +17,8 @@ using BlueprintEditorPlugin.Utils;
 using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using FrostySdk.Ebx;
+using FrostySdk.IO;
 using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin.Windows
@@ -120,7 +122,7 @@ namespace BlueprintEditorPlugin.Windows
             
             //If this loader lacks an interface(e.g ScalableEmitterDocuments) we don't want to try and load the interface
             //So we check with the loader before adding the interface editor
-            if (_loader.HasInterface)
+            if (_loader.HasInterface && ((PointerRef)openedProperties.Interface).Type != PointerRefType.Null)
             {
                 _editor.InterfacePropertyGrid = new BlueprintPropertyGrid()
                 {
