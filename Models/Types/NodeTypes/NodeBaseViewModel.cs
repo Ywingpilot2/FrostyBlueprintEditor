@@ -85,7 +85,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         private void UpdateWidthAndHeight(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             //TODO: Adjust width and height for removed items
-            if (notifyCollectionChangedEventArgs.NewItems.Count == 0) return;
+            if (notifyCollectionChangedEventArgs.NewItems == null || notifyCollectionChangedEventArgs.NewItems.Count == 0) return;
             
             if (notifyCollectionChangedEventArgs.NewItems[0] is PortBaseModel port && port.DisplayName.Length * 1.3 > _width)
             {

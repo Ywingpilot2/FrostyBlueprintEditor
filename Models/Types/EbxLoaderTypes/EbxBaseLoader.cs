@@ -356,7 +356,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             foreach (dynamic linkConnection in properties.LinkConnections)
             {
                 //TODO: Update to check if external ref
-                if (linkConnection.Source.Internal == null || linkConnection.Target.Internal == null) continue; 
+                if (linkConnection.Source.Internal == null || linkConnection.Target.Internal == null) continue;
 
                 NodeBaseModel sourceNode = null;
                 NodeBaseModel targetNode = null;

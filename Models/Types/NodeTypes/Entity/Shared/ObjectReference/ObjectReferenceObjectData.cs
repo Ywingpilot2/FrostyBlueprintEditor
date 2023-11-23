@@ -1,5 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk.Ebx;
@@ -12,6 +15,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
     {
         public override string Name { get; set; } = "Object (null ref)";
         public override string ObjectType { get; set; } = "ObjectReferenceObjectData";
+        protected virtual string ShortName { get; set; } = "Object";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
             new ObservableCollection<InputViewModel>()
@@ -29,11 +33,18 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
             EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
 
-            Name = $"Object ({blueprintAssetEntry.Filename})";
+            Name = $"{ShortName} ({blueprintAssetEntry.Filename})";
 
             PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
-                           
-            //Populate interface outpts/inputs
+            AssetClassGuid interfaceGuid = ((dynamic)interfaceRef.Internal).GetInstanceGuid();
+            
+            //Flags
+            bool hasProperty = false;
+            bool hasEvent = false;
+            bool hasLink = false;
+
+            #region Populate interface outpts/inputs
+            
             foreach (dynamic field in ((dynamic)interfaceRef.Internal).Fields)
             {
                 if (field.AccessType.ToString() == "FieldAccessType_Source") //Source
@@ -49,7 +60,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     this.Inputs.Add(new InputViewModel()
                     {
                         Title = field.Name,
-                        Type = ConnectionType.Property
+                        Type = ConnectionType.Property,
+                        PropertyConnectionType = PropertyType.Interface
                     });
                 }
                 else //Source and Target
@@ -57,7 +69,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     this.Inputs.Add(new InputViewModel()
                     {
                         Title = field.Name,
-                        Type = ConnectionType.Property
+                        Type = ConnectionType.Property,
+                        PropertyConnectionType = PropertyType.Interface
                     });
                     this.Outputs.Add(new OutputViewModel()
                     {
@@ -65,6 +78,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                         Type = ConnectionType.Property
                     });
                 }
+
+                hasProperty = true;
             }
 
             foreach (dynamic inputEvent in ((dynamic)interfaceRef.Internal).InputEvents)
@@ -74,6 +89,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     Title = inputEvent.Name,
                     Type = ConnectionType.Event
                 });
+                hasEvent = true;
             }
             
             foreach (dynamic outputEvent in ((dynamic)interfaceRef.Internal).OutputEvents)
@@ -83,6 +99,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     Title = outputEvent.Name,
                     Type = ConnectionType.Event
                 });
+                hasEvent = true;
             }
                 
             foreach (dynamic inputLink in ((dynamic)interfaceRef.Internal).InputLinks)
@@ -92,6 +109,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     Title = inputLink.Name,
                     Type = ConnectionType.Link
                 });
+                hasLink = true;
             }
                 
             foreach (dynamic outputLink in ((dynamic)interfaceRef.Internal).OutputLinks)
@@ -101,7 +119,69 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     Title = outputLink.Name,
                     Type = ConnectionType.Link
                 });
-            }            
+                hasLink = true;
+            }
+
+            #endregion
+
+            #region Setup realms
+
+            if (hasProperty)
+            {
+                foreach (dynamic connection in ((dynamic)blueprint.RootObject).PropertyConnections)
+                {
+                    if (interfaceRef.Internal == connection.Source.Internal)
+                    {
+                        var helper = new PropertyFlagsHelper(connection.Flags);
+                        GetInput((string)connection.SourceField.ToString(), ConnectionType.Property).Realm = helper.Realm;
+                    }
+                    else if (interfaceRef.Internal == connection.Target.Internal)
+                    {
+                        var helper = new PropertyFlagsHelper(connection.Flags);
+                        GetOutput((string)connection.SourceField.ToString(), ConnectionType.Property).Realm = helper.Realm;
+                    }
+                }
+            }
+
+            if (hasEvent)
+            {
+                foreach (dynamic connection in ((dynamic)blueprint.RootObject).EventConnections)
+                {
+                    if (interfaceRef.Internal == connection.Source.Internal)
+                    {
+                        ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(connection.TargetType.ToString());
+                        GetInput((string)connection.SourceEvent.Name.ToString(), ConnectionType.Event).Realm = connectionRealm;
+                    }
+                    else if (interfaceRef.Internal == connection.Target.Internal)
+                    {
+                        ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(connection.TargetType.ToString());
+                        GetOutput((string)connection.TargetEvent.Name.ToString(), ConnectionType.Event).Realm = connectionRealm;
+                    }
+                }
+            }
+
+            if (hasLink)
+            {
+                foreach (dynamic connection in ((dynamic)blueprint.RootObject).LinkConnections)
+                {
+                    if (interfaceRef.Internal != connection.Target.Internal) continue;
+                    
+                    Type objType = connection.Source.Internal.GetType();
+                    if (objType.GetProperty("Flags") == null) continue;
+                        
+                    var helper = new ObjectFlagsHelper((uint)connection.Source.Internal.Flags);
+                    if (helper.ClientLinkSource)
+                    {
+                        GetOutput((string)connection.TargetField.ToString(), ConnectionType.Link).Realm = ConnectionRealm.Client;
+                    }
+                    else if (helper.ServerLinkSource)
+                    {
+                        GetOutput((string)connection.TargetField.ToString(), ConnectionType.Link).Realm = ConnectionRealm.Server;
+                    }
+                }
+            }
+
+            #endregion
         }
 
         public override void OnModified(ItemModifiedEventArgs args)
@@ -115,11 +195,24 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
                     EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
 
-                    Name = $"LogicPrefab ({blueprintAssetEntry.Filename})";
+                    Name = $"{ShortName} ({blueprintAssetEntry.Filename})";
 
                     PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
-                           
-                    //Populate interface outpts/inputs
+                    
+                    //Clear out our original inputs/outputs
+                    foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(this))
+                    {
+                        EditorUtils.CurrentEditor.Disconnect(connection);
+                    }
+                    Inputs.Clear();
+                    Outputs.Clear();
+                    
+                    bool hasProperty = false;
+                    bool hasEvent = false;
+                    bool hasLink = false;
+
+                    #region Populate interface outpts/inputs
+                    
                     foreach (dynamic field in ((dynamic)interfaceRef.Internal).Fields)
                     {
                         if (field.AccessType.ToString() == "FieldAccessType_Source") //Source
@@ -156,6 +249,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                                 Type = ConnectionType.Property
                             });
                         }
+
+                        hasProperty = true;
                     }
 
                     foreach (dynamic inputEvent in ((dynamic)interfaceRef.Internal).InputEvents)
@@ -166,6 +261,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                             Title = inputEvent.Name,
                             Type = ConnectionType.Event
                         });
+
+                        hasEvent = true;
                     }
             
                     foreach (dynamic outputEvent in ((dynamic)interfaceRef.Internal).OutputEvents)
@@ -176,6 +273,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                             Title = outputEvent.Name,
                             Type = ConnectionType.Event
                         });
+
+                        hasEvent = true;
                     }
                 
                     foreach (dynamic inputLink in ((dynamic)interfaceRef.Internal).InputLinks)
@@ -186,6 +285,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                             Title = inputLink.Name,
                             Type = ConnectionType.Link
                         });
+
+                        hasLink = true;
                     }
 
                     foreach (dynamic outputLink in ((dynamic)interfaceRef.Internal).OutputLinks)
@@ -196,7 +297,70 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                             Title = outputLink.Name,
                             Type = ConnectionType.Link
                         });
+                        
+                        hasLink = true;
                     }
+
+                    #endregion
+
+                    #region Setup realms
+
+                    if (hasProperty)
+                    {
+                        foreach (dynamic connection in ((dynamic)blueprint.RootObject).PropertyConnections)
+                        {
+                            if (interfaceRef.Internal == connection.Source.Internal)
+                            {
+                                var helper = new PropertyFlagsHelper(connection.Flags);
+                                GetInput((string)connection.SourceField.ToString(), ConnectionType.Property).Realm = helper.Realm;
+                            }
+                            else if (interfaceRef.Internal == connection.Target.Internal)
+                            {
+                                var helper = new PropertyFlagsHelper(connection.Flags);
+                                GetOutput((string)connection.TargetField.ToString(), ConnectionType.Property).Realm = helper.Realm;
+                            }
+                        }
+                    }
+
+                    if (hasEvent)
+                    {
+                        foreach (dynamic connection in ((dynamic)blueprint.RootObject).EventConnections)
+                        {
+                            if (interfaceRef.Internal == connection.Source.Internal)
+                            {
+                                ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(connection.TargetType.ToString());
+                                GetInput((string)connection.SourceEvent.Name.ToString(), ConnectionType.Event).Realm = connectionRealm;
+                            }
+                            else if (interfaceRef.Internal == connection.Target.Internal)
+                            {
+                                ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(connection.TargetType.ToString());
+                                GetOutput((string)connection.TargetEvent.Name.ToString(), ConnectionType.Event).Realm = connectionRealm;
+                            }
+                        }
+                    }
+
+                    if (hasLink)
+                    {
+                        foreach (dynamic connection in ((dynamic)blueprint.RootObject).LinkConnections)
+                        {
+                            if (interfaceRef.Internal != connection.Target.Internal) continue;
+                    
+                            Type objType = connection.Source.Internal.GetType();
+                            if (objType.GetProperty("Flags") == null) continue;
+                        
+                            var helper = new ObjectFlagsHelper((uint)connection.Source.Internal.Flags);
+                            if (helper.ClientLinkSource)
+                            {
+                                GetOutput((string)connection.TargetField.ToString(), ConnectionType.Link).Realm = ConnectionRealm.Client;
+                            }
+                            else if (helper.ServerLinkSource)
+                            {
+                                GetOutput((string)connection.TargetField.ToString(), ConnectionType.Link).Realm = ConnectionRealm.Server;
+                            }
+                        }
+                    }
+
+                    #endregion
                 } break;
             }
         }
