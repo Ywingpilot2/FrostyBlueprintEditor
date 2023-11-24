@@ -275,9 +275,8 @@ namespace BlueprintEditorPlugin.Models.Connections
             PointerRef targetA = Object.Target;
             PointerRef targetB = connectionB.Target;
 
-            if (((dynamic)sourceA.Internal).GetInstanceGuid() == ((dynamic)sourceB.Internal).GetInstanceGuid()
-                && ((dynamic)targetA.Internal).GetInstanceGuid() == ((dynamic)targetB.Internal).GetInstanceGuid()
-                && sourceA.Internal.GetType().ToString() == sourceB.Internal.GetType().ToString())
+            if (targetA == targetB
+                && sourceA == sourceB)
             {
                 switch (Type)
                 {

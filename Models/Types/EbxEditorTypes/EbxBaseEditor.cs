@@ -12,6 +12,8 @@ using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
+using FrostySdk.IO;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
 {
@@ -94,7 +96,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         public virtual void RemoveNodeObject(EntityNode nodeToRemove)
         {
             List<PointerRef> pointerRefs = NodeEditor.EditedProperties.Objects;
-            pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == nodeToRemove.Guid);
+            pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == nodeToRemove.InternalGuid);
             NodeEditor.EditedEbxAsset.RemoveObject(nodeToRemove.Object);
         }
 
@@ -165,9 +167,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 }
                                 
                                 connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                                EditEbx(connection.TargetNode.Object,
-                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
-                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                                EditEbxFlags((EntityNode)connection.TargetNode);
                             }
                             break;
                         }
@@ -213,9 +213,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 }
                                 
                                 connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                                EditEbx(connection.TargetNode.Object,
-                                    new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
-                                        new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                                EditEbxFlags((EntityNode)connection.TargetNode);
                             }
                             break;
                         }
@@ -249,8 +247,9 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         dynamic eventConnection = TypeLibrary.CreateObject("EventConnection");
 
-                        eventConnection.Source = new PointerRef(connection.SourceNode.Object);
-                        eventConnection.Target = new PointerRef(connection.TargetNode.Object);
+                        eventConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).FileGuid});
+                        eventConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).FileGuid});
+                        
                         eventConnection.SourceEvent.Name = connection.SourceField;
                         eventConnection.TargetEvent.Name = connection.TargetField;
                         
@@ -343,9 +342,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
                         {
                             connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                            EditEbx(connection.TargetNode.Object,
-                                new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
-                                    new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                            EditEbxFlags((EntityNode)connection.TargetNode);
                         }
                         
                         ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections.Add(eventConnection);
@@ -356,8 +353,9 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         dynamic propertyConnection = TypeLibrary.CreateObject("PropertyConnection");
 
-                        propertyConnection.Source = new PointerRef(connection.SourceNode.Object);
-                        propertyConnection.Target = new PointerRef(connection.TargetNode.Object);
+                        propertyConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).FileGuid});
+                        propertyConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).FileGuid});
+                        
                         propertyConnection.SourceField = connection.SourceField;
                         propertyConnection.TargetField = connection.TargetField;
                         
@@ -466,9 +464,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
                         {
                             connection.TargetNode.Object.Flags = objectFlagsHelper.GetAsFlags();
-                            EditEbx(connection.TargetNode.Object,
-                                new ItemModifiedEventArgs(null, null, connection.TargetNode.Object,
-                                    new ItemModifiedTypeArgs(ItemModifiedTypes.Assign, 0))); //We call EditEbx so that it can handle the editing of the ObjectFlags for us
+                            EditEbxFlags((EntityNode)connection.TargetNode);
                         }
 
                         ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections.Add(propertyConnection);
@@ -479,8 +475,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         dynamic linkConnection = TypeLibrary.CreateObject("LinkConnection");
 
-                        linkConnection.Source = new PointerRef(connection.SourceNode.Object);
-                        linkConnection.Target = new PointerRef(connection.TargetNode.Object);
+                        linkConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).FileGuid});
+                        linkConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).FileGuid});
                     
                         if (connection.SourceField != "self")
                         {
@@ -518,17 +514,16 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         /// It is one of the most important parts of the EbxEditor, ensuring that the Nodes, Property grid, and the actual Ebx stay in sync.
         /// </summary>
         /// <param name="newObj"></param>
+        /// <param name="args"></param>
         public virtual bool EditEbx(object newObj, ItemModifiedEventArgs args)
         {
             if (newObj.GetType().Name != "InterfaceDescriptorData" && newObj.GetType().Name != "DataField" && newObj.GetType().Name != "DynamicEvent" && newObj.GetType().Name != "DynamicLink")
             {
-                dynamic nodeProperties = newObj;
-                AssetClassGuid nodeGuid = nodeProperties.GetInstanceGuid();
-                NodeBaseModel node = NodeEditor.GetNode(nodeGuid);
-                node.Object = newObj;
-                node.Name = node.Object.__Id.ToString();
-                if (args.Item != null)
+                if (NodeEditor.SelectedNodes[0] is EntityNode)
                 {
+                    EntityNode node = NodeEditor.SelectedNodes[0] as EntityNode;
+                    node.Object = newObj;
+                    node.Name = node.Object.__Id.ToString();
                     node.OnModified(args);
                     if (args.Item.Name == "Realm")
                     {
@@ -537,16 +532,38 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                             connection.ConnectionStatus = !NodeUtils.RealmsAreValid(connection) ? EditorStatus.Error : EditorStatus.Good;
                         }
                     }
-                }
-            
-                //TODO: Update this so we aren't enumerating over every single object in the entire file
-                for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
-                {
-                    PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
-                    if (((dynamic)pointerRef.Internal).GetInstanceGuid() == nodeGuid)
+                    
+                    switch (node.PointerRefType)
                     {
-                        NodeEditor.EditedProperties.Objects[i] = new PointerRef(newObj);
-                        return true;
+                        case PointerRefType.Internal:
+                        {
+                            //TODO: Update this so we aren't enumerating over every single object in the entire file
+                            for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
+                            {
+                                PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
+                                if (((dynamic)pointerRef.Internal).GetInstanceGuid() != node.InternalGuid) continue;
+                                
+                                NodeEditor.EditedProperties.Objects[i] = new PointerRef(newObj);
+                                return true;
+                            }
+                        } break;
+                        case PointerRefType.External:
+                        {
+                            EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
+                            EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+
+                            object obj = asset.Objects.FirstOrDefault(assetObject => ((dynamic)assetObject).GetInstanceGuid() == node.InternalGuid);
+                            
+                            //Hacky way to dynamically set the values
+                            for (var index = 0; index < obj.GetType().GetProperties().Length; index++)
+                            {
+                                PropertyInfo property = obj.GetType().GetProperties()[index];
+                                if (!property.CanWrite) continue;
+                                property.SetValue(obj, newObj.GetType().GetProperty(property.Name).GetValue(newObj));
+                            }
+
+                            App.AssetManager.ModifyEbx(assetEntry.Name, asset);
+                        } break;
                     }
                 }
 
@@ -735,6 +752,42 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
             }
 
             return false;
+        }
+
+        private void EditEbxFlags(EntityNode node)
+        {
+            switch (node.PointerRefType)
+            {
+                case PointerRefType.Internal:
+                {
+                    //TODO: Update this so we aren't enumerating over every single object in the entire file
+                    for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
+                    {
+                        PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
+                        if (((dynamic)pointerRef.Internal).GetInstanceGuid() != node.InternalGuid) continue;
+                                
+                        NodeEditor.EditedProperties.Objects[i] = new PointerRef(node.Object);
+                        return;
+                    }
+                } break;
+                case PointerRefType.External:
+                {
+                    EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
+                    EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+
+                    object obj = asset.Objects.FirstOrDefault(assetObject => ((dynamic)assetObject).GetInstanceGuid() == node.InternalGuid);
+                            
+                    //Hacky way to dynamically set the values
+                    for (var index = 0; index < obj.GetType().GetProperties().Length; index++)
+                    {
+                        PropertyInfo property = obj.GetType().GetProperties()[index];
+                        if (!property.CanWrite) continue;
+                        property.SetValue(obj, node.Object.GetType().GetProperty(property.Name).GetValue(node.Object));
+                    }
+
+                    App.AssetManager.ModifyEbx(assetEntry.Name, asset);
+                } break;
+            }
         }
     }
 }

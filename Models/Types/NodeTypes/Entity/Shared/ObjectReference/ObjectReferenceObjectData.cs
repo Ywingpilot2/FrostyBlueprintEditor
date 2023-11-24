@@ -29,6 +29,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
         public override void OnCreation()
         {
             PointerRef ptr = Object.Blueprint;
+            if (ptr.Type == PointerRefType.Null) return;
 
             EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
             EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
@@ -190,15 +191,6 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             {
                 case "Blueprint":
                 {
-                    PointerRef ptr = Object.Blueprint;
-
-                    EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
-                    EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
-
-                    Name = $"{ShortName} ({blueprintAssetEntry.Filename})";
-
-                    PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
-                    
                     //Clear out our original inputs/outputs
                     foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(this))
                     {
@@ -207,6 +199,21 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     Inputs.Clear();
                     Outputs.Clear();
                     
+                    PointerRef ptr = Object.Blueprint;
+
+                    if (ptr.Type == PointerRefType.Null)
+                    {
+                        Name = $"{ShortName} (null ref)";
+                        return;
+                    }
+
+                    EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
+                    EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
+
+                    Name = $"{ShortName} ({blueprintAssetEntry.Filename})";
+
+                    PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
+
                     bool hasProperty = false;
                     bool hasEvent = false;
                     bool hasLink = false;

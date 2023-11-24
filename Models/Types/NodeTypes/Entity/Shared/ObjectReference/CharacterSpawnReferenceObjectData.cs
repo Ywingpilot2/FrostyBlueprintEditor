@@ -59,7 +59,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 case "Template":
                 {
                     PointerRef ptr = Object.Blueprint;
-                    if (ptr.External.FileGuid == System.Guid.Empty) return;
+                    if (ptr.Type == PointerRefType.Null) return;
             
                     EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
                     PointerRef templatePointer = Object.Template;

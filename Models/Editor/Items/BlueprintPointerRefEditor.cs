@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Controls;
 using Frosty.Core;
@@ -303,7 +304,18 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
                     // otherwise a new guid
                     if (!guid.IsExported)
                     {
-                        EbxAssetEntry asset = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid);
+                        EbxAssetEntry asset;
+                
+                        //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
+                        if (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType == PointerRefType.Internal)
+                        {
+                            asset = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid);
+                        }
+                        else
+                        {
+                            EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
+                            asset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                        }
 
                         // set internal id to -1 so it will be set on adding to asset
                         guid = new AssetClassGuid(FrostySdk.Utils.GenerateDeterministicGuid(EditorUtils.CurrentEditor.EditedEbxAsset.Objects, selectedType, asset.Guid), -1);
@@ -320,7 +332,18 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
                     }
 
                     // add it to the list of objects so it can be assigned places
-                    EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(newValue.Internal);
+                    if (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType == PointerRefType.Internal)
+                    {
+                        EditorUtils.CurrentEditor.EditedEbxAsset.AddObject(newValue.Internal);
+                    }
+                    else
+                    {
+                        EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        
+                        asset.AddObject(newValue.Internal);
+                    }
                     Value = newValue;
                 }
             }
@@ -382,7 +405,20 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
                     FileGuid = assignFileGuid,
                     ClassGuid = guid.ExportedGuid
                 };
-                EditorUtils.CurrentEditor.EditedEbxAsset.AddDependency(reference.FileGuid);
+                
+                //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
+                if (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType == PointerRefType.Internal)
+                {
+                    EditorUtils.CurrentEditor.EditedEbxAsset.AddDependency(reference.FileGuid);
+                }
+                else
+                {
+                    EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
+                    EbxAssetEntry asset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                    EbxAsset ebx = App.AssetManager.GetEbx(asset);
+
+                    ebx.AddDependency(reference.FileGuid);
+                }
                 Value = new PointerRef(reference);
             }
         }
@@ -457,7 +493,18 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
                 return;
 
             // selected asset is the same as the editing one
-            EbxAssetEntry currentAsset = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid);
+            EbxAssetEntry currentAsset;
+            
+            if (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType == PointerRefType.Internal)
+            {
+                currentAsset = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.FileGuid);
+            }
+            else
+            {
+                EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
+                currentAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
+            }
+            
             isInternal = selectedAsset == currentAsset;
             if (isInternal)
                 return;
@@ -504,7 +551,19 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
                     FileGuid = assignFileGuid,
                     ClassGuid = guid.ExportedGuid
                 };
-                EditorUtils.CurrentEditor.EditedEbxAsset.AddDependency(reference.FileGuid);
+                
+                if (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType == PointerRefType.Internal)
+                {
+                    EditorUtils.CurrentEditor.EditedEbxAsset.AddDependency(reference.FileGuid);
+                }
+                else
+                {
+                    EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
+                    EbxAssetEntry nodeAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                    EbxAsset ebx = App.AssetManager.GetEbx(nodeAsset);
+
+                    ebx.AddDependency(reference.FileGuid);
+                }
                 Value = new PointerRef(reference);
             }
             else
@@ -549,7 +608,19 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
             if (pointerRef.Type == PointerRefType.External)
             {
                 EbxAssetEntry entry = App.AssetManager.GetEbxEntry(pointerRef.External.FileGuid);
-                EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
+                EbxAssetEntry assetEntry; // = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
+                
+                //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
+                if (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType == PointerRefType.Internal)
+                {
+                    assetEntry = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
+                }
+                else
+                {
+                    EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
+                    EbxAsset nodeAsset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(node.FileGuid));
+                    assetEntry = App.AssetManager.GetEbxEntry(nodeAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
+                }
                 EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
 
                 if (entry != null)

@@ -10,6 +10,7 @@ using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
 {
@@ -36,7 +37,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
         /// <summary>
         /// Contains a list of AssetClassGuid's and the EditorViewModel.Nodes[] index
         /// </summary>
-        public Dictionary<AssetClassGuid, int> NodeIdCache = new Dictionary<AssetClassGuid, int>();
+        private Dictionary<AssetClassGuid, int> _nodeIdCache = new Dictionary<AssetClassGuid, int>();
 
         /// <summary>
         /// This method is used to fill the Types list with types
@@ -84,7 +85,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 newNode.Name = ((dynamic)obj).__Id.ToString(); //Set the name to be the nodes __Id
             }
             
-            newNode.Guid = ((dynamic)obj).GetInstanceGuid();
+            newNode.InternalGuid = ((dynamic)obj).GetInstanceGuid();
             newNode.OnCreation();
 
             //Add the realm to the port names(if they do not already have it)
@@ -126,12 +127,12 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 }
                 
                 EntityNode node = GetNodeFromObject(obj);
-                if (NodeIdCache.ContainsKey(node.Guid))
+                if (_nodeIdCache.ContainsKey(node.InternalGuid))
                 {
-                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{node.Guid}_identical"), $"Multiple nodes share the guid {node.Guid}");
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{node.InternalGuid}_identical"), $"Multiple nodes share the guid {node.InternalGuid}");
                     continue;
                 }
-                NodeIdCache.Add(node.Guid, NodeEditor.Nodes.IndexOf(node));
+                _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
             }
         }
 
@@ -152,58 +153,120 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
 
-                NodeBaseModel sourceNode = null;
-                NodeBaseModel targetNode = null;
+                EntityNode sourceNode = null;
+                EntityNode targetNode = null;
 
-                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
-                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
+                PointerRef source = propertyConnection.Source;
+                PointerRef target = propertyConnection.Target;
 
-                //First check if the the node is an interface node
-                if (((dynamic)propertyConnection.Source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                switch (source.Type)
                 {
-                    if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(propertyConnection.SourceField.ToString()))
+                    case PointerRefType.Internal:
                     {
-                        sourceNode = NodeEditor.InterfaceOutputDataNodes[propertyConnection.SourceField.ToString()];
+                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
+
+                        //First check if the the node is an interface node
+                        if (((dynamic)source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                        {
+                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(propertyConnection.SourceField.ToString()))
+                            {
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes[propertyConnection.SourceField.ToString()];
+                            }
+                            else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
+                                         FrostySdk.Utils.HashString(x.Key)
+                                         == 
+                                         propertyConnection.SourceFieldId))
+                            {
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == propertyConnection.SourceField.ToString()).Value;
+                            }
+                            else
+                            {
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{propertyConnection.SourceField.ToString()}_missing"), $"The interface node {propertyConnection.SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                            }
+                        }
+                        else
+                        {
+                            sourceNode = NodeEditor.Nodes[_nodeIdCache[sourceGuid]] as EntityNode;
+                            sourceNode.PointerRefType = PointerRefType.Internal;
+                        }
+
+                        break;
                     }
-                    else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
-                                 FrostySdk.Utils.HashString(x.Key)
-                                 == 
-                                 propertyConnection.SourceFieldId))
+                    case PointerRefType.External:
                     {
-                        sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == propertyConnection.SourceField.ToString()).Value;
-                    }
-                    else
-                    {
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{propertyConnection.SourceField.ToString()}_missing"), $"The interface node {propertyConnection.SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(source.External.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        dynamic obj = asset.GetObject(source.External.ClassGuid);
+                    
+                        if (_nodeIdCache.ContainsKey(obj.GetInstanceGuid()))
+                        {
+                            sourceNode = NodeEditor.Nodes[_nodeIdCache[obj.GetInstanceGuid()]];
+                            break;
+                        }
+                        
+                        EntityNode node = GetNodeFromObject(obj);
+                        _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
+                        node.PointerRefType = PointerRefType.External;
+                        
+                        node.FileGuid = source.External.FileGuid;
+                        node.ClassGuid = source.External.ClassGuid;
+                        sourceNode = node;
+                        break;
                     }
                 }
-                else
-                {
-                    sourceNode = NodeEditor.Nodes[NodeIdCache[sourceGuid]];
-                }
 
+                switch (target.Type)
+                {
+                    case PointerRefType.Internal:
+                    {
+                        AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
+                        if (((dynamic)target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                        {
+                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(propertyConnection.TargetField.ToString()))
+                            {
+                                targetNode = NodeEditor.InterfaceInputDataNodes[propertyConnection.TargetField.ToString()];
+                            }
+                            else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
+                                         FrostySdk.Utils.HashString(x.Key)
+                                         == 
+                                         propertyConnection.TargetFieldId))
+                            {
+                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == propertyConnection.TargetFieldId).Value;
+                            }
+                            else
+                            {
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{propertyConnection.TargetField.ToString()}_missing"), $"The interface node {propertyConnection.TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                            }
+                        }
+                        else
+                        {
+                            targetNode = NodeEditor.Nodes[_nodeIdCache[targetGuid]] as EntityNode;
+                            targetNode.PointerRefType = PointerRefType.Internal;
+                        }
 
-                if (((dynamic)propertyConnection.Target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
-                {
-                    if (NodeEditor.InterfaceInputDataNodes.ContainsKey(propertyConnection.TargetField.ToString()))
-                    {
-                        targetNode = NodeEditor.InterfaceInputDataNodes[propertyConnection.TargetField.ToString()];
+                        break;
                     }
-                    else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
-                                 FrostySdk.Utils.HashString(x.Key)
-                                 == 
-                                 propertyConnection.TargetFieldId))
+                    case PointerRefType.External:
                     {
-                        targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == propertyConnection.TargetFieldId).Value;
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(target.External.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        dynamic obj = asset.GetObject(target.External.ClassGuid);
+                    
+                        if (_nodeIdCache.ContainsKey(obj.GetInstanceGuid()))
+                        {
+                            targetNode = NodeEditor.Nodes[_nodeIdCache[obj.GetInstanceGuid()]];
+                            break;
+                        }
+                        
+                        EntityNode node = GetNodeFromObject(obj);
+                        _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
+                        node.PointerRefType = PointerRefType.External;
+                        
+                        node.FileGuid = target.External.FileGuid;
+                        node.ClassGuid = target.External.ClassGuid;
+                        targetNode = node;
+                        break;
                     }
-                    else
-                    {
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{propertyConnection.TargetField.ToString()}_missing"), $"The interface node {propertyConnection.TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
-                    }
-                }
-                else
-                {
-                    targetNode = NodeEditor.Nodes[NodeIdCache[targetGuid]];
                 }
 
                 //We encountered an error
@@ -263,57 +326,120 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
 
-                NodeBaseModel sourceNode = null;
-                NodeBaseModel targetNode = null;
+                EntityNode sourceNode = null;
+                EntityNode targetNode = null;
 
-                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
-                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
+                PointerRef source = eventConnection.Source;
+                PointerRef target = eventConnection.Target;
 
-                //First check if the the node is an interface node
-                if (((dynamic)eventConnection.Source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                switch (source.Type)
                 {
-                    if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(eventConnection.SourceEvent.Name.ToString()))
+                    case PointerRefType.Internal:
                     {
-                        sourceNode = NodeEditor.InterfaceOutputDataNodes[eventConnection.SourceEvent.Name.ToString()];
+                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
+
+                        //First check if the the node is an interface node
+                        if (((dynamic)source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                        {
+                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(eventConnection.SourceEvent.Name.ToString()))
+                            {
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes[eventConnection.SourceEvent.Name.ToString()];
+                            }
+                            else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
+                                         FrostySdk.Utils.HashString(x.Key)
+                                         == 
+                                         eventConnection.SourceFieldId))
+                            {
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == eventConnection.SourceEvent.Id).Value;
+                            }
+                            else
+                            {
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{eventConnection.SourceEvent.Name.ToString()}_missing"), $"The interface node {eventConnection.SourceEvent.Name.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                            }
+                        }
+                        else
+                        {
+                            sourceNode = NodeEditor.Nodes[_nodeIdCache[sourceGuid]] as EntityNode;
+                            sourceNode.PointerRefType = PointerRefType.Internal;
+                        }
+
+                        break;
                     }
-                    else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
-                                 FrostySdk.Utils.HashString(x.Key)
-                                 == 
-                                 eventConnection.SourceEvent.Id))
+                    case PointerRefType.External:
                     {
-                        sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == eventConnection.SourceEvent.Id).Value;
-                    }
-                    else
-                    {
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{eventConnection.SourceEvent.Name.ToString()}_missing"), $"The interface node {eventConnection.SourceEvent.Name.ToString()} does not exist, yet is referenced in the Event Connections of this ebx. Some connections might be missing as a result");
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(source.External.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        dynamic obj = asset.GetObject(source.External.ClassGuid);
+                    
+                        if (_nodeIdCache.ContainsKey(obj.GetInstanceGuid()))
+                        {
+                            sourceNode = NodeEditor.Nodes[_nodeIdCache[obj.GetInstanceGuid()]];
+                            break;
+                        }
+                        
+                        EntityNode node = GetNodeFromObject(obj);
+                        _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
+                        node.PointerRefType = PointerRefType.External;
+                        
+                        node.FileGuid = source.External.FileGuid;
+                        node.ClassGuid = source.External.ClassGuid;
+                        sourceNode = node;
+                        break;
                     }
                 }
-                else
-                {
-                    sourceNode = NodeEditor.Nodes[NodeIdCache[sourceGuid]];
-                }
 
-                if (((dynamic)eventConnection.Target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                switch (target.Type)
                 {
-                    if (NodeEditor.InterfaceInputDataNodes.ContainsKey(eventConnection.TargetEvent.Name.ToString()))
+                    case PointerRefType.Internal:
                     {
-                        targetNode = NodeEditor.InterfaceInputDataNodes[eventConnection.TargetEvent.Name.ToString()];
+                        AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
+                        if (((dynamic)target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                        {
+                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(eventConnection.TargetEvent.Name.ToString()))
+                            {
+                                targetNode = NodeEditor.InterfaceInputDataNodes[eventConnection.TargetEvent.Name.ToString()];
+                            }
+                            else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
+                                         FrostySdk.Utils.HashString(x.Key)
+                                         == 
+                                         eventConnection.TargetFieldId))
+                            {
+                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == eventConnection.TargetEvent.Id).Value;
+                            }
+                            else
+                            {
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{eventConnection.TargetEvent.Name.ToString()}_missing"), $"The interface node {eventConnection.TargetEvent.Name.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                            }
+                        }
+                        else
+                        {
+                            targetNode = NodeEditor.Nodes[_nodeIdCache[targetGuid]] as EntityNode;
+                            targetNode.PointerRefType = PointerRefType.Internal;
+                        }
+
+                        break;
                     }
-                    else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
-                                 FrostySdk.Utils.HashString(x.Key)
-                                 == 
-                                 eventConnection.TargetEvent.Id))
+                    case PointerRefType.External:
                     {
-                        targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == eventConnection.TargetEvent.Id).Value;
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(target.External.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        dynamic obj = asset.GetObject(target.External.ClassGuid);
+                    
+                        if (_nodeIdCache.ContainsKey(obj.GetInstanceGuid()))
+                        {
+                            targetNode = NodeEditor.Nodes[_nodeIdCache[obj.GetInstanceGuid()]];
+                            break;
+                        }
+                        
+                        EntityNode node = GetNodeFromObject(obj);
+                        _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
+                        node.PointerRefType = PointerRefType.External;
+                        
+                        node.FileGuid = target.External.FileGuid;
+                        node.ClassGuid = target.External.ClassGuid;
+                        targetNode = node;
+                        break;
                     }
-                    else
-                    {
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{eventConnection.TargetEvent.Name.ToString()}_missing"), $"The interface node {eventConnection.TargetEvent.Name.ToString()} does not exist, yet is referenced in the Event Connections of this ebx. Some connections might be missing as a result");
-                    }
-                }
-                else
-                {
-                    targetNode = NodeEditor.Nodes[NodeIdCache[targetGuid]];
                 }
 
 
@@ -370,60 +496,121 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
 
-                NodeBaseModel sourceNode = null;
-                NodeBaseModel targetNode = null;
+                EntityNode sourceNode = null;
+                EntityNode targetNode = null;
+                
+                PointerRef source = linkConnection.Source;
+                PointerRef target = linkConnection.Target;
 
-                AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)linkConnection.Source.Internal).GetInstanceGuid();
-                AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
-
-                //First check if the the node is an interface node
-                if (((dynamic)linkConnection.Source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                switch (source.Type)
                 {
-                    if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(linkConnection.SourceField.ToString()))
+                    case PointerRefType.Internal:
                     {
-                        sourceNode = NodeEditor.InterfaceOutputDataNodes[linkConnection.SourceField.ToString()];
+                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)linkConnection.Source.Internal).GetInstanceGuid();
+
+                        //First check if the the node is an interface node
+                        if (((dynamic)source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                        {
+                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(linkConnection.SourceField.ToString()))
+                            {
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes[linkConnection.SourceField.ToString()];
+                            }
+                            else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
+                                         FrostySdk.Utils.HashString(x.Key)
+                                         == 
+                                         linkConnection.SourceFieldId))
+                            {
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == linkConnection.SourceField.ToString()).Value;
+                            }
+                            else
+                            {
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{linkConnection.SourceField.ToString()}_missing"), $"The interface node {linkConnection.SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                            }
+                        }
+                        else
+                        {
+                            sourceNode = NodeEditor.Nodes[_nodeIdCache[sourceGuid]] as EntityNode;
+                            sourceNode.PointerRefType = PointerRefType.Internal;
+                        }
+
+                        break;
                     }
-                    else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
-                                 FrostySdk.Utils.HashString(x.Key)
-                                 == 
-                                 linkConnection.SourceFieldId))
+                    case PointerRefType.External:
                     {
-                        sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == linkConnection.SourceFieldId).Value;
-                    }
-                    else
-                    {
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{linkConnection.SourceField.ToString()}_missing"), $"The interface node {linkConnection.SourceField.ToString()} does not exist, yet is referenced in the Link Connections of this ebx. Some connections might be missing as a result");
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(source.External.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        dynamic obj = asset.GetObject(source.External.ClassGuid);
+                    
+                        if (_nodeIdCache.ContainsKey(obj.GetInstanceGuid()))
+                        {
+                            sourceNode = NodeEditor.Nodes[_nodeIdCache[obj.GetInstanceGuid()]];
+                            break;
+                        }
+                        
+                        EntityNode node = GetNodeFromObject(obj);
+                        _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
+                        node.PointerRefType = PointerRefType.External;
+                        
+                        node.FileGuid = source.External.FileGuid;
+                        node.ClassGuid = source.External.ClassGuid;
+                        sourceNode = node;
+                        break;
                     }
                 }
-                else
-                {
-                    sourceNode = NodeEditor.Nodes[NodeIdCache[sourceGuid]];
-                }
 
-
-                if (((dynamic)linkConnection.Target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                switch (target.Type)
                 {
-                    if (NodeEditor.InterfaceInputDataNodes.ContainsKey(linkConnection.TargetField.ToString()))
+                    case PointerRefType.Internal:
                     {
-                        targetNode = NodeEditor.InterfaceInputDataNodes[linkConnection.TargetField.ToString()];
+                        AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
+                        if (((dynamic)target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
+                        {
+                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(linkConnection.TargetField.ToString()))
+                            {
+                                targetNode = NodeEditor.InterfaceInputDataNodes[linkConnection.TargetField.ToString()];
+                            }
+                            else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
+                                         FrostySdk.Utils.HashString(x.Key)
+                                         == 
+                                         linkConnection.TargetFieldId))
+                            {
+                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == linkConnection.TargetFieldId).Value;
+                            }
+                            else
+                            {
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{linkConnection.TargetField.ToString()}_missing"), $"The interface node {linkConnection.TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                            }
+                        }
+                        else
+                        {
+                            targetNode = NodeEditor.Nodes[_nodeIdCache[targetGuid]] as EntityNode;
+                            targetNode.PointerRefType = PointerRefType.Internal;
+                        }
+
+                        break;
                     }
-                    else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
-                                 FrostySdk.Utils.HashString(x.Key) 
-                                 == 
-                                 linkConnection.TargetFieldId))
+                    case PointerRefType.External:
                     {
-                        targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == linkConnection.TargetFieldId).Value;
-                    }
-                    else
-                    {
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{linkConnection.TargetField.ToString()}_missing"), $"The interface node {linkConnection.TargetField.ToString()} does not exist, yet is referenced in the Link Connections of this ebx. Some connections might be missing as a result");
+                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(target.External.FileGuid);
+                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        dynamic obj = asset.GetObject(target.External.ClassGuid);
+                    
+                        if (_nodeIdCache.ContainsKey(obj.GetInstanceGuid()))
+                        {
+                            targetNode = NodeEditor.Nodes[_nodeIdCache[obj.GetInstanceGuid()]];
+                            break;
+                        }
+                        
+                        EntityNode node = GetNodeFromObject(obj);
+                        _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
+                        node.PointerRefType = PointerRefType.External;
+                        
+                        node.FileGuid = target.External.FileGuid;
+                        node.ClassGuid = target.External.ClassGuid;
+                        targetNode = node;
+                        break;
                     }
                 }
-                else
-                {
-                    targetNode = NodeEditor.Nodes[NodeIdCache[targetGuid]];
-                }
-
 
                 //We encountered an error
                 if (sourceNode == null || targetNode == null)

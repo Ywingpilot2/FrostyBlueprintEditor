@@ -606,7 +606,7 @@ namespace BlueprintEditorPlugin.Models.Editor
             Parallel.ForEach(Nodes, (node, state) =>
             {
                 EntityNode entityNode = node as EntityNode;
-                if (entityNode != null && entityNode.Guid == nodeGuid)
+                if (entityNode != null && entityNode.InternalGuid == nodeGuid)
                 {
                     got = entityNode;
                     state.Break();

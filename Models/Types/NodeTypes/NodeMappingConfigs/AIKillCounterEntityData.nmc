@@ -4,4 +4,4 @@ InputEvent = Enable, Server
 InputEvent = Disable, Server
 OutputProperty = Alive, Server
 OutputEvent = AliveThresholdTrigger, Server
-OutputLink = Spawners, Invalid
+OutputLink = Spawners, Server
