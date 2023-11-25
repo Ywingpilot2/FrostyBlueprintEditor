@@ -769,6 +769,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         NodeEditor.EditedProperties.Objects[i] = new PointerRef(node.Object);
                         return;
                     }
+                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(NodeEditor.EditedEbxAsset.FileGuid).Filename, NodeEditor.EditedEbxAsset);
                 } break;
                 case PointerRefType.External:
                 {
