@@ -67,6 +67,7 @@
     <None Remove="Images\AutoSortButton.png" />
     <Resource Include="Images\AutoSortButton.png" />
     <None Remove="Images\RemoveObjectButton.png" />
+    <Resource Include="Images\Refresh.png" />
     <Resource Include="Images\RemoveObjectButton.png" />
   </ItemGroup>
 

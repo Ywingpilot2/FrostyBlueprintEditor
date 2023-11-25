@@ -13,6 +13,7 @@ using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using Frosty.Controls;
 using Frosty.Core;
 using FrostySdk;
+using FrostySdk.Interfaces;
 
 namespace BlueprintEditorPlugin.Utils
 {
@@ -750,115 +751,149 @@ namespace BlueprintEditorPlugin.Utils
         }
 
         #endregion
-        
-        static NodeUtils()
+
+        #region Initialization & updating
+
+        public static void Initialize(ILogger logger = null)
         {
             NodeExtensions.Add("null", new EntityNode());
             foreach (var type in Assembly.GetCallingAssembly().GetTypes())
             {
+                logger?.Log("Loading node extensions...");
                 if (type.IsSubclassOf(typeof(EntityNode)))
                 {
-                    var extension = (EntityNode)Activator.CreateInstance(type);
-                    if ((extension.ValidForGames == null 
-                         || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName)) 
-                        && extension.ObjectType != null 
-                        && !NodeExtensions.ContainsKey(extension.ObjectType))
+                    try
                     {
-                        NodeExtensions.Add(extension.ObjectType, extension);
+                        var extension = (EntityNode)Activator.CreateInstance(type);
+                        if ((extension.ValidForGames == null 
+                             || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName)) 
+                            && extension.ObjectType != null 
+                            && !NodeExtensions.ContainsKey(extension.ObjectType))
+                        {
+                            NodeExtensions.Add(extension.ObjectType, extension);
+                        }
+                        else
+                        {
+                            App.Logger.LogError("Node Extension {0} is invalid, as its ObjectType was either null or is already taken.", extension.GetType().Name);
+                            logger?.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        App.Logger.LogError("Node Extension {0} is invalid, as its ObjectType was either null or is already taken.", extension.GetType().Name);
+                        logger?.LogError("Could not load node extension {0}", type.Name);
+                        App.Logger.LogError("Could not load node extension {0}", type.Name);
                     }
                 }
                 else if (type.IsSubclassOf(typeof(TransientNode)))
                 {
-                    var extension = (TransientNode)Activator.CreateInstance(type);
-                    if (extension.Name == null || NodeExtensions.ContainsKey(extension.Name))
+                    try
                     {
-                        App.Logger.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
-                        continue;
+                        var extension = (TransientNode)Activator.CreateInstance(type);
+                        if (extension.Name == null || NodeExtensions.ContainsKey(extension.Name))
+                        {
+                            logger?.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                            App.Logger.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                            continue;
+                        }
+                        NodeExtensions.Add(extension.Name, extension);
                     }
-                    NodeExtensions.Add(extension.Name, extension);
+                    catch (Exception e)
+                    {
+                        logger?.LogError("Could not load node extension {0}", type.Name);
+                        App.Logger.LogError("Could not load node extension {0}", type.Name);
+                    }
                 }
             }
             
-            //Check if the directory for nmc's exists
+            //If the nmc directory doesn't exist we create it
+            logger?.Log("Loading Node Mappings...");
             if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings"))
             {
                 Directory.CreateDirectory($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings");
+                logger?.LogWarning("Node Mappings directory did not exist and had to be created");
+                App.Logger.LogWarning("Node Mappings directory did not exist and had to be created");
             }
 
             //Read our xml-style NodeMappings
-            //TODO: try catch
             foreach (string file in Directory.GetFiles($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings", "*.nmc", SearchOption.AllDirectories))
             {
+                logger?.Log("Loading Node Mappings...");
                 StreamReader sr = new StreamReader(@file);
                 string type = null;
                 List<string> args = new List<string>();
                 
                 string currentLine = sr.ReadLine();
-                while (currentLine != null)
+                try
                 {
-                    switch (currentLine.Replace(" = ", "=").Split('=')[0])
+                    while (currentLine != null)
                     {
-                        case "Type":
+                        switch (currentLine.Replace(" = ", "=").Split('=')[0])
                         {
-                            type = currentLine.Replace(" = ", "=").Split('=')[1];
-                        } break;
-                        case "DisplayName":
-                        {
-                            args.Add(currentLine.Replace(" = ", "="));
-                        } break;
-                        case "InputEvent":
-                        {
-                            args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
-                        } break;
-                        case "InputProperty":
-                        {
-                            args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
-                        } break;
-                        case "InputLink":
-                        {
-                            args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
-                        } break;
-                        case "OutputEvent":
-                        {
-                            args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
-                        } break;
-                        case "OutputProperty":
-                        {
-                            args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
-                        } break;
-                        case "OutputLink":
-                        {
-                            args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
-                        } break;
-                        case "ValidGameExecutableName":
-                        {
-                            args.Add(currentLine.Replace(" = ", "="));
-                        } break;
-                        case "Documentation":
-                        {
-                            args.Add(currentLine.Replace(" = ", "="));
-                        } break;
-                        default:
-                        {
-                            App.Logger.LogError("{1} contains an invalid argument, {0}", currentLine, file);
-                        } break;
-                    }
+                            case "Type":
+                            {
+                                type = currentLine.Replace(" = ", "=").Split('=')[1];
+                            } break;
+                            case "DisplayName":
+                            {
+                                args.Add(currentLine.Replace(" = ", "="));
+                            } break;
+                            case "InputEvent":
+                            {
+                                args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
+                            } break;
+                            case "InputProperty":
+                            {
+                                args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
+                            } break;
+                            case "InputLink":
+                            {
+                                args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
+                            } break;
+                            case "OutputEvent":
+                            {
+                                args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
+                            } break;
+                            case "OutputProperty":
+                            {
+                                args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
+                            } break;
+                            case "OutputLink":
+                            {
+                                args.Add(currentLine.Replace(" = ", "=").Replace(", ", ","));
+                            } break;
+                            case "ValidGameExecutableName":
+                            {
+                                args.Add(currentLine.Replace(" = ", "="));
+                            } break;
+                            case "Documentation":
+                            {
+                                args.Add(currentLine.Replace(" = ", "="));
+                            } break;
+                            default:
+                            {
+                                App.Logger.LogError("{1} contains an invalid argument, {0}", currentLine, file);
+                            } break;
+                        }
 
-                    if (type != null 
-                        && !NmcExtensions.ContainsKey(type) 
-                        && (args.All(arg => arg.Split('=')[0] != "ValidGameExecutableName") 
-                            || args.Any(arg => arg == $"ValidGameExecutableName={ProfilesLibrary.ProfileName}")))
-                    {
-                        NmcExtensions.Add(type, args);
-                    }
+                        if (type != null 
+                            && !NmcExtensions.ContainsKey(type) 
+                            && (args.All(arg => arg.Split('=')[0] != "ValidGameExecutableName") 
+                                || args.Any(arg => arg == $"ValidGameExecutableName={ProfilesLibrary.ProfileName}")))
+                        {
+                            NmcExtensions.Add(type, args);
+                        }
 
-                    currentLine = sr.ReadLine();
+                        currentLine = sr.ReadLine();
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger?.LogError("line \"{0}\" in {1} is invalid", currentLine, file);
+                    App.Logger.LogError("line \"{0}\" in {1} is invalid", currentLine, file);
                 }
             }
         }
+
+        #endregion
     }
 }

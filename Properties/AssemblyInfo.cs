@@ -30,3 +30,4 @@ using BlueprintEditorPlugin.Options;
 [assembly: RegisterMenuExtension(typeof(ViewBlueprintMenuExtension))]
 [assembly: RegisterDataExplorerContextMenu(typeof(ViewBlueprintContextMenuItem))]
 [assembly: RegisterOptionsExtension(typeof(BlueprintEditorOptions))]
+[assembly: RegisterStartupAction(typeof(BlueprintEditorStartupAction))]
