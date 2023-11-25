@@ -234,7 +234,7 @@ namespace BlueprintEditorPlugin.Utils
                     y -= (y % 8);
                     node.Location = new Point(x, y);
 
-                    double curWidth = node.Width * 2;
+                    double curWidth = node.Name.Length * 2;
                     double curHeight = Math.Floor(((15 + node.Inputs.Count * 14) + 70.0) / 8.0) * 8.0;
 
                     y += curHeight + 56.0;

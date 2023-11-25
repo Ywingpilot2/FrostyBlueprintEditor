@@ -17,6 +17,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
     /// </summary>
     public class NodeBaseModel : INotifyPropertyChanged
     {
+        #region Node Display
+
         private string _name;
         /// <summary>
         /// The name that will be displayed
@@ -28,7 +30,6 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             {
                 _name = value;
                 NotifyPropertyChanged(nameof(Name));
-                NotifyPropertyChanged(nameof(Width)); //Need to update the width
             }
         }
 
@@ -39,6 +40,11 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
 
         public virtual SolidColorBrush HeaderColor { get; set; } =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3F3F3F"));
+
+        #endregion
+
+        #region Object Info
+
         public virtual string ObjectType { get; set; } = "null";
         public virtual bool IsTransient => false;
 
@@ -46,7 +52,11 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         /// The object this node belongs to.
         /// </summary>
         public dynamic Object { get; set; }
-        
+
+        #endregion
+
+        #region Node Info
+
         private Point _location;
 
         public Point Location
@@ -59,15 +69,25 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             get => _location;
         }
 
-        private double _width = 25;
-        public double Width
+        private bool _isSelected;
+
+        public bool IsSelected
         {
-            get => _width;
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                NotifyPropertyChanged(nameof(IsSelected));
+            }
         }
 
         public virtual ObservableCollection<InputViewModel> Inputs { get; set; } = new ObservableCollection<InputViewModel>();
         public virtual ObservableCollection<OutputViewModel> Outputs { get; set; } = new ObservableCollection<OutputViewModel>();
-        
+
+        #endregion
+
+        #region Property Changed
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(string propertyName)
@@ -75,24 +95,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public NodeBaseModel()
-        {
-            //We need to update the width and height of our nodes whenever we add a new Input/Output
-            Inputs.CollectionChanged += UpdateWidthAndHeight;
-            Outputs.CollectionChanged += UpdateWidthAndHeight;
-        }
-
-        private void UpdateWidthAndHeight(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
-        {
-            //TODO: Adjust width and height for removed items
-            if (notifyCollectionChangedEventArgs.NewItems == null || notifyCollectionChangedEventArgs.NewItems.Count == 0) return;
-            
-            if (notifyCollectionChangedEventArgs.NewItems[0] is PortBaseModel port && port.DisplayName.Length * 1.3 > _width)
-            {
-                _width = port.DisplayName.Length * 1.3;
-                NotifyPropertyChanged(nameof(Width));
-            }
-        }
+        #endregion
 
         #region Get Methods
 

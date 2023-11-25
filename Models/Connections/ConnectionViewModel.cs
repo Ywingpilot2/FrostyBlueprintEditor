@@ -60,23 +60,42 @@ namespace BlueprintEditorPlugin.Models.Connections
 
         #endregion
 
-        #region Connection Type
+        #region Connection Color
 
         public ConnectionType Type { get; }
+
+        private bool _isHighlighted;
+        public bool IsHighlighted
+        {
+            get => _isHighlighted;
+            set
+            {
+                _isHighlighted = value;
+                OnPropertyChanged(nameof(IsHighlighted));
+                OnPropertyChanged(nameof(ConnectionColor));
+            }
+        }
         public SolidColorBrush ConnectionColor
         {
             get
             {
-                switch (Type)
+                if (!_isHighlighted)
                 {
-                    case ConnectionType.Event:
-                        return new SolidColorBrush(Colors.White); 
-                    case ConnectionType.Property:
-                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF21"));
-                    case ConnectionType.Link:
-                        return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0094FF"));
-                    default:
-                        return new SolidColorBrush(Colors.White);
+                    switch (Type)
+                    {
+                        case ConnectionType.Event:
+                            return new SolidColorBrush(Colors.White); 
+                        case ConnectionType.Property:
+                            return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF21"));
+                        case ConnectionType.Link:
+                            return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0094FF"));
+                        default:
+                            return new SolidColorBrush(Colors.White);
+                    }
+                }
+                else
+                {
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EEE8AB"));
                 }
             }
         }
@@ -111,7 +130,7 @@ namespace BlueprintEditorPlugin.Models.Connections
                     }
                     case EditorStatus.Warning:
                     {
-                        return new SolidColorBrush(Colors.Goldenrod);
+                        return new SolidColorBrush(Colors.Yellow);
                     }
                     case EditorStatus.Error:
                     {
@@ -341,14 +360,23 @@ namespace BlueprintEditorPlugin.Models.Connections
         /// <param name="e"></param>
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Anchor")
+            switch (e.PropertyName)
             {
-                OnPropertyChanged(nameof(CurvePoint1));
-                OnPropertyChanged(nameof(CurvePoint2));
-            }
-            else
-            {
-                PropertyChanged?.Invoke(sender, e);
+                case "Anchor":
+                {
+                    OnPropertyChanged(nameof(CurvePoint1));
+                    OnPropertyChanged(nameof(CurvePoint2));
+                } break;
+                case "IsSelected":
+                {
+                    _isHighlighted = SourceNode.IsSelected || TargetNode.IsSelected; 
+                    OnPropertyChanged(nameof(IsHighlighted));
+                    OnPropertyChanged(nameof(ConnectionColor));
+                } break;
+                default:
+                {
+                    PropertyChanged?.Invoke(sender, e);
+                } break;
             }
         }
         

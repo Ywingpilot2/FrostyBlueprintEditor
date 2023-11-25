@@ -1,0 +1,4 @@
+Type = WSPlayerFilterEntityData
+DisplayName = WSPlayerFilter
+InputEvent = In, ObjectRealm
+OutputEvent = OnTriggerOnlyForPlayer, ObjectRealm

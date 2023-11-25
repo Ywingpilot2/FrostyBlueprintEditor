@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
 using BlueprintEditorPlugin.Models.Types.EbxLoaderTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
@@ -102,7 +103,7 @@ namespace BlueprintEditorPlugin.Windows
             //Setup UI methods
             Editor.KeyDown += Editor_ControlInput;
             Editor.KeyUp += Editor_ControlInput;
-            _editor.SelectedNodes.CollectionChanged += UpdatePropertyGrid;
+            _editor.SelectedNodes.CollectionChanged += NodeSelectionUpdated;
             
             //Mouse capture
             _editor.NodePropertyGrid.GotMouseCapture += BlueprintEditorWindow_OnGotFocus;
@@ -140,7 +141,9 @@ namespace BlueprintEditorPlugin.Windows
 
             EditorUtils.ApplyLayouts(_file, _editor); //Organize the file
         }
-        
+
+        #region Window events
+
         /// <summary>
         /// This method executes whenever a button is inputted into the Editor
         /// To be used for things like keybinds 
@@ -226,6 +229,46 @@ namespace BlueprintEditorPlugin.Windows
         public void BlueprintEditorWindow_OnGotFocus(object sender, RoutedEventArgs e)
         {
             EditorUtils.CurrentEditor = _editor;
+        }
+
+        #endregion
+        
+        /// <summary>
+        /// This method executes whenever the selection of nodes changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NodeSelectionUpdated(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (object oldItem in e.OldItems)
+                {
+                    NodeBaseModel oldNode = oldItem as NodeBaseModel;
+                    oldNode.IsSelected = false;
+                }
+            }
+            
+            if (_editor.SelectedNodes.Count == 0)
+            {
+                _editor.NodePropertyGrid.Object = new object();
+                return;
+            }
+
+            if (_editor.SelectedNodes.First().ObjectType != "EditorInterfaceNode")
+            {
+                PropertiesTabControl.SelectedIndex = 0;
+                _editor.NodePropertyGrid.Object = _editor.SelectedNodes.First().Object;
+            }
+            else
+            {
+                PropertiesTabControl.SelectedIndex = 1;
+            }
+
+            foreach (NodeBaseModel node in _editor.SelectedNodes)
+            {
+                node.IsSelected = true;
+            }
         }
 
         #endregion
@@ -492,30 +535,6 @@ namespace BlueprintEditorPlugin.Windows
 
         #region Property Grid
 
-        /// <summary>
-        /// This method executes whenever the property grid needs to be changed, so e.g when the selected node changes
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdatePropertyGrid(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (_editor.SelectedNodes.Count == 0)
-            {
-                _editor.NodePropertyGrid.Object = new object();
-                return;
-            }
-
-            if (_editor.SelectedNodes.First().ObjectType != "EditorInterfaceNode")
-            {
-                PropertiesTabControl.SelectedIndex = 0;
-                _editor.NodePropertyGrid.Object = _editor.SelectedNodes.First().Object;
-            }
-            else
-            {
-                PropertiesTabControl.SelectedIndex = 1;
-            }
-        }
-        
         /// <summary>
         /// This executes whenever the property grid visibility button is pressed
         /// </summary>
