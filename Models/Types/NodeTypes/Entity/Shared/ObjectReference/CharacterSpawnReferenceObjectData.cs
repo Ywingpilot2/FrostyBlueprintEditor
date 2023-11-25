@@ -48,6 +48,27 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             }
         }
 
+        public override void OnCreateNew()
+        {
+            base.OnCreateNew();
+            Object.Enabled = true;
+            Object.QueueSpawnEvent = true;
+            Object.SpawnDelay = 0.1;
+            Object.MaxCount = -1;
+            Object.MaxCountSimultaneously = -1;
+            Object.MaxCountSimultaneouslyOfType = -1;
+            Object.SpawnProtectionCheckAllTeams = true;
+            Object.ClearBangersOnSpawn = true;
+            Object.OnlySendEventForHumanPlayers = true;
+            Object.TryToSpawnOutOfSight = true;
+            Object.TakeControlOnTransformChange = true;
+            Object.ReturnControlOnIdle = true;
+            Object.SpawnWithHumanLikeAI = true;
+            Object.SpawnVisible = true;
+            Object.HumanTargetPreference = -1;
+            Object.IsTarget = true;
+        }
+
         public override void OnModified(ItemModifiedEventArgs args)
         {
             switch (args.Item.Name)

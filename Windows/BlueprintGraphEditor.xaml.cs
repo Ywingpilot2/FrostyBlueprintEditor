@@ -381,6 +381,7 @@ namespace BlueprintEditorPlugin.Windows
             
                 var node = _loader.GetNodeFromObject(obj);
                 node.Location = new Point(_editor.ViewportLocation.X + (575 / _editor.ViewportZoom), _editor.ViewportLocation.Y + 287.5 / _editor.ViewportZoom);
+                node.OnCreateNew();
             }
             else if (_selectedType != null) //Stuff for adding transients
             {

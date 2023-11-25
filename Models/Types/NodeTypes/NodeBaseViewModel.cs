@@ -181,6 +181,14 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         }
 
         /// <summary>
+        /// This method executes whenever a completely fresh and new instance of the node is created.
+        /// </summary>
+        public virtual void OnCreateNew()
+        {
+            
+        }
+
+        /// <summary>
         /// This method executes whenever the nodes Inputs are updated
         /// </summary>
         /// <param name="input">The input that was updated</param>

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
@@ -183,6 +186,18 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             }
 
             #endregion
+        }
+
+        public override void OnCreateNew()
+        {
+            Object.CastSunShadowEnable = true;
+            Object.CastReflectionEnable = true;
+            Object.CastEnvmapEnable = true;
+            
+            Array localPlayerIdArray = ((object)TypeLibrary.CreateObject("LocalPlayerId")).GetType().GetEnumValues();
+            List<dynamic> localPlayerIdEnum = new List<dynamic>(localPlayerIdArray.Cast<dynamic>());
+            Object.LocalPlayerId = localPlayerIdEnum[8];
+            Object.LightmapResolutionScale = 1;
         }
 
         public override void OnModified(ItemModifiedEventArgs args)
