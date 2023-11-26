@@ -133,6 +133,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{node.InternalGuid}_identical"), $"Multiple nodes share the guid {node.InternalGuid}");
                     continue;
                 }
+
+                node.PointerRefType = PointerRefType.Internal;
                 _nodeIdCache.Add(node.InternalGuid, NodeEditor.Nodes.IndexOf(node));
             }
         }
@@ -188,7 +190,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         else
                         {
                             sourceNode = NodeEditor.Nodes[_nodeIdCache[sourceGuid]] as EntityNode;
-                            sourceNode.PointerRefType = PointerRefType.Internal;
                         }
 
                         break;
@@ -242,7 +243,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         else
                         {
                             targetNode = NodeEditor.Nodes[_nodeIdCache[targetGuid]] as EntityNode;
-                            targetNode.PointerRefType = PointerRefType.Internal;
                         }
 
                         break;
@@ -361,7 +361,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         else
                         {
                             sourceNode = NodeEditor.Nodes[_nodeIdCache[sourceGuid]] as EntityNode;
-                            sourceNode.PointerRefType = PointerRefType.Internal;
                         }
 
                         break;
@@ -415,7 +414,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         else
                         {
                             targetNode = NodeEditor.Nodes[_nodeIdCache[targetGuid]] as EntityNode;
-                            targetNode.PointerRefType = PointerRefType.Internal;
                         }
 
                         break;
@@ -531,7 +529,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         else
                         {
                             sourceNode = NodeEditor.Nodes[_nodeIdCache[sourceGuid]] as EntityNode;
-                            sourceNode.PointerRefType = PointerRefType.Internal;
                         }
 
                         break;
@@ -585,7 +582,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                         else
                         {
                             targetNode = NodeEditor.Nodes[_nodeIdCache[targetGuid]] as EntityNode;
-                            targetNode.PointerRefType = PointerRefType.Internal;
                         }
 
                         break;

@@ -41,9 +41,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
 
             PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
             if (interfaceRef.Type == PointerRefType.Null) return;
-            
-            AssetClassGuid interfaceGuid = ((dynamic)interfaceRef.Internal).GetInstanceGuid();
-            
+
             //Flags
             bool hasProperty = false;
             bool hasEvent = false;
