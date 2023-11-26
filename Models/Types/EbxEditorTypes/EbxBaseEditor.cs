@@ -27,6 +27,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         /// This is the asset type that the Blueprint Editor uses
         /// In this case its set to null, but you would want to set it to the asset type
         /// e.g, LogicPrefabBlueprint
+        /// TODO: Add in ValidForGame property
         /// </summary>
         public virtual string AssetType { get; } = "null";
         

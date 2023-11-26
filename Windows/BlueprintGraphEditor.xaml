@@ -71,7 +71,7 @@
                                          ViewportZoom="{Binding ViewportZoom}"
                                          x:Name="Editor">
                         <nodify:NodifyEditor.DataContext>
-                            <editor:EditorViewModel/>
+                            <editor:EditorViewModel x:Name="EditorViewModel"/>
                         </nodify:NodifyEditor.DataContext>
                         
                         <nodify:NodifyEditor.Style>

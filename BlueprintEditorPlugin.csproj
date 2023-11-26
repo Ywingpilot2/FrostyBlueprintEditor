@@ -3,8 +3,8 @@
     <Configurations>Developer - Debug;Release - Alpha;Release - Beta;Release - Final</Configurations>
     <Platforms>x64</Platforms>
     <TargetFramework>net48</TargetFramework>
-    <AssemblyTitle>BlueprintEditor</AssemblyTitle>
-    <Product>BlueprintEditor</Product>
+    <AssemblyTitle>BlueprintEditorPlugin</AssemblyTitle>
+    <Product>BlueprintEditorPlugin</Product>
     <Copyright>Copyright ©  2020</Copyright>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

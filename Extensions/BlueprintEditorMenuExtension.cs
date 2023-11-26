@@ -17,7 +17,7 @@ namespace BlueprintEditorPlugin.Extensions
 
         public override RelayCommand MenuItemClicked => new RelayCommand((o) =>
         {
-            if (App.EditorWindow.GetOpenedAssetEntry() != null && !EditorUtils.Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
+            if (App.EditorWindow.GetOpenedAssetEntry() != null && !EditorUtils.ActiveNodeEditors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
             {
                 BlueprintEditorWindow blueprintEditor = new BlueprintEditorWindow();
                 blueprintEditor.Show();
@@ -26,7 +26,7 @@ namespace BlueprintEditorPlugin.Extensions
             {
                 App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
             }
-            else if (EditorUtils.Editors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
+            else if (EditorUtils.ActiveNodeEditors.ContainsKey(App.EditorWindow.GetOpenedAssetEntry().Filename))
             {
                 App.Logger.LogError("This editor is already open.");
             }
@@ -40,7 +40,7 @@ namespace BlueprintEditorPlugin.Extensions
 
         public override RelayCommand ContextItemClicked => new RelayCommand((o) =>
         {
-            if (App.SelectedAsset != null && !EditorUtils.Editors.ContainsKey(App.SelectedAsset.Filename))
+            if (App.SelectedAsset != null && !EditorUtils.ActiveNodeEditors.ContainsKey(App.SelectedAsset.Filename))
             {
                 App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", new BlueprintEditor());
             }
@@ -48,7 +48,7 @@ namespace BlueprintEditorPlugin.Extensions
             {
                 App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
             }
-            else if (EditorUtils.Editors.ContainsKey(App.SelectedAsset.Filename))
+            else if (EditorUtils.ActiveNodeEditors.ContainsKey(App.SelectedAsset.Filename))
             {
                 App.Logger.LogError("This editor is already open.");
             }

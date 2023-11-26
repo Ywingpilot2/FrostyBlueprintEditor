@@ -7,16 +7,15 @@ namespace BlueprintEditorPlugin.Windows
 {
     public partial class BlueprintEditorWindow : FrostyWindow
     {
-        private readonly EbxAssetEntry _file;
-
         public BlueprintEditorWindow()
         {
             //This happens before InitializeComponent() explicitly because it needs to be set as early as possible, and InitializeComponent is slow.
-            _file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
+            var file = App.EditorWindow.GetOpenedAssetEntry() as EbxAssetEntry;
+            App.SelectedAsset = file;
             InitializeComponent();
             Owner = Application.Current.MainWindow;
-            Title = $"Ebx Graph({_file.Filename})";
-            GraphEditor.File = _file;
+            Title = $"Ebx Graph({file.Filename})";
+            GraphEditor.File = file;
             Closing += GraphEditor.BlueprintEditorWindow_OnClosing;
         }
     }

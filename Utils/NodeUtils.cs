@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using BlueprintEditorPlugin.Attributes;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
@@ -25,7 +26,9 @@ namespace BlueprintEditorPlugin.Utils
         /// <summary>
         /// A list of extensions for nodes
         /// </summary>
-        public static Dictionary<string, NodeBaseModel> NodeExtensions = new Dictionary<string, NodeBaseModel>();
+        public static Dictionary<string, EntityNode> EntityNodeExtensions = new Dictionary<string, EntityNode>();
+        
+        public static Dictionary<string, TransientNode> TransNodeExtensions = new Dictionary<string, TransientNode>();
 
         /// <summary>
         /// A list of node mapping configs for nodes
@@ -331,7 +334,9 @@ namespace BlueprintEditorPlugin.Utils
         
         #endregion
 
-        #region C# Node Utils
+        #region C# Extensions
+
+        #region Extension Utils
 
         public static ConnectionRealm ParseRealmFromString(string str)
         {
@@ -534,6 +539,8 @@ namespace BlueprintEditorPlugin.Utils
 
             return true;
         }
+
+        #endregion
 
         #endregion
 
@@ -756,7 +763,10 @@ namespace BlueprintEditorPlugin.Utils
 
         public static void Initialize(ILogger logger = null)
         {
-            NodeExtensions.Add("null", new EntityNode());
+            #region Load internal extensions
+            
+            EntityNodeExtensions.Add("null", new EntityNode());
+            
             foreach (var type in Assembly.GetCallingAssembly().GetTypes())
             {
                 logger?.Log("Loading node extensions...");
@@ -768,9 +778,9 @@ namespace BlueprintEditorPlugin.Utils
                         if ((extension.ValidForGames == null 
                              || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName)) 
                             && extension.ObjectType != null 
-                            && !NodeExtensions.ContainsKey(extension.ObjectType))
+                            && !EntityNodeExtensions.ContainsKey(extension.ObjectType))
                         {
-                            NodeExtensions.Add(extension.ObjectType, extension);
+                            EntityNodeExtensions.Add(extension.ObjectType, extension);
                         }
                         else
                         {
@@ -789,13 +799,13 @@ namespace BlueprintEditorPlugin.Utils
                     try
                     {
                         var extension = (TransientNode)Activator.CreateInstance(type);
-                        if (extension.Name == null || NodeExtensions.ContainsKey(extension.Name))
+                        if (extension.Name == null || TransNodeExtensions.ContainsKey(extension.Name))
                         {
                             logger?.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
                             App.Logger.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
                             continue;
                         }
-                        NodeExtensions.Add(extension.Name, extension);
+                        TransNodeExtensions.Add(extension.Name, extension);
                     }
                     catch (Exception e)
                     {
@@ -804,7 +814,68 @@ namespace BlueprintEditorPlugin.Utils
                     }
                 }
             }
-            
+
+            #endregion
+
+            #region Load external extensions
+
+            foreach (string item in Directory.EnumerateFiles("Plugins", "*.dll", SearchOption.AllDirectories))
+            {
+                FileInfo fileInfo = new FileInfo(item);
+                Assembly plugin = Assembly.LoadFile(fileInfo.FullName);
+
+                foreach (Attribute attribute in plugin.GetCustomAttributes())
+                {
+                    if (attribute is RegisterEntityNodeExtension entityRegister)
+                    {
+                        try
+                        {
+                            var extension = (EntityNode)Activator.CreateInstance(entityRegister.EntityNodeExtension);
+                            if ((extension.ValidForGames == null 
+                                 || extension.ValidForGames.Contains(ProfilesLibrary.ProfileName)) 
+                                && extension.ObjectType != null 
+                                && !EntityNodeExtensions.ContainsKey(extension.ObjectType))
+                            {
+                                EntityNodeExtensions.Add(extension.ObjectType, extension);
+                            }
+                            else
+                            {
+                                App.Logger.LogError("Node Extension {0} is invalid, as its ObjectType was either null or is already taken.", extension.GetType().Name);
+                                logger?.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            logger?.LogError("Could not load node extension {0}", entityRegister.EntityNodeExtension.Name);
+                            App.Logger.LogError("Could not load node extension {0}", entityRegister.EntityNodeExtension.Name);
+                        }
+                    }
+                    else if (attribute is RegisterTransientNodeExtension transRegister)
+                    {
+                        try
+                        {
+                            var extension = (TransientNode)Activator.CreateInstance(transRegister.TransientNodeExtension);
+                            if (extension.Name == null || TransNodeExtensions.ContainsKey(extension.Name))
+                            {
+                                logger?.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                                App.Logger.LogError("Node Extension {0} is invalid, as its name was either null or is already taken.", extension.GetType().Name);
+                                continue;
+                            }
+                            TransNodeExtensions.Add(extension.Name, extension);
+                        }
+                        catch (Exception e)
+                        {
+                            logger?.LogError("Could not load node extension {0}", transRegister.TransientNodeExtension.Name);
+                            App.Logger.LogError("Could not load node extension {0}", transRegister.TransientNodeExtension.Name);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Load node mapping configs
+
             //If the nmc directory doesn't exist we create it
             logger?.Log("Loading Node Mappings...");
             if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\NodeMappings"))
@@ -892,6 +963,8 @@ namespace BlueprintEditorPlugin.Utils
                     App.Logger.LogError("line \"{0}\" in {1} is invalid", currentLine, file);
                 }
             }
+
+            #endregion
         }
 
         #endregion

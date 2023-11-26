@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
+using BlueprintEditorPlugin.Models.Types.EbxLoaderTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
@@ -57,21 +58,11 @@ namespace BlueprintEditorPlugin.Models.Editor
         {
             EditedEbxAsset = App.AssetManager.GetEbx((EbxAssetEntry)App.SelectedAsset);
             EditorName = App.SelectedAsset.Filename;
-            
-            EbxBaseEditor ebxEditor = new EbxBaseEditor();
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
-            {
-                if (type.IsSubclassOf(typeof(EbxBaseEditor)))
-                {
-                    EbxBaseEditor extension = (EbxBaseEditor)Activator.CreateInstance(type);
-                    if (extension.AssetType != App.SelectedAsset.Type) continue;
-                    ebxEditor = extension;
-                    break;
-                }
-            }
 
-            ebxEditor.NodeEditor = this;
-            _ebxEditor = ebxEditor;
+            _ebxEditor = (EbxBaseEditor)Activator.CreateInstance(
+                EditorUtils.EbxEditors.ContainsKey(App.SelectedAsset.Type)
+                    ? EditorUtils.EbxEditors[App.SelectedAsset.Type] : EditorUtils.EbxEditors["null"]);
+            _ebxEditor.NodeEditor = this;
 
             PendingConnection = new PendingConnectionViewModel(this, _ebxEditor);
             
@@ -83,7 +74,7 @@ namespace BlueprintEditorPlugin.Models.Editor
                     : Connections.First(x => x.Source == connector));
             });
             
-            EditorUtils.Editors.Add(EditorName, this);
+            EditorUtils.ActiveNodeEditors.Add(EditorName, this);
             EditorUtils.CurrentEditor = this;
         }
 

@@ -18,6 +18,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
     /// This is the base class for a Blueprint Loader
     /// If you ever wish to create a graphed form of a specific asset type(which this does not support)
     /// you would want to make an extension of this
+    /// TODO: Add in ValidForGame property
     /// </summary>
     public class EbxBaseLoader
     {
@@ -63,9 +64,9 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             EntityNode newNode;
             
             //Check if a C# extension exists
-            if (NodeUtils.NodeExtensions.ContainsKey(key))
+            if (NodeUtils.EntityNodeExtensions.ContainsKey(key))
             {
-                newNode = (EntityNode)Activator.CreateInstance(NodeUtils.NodeExtensions[key].GetType());
+                newNode = (EntityNode)Activator.CreateInstance(NodeUtils.EntityNodeExtensions[key].GetType());
                 newNode.Object = obj;
             }
             //If not, check if a NMC exists

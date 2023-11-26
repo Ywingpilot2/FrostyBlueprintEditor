@@ -13,6 +13,7 @@ namespace BlueprintEditorPlugin.Extensions
         {
             logger.Log("Initializing blueprint editor utilities...");
             NodeUtils.Initialize(logger);
+            EditorUtils.Initialize(logger);
         }
     }
 }

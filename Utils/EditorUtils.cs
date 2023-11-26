@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Windows;
+using BlueprintEditorPlugin.Attributes;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Editor;
+using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
+using BlueprintEditorPlugin.Models.Types.EbxLoaderTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using BlueprintEditorPlugin.Options;
 using Frosty.Core;
 using FrostyEditor;
 using FrostySdk;
+using FrostySdk.Interfaces;
 using FrostySdk.Managers;
 using App = Frosty.Core.App;
 
@@ -23,7 +28,10 @@ namespace BlueprintEditorPlugin.Utils
         /// <summary>
         /// A list of all Editors
         /// </summary>
-        public static Dictionary<string, EditorViewModel> Editors = new Dictionary<string, EditorViewModel>();
+        public static Dictionary<string, EditorViewModel> ActiveNodeEditors = new Dictionary<string, EditorViewModel>();
+
+        public static Dictionary<string, Type> EbxLoaders = new Dictionary<string, Type>();
+        public static Dictionary<string, Type> EbxEditors = new Dictionary<string, Type>();
 
         /// <summary>
         /// This gets the currently open <see cref="EditorViewModel"/>
@@ -288,11 +296,6 @@ namespace BlueprintEditorPlugin.Utils
 
         public static ConnectionStyle CStyle { get; set; }
 
-        static EditorUtils()
-        {
-            UpdateSettings();
-        }
-
         public static void UpdateSettings()
         {
             switch (Config.Get("ConnectionStyle", "StartStop"))
@@ -309,6 +312,60 @@ namespace BlueprintEditorPlugin.Utils
                 {
                     CStyle = ConnectionStyle.Curvy;
                 } break;
+            }
+        }
+
+        #endregion
+
+        #region Initialization
+
+        public static void Initialize(ILogger logger = null)
+        {
+            logger?.Log("Getting user preferences...");
+            UpdateSettings();
+            
+            logger?.Log("Initializing Loader extensions...");
+            EbxLoaders.Add("null", typeof(EbxBaseLoader));
+            
+            //Load internal loaders
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes()) //Iterate over all of the loader extensions
+            {
+                if (!type.IsSubclassOf(typeof(EbxBaseLoader))) continue;
+                
+                var extension = (EbxBaseLoader)Activator.CreateInstance(type);
+                EbxLoaders.Add(extension.AssetType, type);
+            }
+            
+            logger?.Log("Initializing Editor extensions...");
+            EbxEditors.Add("null", typeof(EbxBaseEditor));
+            
+            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
+            {
+                if (!type.IsSubclassOf(typeof(EbxBaseEditor))) continue;
+                
+                EbxBaseEditor extension = (EbxBaseEditor)Activator.CreateInstance(type);
+                EbxEditors.Add(extension.AssetType, type);
+            }
+            
+            logger?.Log("Loading external extensions...");
+            foreach (string item in Directory.EnumerateFiles("Plugins", "*.dll", SearchOption.AllDirectories))
+            {
+                FileInfo fileInfo = new FileInfo(item);
+                Assembly plugin = Assembly.LoadFile(fileInfo.FullName);
+
+                foreach (Attribute attribute in plugin.GetCustomAttributes())
+                {
+                    if (attribute is RegisterEbxLoaderExtension registerLoader)
+                    {
+                        EbxBaseLoader loader = (EbxBaseLoader)Activator.CreateInstance(registerLoader.EbxLoaderExtension);
+                        EbxLoaders.Add(loader.AssetType, registerLoader.EbxLoaderExtension);
+                    }
+                    else if (attribute is RegisterEbxEditorExtension registerEditor)
+                    {
+                        EbxBaseEditor editor = (EbxBaseEditor)Activator.CreateInstance(registerEditor.EbxEditorExtension);
+                        EbxEditors.Add(editor.AssetType, registerEditor.EbxEditorExtension);
+                    }
+                }
             }
         }
 

@@ -60,28 +60,16 @@ namespace BlueprintEditorPlugin.Windows
         /// </summary>
         public void Initiate()
         {
-            _editor = EditorUtils.Editors[_file.Filename]; //Get the editor based on what our filename is
+            _editor = EditorUtils.ActiveNodeEditors[_file.Filename]; //Get the editor based on what our filename is
             _editor.MouseLocation = Editor.MouseLocation;
 
-            //Create a new loader
-            EbxBaseLoader loader = new EbxBaseLoader(); //Base loader will be used if no extensions are found
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes()) //Iterate over all of the loader extensions
-            {
-                if (!type.IsSubclassOf(typeof(EbxBaseLoader))) continue;
-                var extension = (EbxBaseLoader)Activator.CreateInstance(type);
-                    
-                //If the extension type doesn't match our file type then we continue
-                if (extension.AssetType != _file.Type) continue;  
-                loader = extension; //If it does, we set the loader to be this extension instead and stop searching
-                break;
-            }
-
-            _loader = loader;
+            _loader = (EbxBaseLoader)Activator.CreateInstance(EditorUtils.EbxLoaders.ContainsKey(File.AssetType) ? EditorUtils.EbxLoaders[File.AssetType] : EditorUtils.EbxLoaders["null"]);
             _loader.PopulateTypesList(_types); //Populate the types list with our types
             ClassSelector.Types = _types;
             
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes()) //Iterate over all of the transient extensions
+            foreach (TransientNode transNode in NodeUtils.TransNodeExtensions.Values) //Iterate over all of the transient extensions
             {
+                Type type = transNode.GetType();
                 if (type.IsSubclassOf(typeof(TransientNode)))
                 {
                     _transTypes.Add(type);
@@ -217,7 +205,7 @@ namespace BlueprintEditorPlugin.Windows
         public void BlueprintEditorWindow_OnClosing(object sender, CancelEventArgs e)
         {
             EditorUtils.SaveLayouts(_file);
-            EditorUtils.Editors.Remove(_file.Filename);
+            EditorUtils.ActiveNodeEditors.Remove(_file.Filename);
             App.EditorWindow.OpenAsset(_file); //TODO: Make this a profile option
         }
         
@@ -486,9 +474,9 @@ namespace BlueprintEditorPlugin.Windows
             if (_selectedType != null)
             {
                 DocBoxName.Text = _selectedType.Name;
-                if (NodeUtils.NodeExtensions.ContainsKey(_selectedType.Name))
+                if (NodeUtils.EntityNodeExtensions.ContainsKey(_selectedType.Name))
                 {
-                    DocBoxText.Text = NodeUtils.NodeExtensions[_selectedType.Name].Documentation;
+                    DocBoxText.Text = NodeUtils.EntityNodeExtensions[_selectedType.Name].Documentation;
                 }
                 else if (NodeUtils.NmcExtensions.ContainsKey(_selectedType.Name) && NodeUtils.NmcExtensions[_selectedType.Name].Any(x => x.StartsWith("Documentation")))
                 {
@@ -533,6 +521,30 @@ namespace BlueprintEditorPlugin.Windows
 
         #endregion
 
+        #region Trans-Toolbox
+
+        private void TransientClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            _selectedType = TransientClassSelector.SelectedClass;
+            if (_selectedType == null) return;
+            
+            DocBoxName.Text = _selectedType.Name;
+            DocBoxText.Text = NodeUtils.EntityNodeExtensions.ContainsKey(_selectedType.Name) ? NodeUtils.EntityNodeExtensions[_selectedType.Name].Documentation : "";
+        }
+
+        private void TransientClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            BlueprintEditorWindow_OnGotFocus(this, new RoutedEventArgs());
+            AddButton_OnClick(this, new RoutedEventArgs()); //We just send this over to the AddButton lol
+        }
+
+        // private void ClassSelector_OnItemBeginDrag(object sender, RoutedEventArgs e)
+        // {
+        //     
+        // }
+
+        #endregion
+
         #region Property Grid
 
         /// <summary>
@@ -555,25 +567,5 @@ namespace BlueprintEditorPlugin.Windows
         }
 
         #endregion
-
-        private void TransientClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            _selectedType = TransientClassSelector.SelectedClass;
-            if (_selectedType == null) return;
-            
-            DocBoxName.Text = _selectedType.Name;
-            DocBoxText.Text = NodeUtils.NodeExtensions.ContainsKey(_selectedType.Name) ? NodeUtils.NodeExtensions[_selectedType.Name].Documentation : "";
-        }
-
-        private void TransientClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
-        {
-            BlueprintEditorWindow_OnGotFocus(this, new RoutedEventArgs());
-            AddButton_OnClick(this, new RoutedEventArgs()); //We just send this over to the AddButton lol
-        }
-
-        // private void ClassSelector_OnItemBeginDrag(object sender, RoutedEventArgs e)
-        // {
-        //     
-        // }
     }
 }
