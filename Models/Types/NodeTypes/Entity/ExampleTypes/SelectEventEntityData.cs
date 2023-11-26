@@ -34,7 +34,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
             new ObservableCollection<InputViewModel>()
             {
                 new InputViewModel() {Title = "In", Type = ConnectionType.Event},
-                new InputViewModel() {Title = "Selection", Type = ConnectionType.Property}
+                new InputViewModel() {Title = "Selected", Type = ConnectionType.Property}
             };
 
         /// <summary>

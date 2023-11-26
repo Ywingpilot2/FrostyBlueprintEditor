@@ -40,6 +40,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             Name = $"{ShortName} ({blueprintAssetEntry.Filename})";
 
             PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
+            if (interfaceRef.Type == PointerRefType.Null) return;
+            
             AssetClassGuid interfaceGuid = ((dynamic)interfaceRef.Internal).GetInstanceGuid();
             
             //Flags
