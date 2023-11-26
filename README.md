@@ -31,8 +31,11 @@ Here is a basic overview of the Terminology used in this project:
 - Connection: Also commonly known as an edge, this connects an input and output together transferring a property or sending an event.
 - Connection Object: An object stored inside the connection, this represents the original object of this connection.
 - Node Mapping: A configuration of a type or class which details the inputs and outputs, among other details, it should have
+- Node Extension: An extension of either EntityNode or TransientNode which acts as a C# written version of a Node Mapping, with access to a variety of events that can affect the Node Mapping.
+- NodeUtils: A static class which is initialized during frosty's startup, this provides a variety of utilities to managing nodes, determing realms, and node extensions.
 - Layout: A file which stores all of the information regarding the current node layout. So e.g, node positions or transient node data
 - Node Editor: Also commonly referred to as EditorViewModel or Editor, this refers to the EditorViewModel class which is used to edit and create connections and nodes
+- EditorUtils: A static class which gets initialized on frosty's startup, this provides a number of utilities for thr various Node Editors such as EbxLoaders, EbxEditors, or layout management.
 - Editor Window: The window which contains the UI of the editor
 - Ebx Loader: A class which is designed to load EBX, or an asset found in frosty's file browser, into a graphed representation
 - Ebx Editor: A class which edits the loaded EBX or asset, converting the graphed representation into actual data
