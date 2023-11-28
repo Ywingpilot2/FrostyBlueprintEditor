@@ -57,12 +57,11 @@ namespace BlueprintEditorPlugin.Windows
 
         /// <summary>
         /// Initiates the editor by populating the graph with nodes and connections
-        /// TODO: Add in FrostyTaskWindow(with owner set to <see cref="BlueprintWindow"/>) so frosty doesn't just freeze
+        /// TODO: Add in FrostyTaskWindow so frosty doesn't just freeze
         /// </summary>
         public void Initiate()
         {
             _editor = EditorUtils.ActiveNodeEditors[_file.Filename]; //Get the editor based on what our filename is
-            _editor.MouseLocation = NodifyEditor.MouseLocation;
 
             _loader = (EbxBaseLoader)Activator.CreateInstance(EditorUtils.EbxLoaders.ContainsKey(File.AssetType) ? EditorUtils.EbxLoaders[File.AssetType] : EditorUtils.EbxLoaders["null"]);
             _loader.PopulateTypesList(_types); //Populate the types list with our types
@@ -92,6 +91,8 @@ namespace BlueprintEditorPlugin.Windows
             //Setup UI methods
             NodifyEditor.KeyDown += Editor_ControlInput;
             NodifyEditor.KeyUp += Editor_ControlInput;
+            NodifyEditor.MouseRightButtonUp += Editor_MouseInput;
+            NodifyEditor.MouseLeftButtonUp += Editor_MouseInput;
             _editor.SelectedNodes.CollectionChanged += NodeSelectionUpdated;
             
             //Mouse capture
@@ -195,6 +196,35 @@ namespace BlueprintEditorPlugin.Windows
                     nodesToDupe.Remove(nodeToDupe);
                 }
                 App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+            }
+            
+        }
+
+        private void Editor_MouseInput(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            if (mouseButtonEventArgs.ChangedButton == MouseButton.Right && (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                if (_selectedType != null)
+                {
+                    if (_selectedType != null && !_selectedType.IsSubclassOf(typeof(TransientNode)))
+                    {
+                        object obj = _editor.CreateNodeObject(_selectedType);
+
+                        var node = _loader.GetNodeFromObject(obj);
+                        node.Location = new Point(NodifyEditor.MouseLocation.X, NodifyEditor.MouseLocation.Y);
+                        node.OnCreateNew();
+                    }
+                    else if (_selectedType != null) //Stuff for adding transients
+                    {
+                        TransientNode node = (TransientNode)Activator.CreateInstance(_selectedType);
+                        node.OnCreation();
+                        node.Location = new Point(NodifyEditor.MouseLocation.X, NodifyEditor.MouseLocation.Y);
+                        _editor.Nodes.Add(node);
+                    }
+
+                    App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+                    App.EditorWindow.DataExplorer.RefreshItems();
+                }
             }
         }
 

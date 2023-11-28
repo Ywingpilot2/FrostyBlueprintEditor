@@ -53,7 +53,6 @@ namespace BlueprintEditorPlugin.Models.Editor
         public AssetClassGuid InterfaceGuid { get; private set; }
         public Point ViewportLocation { get; set; }
         public double ViewportZoom { get; set; } = 0.75;
-        public Point MouseLocation { get; set; }
 
         public EditorViewModel()
         {
