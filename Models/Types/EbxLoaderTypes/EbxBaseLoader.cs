@@ -149,7 +149,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             //Create property connections
             foreach (dynamic propertyConnection in properties.PropertyConnections)
             {
-                //TODO: Update to check if external ref
                 if ((propertyConnection.Source.Internal == null && propertyConnection.Source.Type != PointerRefType.External) 
                     || (propertyConnection.Target.Internal == null && propertyConnection.Target.Type != PointerRefType.External))
                 {
@@ -306,21 +305,18 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 if (!NodeUtils.RealmsAreValid(flagHelper)) //If the connection realm itself is invalid
                 {
                     connection.ConnectionStatus = EditorStatus.Error;
-                    //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Error, 1, "Some connections in this file have invalid realms");
+                    NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString(connection.ToString()), "Some connections in this file have invalid realms");
                 }
                 else if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput)) //If the realms of the ports aren't valid
                 {
                     connection.ConnectionStatus = EditorStatus.Warning;
-                    //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have improper realms");
+                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "Some connections in this file have improper realms");
                 }
             }
                 
             //Create event connections
             foreach (dynamic eventConnection in properties.EventConnections)
             {
-                //TODO: Update to check if external ref
                 if ((eventConnection.Source.Internal == null && eventConnection.Source.Type != PointerRefType.External) 
                     || (eventConnection.Target.Internal == null && eventConnection.Target.Type != PointerRefType.External))
                 {
@@ -473,13 +469,12 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     if (!NodeUtils.RealmsAreValid(sourceOutput, targetInput))
                     {
                         connection.ConnectionStatus = EditorStatus.Warning;
-                        NodeEditor.SetEditorStatus(EditorStatus.Warning, 1, "Some connections in this file have improper realms");
+                        NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "Some connections in this file have improper realms");
                     }
                 }
                 else
                 {
-                    //TODO: Update this problem ID so that it specifically references this connection
-                    NodeEditor.SetEditorStatus(EditorStatus.Error, 1, "Some connections in this file have invalid realms");
+                    NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString(connection.ToString()), "Some connections in this file have invalid realms");
                     connection.ConnectionStatus = EditorStatus.Error;
                 }
                 connection.Object = eventConnection;
@@ -488,7 +483,6 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             //Create link connections
             foreach (dynamic linkConnection in properties.LinkConnections)
             {
-                //TODO: Update to check if external ref
                 if ((linkConnection.Source.Internal == null && linkConnection.Source.Type != PointerRefType.External) 
                     || (linkConnection.Target.Internal == null && linkConnection.Target.Type != PointerRefType.External))
                 {

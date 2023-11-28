@@ -250,6 +250,18 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     } break;
                 }
             }
+
+            switch (connection.ConnectionStatus)
+            {
+                case EditorStatus.Warning:
+                {
+                    NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString(connection.ToString()), EditorStatus.Warning);
+                } break;
+                case EditorStatus.Error:
+                {
+                    NodeEditor.ResetEditorStatus(FrostySdk.Utils.HashString(connection.ToString()), EditorStatus.Error);
+                } break;
+            }
         }
 
         /// <summary>
@@ -353,9 +365,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 case ConnectionRealm.Invalid:
                                 {
                                     App.Logger.LogError("Unable to determine the realm of a connection");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "Unable to determine the realm of a connection");
-                                    connection.ConnectionStatus = EditorStatus.Warning;
+                                    NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString(connection.ToString()), "Unable to determine the realm of a connection");
+                                    connection.ConnectionStatus = EditorStatus.Error;
                                 } break;
                             }
                         }
@@ -429,8 +440,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     objectFlagsHelper.ClientEvent = true;
                                     
                                     App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
                                     connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.ClientAndServer:
@@ -439,8 +449,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     objectFlagsHelper.ServerEvent = true;
                                     
                                     App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
                                     connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.Server:
@@ -448,8 +457,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     objectFlagsHelper.ServerEvent = true;
                                     
                                     App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
                                     connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.NetworkedClient:
@@ -457,8 +465,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     objectFlagsHelper.ClientEvent = true;
                                     
                                     App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
                                     connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.NetworkedClientAndServer:
@@ -467,15 +474,13 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     objectFlagsHelper.ServerEvent = true;
                                     
                                     App.Logger.LogWarning("The intended realms for connections is ambiguous, so connection might not have proper realms established.");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, 2, "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString(connection.ToString()), "The intended realms for connections is ambiguous, so connection might not have proper realms established.");
                                     connection.ConnectionStatus = EditorStatus.Warning;
                                 } break;
                                 case ConnectionRealm.Invalid:
                                 {
                                     App.Logger.LogError("Unable to determine the realm of a connection");
-                                    //TODO: Make problem ID specific to connection
-                                    NodeEditor.SetEditorStatus(EditorStatus.Error, 2, "Unable to determine the realm of a connection");
+                                    NodeEditor.SetEditorStatus(EditorStatus.Error, FrostySdk.Utils.HashString(connection.ToString()), "Unable to determine the realm of a connection");
                                     connection.ConnectionStatus = EditorStatus.Error;
                                 } break;
                             }

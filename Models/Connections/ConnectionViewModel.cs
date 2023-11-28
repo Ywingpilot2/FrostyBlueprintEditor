@@ -342,6 +342,11 @@ namespace BlueprintEditorPlugin.Models.Connections
             }
         }
 
+        public override string ToString()
+        {
+            return $"{SourceNode.ObjectType}/{SourceNode.Name}-{Source}->{TargetNode.ObjectType}/{TargetNode.Name}-{Target}";
+        }
+
         #endregion
 
         #region Property Changing

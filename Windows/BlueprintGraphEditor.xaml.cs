@@ -494,6 +494,12 @@ namespace BlueprintEditorPlugin.Windows
         {
             
         }
+        
+        private void ControlsMenuVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            var controlsWindow = new BlueprintEditorControlsWindow();
+            controlsWindow.Show();
+        }
 
         #endregion
         
@@ -603,11 +609,5 @@ namespace BlueprintEditorPlugin.Windows
         }
 
         #endregion
-
-        private void ControlsMenuVisible_OnClick(object sender, RoutedEventArgs e)
-        {
-            var controlsWindow = new BlueprintEditorControlsWindow();
-            controlsWindow.Show();
-        }
     }
 }

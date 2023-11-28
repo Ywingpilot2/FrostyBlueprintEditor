@@ -253,8 +253,12 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             }
         }
 
-        #endregion
+        public override string ToString()
+        {
+            return Name;
+        }
 
+        #endregion
     }
     
     #region Inputs and Outputs
@@ -340,6 +344,11 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public override string ToString()
+        {
+            return Title;
+        }
     }
 
     /// <summary>
