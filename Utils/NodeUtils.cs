@@ -73,11 +73,17 @@ namespace BlueprintEditorPlugin.Utils
         
         public static void GenerateNodeMapping(NodeBaseModel node)
         {
+            if (EntityNodeExtensions.ContainsKey(node.ObjectType) || TransNodeExtensions.ContainsKey(node.ObjectType))
+            {
+                App.Logger.LogError("Cannot overwrite hard coded Node Extensions.");
+                return;
+            }
+            
             //First check if filepath exists, if it doesn't we create it
             FileInfo fi = new FileInfo($"{NodeMappingConfigsPath}{node.Object.GetType().Name}.nmc");
             if (fi.Directory != null && !fi.Directory.Exists) 
             { 
-                Directory.CreateDirectory(fi.DirectoryName); 
+                Directory.CreateDirectory(fi.DirectoryName);
             }
 
             if (fi.Exists)

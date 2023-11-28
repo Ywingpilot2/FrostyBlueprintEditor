@@ -21,10 +21,13 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
         {
             PointerRef ptr = Object.Channel;
 
+            if (ptr.Type == PointerRefType.Null) return;
+
             EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
             EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
 
             Name = $"Schematic Channel ({blueprintAssetEntry.Filename}, {((dynamic)blueprint.RootObject).Events.Count} events)";
+            NotifyPropertyChanged(nameof(Name));
 
             //Populate interface outpts/inputs
             //TODO: Enumerate over links too

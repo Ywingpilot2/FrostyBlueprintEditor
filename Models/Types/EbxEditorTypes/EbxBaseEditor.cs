@@ -107,6 +107,11 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         /// <param name="nodeToRemove"></param>
         public virtual void RemoveNodeObject(EntityNode nodeToRemove)
         {
+            if (nodeToRemove.PointerRefType == PointerRefType.External)
+            {
+                App.Logger.LogError("Cannot remove imported objects, as a result the node has simply been removed from all connections in this file.");
+                return;
+            }
             List<PointerRef> pointerRefs = NodeEditor.EditedProperties.Objects;
             pointerRefs.RemoveAll(pointer => ((dynamic)pointer.Internal).GetInstanceGuid() == nodeToRemove.InternalGuid);
             NodeEditor.EditedEbxAsset.RemoveObject(nodeToRemove.Object);

@@ -87,6 +87,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             }
             
             newNode.InternalGuid = ((dynamic)obj).GetInstanceGuid();
+            newNode.PointerRefType = PointerRefType.Internal; //Hacky workaround
             newNode.OnCreation();
 
             //Add the realm to the port names(if they do not already have it)

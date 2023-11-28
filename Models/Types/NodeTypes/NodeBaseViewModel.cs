@@ -90,7 +90,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged(string propertyName)
+        protected void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
