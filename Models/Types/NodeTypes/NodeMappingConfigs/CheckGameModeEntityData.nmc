@@ -1,0 +1,5 @@
+Type = CheckGameModeEntityData
+DisplayName = CheckGameMode
+InputEvent = Impulse, ObjectRealm
+OutputEvent = OnTrue, ObjectRealm
+OutputEvent = OnFalse, ObjectRealm

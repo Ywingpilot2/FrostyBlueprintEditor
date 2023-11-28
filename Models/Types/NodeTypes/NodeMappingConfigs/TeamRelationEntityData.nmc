@@ -1,0 +1,8 @@
+Type = TeamRelationEntityData
+DisplayName = TeamRelation
+InputProperty = A, ObjectRealm
+InputProperty = B, ObjectRealm
+InputEvent = In, ObjectRealm
+OutputEvent = OnFriendly, ObjectRealm
+OutputEvent = OnHostile, ObjectRealm
+OutputEvent = 0xae468f51, ObjectRealm

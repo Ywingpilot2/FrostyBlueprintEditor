@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Core.Controls;
@@ -77,17 +79,100 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
         /// </summary>
         public override void OnModified(ItemModifiedEventArgs args)
         {
-            //TODO: Fix this. This will remove all of the connections(since we are removing the inputs/outputs) and cause bugs
-            Outputs.Clear();
-            Inputs.Clear();
-            foreach (CString eventName in Object.Events) //Go through all of the Events this SelectEvent has
+            List<CString> events = Object.Events;
+            if (args.Item.Name == "Events")
             {
-                //And for each one, add it to our Outputs
-                Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
-                Inputs.Add(new InputViewModel() {Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event});
+                switch (args.ModifiedArgs.Type)
+                {
+                    case ItemModifiedTypes.Add:
+                    {
+                        CString eventName = events.Last();
+                        if (eventName.IsNull())
+                        {
+                            break;
+                        }
+                        
+                        Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
+                        Inputs.Add(new InputViewModel() {Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event});
+                    } break;
+                    case ItemModifiedTypes.Insert:
+                    {
+                        dynamic eventName = args.NewValue;
+                        if (eventName.IsNull())
+                        {
+                            break;
+                        }
+                        
+                        Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
+                        Inputs.Add(new InputViewModel() {Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event});
+                    } break;
+                    case ItemModifiedTypes.Clear:
+                    {
+                        for (var i = 0; i < Inputs.Count; i++)
+                        {
+                            InputViewModel input = Inputs[i];
+                            if (!input.Title.StartsWith("Select")) continue;
+                            
+                            foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(input))
+                            {
+                                EditorUtils.CurrentEditor.Disconnect(connection);
+                            }
+                            Inputs.Remove(input);
+                        }
+
+                        Outputs.Clear();
+                    } break;
+                    case ItemModifiedTypes.Remove:
+                    {
+                        dynamic eventName = args.OldValue;
+                        if (eventName.IsNull())
+                        {
+                            break;
+                        }
+                        
+                        foreach (dynamic connection in EditorUtils.CurrentEditor.GetConnections(GetOutput(eventName.ToString(), ConnectionType.Event)))
+                        {
+                            EditorUtils.CurrentEditor.Disconnect(connection);
+                        }
+                        Outputs.Remove(GetOutput(eventName.ToString(), ConnectionType.Event));
+
+                        foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(GetInput($"Select{eventName.ToString()}", ConnectionType.Event)))
+                        {
+                            EditorUtils.CurrentEditor.Disconnect(connection);
+                        }
+                        Inputs.Remove(GetInput($"Select{eventName.ToString()}", ConnectionType.Event));
+                    } break;
+                }
+            }
+            else if (args.Item.Parent.Name == "Events")
+            {
+                if (!((CString)args.OldValue).IsNull())
+                {
+                    for (var i = 0; i < events.Count; i++)
+                    {
+                        CString cString = events[i];
+                        if (cString.ToString() == Outputs[i].Title) continue;
+
+                        Outputs[i].Title = cString.ToString();
+                        Outputs[i].DisplayName = cString.ToString();
+                        Inputs[i + 2].Title = $"Select{cString.ToString()}";
+                        Inputs[i + 2].DisplayName = $"Select{cString.ToString()}";
+                        
+                        //TODO: Update connections
+                        foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(Outputs[i]))
+                        {
+                            EditorUtils.CurrentEditor.Disconnect(connection);
+                        }
+                    }
+                }
+                else
+                {
+                    var eventName = (CString)args.NewValue;
+                    Outputs.Add(new OutputViewModel() { Title = eventName.ToString(), Type = ConnectionType.Event });
+                    Inputs.Add(new InputViewModel() { Title = $"Select{eventName.ToString()}", Type = ConnectionType.Event });
+                }
             }
             
-            //We want to make sure our Inputs and Outputs are the same realm as us, that way our flags compute properly
             foreach (InputViewModel input in Inputs)
             {
                 NodeUtils.PortRealmFromObject(Object, input);

@@ -940,6 +940,13 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 args.Add(currentLine.Replace(" = ", "="));
                             } break;
+                            
+                            case " ":
+                            case "":
+                            {
+                                break;
+                            }
+                            
                             default:
                             {
                                 App.Logger.LogError("{1} contains an invalid argument, {0}", currentLine, file);

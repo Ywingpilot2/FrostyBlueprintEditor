@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Models.Connections;
-using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Core.Controls;
 using FrostySdk.Ebx;
+using FrostySdk.IO;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 {
     public class InterfaceDataNode : EntityNode
     {
@@ -50,7 +50,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                             Outputs = new ObservableCollection<OutputViewModel>()
                             {
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property }
-                            }
+                            },
+                            PointerRefType = PointerRefType.Internal
                         };
                         return interfaceNode;
                     }
@@ -66,7 +67,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                             Inputs = new ObservableCollection<InputViewModel>()
                             {
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Property, PropertyConnectionType = PropertyType.Interface }
-                            }
+                            },
+                            PointerRefType = PointerRefType.Internal
                         };
                         return interfaceNode;
                     }
@@ -85,7 +87,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                             Outputs = new ObservableCollection<OutputViewModel>()
                             {
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event }
-                            }
+                            },
+                            PointerRefType = PointerRefType.Internal
                         };
                         return interfaceNode;
                     }
@@ -102,6 +105,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                             {
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Event, PropertyConnectionType = PropertyType.Interface }
                             },
+                            PointerRefType = PointerRefType.Internal
                         };
                         return interfaceNode;
                     }
@@ -120,7 +124,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                             Outputs = new ObservableCollection<OutputViewModel>()
                             {
                                 new OutputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Link }
-                            }
+                            },
+                            PointerRefType = PointerRefType.Internal
                         };
                         return interfaceNode;
                     }
@@ -136,7 +141,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Transient
                             Inputs = new ObservableCollection<InputViewModel>()
                             {
                                 new InputViewModel() { Title = interfaceItem.Name, Type = ConnectionType.Link }
-                            }
+                            },
+                            PointerRefType = PointerRefType.Internal
                         };
                         return interfaceNode;
                     }

@@ -1,0 +1,3 @@
+Type = FadeEntityData
+DisplayName = Fade
+InputEvent = FadeIn, NetworkedClient

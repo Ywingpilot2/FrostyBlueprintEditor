@@ -1,0 +1,3 @@
+Type = ConsoleCommandTriggerEntityData
+DisplayName = ConsoleCommandTrigger
+OutputEvent = OnCommand, ObjectRealm

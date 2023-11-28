@@ -1,0 +1,4 @@
+Type = SyncedIntEntityData
+DisplayName = SyncedInt
+InputProperty = In, Server
+OutputProperty = Out, Client

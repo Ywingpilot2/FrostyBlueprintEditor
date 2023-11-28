@@ -1,0 +1,6 @@
+Type = ProjectileStateEntityData
+DisplayName = ProjectileState
+InputEvent = ContinuousQueryStart, ObjectRealm
+OutputProperty = TeamId, ObjectRealm
+OutputProperty = 0x7a786eb0, ObjectRealm
+OutputLink = 0xf8f2a18d, ObjectRealm

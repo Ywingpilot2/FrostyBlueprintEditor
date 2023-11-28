@@ -1,0 +1,6 @@
+Type = EventMemoryEntityData
+DisplayName = EventMemory
+InputEvent = ClearMemory, ObjectRealm
+InputEvent = LoadMemory, ObjectRealm
+InputEvent = FireMemory, ObjectRealm
+OutputEvent = OnMemoryEvent, ObjectRealm

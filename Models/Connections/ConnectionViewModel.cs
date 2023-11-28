@@ -130,7 +130,7 @@ namespace BlueprintEditorPlugin.Models.Connections
                     }
                     case EditorStatus.Warning:
                     {
-                        return new SolidColorBrush(Colors.Yellow);
+                        return new SolidColorBrush(Colors.Goldenrod);
                     }
                     case EditorStatus.Error:
                     {

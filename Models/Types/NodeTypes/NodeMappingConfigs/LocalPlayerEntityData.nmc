@@ -1,0 +1,3 @@
+Type = LocalPlayerEntityData
+DisplayName = LocalPlayer
+OutputProperty = IsAlive, Client

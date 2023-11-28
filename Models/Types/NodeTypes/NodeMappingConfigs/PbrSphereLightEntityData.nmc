@@ -1,0 +1,4 @@
+Type = PbrSphereLightEntityData
+DisplayName = PbrSphereLight
+InputEvent = Enable, Client
+InputEvent = Disable, Client

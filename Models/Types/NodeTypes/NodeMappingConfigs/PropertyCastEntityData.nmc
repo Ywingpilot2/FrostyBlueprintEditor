@@ -1,0 +1,12 @@
+Type = PropertyCastEntityData
+DisplayName = PropertyCast
+InputProperty = BoolValue, ObjectRealm
+InputProperty = FloatValue, ObjectRealm
+InputProperty = IntValue, ObjectRealm
+InputProperty = UintValue, ObjectRealm
+InputProperty = StringValue, ObjectRealm
+OutputProperty = CastToInt, ObjectRealm
+OutputProperty = CastToUint, ObjectRealm
+OutputProperty = CastToFloat, ObjectRealm
+OutputProperty = CastToString, ObjectRealm
+OutputProperty = CastToBool, ObjectRealm

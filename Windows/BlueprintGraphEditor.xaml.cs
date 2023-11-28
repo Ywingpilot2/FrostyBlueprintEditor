@@ -21,6 +21,7 @@ using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
+using Nodify;
 
 namespace BlueprintEditorPlugin.Windows
 {
@@ -61,7 +62,7 @@ namespace BlueprintEditorPlugin.Windows
         public void Initiate()
         {
             _editor = EditorUtils.ActiveNodeEditors[_file.Filename]; //Get the editor based on what our filename is
-            _editor.MouseLocation = Editor.MouseLocation;
+            _editor.MouseLocation = NodifyEditor.MouseLocation;
 
             _loader = (EbxBaseLoader)Activator.CreateInstance(EditorUtils.EbxLoaders.ContainsKey(File.AssetType) ? EditorUtils.EbxLoaders[File.AssetType] : EditorUtils.EbxLoaders["null"]);
             _loader.PopulateTypesList(_types); //Populate the types list with our types
@@ -89,8 +90,8 @@ namespace BlueprintEditorPlugin.Windows
             PropertiesTabControl.Items.Add(ti);
 
             //Setup UI methods
-            Editor.KeyDown += Editor_ControlInput;
-            Editor.KeyUp += Editor_ControlInput;
+            NodifyEditor.KeyDown += Editor_ControlInput;
+            NodifyEditor.KeyUp += Editor_ControlInput;
             _editor.SelectedNodes.CollectionChanged += NodeSelectionUpdated;
             
             //Mouse capture
@@ -458,6 +459,11 @@ namespace BlueprintEditorPlugin.Windows
                 NodeUtils.GenerateNodeMapping(selectedNode);
             }
         }
+        
+        private void RefreshMappingButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
 
         #endregion
         
@@ -567,5 +573,11 @@ namespace BlueprintEditorPlugin.Windows
         }
 
         #endregion
+
+        private void ControlsMenuVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            var controlsWindow = new BlueprintEditorControlsWindow();
+            controlsWindow.Show();
+        }
     }
 }

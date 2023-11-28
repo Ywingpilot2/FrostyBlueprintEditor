@@ -69,6 +69,8 @@
     <None Remove="Images\RemoveObjectButton.png" />
     <Resource Include="Images\Refresh.png" />
     <Resource Include="Images\RemoveObjectButton.png" />
+    <None Remove="Images\github-mark-white.png" />
+    <Resource Include="Images\github-mark-white.png" />
   </ItemGroup>
 
   <ItemGroup>

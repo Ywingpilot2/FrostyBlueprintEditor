@@ -1,0 +1,3 @@
+Type = SendEventEntityData
+DisplayName = SendEvent
+InputEvent = Trigger, ObjectRealm

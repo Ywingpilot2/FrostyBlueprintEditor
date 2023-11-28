@@ -14,6 +14,7 @@ using BlueprintEditorPlugin.Models.Types.EbxEditorTypes;
 using BlueprintEditorPlugin.Models.Types.EbxLoaderTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity;
+using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
@@ -63,6 +64,7 @@ namespace BlueprintEditorPlugin.Models.Editor
                 EditorUtils.EbxEditors.ContainsKey(App.SelectedAsset.Type)
                     ? EditorUtils.EbxEditors[App.SelectedAsset.Type] : EditorUtils.EbxEditors["null"]);
             _ebxEditor.NodeEditor = this;
+            _ebxEditor.OnCreation();
 
             PendingConnection = new PendingConnectionViewModel(this, _ebxEditor);
             

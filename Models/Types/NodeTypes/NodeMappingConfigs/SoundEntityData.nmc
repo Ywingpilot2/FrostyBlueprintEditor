@@ -1,0 +1,6 @@
+Type = SoundEntityData
+DisplayName = Sound
+InputEvent = Start, Client
+InputEvent = Stop, Client
+InputEvent = Triggered, Client
+InputProperty = Transform, Client

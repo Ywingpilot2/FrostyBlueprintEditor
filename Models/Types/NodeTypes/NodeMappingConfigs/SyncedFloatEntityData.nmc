@@ -1,0 +1,4 @@
+Type = SyncedFloatEntityData
+DisplayName = SyncedFloat
+InputProperty = In, Server
+OutputProperty = Out, ClientAndServer

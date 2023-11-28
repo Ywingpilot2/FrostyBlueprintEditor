@@ -29,7 +29,7 @@
                           TileMode="Tile"
                           ViewportUnits="Absolute"
                           Viewport="0 0 32 32"
-                          Transform="{Binding ViewportTransform, ElementName=Editor}"
+                          Transform="{Binding ViewportTransform, ElementName=NodifyEditor}"
                           Drawing="{StaticResource SmallGridGeometry}" />
 
             <DrawingBrush x:Key="LargeGridLinesDrawingBrush"
@@ -37,7 +37,7 @@
                           ViewportUnits="Absolute"
                           Opacity="0.6"
                           Viewport="0 0 110 110"
-                          Transform="{Binding ViewportTransform, ElementName=Editor}"
+                          Transform="{Binding ViewportTransform, ElementName=NodifyEditor}"
                           Drawing="{StaticResource LargeGridGeometry}" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -69,9 +69,10 @@
                                          Background="{StaticResource SmallGridLinesDrawingBrush}"
                                          ViewportLocation="{Binding ViewportLocation}"
                                          ViewportZoom="{Binding ViewportZoom}"
-                                         x:Name="Editor">
+                                         EnableRealtimeSelection="False"
+                                         x:Name="NodifyEditor">
                         <nodify:NodifyEditor.DataContext>
-                            <editor:EditorViewModel x:Name="EditorViewModel"/>
+                            <editor:EditorViewModel />
                         </nodify:NodifyEditor.DataContext>
                         
                         <nodify:NodifyEditor.Style>
@@ -424,6 +425,17 @@
                             <Image Source="pack://application:,,,/FrostyEditor;component/Images/Compile.png"
                                    Width="20" />
                         </Button>
+                        <Button x:Name="RefreshMappingButton"
+                                Width="20"
+                                Height="20"
+                                Margin="2,0,4,0"
+                                HorizontalAlignment="Left"
+                                Click="RefreshMappingButton_OnClick"
+                                ToolTip="Refreshes all of the nodes in the current editor"
+                                Visibility="Collapsed">
+                            <Image Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/Refresh.png"
+                                   Width="20" />
+                        </Button>
 
                         <Grid Background="{StaticResource SubMenuItemHighlight}" Width="1" />
 
@@ -483,6 +495,16 @@
                                 Click="PropertyGridVisible_OnClick"
                                 ToolTip="Open/Close the property grid">
                             <Image Source="/FrostyEditor;component/Images/Properties.png"
+                                   Width="20" />
+                        </Button>
+                        <Button x:Name="ControlsMenuVisible"
+                                Width="20"
+                                Height="20"
+                                Margin="2,0,2,0"
+                                HorizontalAlignment="Left"
+                                Click="ControlsMenuVisible_OnClick"
+                                ToolTip="View the list of controls for the editor">
+                            <Image Source="/FrostyEditor;component/Images/EditLabel.png"
                                    Width="20" />
                         </Button>
                     </StackPanel>
