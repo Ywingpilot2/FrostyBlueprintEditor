@@ -27,7 +27,6 @@ namespace BlueprintEditorPlugin.Windows
 {
     public partial class BlueprintGraphEditor : UserControl
     {
-        private EditorViewModel _editor;
         private EbxBaseLoader _loader;
         
         private readonly Random _rng = new Random();
@@ -61,8 +60,6 @@ namespace BlueprintEditorPlugin.Windows
         /// </summary>
         public void Initiate()
         {
-            _editor = EditorUtils.ActiveNodeEditors[_file.Name]; //Get the editor based on what our filename is
-
             _loader = (EbxBaseLoader)Activator.CreateInstance(EditorUtils.EbxLoaders.ContainsKey(File.AssetType) ? EditorUtils.EbxLoaders[File.AssetType] : EditorUtils.EbxLoaders["null"]);
             _loader.PopulateTypesList(_types); //Populate the types list with our types
             ClassSelector.Types = _types;
@@ -79,12 +76,12 @@ namespace BlueprintEditorPlugin.Windows
             TransientClassSelector.Types = _transTypes;
 
             //The NodeEditor needs to access the property grid, and vice versa. It's a weird setup to ensure they are in sync, but it works.
-            _editor.NodePropertyGrid = new BlueprintPropertyGrid() { NodeEditor = _editor };
+            NodeEditor.NodePropertyGrid = new BlueprintPropertyGrid() { NodeEditor = NodeEditor };
             FrostyTabItem ti = new FrostyTabItem //Now we create a tab item which contains our property grid
             {
                 Header = "Property Grid",
                 Icon = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Properties.png") as ImageSource,
-                Content = _editor.NodePropertyGrid
+                Content = NodeEditor.NodePropertyGrid
             };
             PropertiesTabControl.Items.Add(ti);
 
@@ -93,20 +90,20 @@ namespace BlueprintEditorPlugin.Windows
             NodifyEditor.KeyUp += Editor_ControlInput;
             NodifyEditor.MouseRightButtonUp += Editor_MouseInput;
             NodifyEditor.MouseLeftButtonUp += Editor_MouseInput;
-            _editor.SelectedNodes.CollectionChanged += NodeSelectionUpdated;
+            NodeEditor.SelectedNodes.CollectionChanged += NodeSelectionUpdated;
             
             //Mouse capture
-            _editor.NodePropertyGrid.GotMouseCapture += BlueprintEditorWindow_OnGotFocus;
-            _editor.NodePropertyGrid.GotKeyboardFocus += BlueprintEditorWindow_OnGotFocus;
+            NodeEditor.NodePropertyGrid.GotMouseCapture += BlueprintEditorWindow_OnGotFocus;
+            NodeEditor.NodePropertyGrid.GotKeyboardFocus += BlueprintEditorWindow_OnGotFocus;
             ClassSelector.GotMouseCapture += BlueprintEditorWindow_OnGotFocus;
             
             //Editor status
-            _editor.EditorStatusChanged += SetEditorStatus;
-            _editor.RemoveEditorStatus += RemoveEditorMessage;
+            NodeEditor.EditorStatusChanged += SetEditorStatus;
+            NodeEditor.RemoveEditorStatus += RemoveEditorMessage;
             
-            dynamic openedProperties = _editor.EditedProperties;
+            dynamic openedProperties = NodeEditor.EditedProperties;
 
-            _loader.NodeEditor = _editor;
+            _loader.NodeEditor = NodeEditor;
             
             _loader.PopulateNodes(openedProperties);
             _loader.CreateConnections(openedProperties);
@@ -115,21 +112,21 @@ namespace BlueprintEditorPlugin.Windows
             //So we check with the loader before adding the interface editor
             if (_loader.HasInterface && ((PointerRef)openedProperties.Interface).Type != PointerRefType.Null)
             {
-                _editor.InterfacePropertyGrid = new BlueprintPropertyGrid()
+                NodeEditor.InterfacePropertyGrid = new BlueprintPropertyGrid()
                 {
                     Object = openedProperties.Interface.Internal, 
-                    NodeEditor = _editor
+                    NodeEditor = NodeEditor
                 };
                 FrostyTabItem iti = new FrostyTabItem()
                 {
                     Header = "Interface",
                     Icon = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Interface.png") as ImageSource,
-                    Content = _editor.InterfacePropertyGrid
+                    Content = NodeEditor.InterfacePropertyGrid
                 };
                 PropertiesTabControl.Items.Add(iti);
             }
 
-            EditorUtils.ApplyLayouts(_file, _editor); //Organize the file
+            EditorUtils.ApplyLayouts(_file, NodeEditor); //Organize the file
         }
 
         #region Window events
@@ -144,21 +141,21 @@ namespace BlueprintEditorPlugin.Windows
         {
             if (e.Key == Key.Delete)
             {
-                while (_editor.SelectedNodes.Count != 0)
+                while (NodeEditor.SelectedNodes.Count != 0)
                 {
-                    _editor.DeleteNode(_editor.SelectedNodes[0]);
+                    NodeEditor.DeleteNode(NodeEditor.SelectedNodes[0]);
                 }
             }
-            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift && Keyboard.IsKeyDown(Key.D) && _editor.SelectedNodes.Count != 0)
+            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift && Keyboard.IsKeyDown(Key.D) && NodeEditor.SelectedNodes.Count != 0)
             {
-                List<NodeBaseModel> nodesToDupe = new List<NodeBaseModel>(_editor.SelectedNodes);
-                _editor.SelectedNodes.Clear();
+                List<NodeBaseModel> nodesToDupe = new List<NodeBaseModel>(NodeEditor.SelectedNodes);
+                NodeEditor.SelectedNodes.Clear();
                 while (nodesToDupe.Count != 0)
                 {
                     var nodeToDupe = nodesToDupe[0];
                     if (nodeToDupe.ObjectType != "EditorInterfaceNode")
                     {
-                        object dupedObj = _editor.CreateNodeObject(nodeToDupe.Object);
+                        object dupedObj = NodeEditor.CreateNodeObject(nodeToDupe.Object);
                         NodeBaseModel dupe = _loader.GetNodeFromObject(dupedObj);
                         
                         //This means we need to copy over the inputs/outputs
@@ -186,7 +183,7 @@ namespace BlueprintEditorPlugin.Windows
                             }
                         }
                         dupe.Location = new Point(nodeToDupe.Location.X + 10, nodeToDupe.Location.Y + 10);
-                        _editor.SelectedNodes.Add(dupe);
+                        NodeEditor.SelectedNodes.Add(dupe);
                     }
                     else
                     {
@@ -195,7 +192,7 @@ namespace BlueprintEditorPlugin.Windows
 
                     nodesToDupe.Remove(nodeToDupe);
                 }
-                App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+                App.AssetManager.ModifyEbx(_file.Name, NodeEditor.EditedEbxAsset);
             }
             
         }
@@ -208,7 +205,7 @@ namespace BlueprintEditorPlugin.Windows
                 {
                     if (_selectedType != null && !_selectedType.IsSubclassOf(typeof(TransientNode)))
                     {
-                        object obj = _editor.CreateNodeObject(_selectedType);
+                        object obj = NodeEditor.CreateNodeObject(_selectedType);
 
                         var node = _loader.GetNodeFromObject(obj);
                         node.Location = new Point(NodifyEditor.MouseLocation.X, NodifyEditor.MouseLocation.Y);
@@ -219,10 +216,10 @@ namespace BlueprintEditorPlugin.Windows
                         TransientNode node = (TransientNode)Activator.CreateInstance(_selectedType);
                         node.OnCreation();
                         node.Location = new Point(NodifyEditor.MouseLocation.X, NodifyEditor.MouseLocation.Y);
-                        _editor.Nodes.Add(node);
+                        NodeEditor.Nodes.Add(node);
                     }
 
-                    App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+                    App.AssetManager.ModifyEbx(_file.Name, NodeEditor.EditedEbxAsset);
                     App.EditorWindow.DataExplorer.RefreshItems();
                 }
             }
@@ -247,7 +244,7 @@ namespace BlueprintEditorPlugin.Windows
         /// <param name="e"></param>
         public void BlueprintEditorWindow_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            EditorUtils.CurrentEditor = _editor;
+            EditorUtils.CurrentEditor = NodeEditor;
         }
 
         #endregion
@@ -268,23 +265,23 @@ namespace BlueprintEditorPlugin.Windows
                 }
             }
             
-            if (_editor.SelectedNodes.Count == 0)
+            if (NodeEditor.SelectedNodes.Count == 0)
             {
-                _editor.NodePropertyGrid.Object = new object();
+                NodeEditor.NodePropertyGrid.Object = new object();
                 return;
             }
 
-            if (_editor.SelectedNodes.First().ObjectType != "EditorInterfaceNode")
+            if (NodeEditor.SelectedNodes.First().ObjectType != "EditorInterfaceNode")
             {
                 PropertiesTabControl.SelectedIndex = 0;
-                _editor.NodePropertyGrid.Object = _editor.SelectedNodes.First().Object;
+                NodeEditor.NodePropertyGrid.Object = NodeEditor.SelectedNodes.First().Object;
             }
             else
             {
                 PropertiesTabControl.SelectedIndex = 1;
             }
 
-            foreach (NodeBaseModel node in _editor.SelectedNodes)
+            foreach (NodeBaseModel node in NodeEditor.SelectedNodes)
             {
                 node.IsSelected = true;
             }
@@ -424,9 +421,9 @@ namespace BlueprintEditorPlugin.Windows
         /// <param name="e"></param>
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
-            while (_editor.SelectedNodes.Count != 0)
+            while (NodeEditor.SelectedNodes.Count != 0)
             {
-                _editor.DeleteNode(_editor.SelectedNodes[0]);
+                NodeEditor.DeleteNode(NodeEditor.SelectedNodes[0]);
             }
         }
 
@@ -439,21 +436,21 @@ namespace BlueprintEditorPlugin.Windows
         {
             if (_selectedType != null && !_selectedType.IsSubclassOf(typeof(TransientNode)))
             {
-                object obj = _editor.CreateNodeObject(_selectedType);
+                object obj = NodeEditor.CreateNodeObject(_selectedType);
             
                 var node = _loader.GetNodeFromObject(obj);
-                node.Location = new Point(_editor.ViewportLocation.X + (575 / _editor.ViewportZoom), _editor.ViewportLocation.Y + 287.5 / _editor.ViewportZoom);
+                node.Location = new Point(NodeEditor.ViewportLocation.X + (575 / NodeEditor.ViewportZoom), NodeEditor.ViewportLocation.Y + 287.5 / NodeEditor.ViewportZoom);
                 node.OnCreateNew();
             }
             else if (_selectedType != null) //Stuff for adding transients
             {
                 TransientNode node = (TransientNode)Activator.CreateInstance(_selectedType);
                 node.OnCreation();
-                node.Location = new Point(_editor.ViewportLocation.X + (575 / _editor.ViewportZoom), _editor.ViewportLocation.Y + 287.5 / _editor.ViewportZoom);
-                _editor.Nodes.Add(node);
+                node.Location = new Point(NodeEditor.ViewportLocation.X + (575 / NodeEditor.ViewportZoom), NodeEditor.ViewportLocation.Y + 287.5 / NodeEditor.ViewportZoom);
+                NodeEditor.Nodes.Add(node);
             }
             
-            App.AssetManager.ModifyEbx(_file.Name, _editor.EditedEbxAsset);
+            App.AssetManager.ModifyEbx(_file.Name, NodeEditor.EditedEbxAsset);
             App.EditorWindow.DataExplorer.RefreshItems();
         }
         
@@ -464,7 +461,7 @@ namespace BlueprintEditorPlugin.Windows
         /// <param name="e"></param>
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            EditorUtils.ApplyAutoLayout(_editor);
+            EditorUtils.ApplyAutoLayout(NodeEditor);
         }
         
         private void ImportOrganizationButton_OnClick(object sender, RoutedEventArgs e)
@@ -473,7 +470,7 @@ namespace BlueprintEditorPlugin.Windows
             FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Layout", "Blueprint Layout (*.lyt)|*.lyt|Text File (*.txt)|*.txt", "BlueprintLayout");
             if (!ofd.ShowDialog()) return; //I think this means it was cancelled though I don't actually know
 
-            EditorUtils.ApplyExistingLayout(ofd.FileName, _editor);
+            EditorUtils.ApplyExistingLayout(ofd.FileName, NodeEditor);
         }
 
         private void SaveOrganizationButton_OnClick(object sender, RoutedEventArgs e)
@@ -484,7 +481,7 @@ namespace BlueprintEditorPlugin.Windows
         
         private void AutoMapButton_OnClick(object sender, RoutedEventArgs e)
         {
-            foreach (NodeBaseModel selectedNode in _editor.SelectedNodes)
+            foreach (NodeBaseModel selectedNode in NodeEditor.SelectedNodes)
             {
                 NodeUtils.GenerateNodeMapping(selectedNode);
             }

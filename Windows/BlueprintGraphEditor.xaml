@@ -72,7 +72,7 @@
                                          EnableRealtimeSelection="False"
                                          x:Name="NodifyEditor">
                         <nodify:NodifyEditor.DataContext>
-                            <editor:EditorViewModel />
+                            <editor:EditorViewModel x:Name="NodeEditor"/>
                         </nodify:NodifyEditor.DataContext>
                         
                         <nodify:NodifyEditor.Style>
