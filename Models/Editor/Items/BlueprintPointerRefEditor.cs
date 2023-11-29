@@ -608,34 +608,8 @@ namespace BlueprintEditorPlugin.Models.Editor.Items
             if (pointerRef.Type == PointerRefType.External)
             {
                 EbxAssetEntry entry = App.AssetManager.GetEbxEntry(pointerRef.External.FileGuid);
-                EbxAssetEntry assetEntry; // = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
-
-                switch (((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]).PointerRefType)
-                {
-                    //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
-                    case PointerRefType.Internal:
-                    {
-                        assetEntry = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
-                    } break;
-                    case PointerRefType.External:
-                    {
-                        EntityNode node = ((EntityNode)EditorUtils.CurrentEditor.SelectedNodes[0]);
-                        EbxAsset nodeAsset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(node.FileGuid));
-                        assetEntry = App.AssetManager.GetEbxEntry(nodeAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
-                    } break;
-                    default:
-                    {
-                        try
-                        {
-                            assetEntry = App.AssetManager.GetEbxEntry(EditorUtils.CurrentEditor.EditedEbxAsset.Dependencies.First(x => x == pointerRef.External.FileGuid));
-                        }
-                        catch (Exception e)
-                        {
-                            App.Logger.LogError("This stupid fucking pointer ref editor has decided to come fuck you in the ass again, congrats. Please contact Ywingpilot2 about the issue and tell him to fuck himself again");
-                            return;
-                        }
-                    } break;
-                }
+                EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(pointerRef.External.FileGuid);
+                
                 EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
 
                 if (entry != null)
