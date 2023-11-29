@@ -75,7 +75,7 @@ namespace BlueprintEditorPlugin.Models.Editor
                     : Connections.First(x => x.Source == connector));
             });
             
-            EditorUtils.ActiveNodeEditors.Add(EditorName, this);
+            EditorUtils.ActiveNodeEditors.Add(App.SelectedAsset.Name, this);
             EditorUtils.CurrentEditor = this;
         }
 

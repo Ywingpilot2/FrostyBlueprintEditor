@@ -61,7 +61,7 @@ namespace BlueprintEditorPlugin.Windows
         /// </summary>
         public void Initiate()
         {
-            _editor = EditorUtils.ActiveNodeEditors[_file.Filename]; //Get the editor based on what our filename is
+            _editor = EditorUtils.ActiveNodeEditors[_file.Name]; //Get the editor based on what our filename is
 
             _loader = (EbxBaseLoader)Activator.CreateInstance(EditorUtils.EbxLoaders.ContainsKey(File.AssetType) ? EditorUtils.EbxLoaders[File.AssetType] : EditorUtils.EbxLoaders["null"]);
             _loader.PopulateTypesList(_types); //Populate the types list with our types
