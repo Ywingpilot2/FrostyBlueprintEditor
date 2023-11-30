@@ -226,6 +226,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                     EbxAsset blueprint = App.AssetManager.GetEbx(blueprintAssetEntry);
 
                     Name = $"{ShortName} ({blueprintAssetEntry.Filename})";
+                    NotifyPropertyChanged(nameof(Name));
 
                     PointerRef interfaceRef = ((dynamic)blueprint.RootObject).Interface;
 
