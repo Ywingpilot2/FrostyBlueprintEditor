@@ -233,7 +233,7 @@ namespace BlueprintEditorPlugin.Windows
         public void BlueprintEditorWindow_OnClosing(object sender, CancelEventArgs e)
         {
             EditorUtils.SaveLayouts(_file);
-            EditorUtils.ActiveNodeEditors.Remove(_file.Filename);
+            EditorUtils.ActiveNodeEditors.Remove(_file.Name);
             App.EditorWindow.OpenAsset(_file); //TODO: Make this a profile option
         }
         
