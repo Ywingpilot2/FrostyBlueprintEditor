@@ -53,7 +53,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             base.OnCreateNew();
             Object.Enabled = true;
             Object.QueueSpawnEvent = true;
-            Object.SpawnDelay = 0.1;
+            Object.SpawnDelay = 0.1f;
             Object.MaxCount = -1;
             Object.MaxCountSimultaneously = -1;
             Object.MaxCountSimultaneouslyOfType = -1;
