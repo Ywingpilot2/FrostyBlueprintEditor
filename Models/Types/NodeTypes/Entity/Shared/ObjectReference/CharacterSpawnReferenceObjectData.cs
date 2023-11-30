@@ -56,7 +56,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             Object.SpawnDelay = 0.1f;
             Object.MaxCount = -1;
             Object.MaxCountSimultaneously = -1;
-            Object.MaxCountSimultaneouslyOfType = -1;
+            Object.TotalCountSimultaneouslyOfType = -1;
             Object.SpawnProtectionCheckAllTeams = true;
             Object.ClearBangersOnSpawn = true;
             Object.OnlySendEventForHumanPlayers = true;
@@ -65,7 +65,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             Object.ReturnControlOnIdle = true;
             Object.SpawnWithHumanLikeAI = true;
             Object.SpawnVisible = true;
-            Object.HumanTargetPreference = -1;
+            Object.HumanTargetPreference = -1.0f;
             Object.IsTarget = true;
         }
 
