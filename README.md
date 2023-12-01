@@ -12,7 +12,7 @@ This tool is still unfinished, with many things relating to optimization and add
 - Transient node functionality
 
 ## What needs to be worked on:
-- Additional support for more situations(e.g external pointerrefs in say subworlds being used in connections)
+- Additional support for more situations(e.g files based around components instead of objects)
 - Layered Graph Drawing algorithm for sorting nodes
 - Options for customizing the look and functionality of the editor
 - Comment, Redirect, and shortcut transient nodes
