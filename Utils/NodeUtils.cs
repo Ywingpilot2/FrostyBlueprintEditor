@@ -73,7 +73,7 @@ namespace BlueprintEditorPlugin.Utils
         
         public static void GenerateNodeMapping(NodeBaseModel node)
         {
-            if (EntityNodeExtensions.ContainsKey(node.ObjectType) || TransNodeExtensions.ContainsKey(node.ObjectType))
+            if (EntityNodeExtensions.ContainsKey(node.Object.GetType().Name) || TransNodeExtensions.ContainsKey(node.Object.GetType().Name))
             {
                 App.Logger.LogError("Cannot overwrite hard coded Node Extensions.");
                 return;

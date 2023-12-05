@@ -1,0 +1,4 @@
+Type = EventSyncEntityData
+DisplayName = EventSync
+InputEvent = Client, Client
+OutputEvent = Out, Server
