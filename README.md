@@ -12,7 +12,7 @@ This tool is still unfinished, with many things relating to optimization and add
 - Transient node functionality
 
 ## What needs to be worked on:
-- Additional support for more situations(e.g external pointerrefs in say subworlds being used in connections)
+- Additional support for more situations(e.g files based around components instead of objects)
 - Layered Graph Drawing algorithm for sorting nodes
 - Options for customizing the look and functionality of the editor
 - Comment, Redirect, and shortcut transient nodes
@@ -27,7 +27,7 @@ Here is a basic overview of the Terminology used in this project:
 - Entity Node: A node which has an Object associated with it, and can be found embedded in the EBX
 - Transient Node: A node which is not stored in the EBX and is instead stored externally in layouts. This through code creates the EBX form of connections and Objects
 - Node Object: An object stored inside of a Node, this represents the original object this node is based on and it's properties are what is displayed in the property grid.
-- Port: An input/output you can plug into and out of on a node
+- Port: Also referred to as a Connector, an input/output you can connect to another input/output to form a connection.
 - Connection: Also commonly known as an edge, this connects an input and output together transferring a property or sending an event.
 - Connection Object: An object stored inside the connection, this represents the original object of this connection.
 - Node Mapping: A configuration of a type or class which details the inputs and outputs, among other details, it should have
