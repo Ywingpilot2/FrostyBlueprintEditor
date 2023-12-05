@@ -8,6 +8,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
     public class BoolEntityData : EntityNode
     {
         public override string Name { get; set; } = "Bool";
+        public override string Documentation { get; } = "A container of a true/false statement";
         public override string ObjectType { get; set; } = "BoolEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
@@ -37,6 +38,10 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             }
         }
 
-        public override void OnModified(ItemModifiedEventArgs args) => OnCreation();
+        public override void OnModified(ItemModifiedEventArgs args)
+        {
+            NotifyPropertyChanged(Name);
+            OnCreation();
+        }
     }
 }

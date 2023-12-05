@@ -8,6 +8,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
     public class AndEntityData : EntityNode
     {
         public override string Name { get; set; } = "AND";
+
+        public override string Documentation { get; } = "This outputs a boolean which is true when all of its inputs are true as well";
         public override string ObjectType { get; set; } = "AndEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } = new ObservableCollection<InputViewModel>();
@@ -40,6 +42,12 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 
         public override void OnModified(ItemModifiedEventArgs args)
         {
+            if (args.Item.Name == "__Id")
+            {
+                NotifyPropertyChanged(nameof(Name));
+                return;
+            }
+            
             if ((int)Object.InputCount == 0)
             {
                 Inputs.Clear();

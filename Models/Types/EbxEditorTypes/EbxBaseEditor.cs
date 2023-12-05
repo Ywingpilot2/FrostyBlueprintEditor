@@ -802,19 +802,25 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         EntityNode node = NodeEditor.SelectedNodes[0] as EntityNode;
                         node.Object = newObj;
-                        node.Name = node.Object.__Id.ToString();
-                        
+
                         if (args != null) //If the args are null its not a user action, so we shouldn't notify the node nor check the realm
                         {
                             node.OnModified(args);
-                            if (args.Item.Name == "Realm")
+                            switch (args.Item.Name)
                             {
-                                foreach (ConnectionViewModel connection in NodeEditor.GetConnections(node))
+                                case "Realm":
                                 {
-                                    connection.ConnectionStatus = !NodeUtils.RealmsAreValid(connection)
-                                        ? EditorStatus.Error
-                                        : EditorStatus.Good;
-                                }
+                                    foreach (ConnectionViewModel connection in NodeEditor.GetConnections(node))
+                                    {
+                                        connection.ConnectionStatus = !NodeUtils.RealmsAreValid(connection)
+                                            ? EditorStatus.Error
+                                            : EditorStatus.Good;
+                                    }
+                                } break;
+                                case "__Id":
+                                {
+                                    node.Name = node.Object.__Id.ToString();
+                                } break;
                             }
                         }
                     

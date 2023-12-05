@@ -8,6 +8,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
     public class EventSwitchEntityData : EntityNode
     {
         public override string Name { get; set; } = "Switch(Event)";
+        public override string Documentation { get; } = "A switch which changes what event it outputs depending on the current OutEvent";
         public override string ObjectType { get; set; } = "EventSwitchEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } =
@@ -40,6 +41,12 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
         
         public override void OnModified(ItemModifiedEventArgs args)
         {
+            if (args.Item.Name == "__Id")
+            {
+                NotifyPropertyChanged(nameof(Name));
+                return;
+            }
+            
             if ((int)Object.OutEvents == 0)
             {
                 Outputs.Clear();

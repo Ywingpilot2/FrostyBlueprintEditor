@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Models.Connections;
+using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk.Ebx;
@@ -11,6 +12,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
     public class SchematicChannelEntityData : EntityNode
     {
         public override string Name { get; set; } = "Schematic Channel (null ref, 0 events)";
+
+        public override string Documentation { get; } = "This references a Schematic Channel, which can be used to transfer data between prefabs";
         public override string ObjectType { get; set; } = "SchematicChannelEntityData";
 
         public override ObservableCollection<InputViewModel> Inputs { get; set; } = new ObservableCollection<InputViewModel>();
@@ -46,6 +49,21 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             }
         }
         
-        public override void OnModified(ItemModifiedEventArgs args) => OnCreation();
+        public override void OnModified(ItemModifiedEventArgs args)
+        {
+            if (args.Item.Name == "__Id")
+            {
+                NotifyPropertyChanged(nameof(Name));
+                return;
+            }
+
+            foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(this))
+            {
+                EditorUtils.CurrentEditor.Disconnect(connection);
+            }
+            Inputs.Clear();
+            Outputs.Clear();
+            OnCreation();
+        }
     }
 }

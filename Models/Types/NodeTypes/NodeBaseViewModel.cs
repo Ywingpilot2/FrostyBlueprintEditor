@@ -290,6 +290,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
             set
             {
                 _title = value;
+                _displayname = null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayName)));
             }

@@ -6,10 +6,8 @@ using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes;
 using BlueprintEditorPlugin.Utils;
 using Frosty.Core.Controls;
-using FrostyEditor;
-using FrostySdk.Ebx;
 
-namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
+namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.Hubs
 {
     /// <summary>
     /// This is a more advanced demonstration, for a simple demonstration <see cref="CompareBoolEntityData"/>
@@ -86,58 +84,76 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
         public override void OnModified(ItemModifiedEventArgs args)
         {
             List<UInt32> events = Object.HashedInput;
-            if (args.Item.Name == "HashedInput")
+            switch (args.Item.Name)
             {
-                switch (args.ModifiedArgs.Type)
+                case "HashedInput":
                 {
-                    case ItemModifiedTypes.Add:
+                    switch (args.ModifiedArgs.Type)
                     {
-                        UInt32 eventHash = events.Last();
-
-                        Inputs.Add(new InputViewModel() {Title = $"0x{eventHash:x8}", Type = ConnectionType.Property});
-                    } break;
-                    case ItemModifiedTypes.Insert:
-                    {
-                        UInt32 eventHash = (UInt32)args.NewValue;
-
-                        Inputs.Add(new InputViewModel() {Title = $"0x{eventHash:x8}", Type = ConnectionType.Property});
-                    } break;
-                    case ItemModifiedTypes.Clear:
-                    {
-                        for (var i = 0; i < Outputs.Count; i++)
+                        case ItemModifiedTypes.Add:
                         {
-                            InputViewModel input = Inputs[i];
-                            if (input.Title.StartsWith("0x"))
+                            UInt32 eventHash = events.Last();
+
+                            Inputs.Add(new InputViewModel()
+                                { Title = $"0x{eventHash:x8}", Type = ConnectionType.Property });
+                        }
+                            break;
+                        case ItemModifiedTypes.Insert:
+                        {
+                            UInt32 eventHash = (UInt32)args.NewValue;
+
+                            Inputs.Add(new InputViewModel()
+                                { Title = $"0x{eventHash:x8}", Type = ConnectionType.Property });
+                        }
+                            break;
+                        case ItemModifiedTypes.Clear:
+                        {
+                            for (var i = 0; i < Outputs.Count; i++)
                             {
-                                Inputs.Remove(input);
+                                InputViewModel input = Inputs[i];
+                                if (input.Title.StartsWith("0x"))
+                                {
+                                    Inputs.Remove(input);
+                                }
                             }
                         }
-                    } break;
-                    case ItemModifiedTypes.Remove:
-                    {
-                        UInt32 eventHash = (UInt32)args.OldValue;
+                            break;
+                        case ItemModifiedTypes.Remove:
+                        {
+                            UInt32 eventHash = (UInt32)args.OldValue;
 
-                        foreach (dynamic connection in EditorUtils.CurrentEditor.GetConnections(GetInput($"0x{eventHash:x8}", ConnectionType.Property)))
+                            foreach (dynamic connection in EditorUtils.CurrentEditor.GetConnections(
+                                         GetInput($"0x{eventHash:x8}", ConnectionType.Property)))
+                            {
+                                EditorUtils.CurrentEditor.Disconnect(connection);
+                            }
+
+                            Inputs.Remove(GetInput($"0x{eventHash:x8}", ConnectionType.Property));
+                        }
+                            break;
+                    }
+                } break;
+                case "__Id":
+                {
+                    NotifyPropertyChanged(nameof(Name));
+                } break;
+                default:
+                {
+                    if (args.Item.Parent.Name == "HashedInput")
+                    {
+                        UInt32 eventHash = (UInt32)args.NewValue;
+                        UInt32 oldHash = (UInt32)args.OldValue;
+                        var input = GetInput($"0x{oldHash:x8}", ConnectionType.Property);
+                        input.Title = $"0x{eventHash:x8}";
+                        input.DisplayName = $"0x{eventHash:x8}";
+                
+                        //TODO: Update connections
+                        foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(input))
                         {
                             EditorUtils.CurrentEditor.Disconnect(connection);
                         }
-                        Inputs.Remove(GetInput($"0x{eventHash:x8}", ConnectionType.Property));
-                    } break;
-                }
-            }
-            else if (args.Item.Parent.Name == "HashedInput")
-            {
-                UInt32 eventHash = (UInt32)args.NewValue;
-                UInt32 oldHash = (UInt32)args.OldValue;
-                var input = GetInput($"0x{oldHash:x8}", ConnectionType.Property);
-                input.Title = $"0x{eventHash:x8}";
-                input.DisplayName = $"0x{eventHash:x8}";
-                
-                //TODO: Update connections
-                foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(input))
-                {
-                    EditorUtils.CurrentEditor.Disconnect(connection);
-                }
+                    }
+                } break;
             }
             
             foreach (InputViewModel input in Inputs)

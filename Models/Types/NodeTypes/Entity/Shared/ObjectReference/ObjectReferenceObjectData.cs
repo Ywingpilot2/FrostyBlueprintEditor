@@ -385,6 +385,10 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
 
                     #endregion
                 } break;
+                case "__Id":
+                {
+                    NotifyPropertyChanged(nameof(Name));
+                } break;
             }
         }
     }

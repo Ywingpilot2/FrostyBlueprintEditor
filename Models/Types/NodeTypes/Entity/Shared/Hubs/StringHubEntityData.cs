@@ -1,4 +1,4 @@
-﻿namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
+﻿namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.Hubs
 {
     public class StringHubEntityData : FloatHubEntityData
     {
