@@ -35,12 +35,12 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
         {
             base.OnCreation();
             
-            PointerRef ptr = Object.Blueprint;
+            PointerRef ptr = ((dynamic)Object).Blueprint;
             EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
 
             if (Object.GetType().GetProperty("Template") != null)
             {
-                PointerRef templatePointer = Object.Template;
+                PointerRef templatePointer = ((dynamic)Object).Template;
 
                 if (templatePointer.External.FileGuid == System.Guid.Empty) return;
                 EbxAssetEntry templateAssetEntry = App.AssetManager.GetEbxEntry(templatePointer.External.FileGuid);
@@ -51,22 +51,22 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
         public override void OnCreateNew()
         {
             base.OnCreateNew();
-            Object.Enabled = true;
-            Object.QueueSpawnEvent = true;
-            Object.SpawnDelay = 0.1f;
-            Object.MaxCount = -1;
-            Object.MaxCountSimultaneously = -1;
-            Object.TotalCountSimultaneouslyOfType = -1;
-            Object.SpawnProtectionCheckAllTeams = true;
-            Object.ClearBangersOnSpawn = true;
-            Object.OnlySendEventForHumanPlayers = true;
-            Object.TryToSpawnOutOfSight = true;
-            Object.TakeControlOnTransformChange = true;
-            Object.ReturnControlOnIdle = true;
-            Object.SpawnWithHumanLikeAI = true;
-            Object.SpawnVisible = true;
-            Object.HumanTargetPreference = -1.0f;
-            Object.IsTarget = true;
+            ((dynamic)Object).Enabled = true;
+            ((dynamic)Object).QueueSpawnEvent = true;
+            ((dynamic)Object).SpawnDelay = 0.1f;
+            ((dynamic)Object).MaxCount = -1;
+            ((dynamic)Object).MaxCountSimultaneously = -1;
+            ((dynamic)Object).TotalCountSimultaneouslyOfType = -1;
+            ((dynamic)Object).SpawnProtectionCheckAllTeams = true;
+            ((dynamic)Object).ClearBangersOnSpawn = true;
+            ((dynamic)Object).OnlySendEventForHumanPlayers = true;
+            ((dynamic)Object).TryToSpawnOutOfSight = true;
+            ((dynamic)Object).TakeControlOnTransformChange = true;
+            ((dynamic)Object).ReturnControlOnIdle = true;
+            ((dynamic)Object).SpawnWithHumanLikeAI = true;
+            ((dynamic)Object).SpawnVisible = true;
+            ((dynamic)Object).HumanTargetPreference = -1.0f;
+            ((dynamic)Object).IsTarget = true;
         }
 
         public override void OnModified(ItemModifiedEventArgs args)
@@ -80,11 +80,11 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
                 } break;
                 case "Template":
                 {
-                    PointerRef ptr = Object.Blueprint;
+                    PointerRef ptr = ((dynamic)Object).Blueprint;
                     if (ptr.Type == PointerRefType.Null) return;
             
                     EbxAssetEntry blueprintAssetEntry = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
-                    PointerRef templatePointer = Object.Template;
+                    PointerRef templatePointer = ((dynamic)Object).Template;
 
                     if (templatePointer.External.FileGuid == System.Guid.Empty) return;
                     EbxAssetEntry templateAssetEntry = App.AssetManager.GetEbxEntry(templatePointer.External.FileGuid);

@@ -21,7 +21,7 @@ namespace BlueprintEditorPlugin.Models.Connections
     {
         #region Properties
 
-        public dynamic Object { get; set; }
+        public object Object { get; set; }
         
         #region Source & Target
 
@@ -254,7 +254,9 @@ namespace BlueprintEditorPlugin.Models.Connections
             dynamic connectionB = null;
             
             //Some transient connections may have their objects as null
-            if (Object == null)
+            if (Object == null || (Object.GetType().Name != "LinkConnection" &&
+                                   Object.GetType().Name != "PropertyConnection" &&
+                                   Object.GetType().Name != "EventConnection"))
             {
                 //In which case we need to call the base equals
                 return base.Equals(obj);
@@ -288,10 +290,10 @@ namespace BlueprintEditorPlugin.Models.Connections
                 return false;
             }
 
-            PointerRef sourceA = Object.Source;
+            PointerRef sourceA = ((dynamic)Object).Source;
             PointerRef sourceB = connectionB.Source;
             
-            PointerRef targetA = Object.Target;
+            PointerRef targetA = ((dynamic)Object).Target;
             PointerRef targetB = connectionB.Target;
 
             if (targetA == targetB
@@ -301,9 +303,9 @@ namespace BlueprintEditorPlugin.Models.Connections
                 {
                     default:
                     {
-                        if (Object.SourceField.ToString() ==
+                        if (((dynamic)Object).SourceField.ToString() ==
                             connectionB.SourceField.ToString()
-                            && Object.TargetField.ToString() ==
+                            && ((dynamic)Object).TargetField.ToString() ==
                             connectionB.TargetField.ToString())
                         {
                             return true;
@@ -312,9 +314,9 @@ namespace BlueprintEditorPlugin.Models.Connections
                     }
                     case ConnectionType.Event:
                     {
-                        if (Object.SourceEvent.Name.ToString() ==
+                        if (((dynamic)Object).SourceEvent.Name.ToString() ==
                             connectionB.SourceEvent.Name.ToString()
-                            && Object.TargetEvent.Name.ToString() ==
+                            && ((dynamic)Object).TargetEvent.Name.ToString() ==
                             connectionB.TargetEvent.Name.ToString())
                         {
                             return true;

@@ -22,9 +22,9 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 
         public override void OnCreation()
         {
-            if ((int)Object.InputCount == 0) return;
+            if ((int)((dynamic)Object).InputCount == 0) return;
             
-            for (int i = 1; i <= (int)Object.InputCount; i++)
+            for (int i = 1; i <= (int)((dynamic)Object).InputCount; i++)
             {
                 Inputs.Add(new InputViewModel() {Title = $"In{i}", Type = ConnectionType.Property});
             }
@@ -48,23 +48,23 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
                 return;
             }
             
-            if ((int)Object.InputCount == 0)
+            if ((int)((dynamic)Object).InputCount == 0)
             {
                 Inputs.Clear();
                 return;
             }
             
             //If the InputCount is a larger number that means we are adding
-            if ((int)Object.InputCount > Inputs.Count)
+            if ((int)((dynamic)Object).InputCount > Inputs.Count)
             {
-                for (int i = Inputs.Count; i <= (int)Object.InputCount; i++)
+                for (int i = Inputs.Count; i <= (int)((dynamic)Object).InputCount; i++)
                 {
                     Inputs.Add(new InputViewModel() {Title = $"In{i}", Type = ConnectionType.Property});
                 }
             }
             else //This means the list must be smaller
             {
-                for (int i = (int)Object.InputCount; i != Inputs.Count; i++)
+                for (int i = (int)((dynamic)Object).InputCount; i != Inputs.Count; i++)
                 {
                     InputViewModel input = Inputs[i];
                     foreach (ConnectionViewModel connection in EditorUtils.CurrentEditor.GetConnections(input))

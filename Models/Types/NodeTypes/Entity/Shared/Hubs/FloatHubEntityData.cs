@@ -60,7 +60,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.Hubs
         public override void OnCreation()
         {
             base.OnCreation();
-            foreach (UInt32 eventHash in Object.HashedInput) //Go through all of the Events this SelectEvent has
+            foreach (UInt32 eventHash in ((dynamic)Object).HashedInput) //Go through all of the Events this SelectEvent has
             {
                 //And for each one, add it to our Outputs
                 Inputs.Add(new InputViewModel() {Title = $"0x{eventHash:x8}", Type = ConnectionType.Property});
@@ -83,7 +83,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.Hubs
         /// </summary>
         public override void OnModified(ItemModifiedEventArgs args)
         {
-            List<UInt32> events = Object.HashedInput;
+            List<UInt32> events = ((dynamic)Object).HashedInput;
             switch (args.Item.Name)
             {
                 case "HashedInput":

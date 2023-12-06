@@ -49,9 +49,9 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         public virtual bool IsTransient => false;
 
         /// <summary>
-        /// The object this node belongs to.
+        /// The object this node belongs to/is displayed in the property grid.
         /// </summary>
-        public dynamic Object { get; set; }
+        public object Object { get; set; }
 
         #endregion
 
@@ -220,38 +220,6 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes
         #endregion
 
         #region Comparison Methods
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-
-            if (Object == null)
-            {
-                return base.Equals(obj);
-            }
-
-            dynamic objectNode = null;
-            if (obj.GetType() == GetType())
-            {
-                objectNode = ((NodeBaseModel)obj).Object;
-            }
-            else if (obj.GetType() == Object.GetType())
-            {
-                objectNode = obj;
-            }
-
-            return objectNode != null && objectNode.GetInstanceGuid() == Object.GetInstanceGuid();
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = (int)2166136261;
-                hash = (hash * 16777619) ^ ObjectType.GetHashCode();
-                return hash;
-            }
-        }
 
         public override string ToString()
         {

@@ -55,7 +55,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
         public override void OnCreation()
         {
             base.OnCreation();
-            foreach (CString eventName in Object.Events) //Go through all of the Events this SelectEvent has
+            foreach (CString eventName in ((dynamic)Object).Events) //Go through all of the Events this SelectEvent has
             {
                 //And for each one, add it to our Outputs
                 Outputs.Add(new OutputViewModel() {Title = eventName.ToString(), Type = ConnectionType.Event});
@@ -79,7 +79,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
         /// </summary>
         public override void OnModified(ItemModifiedEventArgs args)
         {
-            List<CString> events = Object.Events;
+            List<CString> events = ((dynamic)Object).Events;
             if (args.Item.Name == "Events")
             {
                 switch (args.ModifiedArgs.Type)

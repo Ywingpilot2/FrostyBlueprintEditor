@@ -64,7 +64,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.ExampleTypes
         public override void OnCreation()
         {
             //The "Object" property allows you to fetch the property grid values of this node
-            Name = Object.__Id; //This will fetch the Id and set the name as that
+            Name = ((dynamic)Object).__Id; //This will fetch the Id and set the name as that
 
             //We want to make sure our Inputs and Outputs have the same realm as our object, so we can just use the NodeUtils method for it
             //NodeUtils provides a variety of utilities which can help in the process of creating node extensions

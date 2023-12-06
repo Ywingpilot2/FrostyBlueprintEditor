@@ -201,7 +201,7 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
                                 {
-                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                    realm = ParseRealmFromString(((dynamic)newNode.Object).Realm.ToString());
                                 }
                                 else
                                 {
@@ -224,7 +224,7 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
                                 {
-                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                    realm = ParseRealmFromString(((dynamic)newNode.Object).Realm.ToString());
                                 }
                                 else
                                 {
@@ -247,7 +247,7 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
                                 {
-                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                    realm = ParseRealmFromString(((dynamic)newNode.Object).Realm.ToString());
                                 }
                                 else
                                 {
@@ -270,7 +270,7 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
                                 {
-                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                    realm = ParseRealmFromString(((dynamic)newNode.Object).Realm.ToString());
                                 }
                                 else
                                 {
@@ -293,7 +293,7 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
                                 {
-                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                    realm = ParseRealmFromString(((dynamic)newNode.Object).Realm.ToString());
                                 }
                                 else
                                 {
@@ -316,7 +316,7 @@ namespace BlueprintEditorPlugin.Utils
                             {
                                 if (((Type)newNode.Object.GetType()).GetProperty("Realm") != null)
                                 {
-                                    realm = ParseRealmFromString(newNode.Object.Realm.ToString());
+                                    realm = ParseRealmFromString(((dynamic)newNode.Object).Realm.ToString());
                                 }
                                 else
                                 {
@@ -734,7 +734,7 @@ namespace BlueprintEditorPlugin.Utils
             {
                 case ConnectionType.Event:
                 {
-                    ConnectionRealm connectionRealm = ParseRealmFromString(connection.Object.TargetType.ToString());
+                    ConnectionRealm connectionRealm = ParseRealmFromString(((dynamic)connection.Object).TargetType.ToString());
                     if (connectionRealm == ConnectionRealm.Invalid) return false;
 
                     return (connection.Source.Realm == connection.Target.Realm && connectionRealm == connection.Target.Realm)
@@ -743,7 +743,7 @@ namespace BlueprintEditorPlugin.Utils
                 }
                 case ConnectionType.Property:
                 {
-                    var helper = new PropertyFlagsHelper((uint)connection.Object.Flags);
+                    var helper = new PropertyFlagsHelper((uint)((dynamic)connection.Object).Flags);
                     if (helper.Realm == ConnectionRealm.Invalid) return false;
                     
                     return (connection.Source.Realm == connection.Target.Realm && helper.Realm == connection.Target.Realm)
@@ -755,7 +755,7 @@ namespace BlueprintEditorPlugin.Utils
                     Type objType = connection.SourceNode.Object.GetType();
                     if (objType.GetProperty("Flags") == null) return false;
                     
-                    var sourceHelper = new ObjectFlagsHelper((uint)connection.SourceNode.Object.Flags);
+                    var sourceHelper = new ObjectFlagsHelper((uint)((dynamic)connection.SourceNode.Object).Flags);
                     return (sourceHelper.ClientLinkSource && connection.Target.Realm == ConnectionRealm.Client)
                            || (sourceHelper.ServerLinkSource && connection.Target.Realm == ConnectionRealm.Server);
                 }

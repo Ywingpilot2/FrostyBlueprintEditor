@@ -22,7 +22,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
 
         public override void OnCreation()
         {
-            PointerRef ptr = Object.Channel;
+            PointerRef ptr = ((dynamic)Object).Channel;
 
             if (ptr.Type == PointerRefType.Null) return;
 
@@ -38,7 +38,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             for (int i = 0; i < ((dynamic)blueprint.RootObject).Properties.Count; i++)
             {
                 dynamic property = ((dynamic)blueprint.RootObject).Properties[i];
-                if (Object.OutputProperties.Contains(i) || Object.OutputRefProperties.Contains(i))
+                if (((dynamic)Object).OutputProperties.Contains(i) || ((dynamic)Object).OutputRefProperties.Contains(i))
                 {
                     Outputs.Add(new OutputViewModel() { Title = FrostySdk.Utils.GetString(property.Id), Type = ConnectionType.Property});
                 }

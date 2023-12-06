@@ -160,7 +160,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     !x.Equals(connection) 
                                     && x.Source.Realm != connection.Source.Realm))
                             {
-                                var helper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                                var helper = new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags);
                                 switch (connection.Target.Realm)
                                 {
                                     case ConnectionRealm.Client:
@@ -187,8 +187,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     } break;
                                 }
                                 
-                                connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                                EditEbxFlags((EntityNode)connection.TargetNode);
+                                ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
                             }
                             break;
                         }
@@ -206,7 +205,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     !x.Equals(connection) 
                                     && x.Source.Realm != connection.Source.Realm))
                             {
-                                var helper = new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags);
+                                var helper = new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags);
                                 switch (connection.Target.Realm)
                                 {
                                     case ConnectionRealm.Client:
@@ -233,8 +232,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                     } break;
                                 }
                                 
-                                connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                                EditEbxFlags((EntityNode)connection.TargetNode);
+                                ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
                             }
                             break;
                         }
@@ -288,7 +286,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         
                         //Setup flags
                         Type objType = connection.TargetNode.Object.GetType();
-                        ObjectFlagsHelper helper = objType.GetProperty("Flags") != null ? new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags) : new ObjectFlagsHelper(0);
+                        ObjectFlagsHelper helper = objType.GetProperty("Flags") != null ? new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags) : new ObjectFlagsHelper(0);
                         
                         //TODO: THIS CODE FUCKING SUCKS, PLEASE FIX
                         //This is the only way I've found to get the Enum values of a dynamic type, IT SUCKS
@@ -373,8 +371,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
 
                         if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
                         {
-                            connection.TargetNode.Object.Flags = helper.GetAsFlags();
-                            EditEbxFlags((EntityNode)connection.TargetNode);
+                            ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
                         }
                         
                         ((dynamic)NodeEditor.EditedEbxAsset.RootObject).EventConnections.Add(eventConnection);
@@ -394,7 +391,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         //Go through and set our flags
                         var flagsHelper = new PropertyFlagsHelper((uint)propertyConnection.Flags);
                         Type objType = connection.TargetNode.Object.GetType();
-                        ObjectFlagsHelper objectFlagsHelper = objType.GetProperty("Flags") != null ? new ObjectFlagsHelper((uint)connection.TargetNode.Object.Flags) : new ObjectFlagsHelper(0);
+                        ObjectFlagsHelper objectFlagsHelper = objType.GetProperty("Flags") != null ? new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags) : new ObjectFlagsHelper(0);
                         
                         if (NodeUtils.RealmsAreValid(connection.Source, connection.Target))
                         {
@@ -489,8 +486,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         
                         if (objType.GetProperty("Flags") != null) //Double check to make sure our object has Flags
                         {
-                            connection.TargetNode.Object.Flags = objectFlagsHelper.GetAsFlags();
-                            EditEbxFlags((EntityNode)connection.TargetNode);
+                            ((dynamic)connection.TargetNode.Object).Flags = objectFlagsHelper.GetAsFlags();
                         }
 
                         ((dynamic)NodeEditor.EditedEbxAsset.RootObject).PropertyConnections.Add(propertyConnection);
@@ -819,7 +815,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                                 } break;
                                 case "__Id":
                                 {
-                                    node.Name = node.Object.__Id.ToString();
+                                    node.Name = ((dynamic)node.Object).__Id.ToString();
                                 } break;
                             }
                         }
@@ -828,16 +824,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                         {
                             case PointerRefType.Internal:
                             {
-                                //TODO: Update this so we aren't enumerating over every single object in the entire file
-                                for (int i = 0; i < NodeEditor.EditedProperties.Objects.Count; i++)
-                                {
-                                    PointerRef pointerRef = NodeEditor.EditedProperties.Objects[i];
-                                    if (((dynamic)pointerRef.Internal).GetInstanceGuid() != node.InternalGuid) continue;
-                                
-                                    NodeEditor.EditedProperties.Objects[i] = new PointerRef(newObj);
-                                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(NodeEditor.EditedEbxAsset.FileGuid).Filename, NodeEditor.EditedEbxAsset);
-                                    return true;
-                                }
+                                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(NodeEditor.EditedEbxAsset.FileGuid).Filename, NodeEditor.EditedEbxAsset);
                             } break;
                             case PointerRefType.External:
                             {

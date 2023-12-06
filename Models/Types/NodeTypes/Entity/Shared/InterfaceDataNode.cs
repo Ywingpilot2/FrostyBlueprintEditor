@@ -185,7 +185,7 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared
             }
             else if (obj.GetType() == Object.GetType())
             {
-                return ((dynamic)obj).Name == Object.Name;
+                return ((dynamic)obj).Name == ((dynamic)Object).Name;
             }
 
             return obj.GetType() == Object.GetType() && (bool)Object.Equals(obj);
