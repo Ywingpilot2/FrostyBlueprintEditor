@@ -606,5 +606,16 @@ namespace BlueprintEditorPlugin.Windows
         }
 
         #endregion
+
+        private void PortMenuVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (NodeEditor.SelectedNodes.Count == 0) return;
+            
+            EntityNode entityNode = NodeEditor.SelectedNodes[0] as EntityNode;
+            if (entityNode == null) return;
+            
+            BlueprintEditorPortMenu portMenu = new BlueprintEditorPortMenu { Node = entityNode };
+            portMenu.Show();
+        }
     }
 }

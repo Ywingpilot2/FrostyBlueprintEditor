@@ -71,6 +71,7 @@
     <Resource Include="Images\RemoveObjectButton.png" />
     <None Remove="Images\github-mark-white.png" />
     <Resource Include="Images\github-mark-white.png" />
+    <None Remove="Windows\BlueprintEditorPortMenu.xaml.cs~" />
   </ItemGroup>
 
   <ItemGroup>
