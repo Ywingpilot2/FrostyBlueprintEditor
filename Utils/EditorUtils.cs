@@ -355,12 +355,12 @@ namespace BlueprintEditorPlugin.Utils
 
                 foreach (Attribute attribute in plugin.GetCustomAttributes())
                 {
-                    if (attribute is RegisterEbxLoaderExtension registerLoader)
+                    if (attribute is RegisterEbxLoaderExtension registerLoader && registerLoader.ValidForGames != null && registerLoader.ValidForGames.Contains(ProfilesLibrary.ProfileName))
                     {
                         EbxBaseLoader loader = (EbxBaseLoader)Activator.CreateInstance(registerLoader.EbxLoaderExtension);
                         EbxLoaders.Add(loader.AssetType, registerLoader.EbxLoaderExtension);
                     }
-                    else if (attribute is RegisterEbxEditorExtension registerEditor)
+                    else if (attribute is RegisterEbxEditorExtension registerEditor && registerEditor.ValidForGames != null && registerEditor.ValidForGames.Contains(ProfilesLibrary.ProfileName))
                     {
                         EbxBaseEditor editor = (EbxBaseEditor)Activator.CreateInstance(registerEditor.EbxEditorExtension);
                         EbxEditors.Add(editor.AssetType, registerEditor.EbxEditorExtension);

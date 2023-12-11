@@ -31,7 +31,10 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
         /// TODO: Add in ValidForGame property
         /// </summary>
         public virtual string AssetType { get; } = "null";
-        
+
+        /// <summary>
+        /// The parent node editor this belongs to
+        /// </summary>
         public EditorViewModel NodeEditor { get; set; }
 
         /// <summary>

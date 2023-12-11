@@ -33,6 +33,7 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
         /// Whether or not this type has an Interface
         /// </summary>
         public virtual bool HasInterface => true;
+
         public EditorViewModel NodeEditor { get; set; }
 
         /// <summary>
