@@ -563,7 +563,8 @@ namespace BlueprintEditorPlugin.Utils
                 (ConnectionRealm.Client, ConnectionRealm.NetworkedClient),
                 (ConnectionRealm.Client, ConnectionRealm.ClientAndServer),
                 (ConnectionRealm.Server, ConnectionRealm.ClientAndServer),
-                (ConnectionRealm.NetworkedClientAndServer, ConnectionRealm.ClientAndServer)
+                (ConnectionRealm.NetworkedClientAndServer, ConnectionRealm.ClientAndServer),
+                (ConnectionRealm.Server, ConnectionRealm.Client)
             };
         
         public static bool RealmsAreValid(OutputViewModel source, InputViewModel target)

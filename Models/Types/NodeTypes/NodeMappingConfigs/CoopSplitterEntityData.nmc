@@ -1,0 +1,5 @@
+Type = CoopSplitterEntityData
+DisplayName = CoopSplitter
+InputEvent = Impulse, ObjectRealm
+OutputEvent = 0x6310f992, ObjectRealm
+OutputEvent = TwoPlayers, ObjectRealm

@@ -19,7 +19,8 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
             {
                 new InputViewModel() {Title = "self", Type = ConnectionType.Link, Realm = ConnectionRealm.Server},
                 new InputViewModel() {Title = "BlueprintTransform", Type = ConnectionType.Property, Realm = ConnectionRealm.Server},
-                new InputViewModel() {Title = "Spawn", Type = ConnectionType.Event, Realm = ConnectionRealm.Server}
+                new InputViewModel() {Title = "Spawn", Type = ConnectionType.Event, Realm = ConnectionRealm.Server},
+                new InputViewModel() {Title = "Kill", Type = ConnectionType.Event, Realm = ConnectionRealm.Server}
             };
 
         public override ObservableCollection<OutputViewModel> Outputs { get; set; } =

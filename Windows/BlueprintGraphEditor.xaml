@@ -535,7 +535,8 @@
                                Width="20"
                                Visibility="Collapsed" />
                     </StackPanel>
-                </Grid></Border>
+                </Grid>
+            </Border>
         </Border>
     </Grid>
 </UserControl>
