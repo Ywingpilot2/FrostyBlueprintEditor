@@ -281,8 +281,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         dynamic eventConnection = TypeLibrary.CreateObject("EventConnection");
 
-                        eventConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).FileGuid});
-                        eventConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).FileGuid});
+                        eventConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).ClassGuid});
+                        eventConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).ClassGuid});
                         
                         eventConnection.SourceEvent.Name = connection.SourceField;
                         eventConnection.TargetEvent.Name = connection.TargetField;
