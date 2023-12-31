@@ -385,8 +385,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         dynamic propertyConnection = TypeLibrary.CreateObject("PropertyConnection");
 
-                        propertyConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).FileGuid});
-                        propertyConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).FileGuid});
+                        propertyConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).ClassGuid});
+                        propertyConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).ClassGuid});
                         
                         propertyConnection.SourceField = connection.SourceField;
                         propertyConnection.TargetField = connection.TargetField;
@@ -500,8 +500,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                     {
                         dynamic linkConnection = TypeLibrary.CreateObject("LinkConnection");
 
-                        linkConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).FileGuid});
-                        linkConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).FileGuid});
+                        linkConnection.Source = ((EntityNode)connection.SourceNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.SourceNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.SourceNode).FileGuid, ClassGuid = ((EntityNode)connection.SourceNode).ClassGuid});
+                        linkConnection.Target = ((EntityNode)connection.TargetNode).PointerRefType == PointerRefType.Internal ? new PointerRef(connection.TargetNode.Object) : new PointerRef(new EbxImportReference() {FileGuid = ((EntityNode)connection.TargetNode).FileGuid, ClassGuid = ((EntityNode)connection.TargetNode).ClassGuid});
                     
                         if (connection.SourceField != "self")
                         {
