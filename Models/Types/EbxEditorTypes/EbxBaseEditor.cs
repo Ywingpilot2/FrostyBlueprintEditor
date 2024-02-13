@@ -152,102 +152,87 @@ namespace BlueprintEditorPlugin.Models.Types.EbxEditorTypes
                 {
                     case ConnectionType.Event:
                     {
-                        foreach (dynamic eventConnection in NodeEditor.EditedProperties.EventConnections)
+                        //Update object flags
+                        Type targetType = connection.TargetNode.Object.GetType();
+                        if (targetType.GetProperty("Flags") != null && !NodeEditor.GetConnections(connection.Target).Any(x =>
+                                !x.Equals(connection)
+                                && x.Source.Realm != connection.Source.Realm))
                         {
-                            if (!connection.Equals(eventConnection)) continue;
-                            NodeEditor.EditedProperties.EventConnections.Remove(eventConnection);
-                            
-                            //Update object flags
-                            Type targetType = connection.TargetNode.Object.GetType();
-                            if (targetType.GetProperty("Flags") != null && !NodeEditor.GetConnections(connection.Target).Any(x =>
-                                    !x.Equals(connection) 
-                                    && x.Source.Realm != connection.Source.Realm))
+                            var helper = new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags);
+                            switch (connection.Target.Realm)
                             {
-                                var helper = new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags);
-                                switch (connection.Target.Realm)
+                                case ConnectionRealm.Client:
                                 {
-                                    case ConnectionRealm.Client:
-                                    {
-                                        helper.ClientEvent = false;
-                                    } break;
-                                    case ConnectionRealm.Server:
-                                    {
-                                        helper.ServerEvent = false;
-                                    } break;
-                                    case ConnectionRealm.ClientAndServer:
-                                    {
-                                        helper.ClientEvent = false;
-                                        helper.ServerEvent = false;
-                                    } break;
-                                    case ConnectionRealm.NetworkedClient:
-                                    {
-                                        helper.ClientEvent = false;
-                                    } break;
-                                    case ConnectionRealm.NetworkedClientAndServer:
-                                    {
-                                        helper.ClientEvent = false;
-                                        helper.ServerEvent = false;
-                                    } break;
-                                }
-                                
-                                ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
+                                    helper.ClientEvent = false;
+                                } break;
+                                case ConnectionRealm.Server:
+                                {
+                                    helper.ServerEvent = false;
+                                } break;
+                                case ConnectionRealm.ClientAndServer:
+                                {
+                                    helper.ClientEvent = false;
+                                    helper.ServerEvent = false;
+                                } break;
+                                case ConnectionRealm.NetworkedClient:
+                                {
+                                    helper.ClientEvent = false;
+                                } break;
+                                case ConnectionRealm.NetworkedClientAndServer:
+                                {
+                                    helper.ClientEvent = false;
+                                    helper.ServerEvent = false;
+                                } break;
                             }
-                            break;
+                                
+                            ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
                         }
+                        
+                        NodeEditor.EditedProperties.EventConnections.Remove((dynamic)connection.Object);
                     } break;
                     case ConnectionType.Property:
                     {
-                        foreach (dynamic propertyConnection in NodeEditor.EditedProperties.PropertyConnections)
+                        //Update object flags
+                        Type targetType = connection.TargetNode.Object.GetType();
+                        if (targetType.GetProperty("Flags") != null && !NodeEditor.GetConnections(connection.Target).Any(x =>
+                                !x.Equals(connection) 
+                                && x.Source.Realm != connection.Source.Realm))
                         {
-                            if (!connection.Equals(propertyConnection)) continue;
-                            NodeEditor.EditedProperties.PropertyConnections.Remove(propertyConnection);
-                            
-                            //Update object flags
-                            Type targetType = connection.TargetNode.Object.GetType();
-                            if (targetType.GetProperty("Flags") != null && !NodeEditor.GetConnections(connection.Target).Any(x =>
-                                    !x.Equals(connection) 
-                                    && x.Source.Realm != connection.Source.Realm))
+                            var helper = new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags);
+                            switch (connection.Target.Realm)
                             {
-                                var helper = new ObjectFlagsHelper((uint)((dynamic)connection.TargetNode.Object).Flags);
-                                switch (connection.Target.Realm)
+                                case ConnectionRealm.Client:
                                 {
-                                    case ConnectionRealm.Client:
-                                    {
-                                        helper.ClientProperty = false;
-                                    } break;
-                                    case ConnectionRealm.Server:
-                                    {
-                                        helper.ServerProperty = false;
-                                    } break;
-                                    case ConnectionRealm.ClientAndServer:
-                                    {
-                                        helper.ClientProperty = false;
-                                        helper.ServerProperty = false;
-                                    } break;
-                                    case ConnectionRealm.NetworkedClient:
-                                    {
-                                        helper.ClientProperty = false;
-                                    } break;
-                                    case ConnectionRealm.NetworkedClientAndServer:
-                                    {
-                                        helper.ClientProperty = false;
-                                        helper.ServerProperty = false;
-                                    } break;
-                                }
-                                
-                                ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
+                                    helper.ClientProperty = false;
+                                } break;
+                                case ConnectionRealm.Server:
+                                {
+                                    helper.ServerProperty = false;
+                                } break;
+                                case ConnectionRealm.ClientAndServer:
+                                {
+                                    helper.ClientProperty = false;
+                                    helper.ServerProperty = false;
+                                } break;
+                                case ConnectionRealm.NetworkedClient:
+                                {
+                                    helper.ClientProperty = false;
+                                } break;
+                                case ConnectionRealm.NetworkedClientAndServer:
+                                {
+                                    helper.ClientProperty = false;
+                                    helper.ServerProperty = false;
+                                } break;
                             }
-                            break;
+                                
+                            ((dynamic)connection.TargetNode.Object).Flags = helper.GetAsFlags();
                         }
+                        
+                        NodeEditor.EditedProperties.PropertyConnections.Remove((dynamic)connection.Object);
                     } break;
                     case ConnectionType.Link:
                     {
-                        foreach (dynamic linkConnection in NodeEditor.EditedProperties.LinkConnections)
-                        {
-                            if (!connection.Equals(linkConnection)) continue;
-                            NodeEditor.EditedProperties.LinkConnections.Remove(linkConnection);
-                            break;
-                        }
+                        NodeEditor.EditedProperties.LinkConnections.Remove((dynamic)connection.Object);
                     } break;
                 }
             }
