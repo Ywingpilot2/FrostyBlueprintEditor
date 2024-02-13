@@ -518,13 +518,13 @@ namespace BlueprintEditorPlugin.Models.Editor
         public List<ConnectionViewModel> GetConnections(InputViewModel inputViewModel)
         {
             List<ConnectionViewModel> connections = new List<ConnectionViewModel>();
-            Parallel.ForEach(Connections, connection =>
+            foreach (ConnectionViewModel connection in Connections)
             {
                 if (connection.Target == inputViewModel && !connections.Contains(connection))
                 {
                     connections.Add(connection);
                 }
-            });
+            }
             return connections;
         }
 
@@ -536,13 +536,13 @@ namespace BlueprintEditorPlugin.Models.Editor
         public List<ConnectionViewModel> GetConnections(OutputViewModel output)
         {
             List<ConnectionViewModel> connections = new List<ConnectionViewModel>();
-            Parallel.ForEach(Connections, connection =>
+            foreach (ConnectionViewModel connection in Connections)
             {
                 if (connection.Source == output && !connections.Contains(connection))
                 {
                     connections.Add(connection);
                 }
-            });
+            }
             return connections;
         }
 
@@ -554,13 +554,13 @@ namespace BlueprintEditorPlugin.Models.Editor
         public List<ConnectionViewModel> GetConnections(NodeBaseModel node)
         {
             List<ConnectionViewModel> connections = new List<ConnectionViewModel>();
-            Parallel.ForEach(Connections, connection =>
+            foreach (ConnectionViewModel connection in Connections)
             {
                 if ((connection.SourceNode == node || connection.TargetNode == node) && !connections.Contains(connection))
                 {
                     connections.Add(connection);
                 }
-            });
+            }
             return connections;
         }
 
@@ -576,14 +576,14 @@ namespace BlueprintEditorPlugin.Models.Editor
         public NodeBaseModel GetNode(object nodeObj)
         {
             NodeBaseModel got = null;
-            Parallel.ForEach(Nodes, (node, state) =>
+            foreach (NodeBaseModel node in Nodes)
             {
                 if (node.Equals(nodeObj))
                 {
                     got = node;
-                    state.Break();
+                    break;
                 }
-            });
+            }
             return got;
         }
         
@@ -595,14 +595,14 @@ namespace BlueprintEditorPlugin.Models.Editor
         public EntityNode GetNode(AssetClassGuid nodeGuid)
         {
             EntityNode got = null;
-            Parallel.ForEach(Nodes, (node, state) =>
+            foreach (NodeBaseModel node in Nodes)
             {
                 if (node is EntityNode entityNode && entityNode.InternalGuid == nodeGuid)
                 {
                     got = entityNode;
-                    state.Break();
+                    break;
                 }
-            });
+            }
             return got;
         }
 

@@ -251,80 +251,11 @@ namespace BlueprintEditorPlugin.Models.Connections
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            dynamic connectionB = null;
-            
-            //Some transient connections may have their objects as null
-            if (Object == null || (Object.GetType().Name != "LinkConnection" &&
-                                   Object.GetType().Name != "PropertyConnection" &&
-                                   Object.GetType().Name != "EventConnection"))
-            {
-                //In which case we need to call the base equals
-                return base.Equals(obj);
-            }
-            
-            if (obj != null)
-            {
-                if (obj.GetType() == GetType())
-                {
-                    ConnectionViewModel connection2 = ((ConnectionViewModel)obj);
-                    if (connection2.Type == Type)
-                    {
-                        connectionB = connection2.Object;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else if (obj.GetType() == Object.GetType())
-                {
-                    connectionB = obj;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
+            if (obj == null)
                 return false;
-            }
 
-            PointerRef sourceA = ((dynamic)Object).Source;
-            PointerRef sourceB = connectionB.Source;
-            
-            PointerRef targetA = ((dynamic)Object).Target;
-            PointerRef targetB = connectionB.Target;
-
-            if (targetA == targetB
-                && sourceA == sourceB)
-            {
-                switch (Type)
-                {
-                    default:
-                    {
-                        if (((dynamic)Object).SourceField.ToString() ==
-                            connectionB.SourceField.ToString()
-                            && ((dynamic)Object).TargetField.ToString() ==
-                            connectionB.TargetField.ToString())
-                        {
-                            return true;
-                        }
-                        break;   
-                    }
-                    case ConnectionType.Event:
-                    {
-                        if (((dynamic)Object).SourceEvent.Name.ToString() ==
-                            connectionB.SourceEvent.Name.ToString()
-                            && ((dynamic)Object).TargetEvent.Name.ToString() ==
-                            connectionB.TargetEvent.Name.ToString())
-                        {
-                            return true;
-                        }
-                        break;  
-                    }
-                }
-            }
+            if (this == obj || obj == Object)
+                return true;
 
             return false;
         }

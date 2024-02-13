@@ -148,10 +148,10 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
         public virtual void CreateConnections(dynamic properties)
         {
             //Create property connections
-            foreach (dynamic propertyConnection in properties.PropertyConnections)
+            foreach (object propertyConnection in properties.PropertyConnections)
             {
-                if ((propertyConnection.Source.Internal == null && propertyConnection.Source.Type != PointerRefType.External) 
-                    || (propertyConnection.Target.Internal == null && propertyConnection.Target.Type != PointerRefType.External))
+                if (((dynamic)propertyConnection).Source.Type == PointerRefType.Null 
+                     || ((dynamic)propertyConnection).Target.Type == PointerRefType.Null)
                 {
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
@@ -160,32 +160,32 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 EntityNode sourceNode = null;
                 EntityNode targetNode = null;
 
-                PointerRef source = propertyConnection.Source;
-                PointerRef target = propertyConnection.Target;
+                PointerRef source = ((dynamic)propertyConnection).Source;
+                PointerRef target = ((dynamic)propertyConnection).Target;
 
                 switch (source.Type)
                 {
                     case PointerRefType.Internal:
                     {
-                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection.Source.Internal).GetInstanceGuid();
+                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)propertyConnection).Source.Internal.GetInstanceGuid();
 
                         //First check if the the node is an interface node
                         if (((dynamic)source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                         {
-                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(propertyConnection.SourceField.ToString()))
+                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(((dynamic)propertyConnection).SourceField.ToString()))
                             {
-                                sourceNode = NodeEditor.InterfaceOutputDataNodes[propertyConnection.SourceField.ToString()];
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes[((dynamic)propertyConnection).SourceField.ToString()];
                             }
                             else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
                                          FrostySdk.Utils.HashString(x.Key)
                                          == 
-                                         propertyConnection.SourceFieldId))
+                                         ((dynamic)propertyConnection).SourceFieldId))
                             {
-                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == propertyConnection.SourceField.ToString()).Value;
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == ((dynamic)propertyConnection).SourceField.ToString()).Value;
                             }
                             else
                             {
-                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{propertyConnection.SourceField.ToString()}_missing"), $"The interface node {propertyConnection.SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{((dynamic)propertyConnection).SourceField.ToString()}_missing"), $"The interface node {((dynamic)propertyConnection).SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
                             }
                         }
                         else
@@ -222,23 +222,23 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 {
                     case PointerRefType.Internal:
                     {
-                        AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)propertyConnection.Target.Internal).GetInstanceGuid();
+                        AssetClassGuid targetGuid = (AssetClassGuid)(((dynamic)propertyConnection).Target.Internal).GetInstanceGuid();
                         if (((dynamic)target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                         {
-                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(propertyConnection.TargetField.ToString()))
+                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(((dynamic)propertyConnection).TargetField.ToString()))
                             {
-                                targetNode = NodeEditor.InterfaceInputDataNodes[propertyConnection.TargetField.ToString()];
+                                targetNode = NodeEditor.InterfaceInputDataNodes[((dynamic)propertyConnection).TargetField.ToString()];
                             }
                             else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
                                          FrostySdk.Utils.HashString(x.Key)
                                          == 
-                                         propertyConnection.TargetFieldId))
+                                         ((dynamic)propertyConnection).TargetFieldId))
                             {
-                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == propertyConnection.TargetFieldId).Value;
+                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == ((dynamic)propertyConnection).TargetFieldId).Value;
                             }
                             else
                             {
-                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{propertyConnection.TargetField.ToString()}_missing"), $"The interface node {propertyConnection.TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{((dynamic)propertyConnection).TargetField.ToString()}_missing"), $"The interface node {((dynamic)propertyConnection).TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
                             }
                         }
                         else
@@ -279,12 +279,12 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
                 
-                InputViewModel targetInput = targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property, true);
+                InputViewModel targetInput = targetNode.GetInput(((dynamic)propertyConnection).TargetField, ConnectionType.Property, true);
 
-                OutputViewModel sourceOutput = sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property, true);
+                OutputViewModel sourceOutput = sourceNode.GetOutput(((dynamic)propertyConnection).SourceField, ConnectionType.Property, true);
 
                 //Setup the flags
-                var flagHelper = new PropertyFlagsHelper(propertyConnection.Flags);
+                var flagHelper = new PropertyFlagsHelper(((dynamic)propertyConnection).Flags);
 
                 if (NodeUtils.RealmsAreValid(flagHelper))
                 {
@@ -316,10 +316,10 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             }
                 
             //Create event connections
-            foreach (dynamic eventConnection in properties.EventConnections)
+            foreach (object eventConnection in properties.EventConnections)
             {
-                if ((eventConnection.Source.Internal == null && eventConnection.Source.Type != PointerRefType.External) 
-                    || (eventConnection.Target.Internal == null && eventConnection.Target.Type != PointerRefType.External))
+                if ((((dynamic)eventConnection).Source.Internal == null && ((dynamic)eventConnection).Source.Type != PointerRefType.External) 
+                    || (((dynamic)eventConnection).Target.Internal == null && ((dynamic)eventConnection).Target.Type != PointerRefType.External))
                 {
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
@@ -328,32 +328,32 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 EntityNode sourceNode = null;
                 EntityNode targetNode = null;
 
-                PointerRef source = eventConnection.Source;
-                PointerRef target = eventConnection.Target;
+                PointerRef source = ((dynamic)eventConnection).Source;
+                PointerRef target = ((dynamic)eventConnection).Target;
 
                 switch (source.Type)
                 {
                     case PointerRefType.Internal:
                     {
-                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)eventConnection.Source.Internal).GetInstanceGuid();
+                        AssetClassGuid sourceGuid = (AssetClassGuid)(((dynamic)eventConnection).Source.Internal).GetInstanceGuid();
 
                         //First check if the the node is an interface node
                         if (((dynamic)source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                         {
-                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(eventConnection.SourceEvent.Name.ToString()))
+                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(((dynamic)eventConnection).SourceEvent.Name.ToString()))
                             {
-                                sourceNode = NodeEditor.InterfaceOutputDataNodes[eventConnection.SourceEvent.Name.ToString()];
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes[((dynamic)eventConnection).SourceEvent.Name.ToString()];
                             }
                             else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
                                          FrostySdk.Utils.HashString(x.Key)
                                          == 
-                                         eventConnection.SourceFieldId))
+                                         ((dynamic)eventConnection).SourceFieldId))
                             {
-                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == eventConnection.SourceEvent.Id).Value;
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == ((dynamic)eventConnection).SourceEvent.Id).Value;
                             }
                             else
                             {
-                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{eventConnection.SourceEvent.Name.ToString()}_missing"), $"The interface node {eventConnection.SourceEvent.Name.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{((dynamic)eventConnection).SourceEvent.Name.ToString()}_missing"), $"The interface node {((dynamic)eventConnection).SourceEvent.Name.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
                             }
                         }
                         else
@@ -390,23 +390,23 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 {
                     case PointerRefType.Internal:
                     {
-                        AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)eventConnection.Target.Internal).GetInstanceGuid();
+                        AssetClassGuid targetGuid = (AssetClassGuid)(((dynamic)eventConnection).Target.Internal).GetInstanceGuid();
                         if (((dynamic)target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                         {
-                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(eventConnection.TargetEvent.Name.ToString()))
+                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(((dynamic)eventConnection).TargetEvent.Name.ToString()))
                             {
-                                targetNode = NodeEditor.InterfaceInputDataNodes[eventConnection.TargetEvent.Name.ToString()];
+                                targetNode = NodeEditor.InterfaceInputDataNodes[((dynamic)eventConnection).TargetEvent.Name.ToString()];
                             }
                             else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
                                          FrostySdk.Utils.HashString(x.Key)
                                          == 
-                                         eventConnection.TargetFieldId))
+                                         ((dynamic)eventConnection).TargetFieldId))
                             {
-                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == eventConnection.TargetEvent.Id).Value;
+                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == ((dynamic)eventConnection).TargetEvent.Id).Value;
                             }
                             else
                             {
-                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{eventConnection.TargetEvent.Name.ToString()}_missing"), $"The interface node {eventConnection.TargetEvent.Name.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{((dynamic)eventConnection).TargetEvent.Name.ToString()}_missing"), $"The interface node {((dynamic)eventConnection).TargetEvent.Name.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
                             }
                         }
                         else
@@ -448,14 +448,14 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
                 
-                InputViewModel targetInput = targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event, true);
+                InputViewModel targetInput = targetNode.GetInput(((dynamic)eventConnection).TargetEvent.Name, ConnectionType.Event, true);
 
-                OutputViewModel sourceOutput = sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event, true);
+                OutputViewModel sourceOutput = sourceNode.GetOutput(((dynamic)eventConnection).SourceEvent.Name, ConnectionType.Event, true);
 
                 var connection = NodeEditor.Connect(sourceOutput, targetInput);
-                if (NodeUtils.RealmsAreValid(eventConnection.TargetType.ToString()))
+                if (NodeUtils.RealmsAreValid(((dynamic)eventConnection).TargetType.ToString()))
                 {
-                    ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(eventConnection.TargetType.ToString());
+                    ConnectionRealm connectionRealm = NodeUtils.ParseRealmFromString(((dynamic)eventConnection).TargetType.ToString());
                     if (targetInput.Realm == ConnectionRealm.Invalid)
                     {
                         targetInput.Realm = connectionRealm;
@@ -482,10 +482,10 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
             }
                 
             //Create link connections
-            foreach (dynamic linkConnection in properties.LinkConnections)
+            foreach (object linkConnection in properties.LinkConnections)
             {
-                if ((linkConnection.Source.Internal == null && linkConnection.Source.Type != PointerRefType.External) 
-                    || (linkConnection.Target.Internal == null && linkConnection.Target.Type != PointerRefType.External))
+                if ((((dynamic)linkConnection).Source.Internal == null && ((dynamic)linkConnection).Source.Type != PointerRefType.External) 
+                    || (((dynamic)linkConnection).Target.Internal == null && ((dynamic)linkConnection).Target.Type != PointerRefType.External))
                 {
                     NodeEditor.SetEditorStatus(EditorStatus.Warning, 0, "Some connections in this file contain null references, certain connections maybe missing from this ui as a result.");
                     continue;
@@ -494,32 +494,32 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 EntityNode sourceNode = null;
                 EntityNode targetNode = null;
                 
-                PointerRef source = linkConnection.Source;
-                PointerRef target = linkConnection.Target;
+                PointerRef source = ((dynamic)linkConnection).Source;
+                PointerRef target = ((dynamic)linkConnection).Target;
 
                 switch (source.Type)
                 {
                     case PointerRefType.Internal:
                     {
-                        AssetClassGuid sourceGuid = (AssetClassGuid)((dynamic)linkConnection.Source.Internal).GetInstanceGuid();
+                        AssetClassGuid sourceGuid = (AssetClassGuid)(((dynamic)linkConnection).Source.Internal).GetInstanceGuid();
 
                         //First check if the the node is an interface node
                         if (((dynamic)source.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                         {
-                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(linkConnection.SourceField.ToString()))
+                            if (NodeEditor.InterfaceOutputDataNodes.ContainsKey(((dynamic)linkConnection).SourceField.ToString()))
                             {
-                                sourceNode = NodeEditor.InterfaceOutputDataNodes[linkConnection.SourceField.ToString()];
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes[((dynamic)linkConnection).SourceField.ToString()];
                             }
                             else if (NodeEditor.InterfaceOutputDataNodes.Any(x => 
                                          FrostySdk.Utils.HashString(x.Key)
                                          == 
-                                         linkConnection.SourceFieldId))
+                                         ((dynamic)linkConnection).SourceFieldId))
                             {
-                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == linkConnection.SourceField.ToString()).Value;
+                                sourceNode = NodeEditor.InterfaceOutputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key).ToString("x8") == ((dynamic)linkConnection).SourceField.ToString()).Value;
                             }
                             else
                             {
-                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{linkConnection.SourceField.ToString()}_missing"), $"The interface node {linkConnection.SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{((dynamic)linkConnection).SourceField.ToString()}_missing"), $"The interface node {((dynamic)linkConnection).SourceField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
                             }
                         }
                         else
@@ -556,23 +556,23 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                 {
                     case PointerRefType.Internal:
                     {
-                        AssetClassGuid targetGuid = (AssetClassGuid)((dynamic)linkConnection.Target.Internal).GetInstanceGuid();
+                        AssetClassGuid targetGuid = (AssetClassGuid)(((dynamic)linkConnection).Target.Internal).GetInstanceGuid();
                         if (((dynamic)target.Internal).GetInstanceGuid() == NodeEditor.InterfaceGuid)
                         {
-                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(linkConnection.TargetField.ToString()))
+                            if (NodeEditor.InterfaceInputDataNodes.ContainsKey(((dynamic)linkConnection).TargetField.ToString()))
                             {
-                                targetNode = NodeEditor.InterfaceInputDataNodes[linkConnection.TargetField.ToString()];
+                                targetNode = NodeEditor.InterfaceInputDataNodes[((dynamic)linkConnection).TargetField.ToString()];
                             }
                             else if (NodeEditor.InterfaceInputDataNodes.Any(x => 
                                          FrostySdk.Utils.HashString(x.Key)
                                          == 
-                                         linkConnection.TargetFieldId))
+                                         ((dynamic)linkConnection).TargetFieldId))
                             {
-                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == linkConnection.TargetFieldId).Value;
+                                targetNode = NodeEditor.InterfaceInputDataNodes.First(x => FrostySdk.Utils.HashString(x.Key) == ((dynamic)linkConnection).TargetFieldId).Value;
                             }
                             else
                             {
-                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{linkConnection.TargetField.ToString()}_missing"), $"The interface node {linkConnection.TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
+                                NodeEditor.SetEditorStatus(EditorStatus.Warning, FrostySdk.Utils.HashString($"{((dynamic)linkConnection).TargetField.ToString()}_missing"), $"The interface node {((dynamic)linkConnection).TargetField.ToString()} does not exist, yet is referenced in the Property Connections of this ebx. Some connections might be missing as a result");
                             }
                         }
                         else
@@ -613,8 +613,8 @@ namespace BlueprintEditorPlugin.Models.Types.EbxLoaderTypes
                     continue;
                 }
                 
-                string sourceField = linkConnection.SourceField;
-                string targetField = linkConnection.TargetField;
+                string sourceField = ((dynamic)linkConnection).SourceField;
+                string targetField = ((dynamic)linkConnection).TargetField;
                 if (sourceField == "0x00000000")
                 {
                     sourceField = "self";
