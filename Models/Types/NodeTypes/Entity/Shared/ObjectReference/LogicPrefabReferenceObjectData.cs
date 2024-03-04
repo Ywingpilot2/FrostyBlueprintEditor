@@ -26,16 +26,5 @@ namespace BlueprintEditorPlugin.Models.Types.NodeTypes.Entity.Shared.ObjectRefer
 
         public override ObservableCollection<OutputViewModel> Outputs { get; set; } =
             new ObservableCollection<OutputViewModel>();
-
-        public override void OnCreateNew()
-        {
-            ((dynamic)Object).CastSunShadowEnable = true;
-            ((dynamic)Object).CastReflectionEnable = true;
-            ((dynamic)Object).CastEnvmapEnable = true;
-            
-            Array localPlayerIdArray = ((object)TypeLibrary.CreateObject("LocalPlayerId")).GetType().GetEnumValues();
-            List<dynamic> localPlayerIdEnum = new List<dynamic>(localPlayerIdArray.Cast<dynamic>());
-            ((dynamic)Object).LocalPlayerId = localPlayerIdEnum[8];
-        }
     }
 }
