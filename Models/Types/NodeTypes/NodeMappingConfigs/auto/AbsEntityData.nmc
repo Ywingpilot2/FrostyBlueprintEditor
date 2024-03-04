@@ -1,0 +1,5 @@
+Type = AbsEntityData
+DisplayName = Abs
+ValidGameExecutableName = starwarsbattlefrontii
+InputProperty = In, ObjectRealm
+OutputProperty = Out, ObjectRealm

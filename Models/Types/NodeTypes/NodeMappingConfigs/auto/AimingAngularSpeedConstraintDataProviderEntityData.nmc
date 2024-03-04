@@ -1,0 +1,5 @@
+Type = AimingAngularSpeedConstraintDataProviderEntityData
+DisplayName = AimingAngularSpeedConstraintDataProviderEntityData
+InputProperty = ConstraintPriority, ObjectRealm
+InputProperty = Enabled, ObjectRealm
+OutputLink = 0x821bb95b, ObjectRealm

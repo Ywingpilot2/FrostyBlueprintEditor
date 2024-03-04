@@ -1,0 +1,8 @@
+Type = CustomizationDataEntityData
+DisplayName = CustomizationDataEntityData
+ValidGameExecutableName = starwarsbattlefrontii
+OutputProperty = Soldiers, Client
+OutputProperty = Vehicles, Client
+OutputProperty = Heroes, Client
+OutputProperty = HeroVehicles, Client
+OutputProperty = Specials, Client

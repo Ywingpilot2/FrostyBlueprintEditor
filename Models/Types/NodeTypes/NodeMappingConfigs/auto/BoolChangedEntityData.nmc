@@ -1,0 +1,6 @@
+Type = BoolChangedEntityData
+DisplayName = BoolChangedEntityData
+InputProperty = Value, ObjectRealm
+InputProperty = AlwaysSend, ObjectRealm
+OutputEvent = ValueChanged, ObjectRealm
+OutputProperty = NewValue, ObjectRealm

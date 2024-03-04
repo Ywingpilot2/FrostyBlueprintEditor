@@ -1,0 +1,4 @@
+Type = AITemplateFilterEntityData
+DisplayName = AITemplateFilterEntityData
+InputProperty = Templates, ObjectRealm
+InputEvent = In, Server

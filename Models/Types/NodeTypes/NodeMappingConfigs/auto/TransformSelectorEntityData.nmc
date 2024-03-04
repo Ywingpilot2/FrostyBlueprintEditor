@@ -1,0 +1,6 @@
+Type = TransformSelectorEntityData
+DisplayName = TransformSelectorEntityData
+InputProperty = In1, ObjectRealm
+InputProperty = In2, ObjectRealm
+InputProperty = Selection, ObjectRealm
+OutputProperty = Out, ObjectRealm

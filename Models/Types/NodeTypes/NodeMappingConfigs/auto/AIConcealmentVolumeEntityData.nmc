@@ -1,0 +1,3 @@
+Type = AIConcealmentVolumeEntityData
+DisplayName = AIConcealmentVolumeEntityData
+InputEvent = Enable, Server

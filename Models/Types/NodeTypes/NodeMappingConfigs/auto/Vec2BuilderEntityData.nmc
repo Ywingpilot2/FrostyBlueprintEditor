@@ -1,0 +1,5 @@
+Type = Vec2BuilderEntityData
+DisplayName = Vec2BuilderEntityData
+InputProperty = Y, Client
+InputProperty = X, Client
+OutputProperty = Out, Client

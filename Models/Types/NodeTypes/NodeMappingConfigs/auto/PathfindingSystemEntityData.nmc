@@ -1,0 +1,4 @@
+Type = PathfindingSystemEntityData
+DisplayName = PathfindingSystemEntityData
+InputProperty = PathfindingTypesOnLevel, ObjectRealm
+InputProperty = ResourceAsset, ObjectRealm
