@@ -20,6 +20,20 @@ This tool is still unfinished, with many things relating to optimization and add
 # For developers
 if you wish to contribute to this project, please read this before doing so.
 
+## Build Instructions
+In order to build the Blueprint Editor, you first need to change the reference paths for frosty's binaries.
+- Open BlueprintEditorPlugin.csproj
+- Scroll to the item group containing a list of reference "tags" (should say in a comment what it is)
+- Replace the occurrences of "..\1063\" with the directory to your frosty solution
+
+Now it should build properly. But it won't copy itself over to frosty, in order to do this we need to
+- In BlueprintEditorPlugin.csproj, scroll down to the bottom
+- Replace "..\1063\" with the directory to your frosty solution, as before
+
+And now for launching, you need to edit the current launch configurations and change out the path to the FrostyEditor.Exe your path.
+
+Congrats! You should now be able to run and build Blueprint Editor.
+
 ## Terminology 
 Here is a basic overview of the Terminology used in this project:
 - Object: An instance of a type or class which can be found in an asset

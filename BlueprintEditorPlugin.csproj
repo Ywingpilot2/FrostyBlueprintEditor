@@ -36,27 +36,29 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
 
+  <!-- This item group is for referencing all of the binaries frosty has -->
+  <!-- Replace "..\..\1063\" with the directory to your FrostyToolsuite folder -->
   <ItemGroup>
+    <Reference Include="FrostyControls">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyControls.dll</HintPath>
+    </Reference>
+    <Reference Include="FrostyCore">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyCore.dll</HintPath>
+    </Reference>
+    <Reference Include="FrostyEditor">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyEditor.exe</HintPath>
+    </Reference>
+    <Reference Include="FrostyHash">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyHash.dll</HintPath>
+    </Reference>
+    <Reference Include="FrostySdk">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostySdk.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\FrostyControls\FrostyControls.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FrostyEditor\FrostyEditor.csproj" />
-    <ProjectReference Include="..\..\FrostyHash\FrostyHash.vcxproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FrostyPlugin\FrostyCore.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FrostySdk\FrostySdk.csproj">
-      <Private>false</Private>
-    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -79,13 +81,16 @@
     <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
+  <!-- This is for copying our binaries into the plugins folder -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)$(OutDir)Plugins\" />
-    <Exec Command="xcopy /Y $(ProjectDir)Models\Types\NodeTypes\NodeMappingConfigs $(SolutionDir)$(OutDir)BlueprintEditor\NodeMappings\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
+    <!-- Replace the second directory with the directory to your frosty's plugins folder -->
+    <Exec Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Exec Command="xcopy /Y $(ProjectDir)Models\Types\NodeTypes\NodeMappingConfigs ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\BlueprintEditor\NodeMappings\" />
+    <!-- And replace the DestinationFolder here to be your frosty's plugins directory as well -->
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
   </Target>
 
   <PropertyGroup>
