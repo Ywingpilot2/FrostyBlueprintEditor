@@ -12,5 +12,7 @@ namespace BlueprintEditorPlugin.Models.Nodes
         double Height { get; }
         
         bool IsSelected { get; set; }
+
+        bool IsValid();
     }
 }

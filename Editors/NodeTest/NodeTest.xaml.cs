@@ -6,12 +6,28 @@ using BlueprintEditorPlugin.Editors.NodeTest.Nodes;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Status;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin.Editors.NodeTest
 {
     public partial class NodeTest : UserControl, IGraphEditor
     {
         public INodeWrangler NodeWrangler { get; set; }
+        public bool IsValid()
+        {
+            return true;
+        }
+
+        public bool IsValid(EbxAssetEntry assetEntry)
+        {
+            return true;
+        }
+
+        public bool IsValid(params object[] args)
+        {
+            return true;
+        }
+
         public EditorStatusArgs CurrentStatus { get; set; }
         
         public NodeTest()

@@ -12,9 +12,27 @@ namespace BlueprintEditorPlugin.Models.Nodes
     public abstract class BaseNode : INode
     {
         protected BaseNodeWrangler NodeWrangler;
-        public virtual string Header { get; set; }
-        private Point _location;
 
+        #region Visual info
+
+        public virtual string Header { get; set; }
+        
+        private bool _selected;
+        public bool IsSelected
+        {
+            get => _selected;
+            set
+            {
+                _selected = value;
+                NotifyPropertyChanged(nameof(IsSelected));
+            }
+        }
+
+        #endregion
+
+        #region Positional data
+
+        private Point _location;
         public Point Location
         {
             set
@@ -48,21 +66,10 @@ namespace BlueprintEditorPlugin.Models.Nodes
             
         }
 
-        private bool _selected;
-        public bool IsSelected
-        {
-            get => _selected;
-            set
-            {
-                _selected = value;
-                NotifyPropertyChanged(nameof(IsSelected));
-            }
-        }
+        #endregion
 
         public virtual ObservableCollection<BaseInput> Inputs { get; } = new ObservableCollection<BaseInput>();
         public virtual ObservableCollection<BaseOutput> Outputs { get; } = new ObservableCollection<BaseOutput>();
-        
-        public event PropertyChangedEventHandler PropertyChanged;
 
         #region Port Management
 
@@ -112,11 +119,17 @@ namespace BlueprintEditorPlugin.Models.Nodes
         }
 
         #endregion
+
+        #region Property Changing
+
+        public event PropertyChangedEventHandler PropertyChanged;
         
         protected void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
 
         #region Status management
         
@@ -138,6 +151,11 @@ namespace BlueprintEditorPlugin.Models.Nodes
         }
 
         #endregion
+        
+        public virtual bool IsValid()
+        {
+            return true;
+        }
 
         public BaseNode()
         {
