@@ -1,7 +1,0 @@
-Type = AutoPartnerEntityData
-DisplayName = AutoPartnerEntityData
-InputProperty = ResetBlazePartner, ObjectRealm
-InputProperty = ResetPartnerHand, ObjectRealm
-InputEvent = PlayerEnter, Server
-InputEvent = ResetAll, Server
-InputEvent = 0x1729d4c5, Server

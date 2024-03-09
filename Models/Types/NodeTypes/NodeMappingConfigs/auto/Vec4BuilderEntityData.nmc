@@ -1,7 +1,0 @@
-Type = Vec4BuilderEntityData
-DisplayName = Vec4BuilderEntityData
-InputProperty = X, ObjectRealm
-InputProperty = Y, Client
-InputProperty = Z, Client
-InputProperty = W, Client
-OutputProperty = Out, Client

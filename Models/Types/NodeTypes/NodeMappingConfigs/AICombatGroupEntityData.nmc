@@ -1,4 +1,0 @@
-Type = AICombatGroupEntityData
-DisplayName = AICombatGroup
-InputEvent = Alert, Server
-OutputLink = Spawners, Server

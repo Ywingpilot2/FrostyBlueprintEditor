@@ -1,9 +1,0 @@
-Type = CompareCharacterIdDataEntityData
-DisplayName = CompareCharacterIdDataEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-InputProperty = ObjectA, Client
-InputProperty = ObjectB, Client
-InputProperty = TriggerOnPropertyChange, ObjectRealm
-InputProperty = TriggerOnStart, ObjectRealm
-InputProperty = AlwaysSend, ObjectRealm
-OutputProperty = IsEqual, Client

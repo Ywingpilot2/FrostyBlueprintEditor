@@ -1,6 +1,0 @@
-Type = AIDefendAreaEntityData
-DisplayName = Defend Area
-OutputLink = Spawners, Server
-OutputLink = Geometry, Server
-InputProperty = FollowObjectAttractRadius, Server
-Documentation = This will tell a character to defend an area within the Geometry or specified radius

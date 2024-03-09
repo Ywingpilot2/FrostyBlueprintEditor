@@ -1,9 +1,0 @@
-Type = TransformSnapToGroundEntityData
-DisplayName = TransformSnapToGroundEntityData
-InputProperty = In, Server
-InputProperty = DistanceToGround, ObjectRealm
-InputProperty = RayCastLength, ObjectRealm
-InputProperty = RayCastUpOffset, ObjectRealm
-InputProperty = AlignWithGroundNormal, ObjectRealm
-InputProperty = IgnoreWater, ObjectRealm
-OutputProperty = Out, Server

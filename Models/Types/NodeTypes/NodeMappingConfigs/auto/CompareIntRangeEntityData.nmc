@@ -1,9 +1,0 @@
-Type = CompareIntRangeEntityData
-DisplayName = CompareIntRangeEntityData
-InputProperty = Value, ObjectRealm
-InputProperty = Min, ObjectRealm
-InputProperty = Max, ObjectRealm
-InputEvent = In, Client
-OutputEvent = Less, Client
-OutputEvent = InRange, ObjectRealm
-OutputEvent = Greater, Client

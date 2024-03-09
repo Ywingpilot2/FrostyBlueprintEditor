@@ -1,7 +1,0 @@
-﻿Type = FloatEntityData
-DisplayName = Float
-InputProperty = Value, ObjectRealm
-InputEvent = Increment, ObjectRealm
-InputEvent = Decrement, ObjectRealm
-OutputProperty = Value, ObjectRealm
-Documentation = This node stores a simple Float value, which can also be incremented and decremented.

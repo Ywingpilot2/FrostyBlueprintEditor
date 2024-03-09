@@ -1,8 +1,0 @@
-Type = ImmediateOREntityData
-DisplayName = ImmediateOREntityData
-InputProperty = InA, ClientAndServer
-InputProperty = InB, ClientAndServer
-InputProperty = InvertA, ObjectRealm
-InputProperty = InvertB, ObjectRealm
-InputProperty = NOR, ObjectRealm
-OutputProperty = Out, ObjectRealm

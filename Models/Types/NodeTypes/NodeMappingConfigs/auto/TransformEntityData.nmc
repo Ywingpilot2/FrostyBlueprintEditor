@@ -1,4 +1,0 @@
-Type = TransformEntityData
-DisplayName = TransformEntityData
-InputProperty = DefaultTransform, ObjectRealm
-OutputProperty = Transform, ObjectRealm

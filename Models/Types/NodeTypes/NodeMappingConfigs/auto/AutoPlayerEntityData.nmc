@@ -1,5 +1,0 @@
-Type = AutoPlayerEntityData
-DisplayName = Auto Player
-Documentation = This entity represents the individual autoplayers. OnActivated triggers when an autoplayer spawns, and Enable allows them to.
-InputEvent = Enable, Server
-OutputEvent = OnActivated, Server

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BlueprintEditorPlugin.Utils;
 using Frosty.Core;
 using Frosty.Core.Controls.Editors;
 using Frosty.Core.Misc;
@@ -40,6 +39,13 @@ namespace BlueprintEditorPlugin.Options
         [EbxFieldMeta(EbxFieldType.Struct)]
         [Editor(typeof(ConnectionStyleCombo))]
         public CustomComboData<ConnectionStyle, string> CStyle { get; set; }
+        
+        [Category("Connections")]
+        [DisplayName("Thickness")]
+        [EbxFieldMeta(EbxFieldType.Float32)]
+        [Editor(typeof(FrostySliderEditor))]
+        [SliderMinMax(1.0f, 8.0f, 0.1f, 2.0f, true)]
+        public float WireThickness { get; set; }
 
         public override void Load()
         {
@@ -59,6 +65,8 @@ namespace BlueprintEditorPlugin.Options
                     CStyle.SelectedIndex = 0;
                 } break;
             }
+
+            WireThickness = Config.Get("WireThickness", 4.0f);
         }
 
         public override void Save()
@@ -78,7 +86,36 @@ namespace BlueprintEditorPlugin.Options
                     Config.Add("ConnectionStyle", "StartStop");
                 } break;
             }
-            EditorUtils.UpdateSettings();
+            
+            Config.Add("WireThickness", WireThickness);
+            EditorOptions.Update();
+        }
+    }
+
+    public static class EditorOptions
+    {
+        public static ConnectionStyle WireStyle { get; internal set; }
+        public static double WireThickness { get; internal set; }
+
+        public static void Update()
+        {
+            switch (Config.Get("ConnectionStyle", "StartStop"))
+            {
+                case "StartStop":
+                {
+                    WireStyle = ConnectionStyle.StartStop;
+                } break;
+                case "Straight":
+                {
+                    WireStyle = ConnectionStyle.Straight;
+                } break;
+                case "Curvy":
+                {
+                    WireStyle = ConnectionStyle.Curvy;
+                } break;
+            }
+            
+            WireThickness = Config.Get("WireThickness", 4.0f);
         }
     }
 }

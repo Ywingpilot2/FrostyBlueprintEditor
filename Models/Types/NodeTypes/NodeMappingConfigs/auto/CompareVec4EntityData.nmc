@@ -1,6 +1,0 @@
-Type = CompareVec4EntityData
-DisplayName = CompareVec4EntityData
-InputProperty = Tolerance, ObjectRealm
-InputProperty = ValueA, Client
-InputProperty = ValueB, ObjectRealm
-OutputEvent = AreNotEqual, Client

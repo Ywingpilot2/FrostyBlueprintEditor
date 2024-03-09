@@ -1,5 +1,0 @@
-Type = LocalPlayerGateEntityData
-DisplayName = LocalPlayerGate
-InputEvent = In, NetworkedClient
-OutputEvent = LocalPlayerId_0, ObjectRealm
-OutputEvent = LocalPlayerId_1, ObjectRealm

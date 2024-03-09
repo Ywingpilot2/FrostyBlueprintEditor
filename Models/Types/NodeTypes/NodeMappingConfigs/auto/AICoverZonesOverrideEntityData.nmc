@@ -1,5 +1,0 @@
-Type = AICoverZonesOverrideEntityData
-DisplayName = AICoverZonesOverride
-InputEvent = Activate, Server
-InputEvent = Deactivate, Server
-OutputLink = Soldier, ObjectRealm
