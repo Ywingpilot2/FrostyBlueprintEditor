@@ -80,6 +80,10 @@
     <Resource Include="Images\Networked.png" />
     <None Remove="Images\Server.png" />
     <Resource Include="Images\Server.png" />
+    <None Remove="Images\CollapseWindow.png" />
+    <Resource Include="Images\CollapseWindow.png" />
+    <None Remove="Images\CollapsedWindow.png" />
+    <Resource Include="Images\CollapsedWindow.png" />
   </ItemGroup>
 
   <ItemGroup>

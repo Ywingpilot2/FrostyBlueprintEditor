@@ -56,10 +56,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 NotifyPropertyChanged(nameof(_toolTip));
             }
         }
-
-        private bool _selected;
+        
         public Size Size { get; set; }
 
+        private bool _selected;
         public bool IsSelected
         {
             get => _selected;
@@ -67,6 +67,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             {
                 _selected = value;
                 NotifyPropertyChanged(nameof(IsSelected));
+            }
+        }
+
+        private bool _isFlatted;
+        public bool IsFlatted
+        {
+            get => _isFlatted;
+            set
+            {
+                _isFlatted = value;
+                NotifyPropertyChanged(nameof(IsFlatted));
             }
         }
         

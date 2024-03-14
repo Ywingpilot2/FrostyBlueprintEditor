@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
@@ -245,6 +246,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 ((IVertex)removedItem).IsSelected = false;
             }
+        }
+
+        private void NodeFlatten_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            EntityNode node = (EntityNode)button.DataContext;
+            node.IsFlatted = !node.IsFlatted;
         }
     }
 }
