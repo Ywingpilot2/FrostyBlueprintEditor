@@ -9,17 +9,17 @@ namespace BlueprintEditorPlugin.Editors.NodeTest.Nodes
     {
         public override string Header => "test";
 
-        public override ObservableCollection<BaseInput> Inputs { get; }
-        public override ObservableCollection<BaseOutput> Outputs { get; }
+        public override ObservableCollection<IPort> Inputs { get; }
+        public override ObservableCollection<IPort> Outputs { get; }
 
         public TestNode()
         {
-            Inputs = new ObservableCollection<BaseInput>()
+            Inputs = new ObservableCollection<IPort>()
             {
                 new BaseInput("testi", this)
             };
 
-            Outputs = new ObservableCollection<BaseOutput>()
+            Outputs = new ObservableCollection<IPort>()
             {
                 new BaseOutput("testo", this)
             };

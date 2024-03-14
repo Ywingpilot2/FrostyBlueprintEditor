@@ -2,6 +2,9 @@
 
 namespace BlueprintEditorPlugin.Models.Status
 {
+    /// <summary>
+    /// Base implementation of an item which can have a status displayed
+    /// </summary>
     public interface IStatusItem : INotifyPropertyChanged
     {
         EditorStatusArgs CurrentStatus { get; set; }

@@ -11,13 +11,16 @@ namespace BlueprintEditorPlugin.Models.Nodes
 {
     public abstract class BaseNode : INode
     {
-        protected BaseNodeWrangler NodeWrangler;
+        protected INodeWrangler NodeWrangler;
 
         #region Visual info
 
         public virtual string Header { get; set; }
+        public virtual string ToolTip { get; set; }
         
         private bool _selected;
+        public Size Size { get; set; }
+
         public bool IsSelected
         {
             get => _selected;
@@ -43,82 +46,81 @@ namespace BlueprintEditorPlugin.Models.Nodes
             get => _location;
         }
 
-        private double _width;
-        public double Width
-        {
-            get => _width;
-            set
-            {
-                _width = value;
-                NotifyPropertyChanged(nameof(Width));
-            }
-            
-        }
-        private double _height;
-        public double Height
-        {
-            get => _height;
-            set
-            {
-                _height = value;
-                NotifyPropertyChanged(nameof(Height));
-            }
-            
-        }
-
         #endregion
 
-        public virtual ObservableCollection<BaseInput> Inputs { get; } = new ObservableCollection<BaseInput>();
-        public virtual ObservableCollection<BaseOutput> Outputs { get; } = new ObservableCollection<BaseOutput>();
+        public virtual ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
+        public virtual ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
 
         #region Port Management
 
-        private protected Dictionary<string, BaseInput> CachedInputs { get; } = new Dictionary<string, BaseInput>();
-        private protected Dictionary<string, BaseOutput> CachedOutputs { get; } = new Dictionary<string, BaseOutput>();
+        private protected Dictionary<string, IPort> CachedInputs { get; } = new Dictionary<string, IPort>();
+        private protected Dictionary<string, IPort> CachedOutputs { get; } = new Dictionary<string, IPort>();
 
-        public virtual BaseInput GetInput(string name)
+        public virtual IPort GetInput(string name)
         {
             if (!CachedInputs.Keys.Contains(name))
                 return null;
             return CachedInputs[name];
         }
-        public virtual BaseOutput GetOutput(string name)
+        public virtual IPort GetOutput(string name)
         {
             if (!CachedOutputs.Keys.Contains(name))
                 return null;
             return CachedOutputs[name];
         }
 
-        public virtual void AddPort(BaseInput input)
+        public virtual void AddInput(IPort input)
         {
             if (CachedInputs.ContainsKey(input.Name))
                 return;
             
-            Inputs.Add(input);
-            CachedInputs.Add(input.Name, input);
+            Inputs.Add(input as BaseInput);
+            CachedInputs.Add(input.Name, input as BaseInput);
         }
         
-        public virtual void AddPort(BaseOutput output)
+        public virtual void AddOutput(IPort output)
         {
             if (CachedOutputs.ContainsKey(output.Name))
                 return;
             
-            Outputs.Add(output);
-            CachedOutputs.Add(output.Name, output);
+            Outputs.Add(output as BaseOutput);
+            CachedOutputs.Add(output.Name, output as BaseOutput);
         }
         
-        public virtual void RemovePort(BaseInput input)
+        public virtual void RemoveInput(IPort input)
         {
-            Inputs.Remove(input);
+            Inputs.Remove(input as BaseInput);
             CachedInputs.Remove(input.Name);
         }
-        public virtual void RemovePort(BaseOutput output)
+        public virtual void RemoveOutput(IPort output)
         {
-            Outputs.Remove(output);
+            Outputs.Remove(output as BaseOutput);
             CachedOutputs.Remove(output.Name);
         }
 
         #endregion
+        
+        public void OnInputUpdated(IPort port)
+        {
+            
+        }
+
+        public void OnOutputUpdated(IPort port)
+        {
+            
+        }
+
+        public void AddPort(IPort port)
+        {
+            if (port.Direction == PortDirection.In)
+            {
+                Inputs.Add(port);
+            }
+            else
+            {
+                Outputs.Add(port);
+            }
+        }
 
         #region Property Changing
 
@@ -157,11 +159,18 @@ namespace BlueprintEditorPlugin.Models.Nodes
             return true;
         }
 
-        public BaseNode()
+        /// <summary>
+        /// Occurs whenever a node is first created
+        /// </summary>
+        public void OnCreation()
+        {
+        }
+
+        protected BaseNode()
         {
         }
         
-        public BaseNode(BaseNodeWrangler nodeWrangler)
+        public BaseNode(INodeWrangler nodeWrangler)
         {
             NodeWrangler = nodeWrangler;
         }

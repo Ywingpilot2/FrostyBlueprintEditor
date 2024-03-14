@@ -22,6 +22,8 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
 
         void AddConnection(IConnection connection);
         void RemoveConnection(IConnection connection);
+        
+        
 
         IEnumerable<IConnection> GetConnections(INode node);
         IEnumerable<IConnection> GetConnections(IPort port);

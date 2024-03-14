@@ -3,16 +3,16 @@ using System.Windows;
 
 namespace BlueprintEditorPlugin.Models.Nodes
 {
+    /// <summary>
+    /// Base implementation of an object which can be selected and moved in a graph editor.
+    /// </summary>
     public interface IVertex : INotifyPropertyChanged
     {
-        string Header { get; set; }
-        
         Point Location { get; set; }
-        double Width { get; }
-        double Height { get; }
-        
+        Size Size { get; set; }
         bool IsSelected { get; set; }
 
         bool IsValid();
+        void OnCreation();
     }
 }

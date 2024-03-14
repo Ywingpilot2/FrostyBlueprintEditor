@@ -12,10 +12,8 @@ namespace BlueprintEditorPlugin.Models.Connections.Pending
 {
     public class BasePendingConnection : IPendingConnection
     {
-        private readonly INodeWrangler _nodeWrangler;
         public IPort Source { get; set; }
-
-
+        
         #region Anchors
 
         private Point _sAnchor;
@@ -120,42 +118,36 @@ namespace BlueprintEditorPlugin.Models.Connections.Pending
 
         #endregion
 
-        public ICommand Start { get; }
-        public ICommand Finish { get; }
+        public ICommand Start { get; protected set; }
+        public ICommand Finish { get; protected set; }
 
         public BasePendingConnection(INodeWrangler wrangler)
         {
-            _nodeWrangler = wrangler;
-            
-            Start = new DelegateCommand<IPort>(StartPending);
-            Finish = new DelegateCommand<IPort>(StopPending);
-        }
-
-        public virtual void StartPending(IPort source)
-        {
-            Source = source;
-            NotifyPropertyChanged(nameof(CurvePoint1));
-            NotifyPropertyChanged(nameof(CurvePoint2));
-        }
-
-        public virtual void StopPending(IPort target)
-        {
-            if (target == null)
-                return;
+            Start = new DelegateCommand<IPort>(source =>
+            {
+                Source = source;
+                NotifyPropertyChanged(nameof(CurvePoint1));
+                NotifyPropertyChanged(nameof(CurvePoint2));
+            });
+            Finish = new DelegateCommand<IPort>(target =>
+            {
+                if (target == null)
+                    return;
                 
-            if (Source.Direction == PortDirection.Out && target.Direction == PortDirection.In)
-            {
-                _nodeWrangler.AddConnection(new BaseConnection((BaseOutput)Source, (BaseInput)target));
-            }
-            else if (Source.Direction == PortDirection.In && target.Direction == PortDirection.Out)
-            {
-                _nodeWrangler.AddConnection(new BaseConnection((BaseOutput)target, (BaseInput)Source));
-            }
+                if (Source.Direction == PortDirection.Out && target.Direction == PortDirection.In)
+                {
+                    wrangler.AddConnection(new BaseConnection((BaseOutput)Source, (BaseInput)target));
+                }
+                else if (Source.Direction == PortDirection.In && target.Direction == PortDirection.Out)
+                {
+                    wrangler.AddConnection(new BaseConnection((BaseOutput)target, (BaseInput)Source));
+                }
+            });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void NotifyPropertyChanged(string propertyName)
+        public virtual void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

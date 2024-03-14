@@ -31,4 +31,5 @@ using BlueprintEditorPlugin.Options;
 
 #if DEVELOPER___DEBUG
 [assembly: RegisterMenuExtension(typeof(ViewTestGraph))]
+[assembly: RegisterMenuExtension(typeof(ViewTestBlueprintGraph))]
 #endif

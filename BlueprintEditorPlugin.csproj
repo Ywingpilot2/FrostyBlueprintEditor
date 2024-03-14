@@ -74,6 +74,12 @@
     <None Remove="Images\github-mark-white.png" />
     <Resource Include="Images\github-mark-white.png" />
     <None Remove="Windows\BlueprintEditorPortMenu.xaml.cs~" />
+    <None Remove="Images\NCS.png" />
+    <Resource Include="Images\NCS.png" />
+    <None Remove="Images\Networked.png" />
+    <Resource Include="Images\Networked.png" />
+    <None Remove="Images\Server.png" />
+    <Resource Include="Images\Server.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -87,6 +93,20 @@
       <XamlRuntime>Wpf</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Editors\BlueprintEditor\BlueprintGraphEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <XamlRuntime>Wpf</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Editors\BlueprintEditor\PropertyGrid" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Images\Client.png" />
+    <Resource Include="Images\Client.png" />
   </ItemGroup>
 
   <!-- This is for copying our binaries into the plugins folder -->

@@ -8,7 +8,8 @@
     xmlns:fdev="FrostyDeveloper"
     xmlns:nodify="https://miroiu.github.io/nodify"
     xmlns:blueprintEditor="clr-namespace:BlueprintEditorPlugin"
-    xmlns:windows="clr-namespace:BlueprintEditorPlugin.Windows">
+    xmlns:windows="clr-namespace:BlueprintEditorPlugin.Windows"
+    xmlns:blueprintEditor1="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
@@ -16,6 +17,7 @@
     
     <SolidColorBrush x:Key="EventConnection"
                      Color="#F8F8F8" />
+    <Color x:Key="PropertyColor" R="95" G="217" B="95"/> <!--Work around lol-->
     <SolidColorBrush x:Key="PropertyConnection"
                      Color="#5FD95F" />
     <SolidColorBrush x:Key="LinkConnection"
@@ -43,5 +45,18 @@
     <GeometryDrawing x:Key="LargeGridGeometry"
                      Geometry="M0,0 L0,1 0.015,1 0.015,0.015 1,0.015 1,0 Z"
                      Brush="{StaticResource CanvasGridMajor}" />
+    
+    <!--Blueprint Editor-->
+    <Style TargetType="{x:Type blueprintEditor:BlueprintEditor}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type blueprintEditor:BlueprintEditor}">
+                    <Grid Background="Aqua">
+                        <blueprintEditor1:BlueprintGraphEditor x:Name="GraphEditor" IsEnabled="True"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
 </ResourceDictionary>

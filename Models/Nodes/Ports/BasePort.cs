@@ -6,7 +6,18 @@ namespace BlueprintEditorPlugin.Models.Nodes.Ports
     public abstract class BasePort : IPort
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public string Name { get; set; }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                NotifyPropertyChanged(nameof(Name));
+            }
+        }
+
         public abstract PortDirection Direction { get; }
 
         private Point _anchor;
@@ -22,6 +33,7 @@ namespace BlueprintEditorPlugin.Models.Nodes.Ports
         public INode Node { get; protected set; }
         
         private bool _isConnected;
+
         public bool IsConnected
         {
             set
@@ -36,11 +48,17 @@ namespace BlueprintEditorPlugin.Models.Nodes.Ports
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        
+        public BasePort(string name, INode node)
+        {
+            
+        }
     }
     public class BaseInput : BasePort
     {
         public override PortDirection Direction => PortDirection.In;
-        public BaseInput(string name, INode node)
+
+        public BaseInput(string name, INode node) : base(name, node)
         {
             Name = name;
             Node = node;
@@ -50,7 +68,8 @@ namespace BlueprintEditorPlugin.Models.Nodes.Ports
     public class BaseOutput : BasePort
     {
         public override PortDirection Direction => PortDirection.Out;
-        public BaseOutput(string name, INode node)
+
+        public BaseOutput(string name, INode node) : base(name, node)
         {
             Name = name;
             Node = node;

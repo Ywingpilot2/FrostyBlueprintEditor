@@ -4,7 +4,7 @@ using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin.Editors.GraphEditor
 {
-    public interface IGraphEditor : IStatusItem
+    public interface IGraphEditor
     {
         INodeWrangler NodeWrangler { get; set; }
 

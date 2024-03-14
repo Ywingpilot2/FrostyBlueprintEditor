@@ -13,12 +13,12 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
 {
     public class BaseNodeWrangler : INodeWrangler
     {
-        public ObservableCollection<INode> Nodes { get; } = new ObservableCollection<INode>();
-        public ObservableCollection<INode> SelectedNodes { get; } = new ObservableCollection<INode>();
-        public ObservableCollection<IConnection> Connections { get; } = new ObservableCollection<IConnection>();
+        public ObservableCollection<INode> Nodes { get; protected set; } = new ObservableCollection<INode>();
+        public ObservableCollection<INode> SelectedNodes { get; protected set; } = new ObservableCollection<INode>();
+        public ObservableCollection<IConnection> Connections { get; protected set; } = new ObservableCollection<IConnection>();
         
-        public IPendingConnection PendingConnection { get; }
-        public ICommand RemoveConnectionsCommand { get; }
+        public IPendingConnection PendingConnection { get; protected set; }
+        public ICommand RemoveConnectionsCommand { get; protected set; }
 
         #region Node
 

@@ -10,15 +10,15 @@ namespace BlueprintEditorPlugin.Models.Connections
 {
     public class BaseConnection : IConnection
     {
-        public IPort Source { get; }
+        public IPort Source { get; protected set; }
         
-        public IPort Target { get; }
+        public IPort Target { get; protected set; }
         public bool IsSelected { get; set; }
 
         #region Property changing
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string propertyName)
+        public virtual void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -28,7 +28,7 @@ namespace BlueprintEditorPlugin.Models.Connections
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public virtual void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -85,6 +85,17 @@ namespace BlueprintEditorPlugin.Models.Connections
             }
         }
 
+        private string _toolTip;
+        public virtual string ToolTip
+        {
+            get => _toolTip;
+            set
+            {
+                _toolTip = value;
+                NotifyPropertyChanged(nameof(ToolTip));
+            }
+        }
+
         #endregion
         
         #region Status
@@ -134,10 +145,12 @@ namespace BlueprintEditorPlugin.Models.Connections
         }
 
         #endregion
-        
-        
 
-        public BaseConnection(BaseOutput source, BaseInput target)
+        protected BaseConnection()
+        {
+        }
+        
+        public BaseConnection(IPort source, IPort target)
         {
             Source = source;
             Source.IsConnected = true;

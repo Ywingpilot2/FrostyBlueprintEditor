@@ -13,35 +13,14 @@ namespace BlueprintEditorPlugin.Extensions
 
         public override RelayCommand ContextItemClicked => new RelayCommand((o) =>
         {
-            /*if (App.SelectedAsset != null && !EditorUtils.ActiveNodeEditors.ContainsKey(App.SelectedAsset.Filename))
+            if (App.SelectedAsset != null)
             {
                 App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", new BlueprintEditor());
             }
-            else if (App.SelectedAsset == null)
+            else
             {
                 App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
             }
-            else if (EditorUtils.ActiveNodeEditors.ContainsKey(App.SelectedAsset.Filename))
-            {
-                App.Logger.LogError("This editor is already open.");
-            }*/
-        });
-    }
-    
-    public class ViewTestGraph : MenuExtension
-    {
-        public static ImageSource iconImageSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/BlueprintEditorPlugin;component/Images/BlueprintEdit.png") as ImageSource;
-
-        public override string TopLevelMenuName => "View";
-        public override string SubLevelMenuName => "Blueprint Editor Dev";
-
-        public override string MenuItemName => "View test graph";
-        public override ImageSource Icon => iconImageSource;
-
-        public override RelayCommand MenuItemClicked => new RelayCommand((o) =>
-        {
-            TestGraphWindow graphWindow = new TestGraphWindow();
-            graphWindow.Show();
         });
     }
 }

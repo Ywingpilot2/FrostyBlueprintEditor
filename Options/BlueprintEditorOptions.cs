@@ -46,6 +46,27 @@ namespace BlueprintEditorPlugin.Options
         [Editor(typeof(FrostySliderEditor))]
         [SliderMinMax(1.0f, 8.0f, 0.1f, 2.0f, true)]
         public float WireThickness { get; set; }
+        
+        [Category("Connections")]
+        [DisplayName("Connections over Nodes")]
+        [Description("Whether or not to display connections on top of nodes")]
+        public bool WiresOverVerts { get; set; }
+        
+        [Category("Ports")]
+        [DisplayName("Size")]
+        [Description("How large a port should be")]
+        [EbxFieldMeta(EbxFieldType.Float32)]
+        [Editor(typeof(FrostySliderEditor))]
+        [SliderMinMax(1.0f, 10.0f, 0.1f, 2.0f, true)]
+        public float PortSize { get; set; }
+        
+        [Category("Ports")]
+        [DisplayName("Location")]
+        [Description("Where on the horizontal axis of the node should the port be located. 0 is inside, 10 is outside")]
+        [EbxFieldMeta(EbxFieldType.Float32)]
+        [Editor(typeof(FrostySliderEditor))]
+        [SliderMinMax(0.0f, 10.0f, 0.1f, 2.0f, true)]
+        public float PortPosition { get; set; }
 
         public override void Load()
         {
@@ -67,6 +88,10 @@ namespace BlueprintEditorPlugin.Options
             }
 
             WireThickness = Config.Get("WireThickness", 4.0f);
+            WiresOverVerts = Config.Get("WireOverVert", false);
+            
+            PortSize = Config.Get("PortSize", 6.0f);
+            PortPosition = Config.Get("PortPos", 0.0f);
         }
 
         public override void Save()
@@ -88,6 +113,10 @@ namespace BlueprintEditorPlugin.Options
             }
             
             Config.Add("WireThickness", WireThickness);
+            Config.Add("WireOverVert", WiresOverVerts);
+            
+            Config.Add("PortSize", PortSize);
+            Config.Add("PortPos", PortPosition);
             EditorOptions.Update();
         }
     }
@@ -96,6 +125,11 @@ namespace BlueprintEditorPlugin.Options
     {
         public static ConnectionStyle WireStyle { get; internal set; }
         public static double WireThickness { get; internal set; }
+        public static bool WiresOververts { get; internal set; }
+        
+        public static double PortSize { get; internal set; }
+        public static double InputPos { get; internal set; }
+        public static double OutputPos { get; internal set; }
 
         public static void Update()
         {
@@ -116,6 +150,11 @@ namespace BlueprintEditorPlugin.Options
             }
             
             WireThickness = Config.Get("WireThickness", 4.0f);
+            WiresOververts = Config.Get("WireOverVert", false);
+            
+            PortSize = (Config.Get("PortSize", 6.0f) * 0.1) * 15;
+            OutputPos = Config.Get("PortPos", 0.0f);
+            InputPos = OutputPos * -1.0f;
         }
     }
 }
