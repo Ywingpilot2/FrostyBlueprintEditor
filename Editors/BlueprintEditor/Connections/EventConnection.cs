@@ -47,7 +47,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             ((dynamic)Object).SourceEvent.Name = source.Name;
             ((dynamic)Object).TargetEvent.Name = target.Name;
 
-            HasPlayer = source.HasPlayerEvent || ((EntityNode)source.Node).HasPlayerEvent;
+            HasPlayer = source.HasPlayer || ((EntityNode)source.Node).HasPlayerEvent;
 
             Realm = target.Realm;
             UpdateStatus();
@@ -85,7 +85,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 });
             }
 
-            HasPlayer = source.HasPlayerEvent || ((EntityNode)source.Node).HasPlayerEvent;
+            HasPlayer = source.HasPlayer || ((EntityNode)source.Node).HasPlayerEvent;
 
             Realm = target.Realm;
             UpdateStatus();

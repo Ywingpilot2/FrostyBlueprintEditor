@@ -156,15 +156,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
     
     public class EntityPendingConnection : BasePendingConnection
     {
-        private ConnectionType _type;
+        public ConnectionType Type { get; set; }
         
         public EntityPendingConnection(EntityNodeWrangler wrangler) : base(wrangler)
         {
             Start = new DelegateCommand<IPort>(source =>
             {
                 Source = source;
-                _type = ((EntityPort)source).Type;
-                NotifyPropertyChanged(nameof(_type));
+                Type = ((EntityPort)source).Type;
+                NotifyPropertyChanged(nameof(Type));
                 NotifyPropertyChanged(nameof(CurvePoint1));
                 NotifyPropertyChanged(nameof(CurvePoint2));
             });

@@ -49,6 +49,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 NotifyPropertyChanged(nameof(Realm));
             }
         }
+        
+        public bool HasPlayer { get; set; }
+        public bool IsInterface { get; set; }
 
         #endregion
 

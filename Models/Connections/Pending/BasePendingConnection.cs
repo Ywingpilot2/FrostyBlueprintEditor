@@ -104,13 +104,13 @@ namespace BlueprintEditorPlugin.Models.Connections.Pending
                     if (EditorOptions.WireStyle == ConnectionStyle.Curvy)
                     {
                         //The curve point is just the average of the 2 points
-                        return new Point(SourceAnchor.X + 85,
-                            SourceAnchor.Y);
+                        return new Point(TargetAnchor.X + 85,
+                            TargetAnchor.Y);
                     }
                     else
                     {
-                        return new Point(SourceAnchor.X + 25,
-                            SourceAnchor.Y);
+                        return new Point(TargetAnchor.X + 25,
+                            TargetAnchor.Y);
                     }
                 }
             }

@@ -8,8 +8,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
     {
         public override PortDirection Direction => PortDirection.In;
         public override ConnectionType Type => ConnectionType.Property;
-        public bool IsInterface { get; set; }
-        
+
         public PropertyInput(string name, INode node) : base(name, node)
         {
             Name = name;

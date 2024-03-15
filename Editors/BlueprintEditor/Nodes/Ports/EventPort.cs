@@ -20,8 +20,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
     {
         public override PortDirection Direction => PortDirection.Out;
         public override ConnectionType Type => ConnectionType.Event;
-        public bool HasPlayerEvent { get; set; }
-        
+
         public EventOutput(string name, INode node) : base(name, node)
         {
             Name = name;
