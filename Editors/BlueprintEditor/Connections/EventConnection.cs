@@ -1,4 +1,5 @@
-﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
+﻿using System;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using FrostySdk;
 using FrostySdk.Ebx;
@@ -17,6 +18,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             set
             {
                 _realm = value;
+                Type realmType = ((dynamic)Object).TargetType.GetType();
+                ((dynamic)Object).TargetType = (dynamic)Enum.Parse(realmType, $"EventConnectionTargetType_{_realm.ToString()}");
                 NotifyPropertyChanged(nameof(Realm));
                 UpdateStatus();
             }

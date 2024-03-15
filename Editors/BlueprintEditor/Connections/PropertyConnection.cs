@@ -98,8 +98,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         
         public PropertyConnection(PropertyOutput source, PropertyInput target) : base(source, target)
         {
-            PropType = target.IsInterface ? PropertyType.Interface : PropertyType.Default;
             Object = TypeLibrary.CreateObject("PropertyConnection");
+            PropType = target.IsInterface ? PropertyType.Interface : PropertyType.Default;
             
             PointerRef sourceRef;
             if (((EntityNode)source.Node).Type == PointerRefType.Internal)

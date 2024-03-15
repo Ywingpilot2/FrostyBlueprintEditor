@@ -8,6 +8,7 @@ using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Connections.Pending;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using Frosty.Core;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using Prism.Commands;
@@ -142,17 +143,49 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             {
                 case ConnectionType.Event:
                 {
-                    ((dynamic)Asset.RootObject).EventConnections.Add(((EventConnection)connection).Object);
+                    EventConnection eventConnection = ((EventConnection)connection);
+                    ((dynamic)Asset.RootObject).EventConnections.Add((dynamic)eventConnection.Object);
                 } break;
                 case ConnectionType.Link:
                 {
-                    ((dynamic)Asset.RootObject).LinkConnections.Add(((LinkConnection)connection).Object);
+                    LinkConnection linkConnection = (LinkConnection)connection;
+                    ((dynamic)Asset.RootObject).LinkConnections.Add((dynamic)linkConnection.Object);
                 } break;
                 case ConnectionType.Property:
                 {
-                    ((dynamic)Asset.RootObject).PropertyConnections.Add(((PropertyConnection)connection).Object);
+                    PropertyConnection propertyConnection = ((PropertyConnection)connection);
+                    ((dynamic)Asset.RootObject).PropertyConnections.Add((dynamic)propertyConnection.Object);
                 } break;
             }
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+        }
+
+        #endregion
+
+        #region Removing connections
+
+        public override void RemoveConnection(IConnection connection)
+        {
+            base.RemoveConnection(connection);
+            dynamic root = (dynamic)Asset.RootObject;
+            EntityConnection entityConnection = (EntityConnection)connection;
+
+            switch (entityConnection.Type)
+            {
+                case ConnectionType.Event:
+                {
+                    root.EventConnections.Remove((dynamic)entityConnection.Object);
+                } break;
+                case ConnectionType.Link:
+                {
+                    root.LinkConnections.Remove((dynamic)entityConnection.Object);
+                } break;
+                case ConnectionType.Property:
+                {
+                    root.PropertyConnections.Remove((dynamic)entityConnection.Object);
+                } break;
+            }
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
         }
 
         #endregion

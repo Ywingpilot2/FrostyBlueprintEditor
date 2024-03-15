@@ -130,8 +130,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         
         public EntityConnection(IPort source, IPort target) : base(source, target)
         {
-            Realm = ((EntityPort)target).Realm;
-            UpdateStatus();
         }
 
         protected EntityConnection()
