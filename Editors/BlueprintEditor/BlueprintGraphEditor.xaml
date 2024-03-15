@@ -62,13 +62,13 @@
                                  FontFamily="Consolas"
                                  ToolTip="{Binding ToolTip}"
                                  x:Name="NodeTemplate">
-                            
-                        <!--TODO: Update Anchor to be where port is, don't trust nodify!-->
+                        
                         <nodify:Node.InputConnectorTemplate>
                             <DataTemplate DataType="{x:Type ports:EntityInput}">
                                 <nodify:NodeInput IsConnected="{Binding IsConnected}"
                                                   Anchor="{Binding Anchor, Mode=OneWayToSource}"
-                                                  Background="{StaticResource Background}">
+                                                  Background="{StaticResource Background}"
+                                                  BorderBrush="Transparent">
                                     <nodify:NodeInput.Style>
                                         <Style TargetType="{x:Type nodify:NodeInput}">
                                             <Setter Property="Visibility" Value="Visible" />
@@ -89,167 +89,146 @@
                                     <nodify:NodeInput.HeaderTemplate>
                                         <DataTemplate>
                                             <Grid DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeInput}}">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock FontFamily="Consolas"
-                                                               Text="{Binding Name}"
-                                                               FontSize="10"
-                                                               Foreground="Black"
-                                                               HorizontalAlignment="Left"
-                                                               VerticalAlignment="Center"
-                                                               Margin="0,0,3,0" />
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock FontFamily="Consolas"
+                                                           Text="{Binding Name}"
+                                                           FontSize="10"
+                                                           Foreground="Black"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,3,0" />
 
-                                                    <!--NCS Grid-->
-                                                    <Grid Grid.Column="1" VerticalAlignment="Center"
-                                                          HorizontalAlignment="Right">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Rectangle Width="6" Height="6"
-                                                                       HorizontalAlignment="Left"
-                                                                       VerticalAlignment="Top"
-                                                                       Margin="0,0,2,0">
-                                                                <Rectangle.Style>
-                                                                    <Style TargetType="{x:Type Rectangle}">
-                                                                        <Setter Property="Fill" Value="DimGray" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClient}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Invalid}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="DarkRed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Rectangle.Style>
-                                                                <Rectangle.OpacityMask>
-                                                                    <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
-                                                                </Rectangle.OpacityMask>
-                                                            </Rectangle>
-                                                            <Rectangle Width="6" Height="6"
-                                                                       VerticalAlignment="Top"
-                                                                       HorizontalAlignment="Left">
-                                                                <Rectangle.Style>
-                                                                    <Style TargetType="{x:Type Rectangle}">
-                                                                        <Setter Property="Fill" Value="DimGray" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClient}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Client}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.ClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Invalid}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="DarkRed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Rectangle.Style>
-                                                                <Rectangle.OpacityMask>
-                                                                    <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
-                                                                </Rectangle.OpacityMask>
-                                                            </Rectangle>
-                                                            <Rectangle Width="6" Height="6"
-                                                                       VerticalAlignment="Top"
-                                                                       HorizontalAlignment="Left">
-                                                                <Rectangle.Style>
-                                                                    <Style TargetType="{x:Type Rectangle}">
-                                                                        <Setter Property="Fill" Value="DimGray" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Server}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.ClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Invalid}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="DarkRed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Rectangle.Style>
-                                                                <Rectangle.OpacityMask>
-                                                                    <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
-                                                                </Rectangle.OpacityMask>
-                                                            </Rectangle>
-                                                        </StackPanel>
-                                                    </Grid>
+                                                <!--NCS Grid-->
+                                                <Grid Grid.Column="1" VerticalAlignment="Center"
+                                                      HorizontalAlignment="Right">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Rectangle Width="6" Height="6"
+                                                                   HorizontalAlignment="Left"
+                                                                   VerticalAlignment="Top"
+                                                                   Margin="0,0,2,0">
+                                                            <Rectangle.Style>
+                                                                <Style TargetType="{x:Type Rectangle}">
+                                                                    <Setter Property="Fill" Value="DimGray" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="DarkRed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Rectangle.Style>
+                                                            <Rectangle.OpacityMask>
+                                                                <ImageBrush
+                                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
+                                                            </Rectangle.OpacityMask>
+                                                        </Rectangle>
+                                                        <Rectangle Width="6" Height="6"
+                                                                   VerticalAlignment="Top"
+                                                                   HorizontalAlignment="Left">
+                                                            <Rectangle.Style>
+                                                                <Style TargetType="{x:Type Rectangle}">
+                                                                    <Setter Property="Fill" Value="DimGray" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="DarkRed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Rectangle.Style>
+                                                            <Rectangle.OpacityMask>
+                                                                <ImageBrush
+                                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
+                                                            </Rectangle.OpacityMask>
+                                                        </Rectangle>
+                                                        <Rectangle Width="6" Height="6"
+                                                                   VerticalAlignment="Top"
+                                                                   HorizontalAlignment="Left">
+                                                            <Rectangle.Style>
+                                                                <Style TargetType="{x:Type Rectangle}">
+                                                                    <Setter Property="Fill" Value="DimGray" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="DarkRed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Rectangle.Style>
+                                                            <Rectangle.OpacityMask>
+                                                                <ImageBrush
+                                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
+                                                            </Rectangle.OpacityMask>
+                                                        </Rectangle>
+                                                    </StackPanel>
                                                 </Grid>
+                                            </Grid>
                                         </DataTemplate>
                                     </nodify:NodeInput.HeaderTemplate>
 
                                     <nodify:NodeInput.ConnectorTemplate>
                                         <ControlTemplate>
                                             <Ellipse Width="{x:Static options:EditorOptions.PortSize}"
-                                                         Height="{x:Static options:EditorOptions.PortSize}"
-                                                         VerticalAlignment="Center"
-                                                         HorizontalAlignment="Left">
-                                                    <Ellipse.RenderTransform>
-                                                        <TranslateTransform
-                                                            X="{x:Static options:EditorOptions.InputPos}" />
-                                                    </Ellipse.RenderTransform>
-
-                                                    <Ellipse.Style>
-                                                        <Style TargetType="{x:Type Ellipse}">
-                                                            <Setter Property="Fill" Value="Red"></Setter>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Type}"
-                                                                             Value="{x:Static connections:ConnectionType.Event}">
-                                                                    <Setter Property="Fill" Value="White" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Type}"
-                                                                             Value="{x:Static connections:ConnectionType.Property}">
-                                                                    <Setter Property="Fill"
-                                                                            Value="{StaticResource PropertyConnection}" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Type}"
-                                                                             Value="{x:Static connections:ConnectionType.Link}">
-                                                                    <Setter Property="Fill"
-                                                                            Value="{StaticResource LinkConnection}" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Ellipse.Style>
-                                                </Ellipse>
+                                                     Height="{x:Static options:EditorOptions.PortSize}"
+                                                     VerticalAlignment="Center"
+                                                     HorizontalAlignment="Left">
+                                                <Ellipse.RenderTransform>
+                                                    <TranslateTransform
+                                                        X="{x:Static options:EditorOptions.InputPos}" />
+                                                </Ellipse.RenderTransform>
+                                            </Ellipse>
                                         </ControlTemplate>
                                     </nodify:NodeInput.ConnectorTemplate>
                                 </nodify:NodeInput>
@@ -260,7 +239,8 @@
                             <DataTemplate DataType="{x:Type ports:EntityOutput}">
                                 <nodify:NodeOutput IsConnected="{Binding IsConnected}"
                                                    Anchor="{Binding Anchor, Mode=OneWayToSource}"
-                                                   Background="{StaticResource Background}">
+                                                   Background="{StaticResource Background}"
+                                                   BorderBrush="Transparent">
                                     <nodify:NodeOutput.Style>
                                         <Style TargetType="{x:Type nodify:NodeOutput}">
                                             <Setter Property="Visibility" Value="Visible" />
@@ -281,168 +261,147 @@
                                     <nodify:NodeOutput.HeaderTemplate>
                                         <DataTemplate>
                                             <Grid DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeOutput}}">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock FontFamily="Consolas"
-                                                               Text="{Binding Name}"
-                                                               FontSize="10"
-                                                               Foreground="Black"
-                                                               HorizontalAlignment="Left"
-                                                               VerticalAlignment="Center"
-                                                               Margin="0,0,3,0" />
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock FontFamily="Consolas"
+                                                           Text="{Binding Name}"
+                                                           FontSize="10"
+                                                           Foreground="Black"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,3,0" />
 
-                                                    <!--NCS Grid-->
-                                                    <Grid Grid.Column="1" VerticalAlignment="Center"
-                                                          HorizontalAlignment="Right">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Rectangle Width="6" Height="6"
-                                                                       HorizontalAlignment="Left"
-                                                                       VerticalAlignment="Top"
-                                                                       Margin="0,0,2,0">
-                                                                <Rectangle.Style>
-                                                                    <Style TargetType="{x:Type Rectangle}">
-                                                                        <Setter Property="Fill" Value="DimGray" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClient}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Invalid}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="DarkRed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Rectangle.Style>
-                                                                <Rectangle.OpacityMask>
-                                                                    <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
-                                                                </Rectangle.OpacityMask>
-                                                            </Rectangle>
-                                                            <Rectangle Width="6" Height="6"
-                                                                       VerticalAlignment="Top"
-                                                                       HorizontalAlignment="Left">
-                                                                <Rectangle.Style>
-                                                                    <Style TargetType="{x:Type Rectangle}">
-                                                                        <Setter Property="Fill" Value="DimGray" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClient}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Client}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.ClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Invalid}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="DarkRed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Rectangle.Style>
-                                                                <Rectangle.OpacityMask>
-                                                                    <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
-                                                                </Rectangle.OpacityMask>
-                                                            </Rectangle>
-                                                            <Rectangle Width="6" Height="6"
-                                                                       VerticalAlignment="Top"
-                                                                       HorizontalAlignment="Left">
-                                                                <Rectangle.Style>
-                                                                    <Style TargetType="{x:Type Rectangle}">
-                                                                        <Setter Property="Fill" Value="DimGray" />
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Server}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.ClientAndServer}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="{StaticResource NodeSelectedColor}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Realm}"
-                                                                                Value="{x:Static nodes:Realm.Invalid}">
-                                                                                <Setter Property="Fill"
-                                                                                    Value="DarkRed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Rectangle.Style>
-                                                                <Rectangle.OpacityMask>
-                                                                    <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
-                                                                </Rectangle.OpacityMask>
-                                                            </Rectangle>
-                                                        </StackPanel>
-                                                    </Grid>
+                                                <!--NCS Grid-->
+                                                <Grid Grid.Column="1" VerticalAlignment="Center"
+                                                      HorizontalAlignment="Right">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Rectangle Width="6" Height="6"
+                                                                   HorizontalAlignment="Left"
+                                                                   VerticalAlignment="Top"
+                                                                   Margin="0,0,2,0">
+                                                            <Rectangle.Style>
+                                                                <Style TargetType="{x:Type Rectangle}">
+                                                                    <Setter Property="Fill" Value="DimGray" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="DarkRed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Rectangle.Style>
+                                                            <Rectangle.OpacityMask>
+                                                                <ImageBrush
+                                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
+                                                            </Rectangle.OpacityMask>
+                                                        </Rectangle>
+                                                        <Rectangle Width="6" Height="6"
+                                                                   VerticalAlignment="Top"
+                                                                   HorizontalAlignment="Left">
+                                                            <Rectangle.Style>
+                                                                <Style TargetType="{x:Type Rectangle}">
+                                                                    <Setter Property="Fill" Value="DimGray" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="DarkRed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Rectangle.Style>
+                                                            <Rectangle.OpacityMask>
+                                                                <ImageBrush
+                                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
+                                                            </Rectangle.OpacityMask>
+                                                        </Rectangle>
+                                                        <Rectangle Width="6" Height="6"
+                                                                   VerticalAlignment="Top"
+                                                                   HorizontalAlignment="Left">
+                                                            <Rectangle.Style>
+                                                                <Style TargetType="{x:Type Rectangle}">
+                                                                    <Setter Property="Fill" Value="DimGray" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="{StaticResource NodeSelectedColor}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Realm}"
+                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            <Setter Property="Fill"
+                                                                                Value="DarkRed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Rectangle.Style>
+                                                            <Rectangle.OpacityMask>
+                                                                <ImageBrush
+                                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
+                                                            </Rectangle.OpacityMask>
+                                                        </Rectangle>
+                                                    </StackPanel>
                                                 </Grid>
+                                            </Grid>
                                         </DataTemplate>
                                     </nodify:NodeOutput.HeaderTemplate>
 
                                     <nodify:NodeOutput.ConnectorTemplate>
                                         <ControlTemplate>
                                             <Ellipse
-                                                         Width="{x:Static options:EditorOptions.PortSize}"
-                                                         Height="{x:Static options:EditorOptions.PortSize}"
-                                                         VerticalAlignment="Center"
-                                                         HorizontalAlignment="Left">
-                                                    <Ellipse.RenderTransform>
-                                                        <TranslateTransform
-                                                            X="{x:Static options:EditorOptions.OutputPos}" />
-                                                    </Ellipse.RenderTransform>
-
-                                                    <Ellipse.Style>
-                                                        <Style TargetType="{x:Type Ellipse}">
-                                                            <Setter Property="Fill" Value="Red"></Setter>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Type}"
-                                                                             Value="{x:Static connections:ConnectionType.Event}">
-                                                                    <Setter Property="Fill" Value="White" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Type}"
-                                                                             Value="{x:Static connections:ConnectionType.Property}">
-                                                                    <Setter Property="Fill"
-                                                                            Value="{StaticResource PropertyConnection}" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Type}"
-                                                                             Value="{x:Static connections:ConnectionType.Link}">
-                                                                    <Setter Property="Fill"
-                                                                            Value="{StaticResource LinkConnection}" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Ellipse.Style>
-                                                </Ellipse>
+                                                Width="{x:Static options:EditorOptions.PortSize}"
+                                                Height="{x:Static options:EditorOptions.PortSize}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Left">
+                                                <Ellipse.RenderTransform>
+                                                    <TranslateTransform
+                                                        X="{x:Static options:EditorOptions.OutputPos}" />
+                                                </Ellipse.RenderTransform>
+                                            </Ellipse>
                                         </ControlTemplate>
                                     </nodify:NodeOutput.ConnectorTemplate>
                                 </nodify:NodeOutput>

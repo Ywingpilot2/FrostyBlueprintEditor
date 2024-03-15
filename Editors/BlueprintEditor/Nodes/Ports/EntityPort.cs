@@ -14,7 +14,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
         #region Basic info
 
         public string Name { get; set; }
-        public bool IsConnected { get; set; }
+
+        private bool _isConnected;
+
+        public bool IsConnected
+        {
+            get => _isConnected;
+            set
+            {
+                _isConnected = value;
+                NotifyPropertyChanged(nameof(IsConnected));
+            }
+        }
         public abstract PortDirection Direction { get; }
 
         #endregion
