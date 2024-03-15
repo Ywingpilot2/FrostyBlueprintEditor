@@ -1,17 +1,67 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Options;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
 {
-    public abstract class EntityPort : BasePort, INetworked
+    public abstract class EntityPort : IPort, INetworked
     {
-        public abstract override PortDirection Direction { get; }
+        #region Basic info
+
+        public string Name { get; set; }
+        public bool IsConnected { get; set; }
+        public abstract PortDirection Direction { get; }
+
+        #endregion
+
+        #region Complex info
+
+        protected Point _anchor;
+        public virtual Point Anchor
+        {
+            get => _anchor;
+            set
+            {
+                _anchor = value;
+                NotifyPropertyChanged(nameof(Anchor));
+            }
+        }
+        public INode Node { get; protected set; }
+
+        #endregion
+
+        #region Entity Info
+
         public abstract ConnectionType Type { get; }
 
-        public Realm Realm { get; set; }
+        private Realm _realm;
+        public Realm Realm
+        {
+            get => _realm;
+            set
+            {
+                _realm = value;
+                NotifyPropertyChanged(nameof(Realm));
+            }
+        }
+
+        #endregion
+
+        #region Property changing
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
+        
         public Realm ParseRealm(object obj)
         {
             Type type = obj.GetType();
@@ -71,7 +121,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             return $"{Realm} {Type} {Direction}put - {Name}";
         }
 
-        public EntityPort(string name, INode node) : base(name, node)
+        public EntityPort(string name, INode node)
         {
             Name = name;
             Node = node;
@@ -81,6 +131,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
     public abstract class EntityInput : EntityPort
     {
         public override PortDirection Direction => PortDirection.In;
+        public override Point Anchor
+        {
+            get => _anchor;
+            set
+            {
+                _anchor = new Point(value.X - EditorOptions.OutputPos, value.Y);
+                NotifyPropertyChanged(nameof(Anchor));
+            }
+        }
 
         public EntityInput(string name, INode node) : base(name, node)
         {
@@ -92,6 +151,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
     public abstract class EntityOutput : EntityPort
     {
         public override PortDirection Direction => PortDirection.Out;
+        public override Point Anchor
+        {
+            get => _anchor;
+            set
+            {
+                _anchor = new Point(value.X + EditorOptions.OutputPos, value.Y);
+                NotifyPropertyChanged(nameof(Anchor));
+            }
+        }
 
         public EntityOutput(string name, INode node) : base(name, node)
         {
