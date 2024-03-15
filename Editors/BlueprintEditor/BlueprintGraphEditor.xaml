@@ -469,10 +469,20 @@
                                         
                                         <TextBlock FontFamily="Consolas"
                                                    Text="{Binding Header}" 
-                                                   FontSize="8"
                                                    Foreground="White"
                                                    HorizontalAlignment="Left"
-                                                   VerticalAlignment="Top"/>
+                                                   VerticalAlignment="Top">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="FontSize" Value="8"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Footer}" Value="{x:Null}">
+                                                            <Setter Property="FontSize" Value="12" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     
                                         <!--NCS Grid-->
                                         <Grid Grid.Column="1"
@@ -482,8 +492,8 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="1" Width="15"
-                                                    Height="15"
+                                            <Button Grid.Column="1" Width="13"
+                                                    Height="13"
                                                     HorizontalAlignment="Right"
                                                     VerticalAlignment="Center"
                                                     Background="Transparent"
@@ -495,7 +505,7 @@
                                                         <Setter Property="Content">
                                                             <Setter.Value>
                                                                 <Image Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/CollapseWindow.png" 
-                                                                       Width="15"/>
+                                                                       Width="13"/>
                                                             </Setter.Value>
                                                         </Setter>
                                                         <Style.Triggers>
@@ -504,7 +514,7 @@
                                                                 <Setter Property="Content">
                                                                     <Setter.Value>
                                                                         <Image Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/CollapsedWindow.png"
-                                                                               Width="15"/>
+                                                                               Width="13"/>
                                                                     </Setter.Value>
                                                                 </Setter>
                                                             </DataTrigger>
@@ -601,7 +611,18 @@
                                                FontSize="5"
                                                Foreground="DarkGray"
                                                HorizontalAlignment="Left"
-                                               VerticalAlignment="Bottom"/>
+                                               VerticalAlignment="Bottom">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Footer}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </Grid>
                             </DataTemplate>
                         </nodify:Node.HeaderTemplate>

@@ -48,6 +48,11 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
             Connections.Remove(connection);
         }
 
+        public void LayoutNodes()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public virtual void ClearConnections(INode node)
         {
             List<IConnection> connections = GetConnections(node).ToList();

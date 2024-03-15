@@ -111,7 +111,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         public object Object { get; }
-        public string ObjectType { get; }
+        public virtual string ObjectType { get; }
 
         private bool _hasPlayerEvent;
         public virtual bool HasPlayerEvent
