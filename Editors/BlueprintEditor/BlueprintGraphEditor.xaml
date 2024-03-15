@@ -68,7 +68,7 @@
                                 <nodify:NodeInput IsConnected="{Binding IsConnected}"
                                                   Anchor="{Binding Anchor, Mode=OneWayToSource}"
                                                   Background="{StaticResource Background}"
-                                                  BorderBrush="Transparent">
+                                                  BorderBrush="{StaticResource NodeSelectedColor}">
                                     <nodify:NodeInput.Style>
                                         <Style TargetType="{x:Type nodify:NodeInput}">
                                             <Setter Property="Visibility" Value="Visible" />
@@ -228,6 +228,28 @@
                                                     <TranslateTransform
                                                         X="{x:Static options:EditorOptions.InputPos}" />
                                                 </Ellipse.RenderTransform>
+                                                
+                                                <Ellipse.Style>
+                                                    <Style TargetType="{x:Type Ellipse}">
+                                                        <Setter Property="Fill" Value="Red"></Setter>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Event}">
+                                                                <Setter Property="Fill" Value="White" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Property}">
+                                                                <Setter Property="Fill"
+                                                                        Value="{StaticResource PropertyConnection}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Link}">
+                                                                <Setter Property="Fill"
+                                                                        Value="{StaticResource LinkConnection}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
                                             </Ellipse>
                                         </ControlTemplate>
                                     </nodify:NodeInput.ConnectorTemplate>
@@ -240,7 +262,7 @@
                                 <nodify:NodeOutput IsConnected="{Binding IsConnected}"
                                                    Anchor="{Binding Anchor, Mode=OneWayToSource}"
                                                    Background="{StaticResource Background}"
-                                                   BorderBrush="Transparent">
+                                                   BorderBrush="{StaticResource NodeSelectedColor}">
                                     <nodify:NodeOutput.Style>
                                         <Style TargetType="{x:Type nodify:NodeOutput}">
                                             <Setter Property="Visibility" Value="Visible" />
@@ -401,6 +423,28 @@
                                                     <TranslateTransform
                                                         X="{x:Static options:EditorOptions.OutputPos}" />
                                                 </Ellipse.RenderTransform>
+                                                
+                                                <Ellipse.Style>
+                                                    <Style TargetType="{x:Type Ellipse}">
+                                                        <Setter Property="Fill" Value="Red"></Setter>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Event}">
+                                                                <Setter Property="Fill" Value="White" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Property}">
+                                                                <Setter Property="Fill"
+                                                                        Value="{StaticResource PropertyConnection}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Link}">
+                                                                <Setter Property="Fill"
+                                                                        Value="{StaticResource LinkConnection}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
                                             </Ellipse>
                                         </ControlTemplate>
                                     </nodify:NodeOutput.ConnectorTemplate>
