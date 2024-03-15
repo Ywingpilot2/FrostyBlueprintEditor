@@ -108,7 +108,7 @@ namespace BlueprintEditorPlugin.Models.Connections
 
         public virtual void UpdateStatus()
         {
-            CurrentStatus = new EditorStatusArgs();
+            CurrentStatus = new EditorStatusArgs(EditorStatus.Alright, "");
             
             if (Source == Target)
             {

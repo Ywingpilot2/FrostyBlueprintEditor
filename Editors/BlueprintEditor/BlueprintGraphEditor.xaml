@@ -620,10 +620,17 @@
                              Connections="{Binding NodeWrangler.Connections}"
                              PendingConnection="{Binding NodeWrangler.PendingConnection}"
                              DisconnectConnectorCommand="{Binding NodeWrangler.RemoveConnectionsCommand}"
-                             Background="{StaticResource SmallGridLinesDrawingBrush}"
                              DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=UserControl}}"
                              ItemContainerStyle="{StaticResource NodeStyle}"
                              DisplayConnectionsOnTop="{x:Static options:EditorOptions.WiresOververts}">
+            <nodify:NodifyEditor.Background>
+                <DrawingBrush TileMode="Tile"
+                              ViewportUnits="Absolute"
+                              Viewport="0 0 32 32"
+                              Transform="{Binding ViewportTransform, ElementName=Editor}"
+                              Drawing="{StaticResource SmallGridGeometry}" />
+            </nodify:NodifyEditor.Background>
+            
             <nodify:NodifyEditor.ConnectionTemplate>
                 <DataTemplate DataType="{x:Type connections:EntityConnection}">
                     <Canvas>

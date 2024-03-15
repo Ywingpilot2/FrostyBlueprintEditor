@@ -1,4 +1,7 @@
-﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 using FrostySdk;
@@ -11,6 +14,31 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
     {
         public override ConnectionType Type => ConnectionType.Property;
 
+        private Realm _realm;
+        public override Realm Realm
+        {
+            get => _realm;
+            set
+            {
+                _realm = value;
+                ((dynamic)Object).Flags = PropertyFlagsHelper.GetAsFlags(Realm, PropType, SourceCantBeStatic);
+                NotifyPropertyChanged(nameof(Realm));
+                UpdateStatus();
+            }
+        }
+
+        private bool _isDynamic;
+        public bool SourceCantBeStatic
+        {
+            get => _isDynamic;
+            set
+            {
+                ((dynamic)Object).Flags = PropertyFlagsHelper.GetAsFlags(Realm, PropType, SourceCantBeStatic);
+                _isDynamic = value;
+                NotifyPropertyChanged(nameof(SourceCantBeStatic));
+            }
+        }
+
         public override void UpdateStatus()
         {
             base.UpdateStatus();
@@ -19,11 +47,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             {
                 SetStatus(new EditorStatusArgs(EditorStatus.Broken, "Property type is invalid"));
             }
+
+            EntityPort target = (EntityPort)Target;
+            if (PropType == PropertyType.Interface && !target.IsInterface)
+            {
+                SetStatus(new EditorStatusArgs(EditorStatus.Flawed, "Property type is set to interface, despite not plugging into an interface"));
+            }
         }
 
         public PropertyConnection(PropertyOutput source, PropertyInput target, object obj) : base(source, target, obj)
         {
-            PropType = target.IsInterface ? PropertyType.Interface : PropertyType.Default;
             Object = obj;
             
             PointerRef sourceRef;
@@ -53,8 +86,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                     ClassGuid = ((EntityNode)target.Node).ClassGuid
                 });
             }
+            
+            PropertyFlagsHelper.GetAsRealm(((dynamic)Object).Flags, out Realm realm, out  PropertyType propType, out bool isDynamic);
 
-            Realm = target.Realm;
+            Realm = realm;
+            PropType = propType;
+            SourceCantBeStatic = isDynamic;
+            
             UpdateStatus();
         }
         
@@ -98,6 +136,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             Realm = target.Realm;
             UpdateStatus();
+        }
+    }
+
+    public static class PropertyFlagsHelper
+    {
+        public static uint GetAsFlags(Realm realm, PropertyType propType, bool sourceCantBeStatic = false)
+        {
+            uint flags = 0;
+            flags |= (uint)realm;
+            flags |= ((uint)propType) << 4;
+            if (sourceCantBeStatic)
+            {
+                flags |= 8;
+            }
+
+            return flags;
+        }
+
+        public static void GetAsRealm(uint flags, out Realm realm, out PropertyType propType, out bool sourceCantBeStatic)
+        {
+            realm = (Realm)(flags & 7);
+            propType = (PropertyType)((flags & 48) >> 4);
+            sourceCantBeStatic = Convert.ToBoolean((flags & 8) != 0 ? 1 : 0);
         }
     }
 }

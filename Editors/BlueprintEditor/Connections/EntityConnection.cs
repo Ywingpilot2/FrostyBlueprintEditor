@@ -25,7 +25,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             (Realm.NetworkedClientAndServer, Realm.ClientAndServer),
             (Realm.Server, Realm.Client)
         };
-        public Realm Realm { get; set; }
+        public virtual Realm Realm { get; set; }
         public abstract ConnectionType Type { get; }
         public object Object { get; set; }
 
@@ -47,7 +47,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             set
             {
                 _propType = value;
+                ((dynamic)Object).Flags = PropertyFlagsHelper.GetAsFlags(Realm, PropType);
                 NotifyPropertyChanged(nameof(PropType));
+                UpdateStatus();
             }
         }
 
@@ -123,7 +125,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         public EntityConnection(IPort source, IPort target, object obj) : base(source, target)
         {
             Object = obj;
-            Realm = ((EntityPort)target).Realm;
             UpdateStatus();
         }
         

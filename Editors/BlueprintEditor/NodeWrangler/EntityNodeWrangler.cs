@@ -67,6 +67,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
             }
             
+            if (source.Realm == Realm.Invalid)
+            {
+                source.Realm = connection.Realm;
+            }
+
+            if (target.Realm == Realm.Invalid)
+            {
+                target.Realm = connection.Realm;
+            }
+            
             Connections.Add(connection);
         }
         

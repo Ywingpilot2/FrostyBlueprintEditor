@@ -10,6 +10,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
     {
         public override ConnectionType Type => ConnectionType.Event;
 
+        private Realm _realm;
+        public override Realm Realm
+        {
+            get => _realm;
+            set
+            {
+                _realm = value;
+                NotifyPropertyChanged(nameof(Realm));
+                UpdateStatus();
+            }
+        }
+
         public EventConnection(EventOutput source, EventInput target) : base(source, target)
         {
             Object = TypeLibrary.CreateObject("EventConnection");
@@ -87,7 +99,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             HasPlayer = source.HasPlayer || ((EntityNode)source.Node).HasPlayerEvent;
 
-            Realm = target.Realm;
+            Realm = ParseRealm(((dynamic)Object).TargetType.ToString());
             UpdateStatus();
         }
     }

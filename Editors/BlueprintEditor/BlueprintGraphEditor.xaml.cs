@@ -228,7 +228,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
                 EventOutput output = (EventOutput)sourceNode.GetOutput(eventConnection.SourceEvent.Name);
                 EventInput input = (EventInput)targetNode.GetInput(eventConnection.TargetEvent.Name);
-                
+
                 wrangler.AddConnectionTransient(output, input, eventConnection);
             }
 

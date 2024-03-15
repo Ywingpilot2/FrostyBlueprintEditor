@@ -1,4 +1,8 @@
-﻿namespace BlueprintEditorPlugin.Models.Status
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace BlueprintEditorPlugin.Models.Status
 {
     public enum EditorStatus
     {
@@ -7,15 +11,42 @@
         Broken = 2
     }
 
-    public struct EditorStatusArgs
+    public class EditorStatusArgs : INotifyPropertyChanged
     {
-        public EditorStatus Status { get; set; }
-        public string ToolTip { get; set; }
+        private EditorStatus _status;
+        private string _toolTip;
+
+        public EditorStatus Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                NotifyPropertyChanged(nameof(Status));
+            }
+        }
+
+        public string ToolTip
+        {
+            get => _toolTip;
+            set
+            {
+                _toolTip = value;
+                NotifyPropertyChanged(nameof(ToolTip));
+            }
+        }
 
         public EditorStatusArgs(EditorStatus status, string tooltip = "")
         {
             Status = status;
             ToolTip = tooltip;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
