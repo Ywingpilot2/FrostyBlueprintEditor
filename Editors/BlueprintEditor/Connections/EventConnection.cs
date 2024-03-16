@@ -64,7 +64,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             HasPlayer = source.HasPlayer;
 
-            DetermineRealm();
+            FixRealm();
             UpdateStatus();
         }
         

@@ -82,7 +82,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             ((dynamic)Object).SourceField = source.Name;
             ((dynamic)Object).TargetField = target.Name;
 
-            DetermineRealm();
+            FixRealm();
             UpdateStatus();
         }
     }

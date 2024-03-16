@@ -15,7 +15,7 @@ using FrostySdk.IO;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
-    public class InterfaceNode : IObjectNode, ITransient, INetworked
+    public class InterfaceNode : IObjectNode, ITransient
     {
         private string _header;
         private Point _location;
@@ -172,25 +172,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Networking implementation
 
-        public Realm Realm { get; set; }
-        public Realm ParseRealm(object obj)
+        public Realm Realm
         {
-            return (Realm)obj;
-        }
-
-        public void DetermineRealm()
-        {
-            EntityPort port = (EntityPort)Inputs[0];
-            if (port.Realm != Realm.Any)
+            get
             {
-                Realm = port.Realm;
-            }
-            else
-            {
-                port.DetermineRealm();
-                if (port.Realm != Realm.Any)
+                if (Inputs.Count != 0)
                 {
-                    Realm = port.Realm;
+                    return ((EntityPort)Inputs[0]).Realm;
+                }
+                else
+                {
+                    return ((EntityPort)Outputs[0]).Realm;
                 }
             }
         }
@@ -203,6 +195,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             InternalGuid = ((dynamic)obj).GetInstanceGuid();
             int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
             Header = Utils.GetString(hash);
+            ConnectionType = type;
             
             if (direction == PortDirection.In)
             {
@@ -266,8 +259,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     } break;
                 }
             }
+        }
 
-            Realm = realm;
+        public InterfaceNode()
+        {
         }
     }
 }

@@ -140,20 +140,47 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         
         public Realm ParseRealm(object obj)
         {
-            return (Realm)((int)obj);
+            switch (obj.ToString())
+            {
+                case "Realm_Server":
+                {
+                    return Realm.Server;
+                }
+                case "Realm_Client":
+                {
+                    return Realm.Client;
+                }
+                case "Realm_ClientAndServer":
+                {
+                    return Realm.ClientAndServer;
+                }
+                default:
+                {
+                    return Realm.Invalid;
+                }
+            }
         }
 
         
-        public virtual void DetermineRealm()
+        public virtual Realm DetermineRealm()
         {
+            Realm realm = Realm;
+            
             foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
             {
                 if (connection.Realm != Realm.Any && connection.Realm != Realm.Invalid)
                 {
-                    Realm = connection.Realm;
-                    return;
+                    realm = connection.Realm;
+                    return realm;
                 }
             }
+
+            return realm;
+        }
+
+        public virtual void FixRealm()
+        {
+            Realm = DetermineRealm();
         }
 
         #endregion

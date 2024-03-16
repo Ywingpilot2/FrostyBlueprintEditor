@@ -130,14 +130,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             return Realm.Invalid;
         }
 
-        public void DetermineRealm()
+        public Realm DetermineRealm()
         {
-            if (Realm == Realm.Any || Realm == Realm.Invalid)
+            Realm realm = Realm;
+            if (realm == Realm.Any || realm == Realm.Invalid)
             {
                 EntityNode entityNode = (EntityNode)Node;
                 if (entityNode.Realm != Realm.Any && entityNode.Realm != Realm.Invalid)
                 {
-                    Realm = entityNode.Realm;
+                    realm = entityNode.Realm;
                 }
                 else
                 {
@@ -145,12 +146,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                     {
                         if (connection.Realm != Realm.Any)
                         {
-                            Realm = connection.Realm;
-                            return;
+                            realm = connection.Realm;
+                            return realm;
                         }
                     }
                 }
             }
+
+            return realm;
+        }
+        
+        public void FixRealm()
+        {
+            Realm = DetermineRealm();
         }
 
         public override string ToString()

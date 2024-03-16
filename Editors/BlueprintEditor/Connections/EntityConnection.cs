@@ -97,29 +97,39 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             }
         }
 
-        public void DetermineRealm()
+        public Realm DetermineRealm()
         {
+            Realm realm = Realm;
+            
             EntityPort source = (EntityPort)Source;
             EntityPort target = (EntityPort)Target;
+            
             if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
             {
-                Realm = target.Realm;
+                realm = target.Realm;
             }
             else if (source.Realm != Realm.Any && source.Realm != Realm.Invalid)
             {
-                Realm = source.Realm;
+                realm = source.Realm;
             }
             // Fuck you
             else
             {
-                source.DetermineRealm();
-                target.DetermineRealm();
+                source.FixRealm();
+                target.FixRealm();
                 
                 if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
                 {
-                    Realm = target.Realm;
+                    realm = target.Realm;
                 }
             }
+
+            return realm;
+        }
+        
+        public void FixRealm()
+        {
+            Realm = DetermineRealm();
         }
 
         public override void UpdateStatus()
@@ -139,6 +149,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 #if DEVELOPER___DEBUG
                 App.Logger.LogError("HEY DUMBASS YOU'RE USING THE WRONG TYPES FOR CONNECTION {0} USE ENTITYPORTS INSTEAD GOD DAMMIT", ToString());
                 #endif
+                return;
             }
             
             if (source.Realm == Realm.Any && target.Realm == Realm.Any)
@@ -147,7 +158,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 return;
             }
 
-            if (source.Realm != target.Realm && !ImplicitConnectionCombos.Contains((source.Realm, target.Realm)))
+            if (source.Realm != target.Realm && !ImplicitConnectionCombos.Contains((source.Realm, target.Realm)) && (source.Realm != Realm.Any && target.Realm != Realm.Any))
             {
                 SetStatus(new EditorStatusArgs(EditorStatus.Flawed, $"{source.Realm} to {target.Realm} is not a valid combination of realms"));
                 return;
