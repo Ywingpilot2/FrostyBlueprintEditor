@@ -130,6 +130,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             return Realm.Invalid;
         }
 
+        public void DetermineRealm()
+        {
+            if (Realm == Realm.Any || Realm == Realm.Invalid)
+            {
+                EntityNode entityNode = (EntityNode)Node;
+                if (entityNode.Realm != Realm.Any && entityNode.Realm != Realm.Invalid)
+                {
+                    Realm = entityNode.Realm;
+                }
+                else
+                {
+                    foreach (EntityConnection connection in entityNode.NodeWrangler.GetConnections(this))
+                    {
+                        if (connection.Realm != Realm.Any)
+                        {
+                            Realm = connection.Realm;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         public override string ToString()
         {
             return $"{Realm} {Type} {Direction}put - {Name}";

@@ -85,17 +85,6 @@ namespace BlueprintEditorPlugin.Models.Connections
             }
         }
 
-        private string _toolTip;
-        public virtual string ToolTip
-        {
-            get => _toolTip;
-            set
-            {
-                _toolTip = value;
-                NotifyPropertyChanged(nameof(ToolTip));
-            }
-        }
-
         #endregion
         
         #region Status
@@ -152,6 +141,7 @@ namespace BlueprintEditorPlugin.Models.Connections
         
         public BaseConnection(IPort source, IPort target)
         {
+            
             Source = source;
             Source.IsConnected = true;
             Target = target;

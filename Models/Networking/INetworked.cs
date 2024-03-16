@@ -6,5 +6,6 @@ namespace BlueprintEditorPlugin.Models.Networking
     {
         Realm Realm { get; set; }
         Realm ParseRealm(object obj);
+        void DetermineRealm();
     }
 }

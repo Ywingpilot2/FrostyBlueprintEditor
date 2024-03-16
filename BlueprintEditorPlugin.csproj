@@ -84,6 +84,8 @@
     <Resource Include="Images\CollapseWindow.png" />
     <None Remove="Images\CollapsedWindow.png" />
     <Resource Include="Images\CollapsedWindow.png" />
+    <None Remove="Images\InterfaceIcon.png" />
+    <Resource Include="Images\InterfaceIcon.png" />
   </ItemGroup>
 
   <ItemGroup>

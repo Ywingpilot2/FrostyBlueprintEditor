@@ -97,6 +97,31 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             }
         }
 
+        public void DetermineRealm()
+        {
+            EntityPort source = (EntityPort)Source;
+            EntityPort target = (EntityPort)Target;
+            if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
+            {
+                Realm = target.Realm;
+            }
+            else if (source.Realm != Realm.Any && source.Realm != Realm.Invalid)
+            {
+                Realm = source.Realm;
+            }
+            // Fuck you
+            else
+            {
+                source.DetermineRealm();
+                target.DetermineRealm();
+                
+                if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
+                {
+                    Realm = target.Realm;
+                }
+            }
+        }
+
         public override void UpdateStatus()
         {
             if (Realm == Realm.Invalid)
@@ -116,15 +141,26 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 #endif
             }
             
+            if (source.Realm == Realm.Any && target.Realm == Realm.Any)
+            {
+                SetStatus(new EditorStatusArgs(EditorStatus.Flawed, $"Cannot implicitly determine the realms of this connection based on ports. Please manually set realms"));
+                return;
+            }
+
             if (source.Realm != target.Realm && !ImplicitConnectionCombos.Contains((source.Realm, target.Realm)))
             {
                 SetStatus(new EditorStatusArgs(EditorStatus.Flawed, $"{source.Realm} to {target.Realm} is not a valid combination of realms"));
+                return;
             }
         }
+
+        #region Construction
 
         public EntityConnection(IPort source, IPort target, object obj) : base(source, target)
         {
             Object = obj;
+            EntityPort entitySource = (EntityPort)source;
+            EntityPort entityTarget = (EntityPort)target;
             UpdateStatus();
         }
         
@@ -135,6 +171,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         protected EntityConnection()
         {
         }
+
+        #endregion
 
         public override string ToString()
         {

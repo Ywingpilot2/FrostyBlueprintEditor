@@ -9,7 +9,11 @@
     xmlns:nodify="https://miroiu.github.io/nodify"
     xmlns:blueprintEditor="clr-namespace:BlueprintEditorPlugin"
     xmlns:windows="clr-namespace:BlueprintEditorPlugin.Windows"
-    xmlns:blueprintEditor1="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor">
+    xmlns:blueprintEditor1="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor"
+    xmlns:nodes="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes"
+    xmlns:ports="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports"
+    xmlns:options="clr-namespace:BlueprintEditorPlugin.Options"
+    xmlns:connections="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Connections">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>

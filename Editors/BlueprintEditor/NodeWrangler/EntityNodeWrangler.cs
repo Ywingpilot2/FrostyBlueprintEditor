@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
@@ -9,6 +10,7 @@ using BlueprintEditorPlugin.Models.Connections.Pending;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using Frosty.Core;
+using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using Prism.Commands;
@@ -18,8 +20,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
     public class EntityNodeWrangler : BaseNodeWrangler
     {
         public EbxAsset Asset { get; set; }
+        public AssetClassGuid InterfaceGuid { get; set; }
         private readonly Dictionary<AssetClassGuid, EntityNode> _internalNodeCache = new Dictionary<AssetClassGuid, EntityNode>();
         private readonly Dictionary<(Guid, Guid), EntityNode> _externalNodeCache = new Dictionary<(Guid, Guid), EntityNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfaceInputCache = new Dictionary<string, InterfaceNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfaceOutputCache = new Dictionary<string, InterfaceNode>();
 
         #region Transient edits
 
@@ -31,16 +36,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         {
             Nodes.Add(node);
 
-            if (node is EntityNode entityNode)
+            switch (node)
             {
-                if (entityNode.Type == PointerRefType.Internal)
+                case EntityNode entityNode when entityNode.Type == PointerRefType.Internal:
                 {
                     _internalNodeCache.Add(entityNode.InternalGuid, entityNode);
-                }
-                else
+                } break;
+                case EntityNode entityNode:
                 {
                     _externalNodeCache.Add((entityNode.FileGuid, entityNode.ClassGuid), entityNode);
-                }
+                } break;
+                case InterfaceNode interfaceNode:
+                {
+                    if (interfaceNode.Inputs.Count != 0)
+                    {
+                        _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                    }
+                    else
+                    {
+                        _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                    }
+                } break;
             }
         }
 
@@ -133,6 +149,42 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #endregion
 
+        #region Getting InterfaceNodes
+
+        public InterfaceNode GetInterfaceNode(string name, PortDirection direction)
+        {
+            if (direction == PortDirection.In)
+            {
+                if (!_interfaceInputCache.ContainsKey(name))
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        return GetInterfaceNode(Utils.GetString(hash), direction);
+                    }
+
+                    return null;
+                }
+                return _interfaceInputCache[name];
+            }
+            else
+            {
+                if (!_interfaceOutputCache.ContainsKey(name))
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        return GetInterfaceNode(Utils.GetString(hash), direction);
+                    }
+                    
+                    return null;
+                }
+                return _interfaceOutputCache[name];
+            }
+        }
+
+        #endregion
+
         #region Creating connections
 
         public override void AddConnection(IConnection connection)
@@ -157,6 +209,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     ((dynamic)Asset.RootObject).PropertyConnections.Add((dynamic)propertyConnection.Object);
                 } break;
             }
+            
+            entityConnection.Source.Node.OnOutputUpdated(entityConnection.Source);
+            entityConnection.Target.Node.OnOutputUpdated(entityConnection.Target);
+            
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
         }
 

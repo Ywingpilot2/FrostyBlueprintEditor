@@ -11,6 +11,7 @@ using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.NodeTest.Nodes;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
+using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 using Frosty.Core;
 using FrostySdk.Ebx;
@@ -52,6 +53,50 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 if (assetObject == wrangler.Asset.RootObject)
                     continue;
+
+                if (assetObject.GetType().Name == "InterfaceDescriptorData")
+                {
+                    wrangler.InterfaceGuid = ((dynamic)assetObject).GetInstanceGuid();
+                    foreach (dynamic field in ((dynamic)assetObject).Fields)
+                    {
+                        switch (field.AccessType.ToString())
+                        {
+                            case "FieldAccessType_Source":
+                            {
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In));
+                            } break;
+                            case "FieldAccessType_Target":
+                            {
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out));
+                            } break;
+                            case "FieldAccessType_SourceAndTarget":
+                            {
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out));
+                            } break;
+                        }
+                    }
+
+                    foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
+                    {
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out));
+                    }
+                    foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
+                    {
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In));
+                    }
+                    
+                    foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
+                    {
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Event, PortDirection.Out));
+                    }
+                    foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
+                    {
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Event, PortDirection.In));
+                    }
+                    
+                    continue;
+                }
                 
                 wrangler.AddNodeTransient(EntityNode.GetNodeFromEntity(assetObject, NodeWrangler));
             }
@@ -63,8 +108,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 PointerRef source = propertyConnection.Source;
                 PointerRef target = propertyConnection.Target;
 
-                EntityNode sourceNode = null;
-                EntityNode targetNode = null;
+                IObjectNode sourceNode = null;
+                IObjectNode targetNode = null;
 
                 switch (source.Type)
                 {
@@ -75,7 +120,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
-                        sourceNode = wrangler.GetEntityNode(((dynamic)source.Internal).GetInstanceGuid());
+                        if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
+                        {
+                            sourceNode = wrangler.GetInterfaceNode(propertyConnection.SourceField, PortDirection.Out);
+                        }
+                        else
+                        {
+                            sourceNode = wrangler.GetEntityNode(((dynamic)source.Internal).GetInstanceGuid());
+                        }
                     } break;
                     case PointerRefType.External:
                     {
@@ -92,7 +144,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
-                        targetNode = wrangler.GetEntityNode(((dynamic)target.Internal).GetInstanceGuid());
+                        if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
+                        {
+                            targetNode = wrangler.GetInterfaceNode(propertyConnection.TargetField, PortDirection.In);
+                        }
+                        else
+                        {
+                            targetNode = wrangler.GetEntityNode(((dynamic)target.Internal).GetInstanceGuid());
+                        }
                     } break;
                     case PointerRefType.External:
                     {
@@ -121,8 +180,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 PointerRef source = linkConnection.Source;
                 PointerRef target = linkConnection.Target;
 
-                EntityNode sourceNode = null;
-                EntityNode targetNode = null;
+                IObjectNode sourceNode = null;
+                IObjectNode targetNode = null;
 
                 switch (source.Type)
                 {
@@ -133,7 +192,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
-                        sourceNode = wrangler.GetEntityNode(((dynamic)source.Internal).GetInstanceGuid());
+                        if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
+                        {
+                            sourceNode = wrangler.GetInterfaceNode(linkConnection.SourceField, PortDirection.Out);
+                        }
+                        else
+                        {
+                            sourceNode = wrangler.GetEntityNode(((dynamic)source.Internal).GetInstanceGuid());
+                        }
                     } break;
                     case PointerRefType.External:
                     {
@@ -150,7 +216,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
-                        targetNode = wrangler.GetEntityNode(((dynamic)target.Internal).GetInstanceGuid());
+                        if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
+                        {
+                            targetNode = wrangler.GetInterfaceNode(linkConnection.TargetField, PortDirection.In);
+                        }
+                        else
+                        {
+                            targetNode = wrangler.GetEntityNode(((dynamic)target.Internal).GetInstanceGuid());
+                        }
                     } break;
                     case PointerRefType.External:
                     {
@@ -179,8 +252,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 PointerRef source = eventConnection.Source;
                 PointerRef target = eventConnection.Target;
 
-                EntityNode sourceNode = null;
-                EntityNode targetNode = null;
+                IObjectNode sourceNode = null;
+                IObjectNode targetNode = null;
 
                 switch (source.Type)
                 {
@@ -191,7 +264,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
-                        sourceNode = wrangler.GetEntityNode(((dynamic)source.Internal).GetInstanceGuid());
+                        if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
+                        {
+                            sourceNode = wrangler.GetInterfaceNode(eventConnection.SourceEvent.Name, PortDirection.Out);
+                        }
+                        else
+                        {
+                            sourceNode = wrangler.GetEntityNode(((dynamic)source.Internal).GetInstanceGuid());
+                        }
                     } break;
                     case PointerRefType.External:
                     {
@@ -208,7 +288,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
-                        targetNode = wrangler.GetEntityNode(((dynamic)target.Internal).GetInstanceGuid());
+                        if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
+                        {
+                            targetNode = wrangler.GetInterfaceNode(eventConnection.TargetEvent.Name, PortDirection.In);
+                        }
+                        else
+                        {
+                            targetNode = wrangler.GetEntityNode(((dynamic)target.Internal).GetInstanceGuid());
+                        }
                     } break;
                     case PointerRefType.External:
                     {

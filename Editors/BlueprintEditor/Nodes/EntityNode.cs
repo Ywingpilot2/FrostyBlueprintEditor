@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
@@ -22,7 +23,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
     /// <summary>
     /// A basic implementation of an entity in a node form. For creation, please see <see cref="GetNodeFromEntity(object,BlueprintEditorPlugin.Editors.NodeWrangler.INodeWrangler)"/>
     /// </summary>
-    public class EntityNode : INode, INetworked
+    public class EntityNode : IObjectNode, INetworked
     {
         private string _header;
         public virtual string Header
@@ -53,7 +54,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             set
             {
                 _toolTip = value;
-                NotifyPropertyChanged(nameof(_toolTip));
+                NotifyPropertyChanged(nameof(ToolTip));
             }
         }
         
@@ -95,7 +96,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
         public ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
 
-        private protected readonly INodeWrangler NodeWrangler;
+        public readonly INodeWrangler NodeWrangler;
 
         #region Entity Info
 
@@ -142,6 +143,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return (Realm)((int)obj);
         }
 
+        
+        public virtual void DetermineRealm()
+        {
+            foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
+            {
+                if (connection.Realm != Realm.Any && connection.Realm != Realm.Invalid)
+                {
+                    Realm = connection.Realm;
+                    return;
+                }
+            }
+        }
+
         #endregion
 
         #region Basic node implementation
@@ -168,10 +182,38 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         
         public virtual void OnInputUpdated(IPort port)
         {
+            EntityPort entityPort = (EntityPort)port;
+            if (entityPort.Realm == Realm.Invalid)
+            {
+                foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
+                {
+                    if (connection.Realm != Realm.Invalid)
+                    {
+                        entityPort.Realm = connection.Realm;
+                    }
+                }
+            }
+            UpdateStatus();
         }
 
         public virtual void OnOutputUpdated(IPort port)
         {
+            EntityPort entityPort = (EntityPort)port;
+            if (entityPort.Realm == Realm.Invalid)
+            {
+                foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
+                {
+                    if (connection.Realm != Realm.Invalid)
+                    {
+                        entityPort.Realm = connection.Realm;
+                    }
+                    else if (((EntityPort)connection.Target).Realm != Realm.Invalid)
+                    {
+                        connection.Realm = ((EntityPort)connection.Target).Realm;
+                    }
+                }
+            }
+            UpdateStatus();
         }
 
         public void AddPort(IPort port)
