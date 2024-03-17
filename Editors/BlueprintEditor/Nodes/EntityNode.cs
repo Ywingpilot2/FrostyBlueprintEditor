@@ -336,12 +336,85 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             EntityPort entityPort = (EntityPort)port;
             entityPort.FixRealm();
+
+            object value = TryGetProperty("flags");
+            if (value == null)
+                return;
+
+            ObjectFlagsHelper flagsHelper = new ObjectFlagsHelper((uint)value);
+            
+            switch (entityPort.Realm)
+            {
+                case Realm.NetworkedClientAndServer when entityPort.Type == ConnectionType.Event:
+                case Realm.ClientAndServer when entityPort.Type == ConnectionType.Event:
+                {
+                    flagsHelper.ClientEvent = true;
+                    flagsHelper.ServerEvent = true;
+                } break;
+                case Realm.NetworkedClient when entityPort.Type == ConnectionType.Event:
+                case Realm.Client when entityPort.Type == ConnectionType.Event:
+                {
+                    flagsHelper.ClientEvent = true;
+                } break;
+                case Realm.Server when entityPort.Type == ConnectionType.Event:
+                {
+                    flagsHelper.ServerEvent = true;
+                } break;
+                
+                case Realm.NetworkedClientAndServer when entityPort.Type == ConnectionType.Property:
+                case Realm.ClientAndServer when entityPort.Type == ConnectionType.Property:
+                {
+                    flagsHelper.ClientEvent = true;
+                    flagsHelper.ServerEvent = true;
+                } break;
+                case Realm.NetworkedClient when entityPort.Type == ConnectionType.Property:
+                case Realm.Client when entityPort.Type == ConnectionType.Property:
+                {
+                    flagsHelper.ClientEvent = true;
+                } break;
+                case Realm.Server when entityPort.Type == ConnectionType.Property:
+                {
+                    flagsHelper.ServerEvent = true;
+                } break;
+            }
+            
+            TrySetProperty("flags", flagsHelper.GetAsFlags());
         }
 
         public virtual void OnOutputUpdated(IPort port)
         {
             EntityPort entityPort = (EntityPort)port;
             entityPort.FixRealm();
+            
+            if (entityPort.Type != ConnectionType.Link)
+                return;
+            
+            object value = TryGetProperty("flags");
+            if (value == null)
+                return;
+            
+            ObjectFlagsHelper flagsHelper = new ObjectFlagsHelper((uint)value);
+            
+            switch (entityPort.Realm)
+            {
+                case Realm.NetworkedClientAndServer:
+                case Realm.ClientAndServer:
+                {
+                    flagsHelper.ClientLinkSource = true;
+                    flagsHelper.ServerLinkSource = true;
+                } break;
+                case Realm.NetworkedClient:
+                case Realm.Client:
+                {
+                    flagsHelper.ClientLinkSource = true;
+                } break;
+                case Realm.Server:
+                {
+                    flagsHelper.ServerLinkSource = true;
+                } break;
+            }
+
+            TrySetProperty("flags", flagsHelper.GetAsFlags());
         }
 
         public void AddPort(IPort port)
@@ -488,6 +561,52 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         #endregion
+
+        #endregion
+
+        #region Object Properties
+
+        /// <summary>
+        /// This will safely try to set a property on the node's <see cref="Object"/>
+        /// </summary>
+        /// <param name="name">Name of the property to set</param>
+        /// <param name="value">Value of the property</param>
+        /// <returns>Whether or not the property was set</returns>
+        public bool TrySetProperty(string name, object value)
+        {
+            PropertyInfo property = Object.GetType().GetProperty(name);
+            if (property != null)
+            {
+                try
+                {
+                    property.SetValue(Object, value);
+                }
+                catch
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to get a value from the node's <see cref="Object"/>
+        /// </summary>
+        /// <param name="name">The name of the property to fetch</param>
+        /// <returns>The value of the property. Null if it was not found</returns>
+        public object TryGetProperty(string name)
+        {
+            PropertyInfo property = Object.GetType().GetProperty(name);
+            if (property != null)
+            {
+                return property.GetValue(Object);
+            }
+
+            return null;
+        }
 
         #endregion
 
@@ -686,6 +805,83 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public override string ToString()
         {
             return $"{Realm} - {Header}";
+        }
+    }
+    
+    public class ObjectFlagsHelper
+    {
+        public string GuidMask { get; set; }
+        public bool ClientEvent { get; set; }
+        public bool ServerEvent { get; set; }
+        public bool ClientProperty { get; set; }
+        public bool ServerProperty { get; set; }
+        public bool ClientLinkSource { get; set; }
+        public bool ServerLinkSource { get; set; }
+        public bool UnusedFlag { get; set; }
+
+        /// <summary>
+        /// Credit to github.com/Mophead01 for the Object Flags parser
+        /// </summary>
+        /// <param name="flags"></param>
+        public ObjectFlagsHelper(uint flags)
+        {
+            ClientEvent = Convert.ToBoolean((flags & 33554432) != 0 ? 1 : 0);
+            ServerEvent = Convert.ToBoolean((flags & 67108864) != 0 ? 1 : 0);
+            ClientProperty = Convert.ToBoolean((flags & 134217728) != 0 ? 1 : 0);
+            ServerProperty = Convert.ToBoolean((flags & 268435456) != 0 ? 1 : 0);
+            ClientLinkSource = Convert.ToBoolean((flags & 536870912) != 0 ? 1 : 0);
+            ServerLinkSource = Convert.ToBoolean((flags & 1073741824) != 0 ? 1 : 0);
+            UnusedFlag = Convert.ToBoolean((flags & 2147483648) != 0 ? 1 : 0);
+            GuidMask = (flags & 33554431).ToString("X2").ToLower();
+        }
+        
+        public static implicit operator uint(ObjectFlagsHelper flagsHelper) => flagsHelper.GetAsFlags();
+        public static explicit operator ObjectFlagsHelper(uint flags) => new ObjectFlagsHelper(flags);
+
+        /// <summary>
+        /// I'm too lazy to do what I did with PropertyFlagsHelper so we will just use this method to get the flags instead
+        /// Credit to github.com/Mophead01 for the Object Flags creation
+        /// </summary>
+        /// <returns></returns>
+        public uint GetAsFlags()
+        {
+            bool isTooLarge = !uint.TryParse(GuidMask, System.Globalization.NumberStyles.HexNumber, null, out var newFlags);
+            if (isTooLarge || newFlags > 33554431)
+            {
+                newFlags = 0;
+                App.Logger.LogWarning("Invalid Guid Mask");
+            }
+
+            if (ClientEvent)
+            {
+                newFlags |= 33554432;
+            }
+            if (ServerEvent)
+            {
+                newFlags |= 67108864;
+            }
+            if (ClientProperty)
+            {
+                newFlags |= 134217728;
+            }
+            if (ServerProperty)
+            {
+                newFlags |= 268435456;
+            }
+            if (ClientLinkSource)
+            {
+                newFlags |= 536870912;
+            }
+            if (ServerLinkSource)
+            {
+                newFlags |= 1073741824;
+            }
+            if (UnusedFlag)
+            {
+                newFlags |= 2147483648;
+            }
+
+            return newFlags;
         }
     }
 }
