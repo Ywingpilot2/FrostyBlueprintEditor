@@ -123,26 +123,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
-        #region Status
-
-        public EditorStatusArgs CurrentStatus { get; set; }
-        public void CheckStatus()
-        {
-            NotifyPropertyChanged(nameof(CurrentStatus));
-        }
-
-        public void UpdateStatus()
-        {
-        }
-
-        public void SetStatus(EditorStatusArgs args)
-        {
-            CurrentStatus = args;
-            CheckStatus();
-        }
-
-        #endregion
-
         #region Complex implementation
 
         public void OnInputUpdated(IPort port)

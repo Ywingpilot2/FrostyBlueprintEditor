@@ -8,7 +8,7 @@ using BlueprintEditorPlugin.Options;
 
 namespace BlueprintEditorPlugin.Models.Connections
 {
-    public class BaseConnection : IConnection
+    public class BaseConnection : IConnection, IStatusItem
     {
         public IPort Source { get; protected set; }
         
@@ -127,9 +127,10 @@ namespace BlueprintEditorPlugin.Models.Connections
             CheckStatus();
         }
 
-        public virtual void SetStatus(EditorStatusArgs args)
+        public virtual void SetStatus(EditorStatus status, string tooltip)
         {
-            CurrentStatus = args;
+            CurrentStatus.Status = status;
+            CurrentStatus.ToolTip = tooltip;
             CheckStatus();
         }
 
@@ -151,6 +152,8 @@ namespace BlueprintEditorPlugin.Models.Connections
             Target.PropertyChanged += NotifyPropertyChanged;
             Source.Node.PropertyChanged += NotifyPropertyChanged;
             Target.Node.PropertyChanged += NotifyPropertyChanged;
+
+            CurrentStatus = new EditorStatusArgs(EditorStatus.Alright);
         }
     }
 }

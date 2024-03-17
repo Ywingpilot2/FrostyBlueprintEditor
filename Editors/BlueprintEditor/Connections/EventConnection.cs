@@ -123,7 +123,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 } break;
                 case "Realm":
                 {
-                    FixRealm();
                     UpdateStatus();
                 } break;
                 case "Name":

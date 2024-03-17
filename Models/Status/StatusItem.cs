@@ -23,6 +23,6 @@ namespace BlueprintEditorPlugin.Models.Status
         /// Force set our status
         /// </summary>
         /// <param name="args"></param>
-        void SetStatus(EditorStatusArgs args);
+        void SetStatus(EditorStatus status, string tooltip);
     }
 }

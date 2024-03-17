@@ -276,16 +276,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         
-        public virtual Realm DetermineRealm()
+        public virtual Realm DetermineRealm(bool ignoreCurrent = false)
         {
             Realm realm = Realm;
-            
-            foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
+
+            if ((Realm == Realm.Any || Realm == Realm.Invalid) || ignoreCurrent)
             {
-                if (connection.Realm != Realm.Any && connection.Realm != Realm.Invalid)
+                foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
                 {
-                    realm = connection.Realm;
-                    return realm;
+                    if (connection.Realm != Realm.Any && connection.Realm != Realm.Invalid)
+                    {
+                        realm = connection.Realm;
+                        return realm;
+                    }
                 }
             }
 
@@ -295,6 +298,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public virtual void FixRealm()
         {
             Realm = DetermineRealm();
+        }
+        
+        public virtual void ForceFixRealm()
+        {
+            Realm = DetermineRealm(true);
         }
 
         #endregion
@@ -327,37 +335,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public virtual void OnInputUpdated(IPort port)
         {
             EntityPort entityPort = (EntityPort)port;
-            if (entityPort.Realm == Realm.Invalid)
-            {
-                foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
-                {
-                    if (connection.Realm != Realm.Invalid)
-                    {
-                        entityPort.Realm = connection.Realm;
-                    }
-                }
-            }
-            UpdateStatus();
+            entityPort.FixRealm();
         }
 
         public virtual void OnOutputUpdated(IPort port)
         {
             EntityPort entityPort = (EntityPort)port;
-            if (entityPort.Realm == Realm.Invalid)
-            {
-                foreach (EntityConnection connection in NodeWrangler.GetConnections(this))
-                {
-                    if (connection.Realm != Realm.Invalid)
-                    {
-                        entityPort.Realm = connection.Realm;
-                    }
-                    else if (((EntityPort)connection.Target).Realm != Realm.Invalid)
-                    {
-                        connection.Realm = ((EntityPort)connection.Target).Realm;
-                    }
-                }
-            }
-            UpdateStatus();
+            entityPort.FixRealm();
         }
 
         public void AddPort(IPort port)
@@ -504,23 +488,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         #endregion
-
-        #endregion
-
-        #region Status
-
-        public EditorStatusArgs CurrentStatus { get; set; }
-        public void CheckStatus()
-        {
-        }
-
-        public virtual void UpdateStatus()
-        {
-        }
-
-        public void SetStatus(EditorStatusArgs args)
-        {
-        }
 
         #endregion
 

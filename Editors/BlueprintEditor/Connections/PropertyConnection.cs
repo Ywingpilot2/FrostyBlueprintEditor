@@ -45,13 +45,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             if (PropType == PropertyType.Invalid)
             {
-                SetStatus(new EditorStatusArgs(EditorStatus.Broken, "Property type is invalid"));
+                SetStatus(EditorStatus.Broken, "Property type is invalid");
             }
 
             EntityPort target = (EntityPort)Target;
             if (PropType == PropertyType.Interface && !target.IsInterface)
             {
-                SetStatus(new EditorStatusArgs(EditorStatus.Flawed, "Property type is set to interface, despite not plugging into an interface"));
+                SetStatus(EditorStatus.Flawed, "Property type is set to interface, despite not plugging into an interface");
             }
         }
 
@@ -154,7 +154,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 } break;
                 case "Realm":
                 {
-                    FixRealm();
                     UpdateStatus();
                 } break;
                 case "Name":

@@ -133,27 +133,6 @@ namespace BlueprintEditorPlugin.Models.Nodes
 
         #endregion
 
-        #region Status management
-        
-        public EditorStatusArgs CurrentStatus { get; set; }
-
-        public void CheckStatus()
-        {
-            NotifyPropertyChanged(nameof(CurrentStatus));
-        }
-
-        public void UpdateStatus()
-        {
-        }
-
-        public void SetStatus(EditorStatusArgs args)
-        {
-            CurrentStatus = args;
-            CheckStatus();
-        }
-
-        #endregion
-        
         public virtual bool IsValid()
         {
             return true;

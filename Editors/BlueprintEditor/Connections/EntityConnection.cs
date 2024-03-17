@@ -1,11 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
+using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
+using Frosty.Core.Windows;
+using FrostySdk.IO;
+using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 {
@@ -26,6 +33,126 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             (Realm.Server, Realm.Client)
         };
         public virtual Realm Realm { get; set; }
+
+        #region Commands
+
+        public ICommand EditCommand => new DelegateCommand(Edit);
+
+        public void Edit()
+        {
+            if (Type == ConnectionType.Property)
+            {
+                EditPropConnectionArgs editArgs = new EditPropConnectionArgs(this);
+                MessageBoxResult result = EditPromptWindow.Show(editArgs, $"Edit {this}");
+                if (result == MessageBoxResult.Yes)
+                {
+                    Realm = editArgs.Realm;
+                    PropType = editArgs.PropertyType;
+                }
+            }
+            else
+            {
+                EditConnectionArgs editArgs = new EditConnectionArgs(this);
+                MessageBoxResult result = EditPromptWindow.Show(editArgs, $"Edit {this}");
+                if (result == MessageBoxResult.Yes)
+                {
+                    Realm = editArgs.Realm;
+                }
+            }
+
+            EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(asset.FileGuid).Name, asset);
+        }
+        
+        public ICommand RemoveCommand => new DelegateCommand(Remove);
+
+        private void Remove()
+        {
+            Target.Node.NodeWrangler.RemoveConnection(this);
+        }
+        
+        public ICommand FixCommand => new DelegateCommand(UserFix);
+
+        private void UserFix()
+        {
+            EntityPort target = (EntityPort)Target;
+            EntityPort source = (EntityPort)Source;
+            
+            FrostyTaskWindow.Show("Fixing problems...", "", task =>
+            {
+                // We get 5 attempts to solve all problems... Hopefully they work!
+                for (int i = 0; i < 5; i++)
+                {
+                    if (CurrentStatus.Status == EditorStatus.Alright)
+                        break; // Yay!
+                    
+                    switch (CurrentStatus.ToolTip)
+                    {
+                        case "Connection source or target is not an EntityPort. Please use EntityPorts for Blueprints.":
+                        {
+                            Target.Node.NodeWrangler.RemoveConnection(this); // Fuck you
+                            
+                            #if DEVELOPER___DEBUG
+                            App.Logger.LogError("Fuck you");
+                            #endif
+                        } break;
+                        case "Connection realm should be the same as target realm":
+                        {
+                            if (target.Realm != Realm.Any || target.Realm != Realm.Invalid)
+                            {
+                                Realm = target.Realm;
+                            }
+                            else
+                            {
+                                target.ForceFixRealm();
+                            }
+                        } break;
+                        case "Cannot implicitly determine the realms of this connection based on ports. Please manually set realms":
+                        {
+                            source.ForceFixRealm();
+                            target.ForceFixRealm();
+                            ForceFixRealm();
+                        } break;
+                        case "Property type is invalid":
+                        {
+                            if (target.IsInterface)
+                            {
+                                PropType = PropertyType.Interface;
+                            }
+                            else
+                            {
+                                PropType = PropertyType.Default;
+                            }
+                        } break;
+                        case "Property type is set to interface, despite not plugging into an interface":
+                        {
+                            PropType = PropertyType.Default;
+                        } break;
+                        default:
+                        {
+                            if (CurrentStatus.ToolTip == $"{source.Realm} to {target.Realm} is not a valid combination of realms")
+                            {
+                                source.ForceFixRealm();
+                                target.ForceFixRealm();
+                            }
+                            ForceFixRealm();
+                        } break;
+                    }
+                    
+                    UpdateStatus();
+                }
+
+                if (CurrentStatus.Status == EditorStatus.Flawed || CurrentStatus.Status == EditorStatus.Broken)
+                {
+                    App.Logger.LogError("Unable to solve all problems with this connection. Please either manually solve issues, or try again.");
+                }
+            });
+        }
+
+        #endregion
+
+        #region Entity data
+
         public abstract ConnectionType Type { get; }
         public object Object { get; set; }
 
@@ -52,6 +179,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 UpdateStatus();
             }
         }
+
+        #endregion
+
+        #region Networked implementation
 
         public Realm ParseRealm(object obj)
         {
@@ -97,30 +228,33 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             }
         }
 
-        public Realm DetermineRealm()
+        public Realm DetermineRealm(bool ignoreCurrent = false)
         {
             Realm realm = Realm;
-            
-            EntityPort source = (EntityPort)Source;
-            EntityPort target = (EntityPort)Target;
-            
-            if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
+
+            if ((Realm == Realm.Any || Realm == Realm.Invalid) || ignoreCurrent)
             {
-                realm = target.Realm;
-            }
-            else if (source.Realm != Realm.Any && source.Realm != Realm.Invalid)
-            {
-                realm = source.Realm;
-            }
-            // Fuck you
-            else
-            {
-                source.FixRealm();
-                target.FixRealm();
+                EntityPort source = (EntityPort)Source;
+                EntityPort target = (EntityPort)Target;
                 
                 if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
                 {
                     realm = target.Realm;
+                }
+                else if (source.Realm != Realm.Any && source.Realm != Realm.Invalid)
+                {
+                    realm = source.Realm;
+                }
+                // Fuck you
+                else
+                {
+                    source.FixRealm();
+                    target.FixRealm();
+                
+                    if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
+                    {
+                        realm = target.Realm;
+                    }
                 }
             }
 
@@ -130,13 +264,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         public void FixRealm()
         {
             Realm = DetermineRealm();
+            EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(asset.FileGuid).Name, asset);
         }
+
+        public void ForceFixRealm()
+        {
+            Realm = DetermineRealm(true);
+            EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(asset.FileGuid).Name, asset);
+        }
+
+        #endregion
 
         public override void UpdateStatus()
         {
+            SetStatus(EditorStatus.Alright, "");
+            
             if (Realm == Realm.Invalid)
             {
-                SetStatus(new EditorStatusArgs(EditorStatus.Broken, "Connection realm is invalid!"));
+                SetStatus(EditorStatus.Broken, "Connection realm is invalid!");
+                return;
             }
 
             EntityPort source = Source as EntityPort;
@@ -144,7 +292,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             if (source == null || target == null)
             {
-                SetStatus(new EditorStatusArgs(EditorStatus.Broken, "Connection source or target is not an EntityPort. Please use EntityPorts for Blueprints."));
+                SetStatus(EditorStatus.Broken, "Connection source or target is not an EntityPort. Please use EntityPorts for Blueprints.");
                 
                 #if DEVELOPER___DEBUG
                 App.Logger.LogError("HEY DUMBASS YOU'RE USING THE WRONG TYPES FOR CONNECTION {0} USE ENTITYPORTS INSTEAD GOD DAMMIT", ToString());
@@ -154,15 +302,22 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             
             if (source.Realm == Realm.Any && target.Realm == Realm.Any)
             {
-                SetStatus(new EditorStatusArgs(EditorStatus.Flawed, $"Cannot implicitly determine the realms of this connection based on ports. Please manually set realms"));
+                SetStatus(EditorStatus.Flawed, "Cannot implicitly determine the realms of this connection based on ports. Please manually set realms");
                 return;
             }
 
             if (source.Realm != target.Realm && !ImplicitConnectionCombos.Contains((source.Realm, target.Realm)) && (source.Realm != Realm.Any && target.Realm != Realm.Any))
             {
-                SetStatus(new EditorStatusArgs(EditorStatus.Flawed, $"{source.Realm} to {target.Realm} is not a valid combination of realms"));
+                SetStatus(EditorStatus.Flawed, $"{source.Realm} to {target.Realm} is not a valid combination of realms");
                 return;
             }
+
+            if (Realm != target.Realm && target.Realm != Realm.Any)
+            {
+                SetStatus(EditorStatus.Flawed, "Connection realm should be the same as target realm");
+                return;
+            }
+            
         }
 
         #region Construction
@@ -172,7 +327,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             Object = obj;
             EntityPort entitySource = (EntityPort)source;
             EntityPort entityTarget = (EntityPort)target;
-            UpdateStatus();
         }
         
         public EntityConnection(IPort source, IPort target) : base(source, target)
@@ -187,7 +341,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
         public override string ToString()
         {
-            return $"Connection {Source.Node} ({Source.Name}) -> {Target.Node} ({Target.Name})";
+            return $"Connection {Source.Node}({Source.Name}) -> {Target.Node}({Target.Name})";
         }
     }
 

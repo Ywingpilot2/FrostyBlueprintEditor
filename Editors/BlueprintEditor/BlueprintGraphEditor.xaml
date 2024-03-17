@@ -12,6 +12,7 @@
              xmlns:pending="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler"
              xmlns:controls="clr-namespace:Frosty.Controls;assembly=FrostyControls"
              xmlns:controls1="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
+             xmlns:status="clr-namespace:BlueprintEditorPlugin.Models.Status"
              mc:Ignorable="d"
              d:DesignHeight="480" d:DesignWidth="720">
     
@@ -47,6 +48,86 @@
             <DataTemplate DataType="{x:Type connections:EntityConnection}"
                           x:Key="ConnectionTemplate">
                             <Canvas>
+                                <!--TODO: dynamic stroke thickness based on setting-->
+                                <Path StrokeThickness="9">
+                                    <Path.Style>
+                                        <Style TargetType="{x:Type Path}">
+                                            <Setter Property="Stroke" Value="Transparent" />
+                                            <Style.Triggers>
+                                                <!--Connection Color-->
+                                                <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                             Value="{x:Static status:EditorStatus.Alright}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                             Value="{x:Static status:EditorStatus.Flawed}">
+                                                    <Setter Property="Stroke" Value="Yellow" />
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                             Value="{x:Static status:EditorStatus.Broken}">
+                                                    <Setter Property="Stroke" Value="DarkRed" />
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                                <!--Connection Color-->
+
+                                                <!--Wire Style-->
+                                                <DataTrigger
+                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                    Value="{x:Static options:ConnectionStyle.Curvy}">
+                                                    <Setter Property="Data">
+                                                        <Setter.Value>
+                                                            <PathGeometry>
+                                                                <PathGeometry.Figures>
+                                                                    <PathFigure
+                                                                        StartPoint="{Binding Source.Anchor}"
+                                                                        IsClosed="False">
+                                                                        <BezierSegment
+                                                                            Point1="{Binding CurvePoint1}"
+                                                                            Point2="{Binding CurvePoint2}"
+                                                                            Point3="{Binding Target.Anchor}" />
+                                                                    </PathFigure>
+                                                                </PathGeometry.Figures>
+                                                            </PathGeometry>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+
+                                                <DataTrigger
+                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                    Value="{x:Static options:ConnectionStyle.Straight}">
+                                                    <Setter Property="Data">
+                                                        <Setter.Value>
+                                                            <LineGeometry StartPoint="{Binding Source.Anchor}"
+                                                                          EndPoint="{Binding Target.Anchor}" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+
+                                                <DataTrigger
+                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                    Value="{x:Static options:ConnectionStyle.StartStop}">
+                                                    <Setter Property="Data">
+                                                        <Setter.Value>
+                                                            <PathGeometry>
+                                                                <PathGeometry.Figures>
+                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
+                                                                        IsClosed="False">
+                                                                        <LineSegment Point="{Binding CurvePoint1}" />
+                                                                        <LineSegment Point="{Binding CurvePoint2}" />
+                                                                        <LineSegment Point="{Binding Target.Anchor}" />
+                                                                    </PathFigure>
+                                                                </PathGeometry.Figures>
+                                                            </PathGeometry>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <!--Wire Style-->
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
+                                
                                 <Path>
                                     <Path.Style>
                                         <Style TargetType="{x:Type Path}">
@@ -157,6 +238,42 @@
                                         </Style>
                                     </Path.Style>
                                 </Path>
+                                
+                                <Canvas.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Edit" Command="{Binding EditCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="pack://application:,,,/FrostyEditor;component/images/openasset.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Fix Problems" Command="{Binding FixCommand}" 
+                                                      ToolTip="{Binding CurrentStatus.ToolTip}">
+                                                <MenuItem.Style>
+                                                    <Style TargetType="{x:Type MenuItem}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                                         Value="{x:Static status:EditorStatus.Flawed}">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                                         Value="{x:Static status:EditorStatus.Broken}">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </MenuItem.Style>
+                                                <MenuItem.Icon>
+                                                    <Image Source="pack://application:,,,/FrostyCore;component/images/cross.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Remove" Command="{Binding RemoveCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="pack://application:,,,/FrostyEditor;component/images/clear.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Canvas.ContextMenu>
                             </Canvas>
                         </DataTemplate>
             

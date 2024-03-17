@@ -9,7 +9,7 @@ namespace BlueprintEditorPlugin.Models.Nodes
     /// <summary>
     /// Base implementation of a node, or a vertex with a header, inputs, and outputs.
     /// </summary>
-    public interface INode : IVertex, IStatusItem
+    public interface INode : IVertex
     {
         string Header { get; set; }
         ObservableCollection<IPort> Inputs { get; }

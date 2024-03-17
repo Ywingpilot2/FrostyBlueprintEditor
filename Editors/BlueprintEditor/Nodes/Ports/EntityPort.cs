@@ -77,6 +77,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                     if (Realm != portArgs.Realm)
                     {
                         Realm = portArgs.Realm;
+                        foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+                        {
+                            connection.FixRealm();
+                        }
                     }
 
                     if (Type == ConnectionType.Event && HasPlayer != portArgs.HasPlayer)
@@ -218,10 +222,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             return Realm.Invalid;
         }
 
-        public Realm DetermineRealm()
+        public Realm DetermineRealm(bool ignoreCurrent = false)
         {
             Realm realm = Realm;
-            if (realm == Realm.Any || realm == Realm.Invalid)
+            if ((realm == Realm.Any || realm == Realm.Invalid) || ignoreCurrent)
             {
                 EntityNode entityNode = (EntityNode)Node;
                 if (entityNode.Realm != Realm.Any && entityNode.Realm != Realm.Invalid)
@@ -246,7 +250,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
         
         public void FixRealm()
         {
-            Realm = DetermineRealm();
+            if (Realm == Realm.Invalid)
+            {
+                Realm = DetermineRealm();
+            }
+        }
+        
+        public void ForceFixRealm()
+        {
+            Realm = DetermineRealm(true);
         }
 
         #endregion

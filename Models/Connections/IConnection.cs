@@ -6,7 +6,7 @@ using BlueprintEditorPlugin.Models.Status;
 
 namespace BlueprintEditorPlugin.Models.Connections
 {
-    public interface IConnection : INotifyPropertyChanged, IStatusItem
+    public interface IConnection : INotifyPropertyChanged
     {
         IPort Source { get; }
         IPort Target { get; }
