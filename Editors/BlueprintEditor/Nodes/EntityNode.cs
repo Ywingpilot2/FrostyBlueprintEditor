@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
@@ -14,9 +15,11 @@ using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 using Frosty.Core;
+using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
+using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
@@ -25,6 +28,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
     /// </summary>
     public class EntityNode : IObjectNode, INetworked
     {
+        #region Generic node implementation
+
+        #region Text Data
+
         private string _header;
         
         /// <summary>
@@ -69,7 +76,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 NotifyPropertyChanged(nameof(ToolTip));
             }
         }
-        
+
+        #endregion
+
+        #region Positional data
+
         public Size Size { get; set; }
 
         private bool _selected;
@@ -104,11 +115,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
             get => _location;
         }
-        
+
+        #endregion
+
+        #region Node data
+
         public ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
         public ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
 
         public readonly INodeWrangler NodeWrangler;
+
+        #endregion
+
+        #region Commands
+
+        public ICommand CopyCommand => new DelegateCommand(Copy);
+
+        private protected void Copy()
+        {
+            FrostyClipboard.Current.SetData(Object);
+        }
+
+        #endregion
+
+        #endregion
 
         #region Entity Info
 

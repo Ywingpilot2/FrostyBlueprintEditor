@@ -29,6 +29,7 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
 
         public virtual void RemoveNode(INode node)
         {
+            ClearConnections(node);
             Nodes.Remove(node);
         }
 
@@ -58,7 +59,7 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
             List<IConnection> connections = GetConnections(node).ToList();
             foreach (IConnection connection in connections)
             {
-                Connections.Remove(connection);
+                RemoveConnection(connection);
             }
         }
         

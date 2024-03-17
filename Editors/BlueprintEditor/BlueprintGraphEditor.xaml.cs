@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,10 +17,12 @@ using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 using Frosty.Core;
+using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
+using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 {
@@ -364,6 +367,37 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             Button button = sender as Button;
             EntityNode node = (EntityNode)button.DataContext;
             node.IsFlatted = !node.IsFlatted;
+        }
+
+        private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
+        {
+            List<INode> oldSelection = new List<INode>(NodeWrangler.SelectedNodes);
+            foreach (INode selectedNode in oldSelection)
+            {
+                NodeWrangler.RemoveNode(selectedNode);
+            }
+        }
+        
+        private void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
+        {
+            List<INode> oldSelection = new List<INode>(NodeWrangler.SelectedNodes);
+            NodeWrangler.SelectedNodes.Clear();
+            
+            foreach (INode selectedNode in oldSelection)
+            {
+                if (selectedNode is EntityNode entityNode)
+                {
+                    FrostyClipboard.Current.SetData(entityNode.Object); // TODO: Work around, need to copy data
+                    EntityNode newNode = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
+                    NodeWrangler.AddNode(newNode);
+                    NodeWrangler.SelectedNodes.Add(newNode);
+                }
+
+                if (selectedNode is InterfaceNode interfaceNode)
+                {
+                    App.Logger.LogError("Cannot duplicate interface nodes.");
+                }
+            }
         }
 
         #endregion

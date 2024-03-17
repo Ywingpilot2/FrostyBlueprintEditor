@@ -226,6 +226,39 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #endregion
 
+        #region Removing Nodes
+
+        public override void RemoveNode(INode node)
+        {
+            base.RemoveNode(node);
+            switch (node)
+            {
+                case EntityNode entityNode when entityNode.Type == PointerRefType.Internal:
+                {
+                    _internalNodeCache.Remove(entityNode.InternalGuid);
+                    Asset.RemoveObject(entityNode.Object);
+                    PointerRef pointerRef = new PointerRef(entityNode.Object);
+                    ((dynamic)Asset.RootObject).Objects.Remove(pointerRef);
+                } break;
+                case InterfaceNode interfaceNode:
+                {
+                    throw new NotImplementedException();
+                    if (interfaceNode.Inputs.Count != 0)
+                    {
+                        _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                    }
+                    else
+                    {
+                        _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                    }
+                } break;
+            }
+            
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+        }
+
+        #endregion
+
         #region Creating connections
 
         public override void AddConnection(IConnection connection)
