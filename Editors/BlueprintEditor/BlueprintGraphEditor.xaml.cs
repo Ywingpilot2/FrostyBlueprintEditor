@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
@@ -14,6 +16,7 @@ using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 using Frosty.Core;
+using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
@@ -22,6 +25,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 {
     public partial class BlueprintGraphEditor : UserControl, IGraphEditor
     {
+        #region Graph Editor Implementation
+
         public INodeWrangler NodeWrangler { get; set; }
 
         public bool IsValid()
@@ -38,6 +43,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         {
             return true;
         }
+
+        #endregion
 
         public BlueprintGraphEditor()
         {
@@ -322,6 +329,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             #endregion
         }
 
+        #region Static
+
+        public static List<Type> Types = new List<Type>();
+
+        static BlueprintGraphEditor()
+        {
+            //populate types list
+            foreach (Type type in TypeLibrary.GetTypes("GameDataContainer"))
+            {
+                Types.Add(type);
+            }
+        }
+
+        #endregion
+
+        #region Nodes
+
         private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach (object addedItem in e.AddedItems)
@@ -341,5 +365,31 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             EntityNode node = (EntityNode)button.DataContext;
             node.IsFlatted = !node.IsFlatted;
         }
+
+        #endregion
+
+        #region Class Selector
+
+        private void ClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            
+        }
+
+        private void ClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            NodeWrangler.AddNode(EntityNode.GetNodeFromEntity(ClassSelector.SelectedClass, NodeWrangler));
+        }
+
+        private void TransClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            
+        }
+
+        private void TransClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

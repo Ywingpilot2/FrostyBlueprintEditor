@@ -58,7 +58,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     }
                 } break;
             }
+            
+            node.OnCreation();
         }
+
+        #region Connections
 
         public void AddConnectionTransient(EntityConnection connection)
         {
@@ -118,6 +122,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             
             Connections.Add(connection);
         }
+
+        #endregion
 
         #endregion
 
@@ -181,6 +187,41 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 }
                 return _interfaceOutputCache[name];
             }
+        }
+
+        #endregion
+
+        #region Adding Nodes
+
+        public override void AddNode(INode node)
+        {
+            base.AddNode(node);
+            
+            switch (node)
+            {
+                case EntityNode entityNode:
+                {
+                    _internalNodeCache.Add(entityNode.InternalGuid, entityNode);
+                    Asset.AddObject(entityNode.Object);
+                    PointerRef pointerRef = new PointerRef(entityNode.Object);
+                    ((dynamic)Asset.RootObject).Objects.Add(pointerRef);
+                } break;
+                case InterfaceNode interfaceNode:
+                {
+                    throw new NotImplementedException();
+                    if (interfaceNode.Inputs.Count != 0)
+                    {
+                        _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                    }
+                    else
+                    {
+                        _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                    }
+                } break;
+            }
+            
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+            node.OnCreation();
         }
 
         #endregion

@@ -26,6 +26,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
     public class EntityNode : IObjectNode, INetworked
     {
         private string _header;
+        
+        /// <summary>
+        /// The text displayed at the top of the node. By default set as the Types name.
+        /// </summary>
         public virtual string Header
         {
             get => _header;
@@ -37,6 +41,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
         
         private string _footer;
+        
+        /// <summary>
+        /// Smaller subtext displayed below the <see cref="Header"/>
+        /// </summary>
         public virtual string Footer
         {
             get => _footer;
@@ -48,6 +56,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         private string _toolTip;
+        
+        /// <summary>
+        /// The tooltip displayed when hovering over the node. Also used for the docbox
+        /// </summary>
         public virtual string ToolTip
         {
             get => _toolTip;
@@ -137,7 +149,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public Guid ClassGuid { get; }
 
         #endregion
-        
+
+        #region Networked implementation
+
         public Realm ParseRealm(object obj)
         {
             switch (obj.ToString())
@@ -185,6 +199,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
+        #endregion
+
         #region Basic node implementation
 
         #region Property changing
@@ -205,6 +221,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         public virtual void OnCreation()
         {
+            Header = ObjectType;
         }
         
         public virtual void OnInputUpdated(IPort port)
@@ -384,8 +401,36 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             {
                 Realm = ParseRealm(((dynamic)obj).Realm);
             }
+            
+            Object = obj;
+            ObjectType = obj.GetType().Name;
+            NodeWrangler = nodeWrangler;
 
-            Header = obj.GetType().Name;
+            InternalGuid = ((dynamic)obj).GetInstanceGuid();
+            Type = PointerRefType.Internal;
+        }
+        
+        /// <summary>
+        /// Create an entity node from an internal object
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="nodeWrangler"></param>
+        public EntityNode(Type type, INodeWrangler nodeWrangler)
+        {
+            object obj = TypeLibrary.CreateObject(type.Name);
+            
+            if (obj.GetType().GetProperty("Realm") != null)
+            {
+                Realm = ParseRealm(((dynamic)obj).Realm);
+            }
+            
+            EntityNodeWrangler entityWrangler = (EntityNodeWrangler)nodeWrangler;
+            AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
+                entityWrangler.Asset.Objects,
+                type,
+                entityWrangler.Asset.FileGuid), -1); // TODO: Should we always be setting inId as -1?
+            ((dynamic)obj).SetInstanceGuid(guid);
+            
             Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
@@ -407,7 +452,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 Realm = ParseRealm(((dynamic)obj).Realm);
             }
 
-            Header = obj.GetType().Name;
             Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
@@ -458,13 +502,24 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         /// <summary>
-        /// Gets a proper Node from an internal object. This will return subclasses if they are found.  
+        /// Gets a proper Node from an internal object. This will return subclasses if they are found.
         /// </summary>
         /// <param name="entity">The object this will be constructed off of</param>
         /// <param name="wrangler">The <see cref="INodeWrangler"/> this belongs to</param>
-        /// <returns></returns>
-        public static EntityNode GetNodeFromEntity(object entity, INodeWrangler wrangler)
+        /// <param name="createId">Generate a unique ID based on the assets current GUIDs</param>
+        /// <returns>The object as an EntityNode</returns>
+        public static EntityNode GetNodeFromEntity(object entity, INodeWrangler wrangler, bool createId = false)
         {
+            if (createId)
+            {
+                EntityNodeWrangler entityWrangler = (EntityNodeWrangler)wrangler;
+                AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
+                    entityWrangler.Asset.Objects,
+                    entity.GetType(),
+                    entityWrangler.Asset.FileGuid), -1); // TODO: Should we always be setting inId as -1?
+                ((dynamic)entity).SetInstanceGuid(guid);
+            }
+            
             if (_extensions.ContainsKey(entity.GetType().Name))
             {
                 return (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name], entity, wrangler);
@@ -474,6 +529,24 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 return new EntityNode(entity, wrangler);
             }
         }
+        
+        /// <summary>
+        /// Gets a proper Node from an internal object. This will return subclasses if they are found.  
+        /// </summary>
+        /// <param name="type">The object type this will be constructed off of</param>
+        /// <param name="wrangler">The <see cref="INodeWrangler"/> this belongs to</param>
+        /// <returns>The object type as an EntityNode</returns>
+        public static EntityNode GetNodeFromEntity(Type type, INodeWrangler wrangler)
+        {
+            if (_extensions.ContainsKey(type.Name))
+            {
+                return (EntityNode)Activator.CreateInstance(_extensions[type.Name], type, wrangler);
+            }
+            else
+            {
+                return new EntityNode(type, wrangler);
+            }
+        }
 
         /// <summary>
         /// Gets a proper Node from an external object. This will return subclasses if they are found.  
@@ -481,9 +554,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <param name="entity">The object this will be constructed off of</param>
         /// <param name="fileGuid">The guid of the file this external object hails from</param>
         /// <param name="wrangler">The <see cref="INodeWrangler"/> this belongs to</param>
-        /// <returns></returns>
-        public static EntityNode GetNodeFromEntity(object entity, Guid fileGuid, INodeWrangler wrangler)
+        /// <param name="createId">Generate a unique ID based on the assets current guids</param>
+        /// <returns>The object as an EntityNode</returns>
+        public static EntityNode GetNodeFromEntity(object entity, Guid fileGuid, INodeWrangler wrangler, bool createId = false)
         {
+            if (createId)
+            {
+                EntityNodeWrangler entityWrangler = (EntityNodeWrangler)wrangler;
+                AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
+                    App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(fileGuid)).Objects,
+                    entity.GetType(),
+                    fileGuid), -1); // TODO: Should we always be setting inId as -1?
+                ((dynamic)entity).SetInstanceGuid(guid);
+            }
+            
             if (_extensions.ContainsKey(entity.GetType().Name))
             {
                 return (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name], entity, fileGuid, wrangler);
