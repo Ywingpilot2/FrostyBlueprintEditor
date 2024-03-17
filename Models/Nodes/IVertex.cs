@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using BlueprintEditorPlugin.Editors.NodeWrangler;
 
 namespace BlueprintEditorPlugin.Models.Nodes
 {
@@ -11,6 +12,7 @@ namespace BlueprintEditorPlugin.Models.Nodes
         Point Location { get; set; }
         Size Size { get; set; }
         bool IsSelected { get; set; }
+        INodeWrangler NodeWrangler { get; }
 
         bool IsValid();
         void OnCreation();

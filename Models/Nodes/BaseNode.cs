@@ -11,7 +11,7 @@ namespace BlueprintEditorPlugin.Models.Nodes
 {
     public abstract class BaseNode : INode
     {
-        protected INodeWrangler NodeWrangler;
+        public INodeWrangler NodeWrangler { get; }
 
         #region Visual info
 

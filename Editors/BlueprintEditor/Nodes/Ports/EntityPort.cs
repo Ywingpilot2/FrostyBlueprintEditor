@@ -1,11 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Options;
+using BlueprintEditorPlugin.Windows;
+using Frosty.Core;
+using Frosty.Core.Windows;
+using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
 {
@@ -13,7 +19,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
     {
         #region Basic info
 
-        public string Name { get; set; }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                NotifyPropertyChanged(nameof(Name));
+            }
+        }
 
         private bool _isConnected;
 
@@ -27,6 +42,57 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             }
         }
         public abstract PortDirection Direction { get; }
+
+        #endregion
+
+        #region Commands
+
+        public ICommand DeleteCommand => new DelegateCommand(Remove);
+
+        private protected void Remove()
+        {
+            if (Direction == PortDirection.In)
+            {
+                ((EntityNode)Node).RemoveInput((EntityInput)this);
+            }
+            else
+            {
+                ((EntityNode)Node).RemoveOutput((EntityOutput)this);
+            }
+        }
+
+        public ICommand EditCommand => new DelegateCommand(Edit);
+        
+        private protected void Edit()
+        {
+            EditPortArgs portArgs = new EditPortArgs(this);
+            if (EditPromptWindow.Show(portArgs, $"Edit {Direction}put {Name}") == MessageBoxResult.Yes)
+            {
+                FrostyTaskWindow.Show("Applying changes...", "", task =>
+                {
+                    if (Name != portArgs.Name)
+                    {
+                        Name = portArgs.Name;
+                    }
+                    if (Realm != portArgs.Realm)
+                    {
+                        Realm = portArgs.Realm;
+                    }
+
+                    if (Type == ConnectionType.Event && HasPlayer != portArgs.HasPlayer)
+                    {
+                        HasPlayer = portArgs.HasPlayer;
+                    }
+                    
+                    if (Type == ConnectionType.Property && IsInterface != portArgs.IsInterface)
+                    {
+                        IsInterface = portArgs.IsInterface;
+                    }
+                });
+                EntityNodeWrangler wrangler = (EntityNodeWrangler)Node.NodeWrangler;
+                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(wrangler.Asset.FileGuid).Name, wrangler.Asset);
+            }
+        }
 
         #endregion
 
@@ -60,9 +126,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 NotifyPropertyChanged(nameof(Realm));
             }
         }
-        
-        public bool HasPlayer { get; set; }
-        public bool IsInterface { get; set; }
+
+        private bool _hasPlayer;
+        public bool HasPlayer
+        {
+            get => _hasPlayer;
+            set
+            {
+                _hasPlayer = value;
+                NotifyPropertyChanged(nameof(HasPlayer));
+            }
+        }
+
+        private bool _isInterface;
+
+        public bool IsInterface
+        {
+            get => _isInterface;
+            set
+            {
+                _isInterface = value;
+                NotifyPropertyChanged(nameof(IsInterface));
+            }
+        }
 
         #endregion
 
@@ -75,7 +161,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
         }
 
         #endregion
-        
+
+        #region Networked implementation
+
         public Realm ParseRealm(object obj)
         {
             Type type = obj.GetType();
@@ -160,6 +248,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
         {
             Realm = DetermineRealm();
         }
+
+        #endregion
 
         public override string ToString()
         {

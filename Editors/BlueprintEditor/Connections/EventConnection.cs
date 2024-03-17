@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using FrostySdk;
@@ -104,6 +105,45 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             Realm = ParseRealm(((dynamic)Object).TargetType.ToString());
             UpdateStatus();
+        }
+
+        public override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Anchor":
+                {
+                    NotifyPropertyChanged(nameof(CurvePoint1));
+                    NotifyPropertyChanged(nameof(CurvePoint2));
+                } break;
+                case "IsSelected":
+                {
+                    IsSelected = Source.Node.IsSelected || Target.Node.IsSelected;
+                    NotifyPropertyChanged(nameof(IsSelected));
+                } break;
+                case "Realm":
+                {
+                    FixRealm();
+                    UpdateStatus();
+                } break;
+                case "Name":
+                {
+                    ((dynamic)Object).SourceEvent.Name = Source.Name;
+                    ((dynamic)Object).TargetEvent.Name = Target.Name;
+                } break;
+                case "HasPlayerEvent":
+                case "HasPlayer":
+                {
+                    if (sender == Target || sender == Target.Node)
+                        break;
+                    
+                    HasPlayer = ((EntityPort)Source).HasPlayer || ((EntityNode)Source.Node).HasPlayerEvent;
+                    if (Target.Node is EntityNode entityNode)
+                    {
+                        entityNode.HasPlayerEvent = HasPlayer;
+                    }
+                } break;
+            }
         }
     }
 }

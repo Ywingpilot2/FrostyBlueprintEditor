@@ -43,6 +43,237 @@
                 <Setter Property="ActualSize"
                         Value="{Binding Size, Mode=OneWayToSource}" />
             </Style>
+            
+            <DataTemplate DataType="{x:Type connections:EntityConnection}"
+                          x:Key="ConnectionTemplate">
+                            <Canvas>
+                                <Path>
+                                    <Path.Style>
+                                        <Style TargetType="{x:Type Path}">
+                                            <Setter Property="StrokeThickness"
+                                                    Value="{x:Static options:EditorOptions.WireThickness}" />
+                                            <Setter Property="ToolTip" Value="" />
+                                            <Style.Triggers>
+                                                <!--Connection Color-->
+                                                <DataTrigger Binding="{Binding Type}"
+                                                             Value="{x:Static connections:ConnectionType.Event}">
+                                                    <Setter Property="Stroke" Value="White" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Type}"
+                                                             Value="{x:Static connections:ConnectionType.Link}">
+                                                    <Setter Property="Stroke" Value="{StaticResource LinkConnection}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Type}"
+                                                             Value="{x:Static connections:ConnectionType.Property}">
+                                                    <Setter Property="Stroke"
+                                                            Value="{StaticResource PropertyConnection}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                             Value="true">
+                                                    <Setter Property="Stroke"
+                                                            Value="{StaticResource NodeSelectedColor}" />
+                                                </DataTrigger>
+                                                <!--Connection Color-->
+
+                                                <!--Wire Style-->
+                                                <DataTrigger
+                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                    Value="{x:Static options:ConnectionStyle.Curvy}">
+                                                    <Setter Property="Data">
+                                                        <Setter.Value>
+                                                            <PathGeometry>
+                                                                <PathGeometry.Figures>
+                                                                    <PathFigure
+                                                                        StartPoint="{Binding Source.Anchor}"
+                                                                        IsClosed="False">
+                                                                        <BezierSegment
+                                                                            Point1="{Binding CurvePoint1}"
+                                                                            Point2="{Binding CurvePoint2}"
+                                                                            Point3="{Binding Target.Anchor}" />
+                                                                    </PathFigure>
+                                                                </PathGeometry.Figures>
+                                                            </PathGeometry>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+
+                                                <DataTrigger
+                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                    Value="{x:Static options:ConnectionStyle.Straight}">
+                                                    <Setter Property="Data">
+                                                        <Setter.Value>
+                                                            <LineGeometry StartPoint="{Binding Source.Anchor}"
+                                                                          EndPoint="{Binding Target.Anchor}" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+
+                                                <DataTrigger
+                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                    Value="{x:Static options:ConnectionStyle.StartStop}">
+                                                    <Setter Property="Data">
+                                                        <Setter.Value>
+                                                            <PathGeometry>
+                                                                <PathGeometry.Figures>
+                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
+                                                                        IsClosed="False">
+                                                                        <LineSegment Point="{Binding CurvePoint1}" />
+                                                                        <LineSegment Point="{Binding CurvePoint2}" />
+                                                                        <LineSegment Point="{Binding Target.Anchor}" />
+                                                                    </PathFigure>
+                                                                </PathGeometry.Figures>
+                                                            </PathGeometry>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <!--Wire Style-->
+
+                                                <!--Effects-->
+                                                <DataTrigger Binding="{Binding HasPlayer}" Value="true">
+                                                    <Setter Property="Effect">
+                                                        <Setter.Value>
+                                                            <DropShadowEffect RenderingBias="Performance"
+                                                                              Color="#5FD95F"
+                                                                              Direction="315" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Setter Property="ToolTip"
+                                                            Value="This connection has a Player Event attatched to it" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PropType}"
+                                                             Value="{x:Static nodes:PropertyType.Interface}">
+                                                    <Setter Property="Effect">
+                                                        <Setter.Value>
+                                                            <DropShadowEffect RenderingBias="Performance"
+                                                                              Color="#2D9B2D"
+                                                                              Direction="315" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Setter Property="ToolTip"
+                                                            Value="This connection goes into an interface" />
+                                                </DataTrigger>
+                                                <!--Effects-->
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
+                            </Canvas>
+                        </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type pending:EntityPendingConnection}"
+                          x:Key="PendingConnectionTemplate">
+                            <nodify:PendingConnection StartedCommand="{Binding Start}"
+                                                      CompletedCommand="{Binding Finish}"
+                                                      AllowOnlyConnectors="True"
+                                                      EnableSnapping="True"
+                                                      SourceAnchor="{Binding SourceAnchor, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
+                                                      TargetAnchor="{Binding TargetAnchor, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
+                                                      IsVisible="False">
+                                <nodify:PendingConnection.Template>
+                                    <ControlTemplate TargetType="{x:Type nodify:PendingConnection}">
+                                        <Canvas>
+                                            <Path>
+                                                <Path.Style>
+                                                    <Style TargetType="{x:Type Path}">
+                                                        <Setter Property="StrokeThickness"
+                                                                Value="{x:Static options:EditorOptions.WireThickness}" />
+                                                        <Style.Triggers>
+                                                            <!--Connection Color-->
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Event}">
+                                                                <Setter Property="Stroke" Value="White" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Link}">
+                                                                <Setter Property="Stroke"
+                                                                        Value="{StaticResource LinkConnection}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Type}"
+                                                                         Value="{x:Static connections:ConnectionType.Property}">
+                                                                <Setter Property="Stroke"
+                                                                        Value="{StaticResource PropertyConnection}" />
+                                                            </DataTrigger>
+                                                            <!--Connection Color-->
+
+                                                            <!--Wire Style-->
+                                                            <DataTrigger
+                                                                Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                                Value="{x:Static options:ConnectionStyle.Curvy}">
+                                                                <Setter Property="Data">
+                                                                    <Setter.Value>
+                                                                        <PathGeometry>
+                                                                            <PathGeometry.Figures>
+                                                                                <PathFigure
+                                                                                    StartPoint="{Binding SourceAnchor}"
+                                                                                    IsClosed="False">
+                                                                                    <BezierSegment
+                                                                                        Point1="{Binding CurvePoint1}"
+                                                                                        Point2="{Binding CurvePoint2}"
+                                                                                        Point3="{Binding TargetAnchor}" />
+                                                                                </PathFigure>
+                                                                            </PathGeometry.Figures>
+                                                                        </PathGeometry>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+
+                                                            <DataTrigger
+                                                                Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                                Value="{x:Static options:ConnectionStyle.Straight}">
+                                                                <Setter Property="Data">
+                                                                    <Setter.Value>
+                                                                        <LineGeometry
+                                                                            StartPoint="{Binding Source.Anchor}"
+                                                                            EndPoint="{Binding TargetAnchor}" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+
+                                                            <DataTrigger
+                                                                Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                                                Value="{x:Static options:ConnectionStyle.StartStop}">
+                                                                <Setter Property="Data">
+                                                                    <Setter.Value>
+                                                                        <PathGeometry>
+                                                                            <PathGeometry.Figures>
+                                                                                <PathFigure
+                                                                                    StartPoint="{Binding SourceAnchor}"
+                                                                                    IsClosed="False">
+                                                                                    <LineSegment
+                                                                                        Point="{Binding CurvePoint1}" />
+                                                                                    <LineSegment
+                                                                                        Point="{Binding CurvePoint2}" />
+                                                                                    <LineSegment
+                                                                                        Point="{Binding TargetAnchor}" />
+                                                                                </PathFigure>
+                                                                            </PathGeometry.Figures>
+                                                                        </PathGeometry>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <!--Wire Style-->
+
+                                                            <!--Effects-->
+                                                            <DataTrigger Binding="{Binding Source.HasPlayer}"
+                                                                         Value="true">
+                                                                <Setter Property="Effect">
+                                                                    <Setter.Value>
+                                                                        <DropShadowEffect RenderingBias="Performance"
+                                                                            Color="#5FD95F"
+                                                                            Direction="315" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <!--Effects-->
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Path.Style>
+                                            </Path>
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </nodify:PendingConnection.Template>
+                            </nodify:PendingConnection>
+                        </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -64,7 +295,9 @@
                                      DisconnectConnectorCommand="{Binding NodeWrangler.RemoveConnectionsCommand}"
                                      DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=UserControl}}"
                                      ItemContainerStyle="{StaticResource NodeStyle}"
-                                     DisplayConnectionsOnTop="{x:Static options:EditorOptions.WiresOververts}">
+                                     DisplayConnectionsOnTop="{x:Static options:EditorOptions.WiresOververts}"
+                                     ConnectionTemplate="{StaticResource ConnectionTemplate}"
+                                     PendingConnectionTemplate="{StaticResource PendingConnectionTemplate}">
                     <nodify:NodifyEditor.Resources>
                         <DataTemplate DataType="{x:Type nodes:EntityNode}">
                             <nodify:Node Header="{Binding Header}"
@@ -271,6 +504,20 @@
                                                     </Ellipse>
                                                 </ControlTemplate>
                                             </nodify:NodeInput.ConnectorTemplate>
+                                            <nodify:NodeInput.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Edit" Command="{Binding EditCommand}">
+                                                        <MenuItem.Icon>
+                                                            <Image Source="pack://application:,,,/FrostyCore;component/images/rename.png"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}">
+                                                        <MenuItem.Icon>
+                                                            <Image Source="pack://application:,,,/FrostyCore;component/images/clear.png"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </nodify:NodeInput.ContextMenu>
                                         </nodify:NodeInput>
                                     </DataTemplate>
                                 </nodify:Node.InputConnectorTemplate>
@@ -469,6 +716,21 @@
                                                     </Ellipse>
                                                 </ControlTemplate>
                                             </nodify:NodeOutput.ConnectorTemplate>
+                                            
+                                            <nodify:NodeOutput.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Edit" Command="{Binding EditCommand}">
+                                                        <MenuItem.Icon>
+                                                            <Image Source="pack://application:,,,/FrostyCore;component/images/rename.png"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}">
+                                                        <MenuItem.Icon>
+                                                            <Image Source="pack://application:,,,/FrostyCore;component/images/clear.png"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </nodify:NodeOutput.ContextMenu>
                                         </nodify:NodeOutput>
                                     </DataTemplate>
                                 </nodify:Node.OutputConnectorTemplate>
@@ -678,19 +940,24 @@
                                 
                                 <nodify:Node.ContextMenu>
                                     <ContextMenu>
+                                        <MenuItem Header="Add Port" Command="{Binding AddPortCommand}">
+                                            <MenuItem.Icon>
+                                                <Image Source="pack://application:,,,/FrostyEditor;component/images/more.png"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                         <MenuItem Header="Copy" Command="{Binding CopyCommand}">
                                             <MenuItem.Icon>
-                                                <Image Source="pack://application:,,,/FrostyCore;component/images/copy.png"></Image>
+                                                <Image Source="pack://application:,,,/FrostyCore;component/images/copy.png"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="Duplicate" Click="DuplicateNode_OnClick">
                                             <MenuItem.Icon>
-                                                <Image Source="pack://application:,,,/FrostyCore;component/images/add.png"></Image>
+                                                <Image Source="pack://application:,,,/FrostyCore;component/images/add.png"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="Delete" Click="DeleteNode_OnClick">
                                             <MenuItem.Icon>
-                                                <Image Source="pack://application:,,,/FrostyCore;component/images/clear.png"></Image>
+                                                <Image Source="pack://application:,,,/FrostyCore;component/images/clear.png"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
@@ -1191,240 +1458,6 @@
                                       Transform="{Binding ViewportTransform, ElementName=Editor}"
                                       Drawing="{StaticResource SmallGridGeometry}" />
                     </nodify:NodifyEditor.Background>
-
-                    <nodify:NodifyEditor.ConnectionTemplate>
-                        <DataTemplate DataType="{x:Type connections:EntityConnection}">
-                            <Canvas>
-                                <Path>
-                                    <Path.Style>
-                                        <Style TargetType="{x:Type Path}">
-                                            <Setter Property="StrokeThickness"
-                                                    Value="{x:Static options:EditorOptions.WireThickness}" />
-                                            <Setter Property="ToolTip" Value="" />
-                                            <Style.Triggers>
-                                                <!--Connection Color-->
-                                                <DataTrigger Binding="{Binding Type}"
-                                                             Value="{x:Static connections:ConnectionType.Event}">
-                                                    <Setter Property="Stroke" Value="White" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Type}"
-                                                             Value="{x:Static connections:ConnectionType.Link}">
-                                                    <Setter Property="Stroke" Value="{StaticResource LinkConnection}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Type}"
-                                                             Value="{x:Static connections:ConnectionType.Property}">
-                                                    <Setter Property="Stroke"
-                                                            Value="{StaticResource PropertyConnection}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsSelected}"
-                                                             Value="true">
-                                                    <Setter Property="Stroke"
-                                                            Value="{StaticResource NodeSelectedColor}" />
-                                                </DataTrigger>
-                                                <!--Connection Color-->
-
-                                                <!--Wire Style-->
-                                                <DataTrigger
-                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
-                                                    Value="{x:Static options:ConnectionStyle.Curvy}">
-                                                    <Setter Property="Data">
-                                                        <Setter.Value>
-                                                            <PathGeometry>
-                                                                <PathGeometry.Figures>
-                                                                    <PathFigure
-                                                                        StartPoint="{Binding Source.Anchor}"
-                                                                        IsClosed="False">
-                                                                        <BezierSegment
-                                                                            Point1="{Binding CurvePoint1}"
-                                                                            Point2="{Binding CurvePoint2}"
-                                                                            Point3="{Binding Target.Anchor}" />
-                                                                    </PathFigure>
-                                                                </PathGeometry.Figures>
-                                                            </PathGeometry>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </DataTrigger>
-
-                                                <DataTrigger
-                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
-                                                    Value="{x:Static options:ConnectionStyle.Straight}">
-                                                    <Setter Property="Data">
-                                                        <Setter.Value>
-                                                            <LineGeometry StartPoint="{Binding Source.Anchor}"
-                                                                          EndPoint="{Binding Target.Anchor}" />
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </DataTrigger>
-
-                                                <DataTrigger
-                                                    Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
-                                                    Value="{x:Static options:ConnectionStyle.StartStop}">
-                                                    <Setter Property="Data">
-                                                        <Setter.Value>
-                                                            <PathGeometry>
-                                                                <PathGeometry.Figures>
-                                                                    <PathFigure StartPoint="{Binding Source.Anchor}"
-                                                                        IsClosed="False">
-                                                                        <LineSegment Point="{Binding CurvePoint1}" />
-                                                                        <LineSegment Point="{Binding CurvePoint2}" />
-                                                                        <LineSegment Point="{Binding Target.Anchor}" />
-                                                                    </PathFigure>
-                                                                </PathGeometry.Figures>
-                                                            </PathGeometry>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </DataTrigger>
-                                                <!--Wire Style-->
-
-                                                <!--Effects-->
-                                                <DataTrigger Binding="{Binding HasPlayer}" Value="true">
-                                                    <Setter Property="Effect">
-                                                        <Setter.Value>
-                                                            <DropShadowEffect RenderingBias="Performance"
-                                                                              Color="#5FD95F"
-                                                                              Direction="315" />
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                    <Setter Property="ToolTip"
-                                                            Value="This connection has a Player Event attatched to it" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PropType}"
-                                                             Value="{x:Static nodes:PropertyType.Interface}">
-                                                    <Setter Property="Effect">
-                                                        <Setter.Value>
-                                                            <DropShadowEffect RenderingBias="Performance"
-                                                                              Color="#2D9B2D"
-                                                                              Direction="315" />
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                    <Setter Property="ToolTip"
-                                                            Value="This connection goes into an interface" />
-                                                </DataTrigger>
-                                                <!--Effects-->
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Path.Style>
-                                </Path>
-                            </Canvas>
-                        </DataTemplate>
-                    </nodify:NodifyEditor.ConnectionTemplate>
-
-                    <!--This displays whenever the user is attempting to create a new connection-->
-                    <nodify:NodifyEditor.PendingConnectionTemplate>
-                        <DataTemplate DataType="{x:Type pending:EntityPendingConnection}">
-                            <nodify:PendingConnection StartedCommand="{Binding Start}"
-                                                      CompletedCommand="{Binding Finish}"
-                                                      AllowOnlyConnectors="True"
-                                                      EnableSnapping="True"
-                                                      SourceAnchor="{Binding SourceAnchor, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
-                                                      TargetAnchor="{Binding TargetAnchor, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
-                                                      IsVisible="False">
-                                <nodify:PendingConnection.Template>
-                                    <ControlTemplate TargetType="{x:Type nodify:PendingConnection}">
-                                        <Canvas>
-                                            <Path>
-                                                <Path.Style>
-                                                    <Style TargetType="{x:Type Path}">
-                                                        <Setter Property="StrokeThickness"
-                                                                Value="{x:Static options:EditorOptions.WireThickness}" />
-                                                        <Style.Triggers>
-                                                            <!--Connection Color-->
-                                                            <DataTrigger Binding="{Binding Type}"
-                                                                         Value="{x:Static connections:ConnectionType.Event}">
-                                                                <Setter Property="Stroke" Value="White" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Type}"
-                                                                         Value="{x:Static connections:ConnectionType.Link}">
-                                                                <Setter Property="Stroke"
-                                                                        Value="{StaticResource LinkConnection}" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Type}"
-                                                                         Value="{x:Static connections:ConnectionType.Property}">
-                                                                <Setter Property="Stroke"
-                                                                        Value="{StaticResource PropertyConnection}" />
-                                                            </DataTrigger>
-                                                            <!--Connection Color-->
-
-                                                            <!--Wire Style-->
-                                                            <DataTrigger
-                                                                Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
-                                                                Value="{x:Static options:ConnectionStyle.Curvy}">
-                                                                <Setter Property="Data">
-                                                                    <Setter.Value>
-                                                                        <PathGeometry>
-                                                                            <PathGeometry.Figures>
-                                                                                <PathFigure
-                                                                                    StartPoint="{Binding SourceAnchor}"
-                                                                                    IsClosed="False">
-                                                                                    <BezierSegment
-                                                                                        Point1="{Binding CurvePoint1}"
-                                                                                        Point2="{Binding CurvePoint2}"
-                                                                                        Point3="{Binding TargetAnchor}" />
-                                                                                </PathFigure>
-                                                                            </PathGeometry.Figures>
-                                                                        </PathGeometry>
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </DataTrigger>
-
-                                                            <DataTrigger
-                                                                Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
-                                                                Value="{x:Static options:ConnectionStyle.Straight}">
-                                                                <Setter Property="Data">
-                                                                    <Setter.Value>
-                                                                        <LineGeometry
-                                                                            StartPoint="{Binding Source.Anchor}"
-                                                                            EndPoint="{Binding TargetAnchor}" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </DataTrigger>
-
-                                                            <DataTrigger
-                                                                Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
-                                                                Value="{x:Static options:ConnectionStyle.StartStop}">
-                                                                <Setter Property="Data">
-                                                                    <Setter.Value>
-                                                                        <PathGeometry>
-                                                                            <PathGeometry.Figures>
-                                                                                <PathFigure
-                                                                                    StartPoint="{Binding SourceAnchor}"
-                                                                                    IsClosed="False">
-                                                                                    <LineSegment
-                                                                                        Point="{Binding CurvePoint1}" />
-                                                                                    <LineSegment
-                                                                                        Point="{Binding CurvePoint2}" />
-                                                                                    <LineSegment
-                                                                                        Point="{Binding TargetAnchor}" />
-                                                                                </PathFigure>
-                                                                            </PathGeometry.Figures>
-                                                                        </PathGeometry>
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </DataTrigger>
-                                                            <!--Wire Style-->
-
-                                                            <!--Effects-->
-                                                            <DataTrigger Binding="{Binding Source.HasPlayer}"
-                                                                         Value="true">
-                                                                <Setter Property="Effect">
-                                                                    <Setter.Value>
-                                                                        <DropShadowEffect RenderingBias="Performance"
-                                                                            Color="#5FD95F"
-                                                                            Direction="315" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </DataTrigger>
-                                                            <!--Effects-->
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Path.Style>
-                                            </Path>
-                                        </Canvas>
-                                    </ControlTemplate>
-                                </nodify:PendingConnection.Template>
-                            </nodify:PendingConnection>
-                        </DataTemplate>
-                    </nodify:NodifyEditor.PendingConnectionTemplate>
                 </nodify:NodifyEditor>
             </Grid>
             
@@ -1446,7 +1479,7 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         
-                                        <controls1:FrostyClassSelector x:Name="ClassSelector"  
+                                        <controls1:FrostyClassSelector x:Name="ClassSelector"
                                                                        Grid.Row="1"
                                                                        SelectedItemChanged="ClassSelector_OnSelectedItemChanged"
                                                                        ItemDoubleClicked="ClassSelector_OnItemDoubleClicked"
@@ -1484,7 +1517,7 @@
                                     </Grid>
                                 </controls:FrostyTabItem.Content>
                             </controls:FrostyTabItem>
-                            <controls:FrostyTabItem Header="Trans Toolbox"
+                            <controls:FrostyTabItem Header="Utilities"
                                                     Icon="pack://application:,,,/FrostyEditor;component/Images/ThreeD.png">
                                 <controls:FrostyTabItem.Content>
                                     <Grid>

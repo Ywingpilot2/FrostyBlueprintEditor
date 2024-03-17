@@ -28,8 +28,3 @@ using BlueprintEditorPlugin.Options;
 [assembly: RegisterDataExplorerContextMenu(typeof(ViewBlueprintContextMenuItem))]
 [assembly: RegisterOptionsExtension(typeof(BlueprintEditorOptions))]
 [assembly: RegisterStartupAction(typeof(BlueprintEditorStartupAction))]
-
-#if DEVELOPER___DEBUG
-[assembly: RegisterMenuExtension(typeof(ViewTestGraph))]
-[assembly: RegisterMenuExtension(typeof(ViewTestBlueprintGraph))]
-#endif

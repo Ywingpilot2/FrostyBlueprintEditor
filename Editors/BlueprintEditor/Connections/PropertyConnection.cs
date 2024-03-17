@@ -137,6 +137,44 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             FixRealm();
             UpdateStatus();
         }
+        
+        public override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Anchor":
+                {
+                    NotifyPropertyChanged(nameof(CurvePoint1));
+                    NotifyPropertyChanged(nameof(CurvePoint2));
+                } break;
+                case "IsSelected":
+                {
+                    IsSelected = Source.Node.IsSelected || Target.Node.IsSelected;
+                    NotifyPropertyChanged(nameof(IsSelected));
+                } break;
+                case "Realm":
+                {
+                    FixRealm();
+                    UpdateStatus();
+                } break;
+                case "Name":
+                {
+                    ((dynamic)Object).SourceField = Source.Name;
+                    ((dynamic)Object).TargetField = Target.Name;
+                } break;
+                case "IsInterface":
+                {
+                    if (((EntityPort)Target).IsInterface)
+                    {
+                        PropType = PropertyType.Interface;
+                    }
+                    else
+                    {
+                        PropType = PropertyType.Default;
+                    }
+                } break;
+            }
+        }
     }
 
     public static class PropertyFlagsHelper

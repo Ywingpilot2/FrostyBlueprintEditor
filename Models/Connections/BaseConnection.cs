@@ -18,7 +18,7 @@ namespace BlueprintEditorPlugin.Models.Connections
         #region Property changing
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public virtual void NotifyPropertyChanged(string propertyName)
+        public void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

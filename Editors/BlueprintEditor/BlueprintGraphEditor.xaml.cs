@@ -11,7 +11,6 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor;
-using BlueprintEditorPlugin.Editors.NodeTest.Nodes;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -73,36 +72,36 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             case "FieldAccessType_Source":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler));
                             } break;
                             case "FieldAccessType_Target":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler));
                             } break;
                             case "FieldAccessType_SourceAndTarget":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In));
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler));
                             } break;
                         }
                     }
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler));
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler));
                     }
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Event, PortDirection.Out));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler));
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Event, PortDirection.In));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Event, PortDirection.In, NodeWrangler));
                     }
                     
                     continue;

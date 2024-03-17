@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -66,20 +68,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public Guid FileGuid { get; }
         public Guid ClassGuid { get; }
         
-        public EntityPort GetInput(string name)
+        public EntityInput GetInput(string name)
         {
             if (Inputs.Count == 0)
                 return null;
             
-            return (EntityPort)Inputs[0];
+            return (EntityInput)Inputs[0];
         }
 
-        public EntityPort GetOutput(string name)
+        public EntityOutput GetOutput(string name)
         {
             if (Outputs.Count == 0)
                 return null;
             
-            return (EntityPort)Outputs[0];
+            return (EntityOutput)Outputs[0];
         }
 
         public void AddInput(EntityInput input)
@@ -107,6 +109,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         #endregion
 
         #region Basic implementation
+
+        public INodeWrangler NodeWrangler { get; }
 
         public bool IsValid()
         {
@@ -189,13 +193,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
-        public InterfaceNode(object obj, string name, ConnectionType type, PortDirection direction, Realm realm = Realm.Any)
+        public InterfaceNode(object obj, string name, ConnectionType type, PortDirection direction, INodeWrangler wrangler, Realm realm = Realm.Any)
         {
             Object = obj;
             InternalGuid = ((dynamic)obj).GetInstanceGuid();
             int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
             Header = Utils.GetString(hash);
             ConnectionType = type;
+            NodeWrangler = wrangler;
             
             if (direction == PortDirection.In)
             {

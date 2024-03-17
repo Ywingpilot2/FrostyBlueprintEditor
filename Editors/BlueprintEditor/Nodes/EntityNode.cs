@@ -14,6 +14,7 @@ using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
+using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Controls;
 using FrostySdk;
@@ -123,7 +124,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
         public ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
 
-        public readonly INodeWrangler NodeWrangler;
+        public INodeWrangler NodeWrangler { get; }
 
         #endregion
 
@@ -134,6 +135,75 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         private protected void Copy()
         {
             FrostyClipboard.Current.SetData(Object);
+        }
+        
+        public ICommand AddPortCommand => new DelegateCommand(UserAddPort);
+
+        private protected void UserAddPort()
+        {
+            AddPortArgs args = new AddPortArgs();
+            MessageBoxResult result = EditPromptWindow.Show(args, "Set new Properties");
+            if (result == MessageBoxResult.Yes)
+            {
+                if (args.Direction == PortDirection.In)
+                {
+                    switch (args.ConnectionType)
+                    {
+                        case ConnectionType.Event:
+                        {
+                            AddPort(new EventInput(args.Name, this)
+                            {
+                                HasPlayer = args.HasPlayer,
+                                Realm = args.Realm
+                            });
+                        } break;
+                        case ConnectionType.Link:
+                        {
+                            AddPort(new LinkInput(args.Name, this)
+                            {
+                                Realm = args.Realm
+                            });
+                        } break;
+                        case ConnectionType.Property:
+                        {
+                            AddPort(new PropertyInput(args.Name, this)
+                            {
+                                IsInterface = args.IsInterface,
+                                Realm = args.Realm
+                            });
+                        } break;
+                    }
+                }
+                else
+                {
+                    switch (args.ConnectionType)
+                    {
+                        case ConnectionType.Event:
+                        {
+                            AddPort(new EventOutput(args.Name, this)
+                            {
+                                HasPlayer = args.HasPlayer,
+                                Realm = args.Realm
+                            });
+                        } break;
+                        case ConnectionType.Link:
+                        {
+                            AddPort(new LinkOutput(args.Name, this)
+                            {
+                                Realm = args.Realm
+                            });
+                        } break;
+                        case ConnectionType.Property:
+                        {
+                            AddPort(new PropertyOutput(args.Name, this)
+                            {
+                                IsInterface = args.IsInterface,
+                                Realm = args.Realm
+                            });
+                        } break;
+                    }
+                }
+            }
         }
 
         #endregion
@@ -311,7 +381,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Port retrieval
 
-        public EntityPort GetInput(string name)
+        public EntityInput GetInput(string name)
         {
             if (name.StartsWith("0x"))
             {
@@ -324,7 +394,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return _hashCacheInputs[Utils.HashString(name)];
         }
 
-        public EntityPort GetInput(int hash)
+        public EntityInput GetInput(int hash)
         {
             if (!_hashCacheInputs.ContainsKey(hash))
                 return null;
@@ -332,7 +402,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return _hashCacheInputs[hash];
         }
         
-        public EntityPort GetOutput(string name)
+        public EntityOutput GetOutput(string name)
         {
             if (name.StartsWith("0x"))
             {
@@ -345,7 +415,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return _hashCacheOutputs[Utils.HashString(name)];
         }
 
-        public EntityPort GetOutput(int hash)
+        public EntityOutput GetOutput(int hash)
         {
             if (!_hashCacheOutputs.ContainsKey(hash))
                 return null;
@@ -395,6 +465,42 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             
             Outputs.Add(output);
             _hashCacheOutputs.Add(Utils.HashString(output.Name), output);
+        }
+
+        #endregion
+
+        #region Port Removing
+
+        public void RemoveInput(string name)
+        {
+            EntityInput input = GetInput(name);
+            if (input == null)
+                return;
+            
+            RemoveInput(input);
+        }
+        
+        public void RemoveInput(EntityInput input)
+        {
+            NodeWrangler.ClearConnections(input);
+            _hashCacheInputs.Remove(Utils.HashString(input.Name));
+            Inputs.Remove(input);
+        }
+        
+        public void RemoveOutput(string name)
+        {
+            EntityOutput output = GetOutput(name);
+            if (output == null)
+                return;
+            
+            RemoveOutput(output);
+        }
+        
+        public void RemoveOutput(EntityOutput output)
+        {
+            NodeWrangler.ClearConnections(output);
+            _hashCacheOutputs.Remove(Utils.HashString(output.Name));
+            Outputs.Remove(output);
         }
 
         #endregion

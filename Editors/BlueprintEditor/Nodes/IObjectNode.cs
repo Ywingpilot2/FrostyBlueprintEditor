@@ -17,8 +17,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         Guid FileGuid { get; }
         Guid ClassGuid { get; }
 
-        EntityPort GetInput(string name);
-        EntityPort GetOutput(string name);
+        EntityInput GetInput(string name);
+        EntityOutput GetOutput(string name);
 
         void AddInput(EntityInput input);
         void AddOutput(EntityOutput output);
