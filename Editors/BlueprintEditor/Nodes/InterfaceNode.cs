@@ -11,6 +11,7 @@ using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
+using Frosty.Core.Controls;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -67,7 +68,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         
         public Guid FileGuid { get; }
         public Guid ClassGuid { get; }
-        
+
+        public void OnObjectModified(object sender, ItemModifiedEventArgs args)
+        {
+        }
+
         public EntityInput GetInput(string name)
         {
             if (Inputs.Count == 0)

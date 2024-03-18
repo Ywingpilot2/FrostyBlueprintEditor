@@ -6,6 +6,7 @@ using BlueprintEditorPlugin.Extensions;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using Frosty.Core.Windows;
 
 namespace BlueprintEditorPlugin
 {
@@ -14,7 +15,7 @@ namespace BlueprintEditorPlugin
     {
         private const string GraphEditor = "GraphEditor";
         private BlueprintGraphEditor _graphEditor;
-        public override ImageSource Icon { get; } = ViewBlueprintContextMenuItem.IconImageSource;
+        public override ImageSource Icon => ViewBlueprintContextMenuItem.IconImageSource;
 
         static BlueprintEditor()
         {
@@ -27,7 +28,6 @@ namespace BlueprintEditorPlugin
             
             _graphEditor = GetTemplateChild(GraphEditor) as BlueprintGraphEditor;
             _graphEditor.OpenAsset(App.SelectedAsset);
-            _graphEditor.InitializeComponent();
         }
     }
 }

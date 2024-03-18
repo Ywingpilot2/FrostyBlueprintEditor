@@ -13,13 +13,15 @@
              xmlns:controls="clr-namespace:Frosty.Controls;assembly=FrostyControls"
              xmlns:controls1="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
              xmlns:status="clr-namespace:BlueprintEditorPlugin.Models.Status"
+             xmlns:propertygrid="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid"
              mc:Ignorable="d"
-             d:DesignHeight="480" d:DesignWidth="720">
+             d:DesignHeight="700" d:DesignWidth="1518">
     
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/BlueprintEditorPlugin;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/BlueprintEditorPlugin;component/Editors/BlueprintEditor/PropertyGrid/BlueprintPropertyGrid.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -400,6 +402,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="225" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="425"/>
             </Grid.ColumnDefinitions>
             <!--Node Editor-->
             <Grid Grid.Column="1" Background="{StaticResource CanvasBackground}">
@@ -1681,10 +1684,30 @@
                     </controls:FrostyTabControl>
                 </Border>
             </Grid>
+            
+            <Grid Grid.Column="2" x:Name="PropertyPanel"
+                  Background="{StaticResource MenuItemBackground}">
+                <controls:FrostyTabControl x:Name="PropertiesTabControl">
+                    <controls:FrostyTabItem Header="Node Properties"
+                                            Icon="pack://application:,,,/FrostyEditor;component/Images/classref.png">
+                        <controls:FrostyTabItem.Content>
+                            <Border BorderBrush="{StaticResource SubItemPressed}"
+                                    BorderThickness="0,2,0,0">
+                                <propertygrid:BlueprintPropertyGrid x:Name="NodePropertyGrid"
+                                                                    OnModified="NodePropertyGrid_OnOnModified" />
+                            </Border>
+                        </controls:FrostyTabItem.Content>
+                    </controls:FrostyTabItem>
+                </controls:FrostyTabControl>
+            </Grid>
 
             <!--This through what I presume to be black magic
             Allows the user to change the size of the Nodes window-->
             <GridSplitter Grid.Column="0"
+                          Background="{StaticResource SubItemPressed}"
+                          Width="3"
+                          ResizeDirection="Columns" />
+            <GridSplitter Grid.Column="1"
                           Background="{StaticResource SubItemPressed}"
                           Width="3"
                           ResizeDirection="Columns" />

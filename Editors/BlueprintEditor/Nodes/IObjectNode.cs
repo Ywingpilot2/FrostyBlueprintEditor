@@ -1,6 +1,7 @@
 ﻿using System;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes;
+using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 
@@ -16,6 +17,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         AssetClassGuid InternalGuid { get; set; }
         Guid FileGuid { get; }
         Guid ClassGuid { get; }
+
+        void OnObjectModified(object sender, ItemModifiedEventArgs args);
 
         EntityInput GetInput(string name);
         EntityOutput GetOutput(string name);

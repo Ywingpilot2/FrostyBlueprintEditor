@@ -10,6 +10,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -17,6 +18,7 @@ using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using Frosty.Core.Windows;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -329,6 +331,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             }
 
             #endregion
+
+            InitializeComponent();
+            NodePropertyGrid.GraphEditor = this;
         }
 
         #region Static
@@ -358,6 +363,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             foreach (object removedItem in e.RemovedItems)
             {
                 ((IVertex)removedItem).IsSelected = false;
+            }
+
+            if (e.AddedItems.Count != 0)
+            {
+                if (e.AddedItems[0] is EntityNode entityNode)
+                {
+                    NodePropertyGrid.Object = entityNode.Object;
+                }
+            }
+            else
+            {
+                NodePropertyGrid.Object = new object();
             }
         }
 
@@ -424,5 +441,31 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
+
+        private void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)
+        {
+            // If the user holds down alt that means all selected nodes should have their properties set the same
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+            {
+                FrostyTaskWindow.Show("Updating properties...", "", task =>
+                {
+                    foreach (INode selectedNode in NodeWrangler.SelectedNodes)
+                    {
+                        if (selectedNode is EntityNode node)
+                        {
+                            node.TrySetProperty(e.Item.Name, e.NewValue);
+                            node.OnObjectModified(sender, e);
+                        }
+                    }
+                });
+            }
+            else
+            {
+                if (NodeWrangler.SelectedNodes[0] is EntityNode node)
+                {
+                    node.OnObjectModified(sender, e);
+                }
+            }
+        }
     }
 }

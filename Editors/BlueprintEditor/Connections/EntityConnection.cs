@@ -73,15 +73,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         
         public ICommand FixCommand => new DelegateCommand(UserFix);
 
-        private void UserFix()
+        public void UserFix()
         {
             EntityPort target = (EntityPort)Target;
             EntityPort source = (EntityPort)Source;
             
             FrostyTaskWindow.Show("Fixing problems...", "", task =>
             {
-                // We get 5 attempts to solve all problems... Hopefully they work!
-                for (int i = 0; i < 5; i++)
+                // We get 16 attempts to solve all problems... Hopefully they work!
+                for (int i = 0; i < 16; i++)
                 {
                     if (CurrentStatus.Status == EditorStatus.Alright)
                         break; // Yay!
@@ -144,6 +144,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
                 if (CurrentStatus.Status == EditorStatus.Flawed || CurrentStatus.Status == EditorStatus.Broken)
                 {
+                    if (CurrentStatus.ToolTip == $"{source.Realm} to {target.Realm} is not a valid combination of realms")
+                    {
+                        App.Logger.LogError($"Unable to implicitly determine intended realms for {source} to {target}, please manually update their realms.");
+                        return;
+                    }
                     App.Logger.LogError("Unable to solve all problems with this connection. Please either manually solve issues, or try again.");
                 }
             });

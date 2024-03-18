@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
+using Frosty.Core.Windows;
 
 namespace BlueprintEditorPlugin.Extensions
 {

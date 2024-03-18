@@ -416,16 +416,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
             TrySetProperty("flags", flagsHelper.GetAsFlags());
         }
-
-        public void AddPort(IPort port)
+        
+        public virtual void OnObjectModified(object sender, ItemModifiedEventArgs args)
         {
-            if (port is EntityOutput output)
+            if (args.Item.Name == "Realm" && TryGetProperty("Realm") != null)
             {
-                AddOutput(output);
-            }
-            else
-            {
-                AddInput((EntityInput)port); // Has to be an entity input
+                Realm = ParseRealm(args.NewValue);
+                Realm oldRealm = ParseRealm(args.OldValue);
+                foreach (EntityPort input in Inputs)
+                {
+                    if (input.Realm == oldRealm)
+                    {
+                        input.Realm = Realm;
+                    }
+                }
+                foreach (EntityPort output in Outputs)
+                {
+                    if (output.Realm == oldRealm)
+                    {
+                        output.Realm = Realm;
+                    }
+                }
             }
         }
 
@@ -483,8 +494,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         #endregion
 
         #region Port adding
+        
+        public void AddPort(IPort port)
+        {
+            if (port is EntityOutput output)
+            {
+                AddOutput(output);
+            }
+            else
+            {
+                AddInput((EntityInput)port); // Has to be an entity input
+            }
+        }
 
-        public void AddInput(EntityInput input)
+        public virtual void AddInput(EntityInput input)
         {
             if (input.Name.StartsWith("0x"))
             {
@@ -499,12 +522,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             
             if (_hashCacheInputs.ContainsKey(Utils.HashString(input.Name)))
                 return;
+
+            if (TryGetProperty("Realm") != null && input.Realm == Realm.Invalid)
+            {
+                input.Realm = Realm;
+            }
             
             Inputs.Add(input);
             _hashCacheInputs.Add(Utils.HashString(input.Name), input);
         }
-        
-        public void AddOutput(EntityOutput output)
+
+        public virtual void AddOutput(EntityOutput output)
         {
             if (output.Name.StartsWith("0x"))
             {
@@ -519,6 +547,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             
             if (_hashCacheOutputs.ContainsKey(Utils.HashString(output.Name)))
                 return;
+            
+            if (TryGetProperty("Realm") != null && output.Realm == Realm.Invalid)
+            {
+                output.Realm = Realm;
+            }
             
             Outputs.Add(output);
             _hashCacheOutputs.Add(Utils.HashString(output.Name), output);

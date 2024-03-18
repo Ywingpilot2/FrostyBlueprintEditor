@@ -10,9 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using BlueprintEditorPlugin.Models.Editor.Items;
-using BlueprintEditorPlugin.Models.Types.NodeTypes.Transient;
-using BlueprintEditorPlugin.Utils;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items;
 using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -23,7 +22,7 @@ using FrostySdk.Attributes;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 
-namespace BlueprintEditorPlugin.Models.Editor
+namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid
 { 
     public class BlueprintPropertyGridItem : FrostyPropertyGridItem
     {
@@ -99,7 +98,14 @@ namespace BlueprintEditorPlugin.Models.Editor
                     }
 
                     object editor = Activator.CreateInstance(editorType);
-                    elem = (UIElement)editorType.GetMethod("CreateEditor").Invoke(editor, new object[] { item });
+                    if (editorType.BaseType.Name == typeof(BlueprintTypeEditor<>).Name)
+                    {
+                        elem = (UIElement)editorType.GetMethod("CreateEditor").Invoke(editor, new object[] { item, GetPropertyGrid().GraphEditor.NodeWrangler });
+                    }
+                    else
+                    {
+                        elem = (UIElement)editorType.GetMethod("CreateEditor").Invoke(editor, new object[] { item });
+                    }
                 }
 
                 value.Content = elem;
@@ -333,7 +339,7 @@ namespace BlueprintEditorPlugin.Models.Editor
 
         #region -- Properties --
 
-        public EditorViewModel NodeEditor;
+        public BlueprintGraphEditor GraphEditor { get; set; }
 
         #region -- Object --
         public static readonly DependencyProperty ObjectProperty = DependencyProperty.Register("Object", typeof(object), typeof(BlueprintPropertyGrid), new FrameworkPropertyMetadata(null, OnObjectChanged));
@@ -364,8 +370,6 @@ namespace BlueprintEditorPlugin.Models.Editor
             BlueprintPropertyGrid pg = sender as BlueprintPropertyGrid;
             EbxAsset asset = args.NewValue as EbxAsset;
             pg.asset = asset;
-            EditorUtils.CurrentEditor.NodePropertyGrid = pg;
-            pg.NodeEditor = EditorUtils.CurrentEditor;
         }
         #endregion
 
@@ -711,19 +715,7 @@ namespace BlueprintEditorPlugin.Models.Editor
 
             OnModifiedCommand?.Execute(e);
             OnModified?.Invoke(sender, e);
-
-            //Check if our selected node is transient
-            if (NodeEditor.SelectedNodes.Count == 0 || !NodeEditor.SelectedNodes[0].IsTransient)
-            {
-                //If it isn't transient, then we just use Ebx Editor
-                NodeEditor.EditNodeProperties(nodeObj, e);
-            }
-            else
-            {
-                //If it is transient, then we need to let it handle the modification
-                TransientNode transientNode = NodeEditor.SelectedNodes[0] as TransientNode;
-                transientNode.ModifyTransientData(nodeObj, e);
-            }
+            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)GraphEditor.NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)GraphEditor.NodeWrangler).Asset);
         }
     }
 
