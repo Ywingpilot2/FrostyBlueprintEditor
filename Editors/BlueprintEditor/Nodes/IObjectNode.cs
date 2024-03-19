@@ -1,4 +1,5 @@
 ﻿using System;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes;
 using Frosty.Core.Controls;
@@ -12,8 +13,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
     /// </summary>
     public interface IObjectNode : INode, IEntityObject
     {
-        EntityInput GetInput(string name);
-        EntityOutput GetOutput(string name);
+        EntityInput GetInput(string name, ConnectionType type);
+        EntityOutput GetOutput(string name, ConnectionType type);
 
         void AddInput(EntityInput input);
         void AddOutput(EntityOutput output);

@@ -448,51 +448,163 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Complex node implementation
 
-        private Dictionary<int, EntityInput> _hashCacheInputs = new Dictionary<int, EntityInput>();
-        private Dictionary<int, EntityOutput> _hashCacheOutputs = new Dictionary<int, EntityOutput>();
+        private Dictionary<int, PropertyInput> _hashCachePInputs = new Dictionary<int, PropertyInput>();
+        private Dictionary<int, LinkInput> _hashCacheLInputs = new Dictionary<int, LinkInput>();
+        private Dictionary<int, EventInput> _hashCacheEInputs = new Dictionary<int, EventInput>();
+        
+        private Dictionary<int, PropertyOutput> _hashCachePOutputs = new Dictionary<int, PropertyOutput>();
+        private Dictionary<int, LinkOutput> _hashCacheLOutputs = new Dictionary<int, LinkOutput>();
+        private Dictionary<int, EventOutput> _hashCacheEOutputs = new Dictionary<int, EventOutput>();
 
         #region Port retrieval
 
-        public EntityInput GetInput(string name)
+        public EntityInput GetInput(string name, ConnectionType type)
         {
-            if (name.StartsWith("0x"))
+            switch (type)
             {
-                return GetInput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier));
-            }
+                case ConnectionType.Event:
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        return GetInput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier), type);
+                    }
             
-            if (!_hashCacheInputs.ContainsKey(Utils.HashString(name)))
-                return null;
+                    if (!_hashCacheEInputs.ContainsKey(Utils.HashString(name)))
+                        return null;
 
-            return _hashCacheInputs[Utils.HashString(name)];
+                    return _hashCacheEInputs[Utils.HashString(name)];
+                }
+                case ConnectionType.Link:
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        return GetInput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier), type);
+                    }
+            
+                    if (!_hashCacheLInputs.ContainsKey(Utils.HashString(name)))
+                        return null;
+
+                    return _hashCacheLInputs[Utils.HashString(name)];
+                }
+                case ConnectionType.Property:
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        return GetInput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier), type);
+                    }
+            
+                    if (!_hashCachePInputs.ContainsKey(Utils.HashString(name)))
+                        return null;
+
+                    return _hashCachePInputs[Utils.HashString(name)];
+                }
+            }
+
+            return null;
         }
-
-        public EntityInput GetInput(int hash)
+        public EntityInput GetInput(int hash, ConnectionType type)
         {
-            if (!_hashCacheInputs.ContainsKey(hash))
-                return null;
+            switch (type)
+            {
+                case ConnectionType.Event:
+                {
+                    if (!_hashCacheEInputs.ContainsKey(hash))
+                        return null;
 
-            return _hashCacheInputs[hash];
+                    return _hashCacheEInputs[hash];
+                }
+                case ConnectionType.Link:
+                {
+                    if (!_hashCacheLInputs.ContainsKey(hash))
+                        return null;
+
+                    return _hashCacheLInputs[hash];
+                }
+                case ConnectionType.Property:
+                {
+                    if (!_hashCachePInputs.ContainsKey(hash))
+                        return null;
+
+                    return _hashCachePInputs[hash];
+                }
+            }
+
+            return null;
         }
         
-        public EntityOutput GetOutput(string name)
+        public EntityOutput GetOutput(string name, ConnectionType type)
         {
-            if (name.StartsWith("0x"))
+            switch (type)
             {
-                return GetOutput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier));
-            }
+                case ConnectionType.Event:
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        return GetOutput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier), type);
+                    }
             
-            if (!_hashCacheOutputs.ContainsKey(Utils.HashString(name)))
-                return null;
+                    if (!_hashCacheEOutputs.ContainsKey(Utils.HashString(name)))
+                        return null;
 
-            return _hashCacheOutputs[Utils.HashString(name)];
+                    return _hashCacheEOutputs[Utils.HashString(name)];
+                }
+                case ConnectionType.Link:
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        return GetOutput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier), type);
+                    }
+            
+                    if (!_hashCacheLOutputs.ContainsKey(Utils.HashString(name)))
+                        return null;
+
+                    return _hashCacheLOutputs[Utils.HashString(name)];
+                }
+                case ConnectionType.Property:
+                {
+                    if (name.StartsWith("0x"))
+                    {
+                        return GetOutput(int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier), type);
+                    }
+            
+                    if (!_hashCachePOutputs.ContainsKey(Utils.HashString(name)))
+                        return null;
+
+                    return _hashCachePOutputs[Utils.HashString(name)];
+                }
+            }
+
+            return null;
         }
 
-        public EntityOutput GetOutput(int hash)
+        public EntityOutput GetOutput(int hash, ConnectionType type)
         {
-            if (!_hashCacheOutputs.ContainsKey(hash))
-                return null;
+            switch (type)
+            {
+                case ConnectionType.Event:
+                {
+                    if (!_hashCacheEOutputs.ContainsKey(hash))
+                        return null;
 
-            return _hashCacheOutputs[hash];
+                    return _hashCacheEOutputs[hash];
+                }
+                case ConnectionType.Link:
+                {
+                    if (!_hashCacheLOutputs.ContainsKey(hash))
+                        return null;
+
+                    return _hashCacheLOutputs[hash];
+                }
+                case ConnectionType.Property:
+                {
+                    if (!_hashCachePOutputs.ContainsKey(hash))
+                        return null;
+
+                    return _hashCachePOutputs[hash];
+                }
+            }
+
+            return null;
         }
 
         #endregion
@@ -515,59 +627,175 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             if (input.Name.StartsWith("0x"))
             {
-                int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                if (_hashCacheInputs.ContainsKey(hash))
-                    return;
+                switch (input.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        if (_hashCacheEInputs.ContainsKey(hash))
+                            return;
                 
-                Inputs.Add(input);
-                _hashCacheInputs.Add(hash, input);
-                return;
+                        Inputs.Add(input);
+                        _hashCacheEInputs.Add(hash, (EventInput)input);
+                        return;
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        if (_hashCacheLInputs.ContainsKey(hash))
+                            return;
+                
+                        Inputs.Add(input);
+                        _hashCacheLInputs.Add(hash, (LinkInput)input);
+                        return;
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        if (_hashCachePInputs.ContainsKey(hash))
+                            return;
+                
+                        Inputs.Add(input);
+                        _hashCachePInputs.Add(hash, (PropertyInput)input);
+                        return;
+                    } break;
+                }
             }
-            
-            if (_hashCacheInputs.ContainsKey(Utils.HashString(input.Name)))
-                return;
 
-            if (TryGetProperty("Realm") != null && input.Realm == Realm.Invalid)
+            switch (input.Type)
             {
-                input.Realm = Realm;
-            }
+                case ConnectionType.Event:
+                {
+                    if (_hashCacheEInputs.ContainsKey(Utils.HashString(input.Name)))
+                        return;
+
+                    if (TryGetProperty("Realm") != null && input.Realm == Realm.Invalid)
+                    {
+                        input.Realm = Realm;
+                    }
             
-            Inputs.Add(input);
-            _hashCacheInputs.Add(Utils.HashString(input.Name), input);
+                    Inputs.Add(input);
+                    _hashCacheEInputs.Add(Utils.HashString(input.Name), (EventInput)input);
+                } break;
+                case ConnectionType.Link:
+                {
+                    if (_hashCacheLInputs.ContainsKey(Utils.HashString(input.Name)))
+                        return;
+
+                    if (TryGetProperty("Realm") != null && input.Realm == Realm.Invalid)
+                    {
+                        input.Realm = Realm;
+                    }
+            
+                    Inputs.Add(input);
+                    _hashCacheLInputs.Add(Utils.HashString(input.Name), (LinkInput)input);
+                } break;
+                case ConnectionType.Property:
+                {
+                    if (_hashCachePInputs.ContainsKey(Utils.HashString(input.Name)))
+                        return;
+
+                    if (TryGetProperty("Realm") != null && input.Realm == Realm.Invalid)
+                    {
+                        input.Realm = Realm;
+                    }
+            
+                    Inputs.Add(input);
+                    _hashCachePInputs.Add(Utils.HashString(input.Name), (PropertyInput)input);
+                } break;
+            }
         }
 
         public virtual void AddOutput(EntityOutput output)
         {
             if (output.Name.StartsWith("0x"))
             {
-                int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                if (_hashCacheOutputs.ContainsKey(hash))
-                    return;
+                switch (output.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        if (_hashCacheEOutputs.ContainsKey(hash))
+                            return;
                 
-                Outputs.Add(output);
-                _hashCacheOutputs.Add(hash, output);
-                return;
+                        Outputs.Add(output);
+                        _hashCacheEOutputs.Add(hash, (EventOutput)output);
+                        return;
+                    }
+                    case ConnectionType.Link:
+                    {
+                        int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        if (_hashCacheLOutputs.ContainsKey(hash))
+                            return;
+                
+                        Outputs.Add(output);
+                        _hashCacheLOutputs.Add(hash, (LinkOutput)output);
+                        return;
+                    }
+                    case ConnectionType.Property:
+                    {
+                        int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                        if (_hashCachePOutputs.ContainsKey(hash))
+                            return;
+                
+                        Outputs.Add(output);
+                        _hashCachePOutputs.Add(hash, (PropertyOutput)output);
+                        return;
+                    }
+                }
             }
-            
-            if (_hashCacheOutputs.ContainsKey(Utils.HashString(output.Name)))
-                return;
-            
-            if (TryGetProperty("Realm") != null && output.Realm == Realm.Invalid)
+
+            switch (output.Type)
             {
-                output.Realm = Realm;
-            }
+                case ConnectionType.Event:
+                {
+                    if (_hashCacheEOutputs.ContainsKey(Utils.HashString(output.Name)))
+                        return;
+
+                    if (TryGetProperty("Realm") != null && output.Realm == Realm.Invalid)
+                    {
+                        output.Realm = Realm;
+                    }
             
-            Outputs.Add(output);
-            _hashCacheOutputs.Add(Utils.HashString(output.Name), output);
+                    Outputs.Add(output);
+                    _hashCacheEOutputs.Add(Utils.HashString(output.Name), (EventOutput)output);
+                } break;
+                case ConnectionType.Link:
+                {
+                    if (_hashCacheLOutputs.ContainsKey(Utils.HashString(output.Name)))
+                        return;
+
+                    if (TryGetProperty("Realm") != null && output.Realm == Realm.Invalid)
+                    {
+                        output.Realm = Realm;
+                    }
+            
+                    Outputs.Add(output);
+                    _hashCacheLOutputs.Add(Utils.HashString(output.Name), (LinkOutput)output);
+                } break;
+                case ConnectionType.Property:
+                {
+                    if (_hashCachePOutputs.ContainsKey(Utils.HashString(output.Name)))
+                        return;
+
+                    if (TryGetProperty("Realm") != null && output.Realm == Realm.Invalid)
+                    {
+                        output.Realm = Realm;
+                    }
+            
+                    Outputs.Add(output);
+                    _hashCachePOutputs.Add(Utils.HashString(output.Name), (PropertyOutput)output);
+                } break;
+            }
         }
 
         #endregion
 
         #region Port Removing
 
-        public void RemoveInput(string name)
+        public void RemoveInput(string name, ConnectionType type)
         {
-            EntityInput input = GetInput(name);
+            EntityInput input = GetInput(name, type);
             if (input == null)
                 return;
             
@@ -577,13 +805,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public void RemoveInput(EntityInput input)
         {
             NodeWrangler.ClearConnections(input);
-            _hashCacheInputs.Remove(Utils.HashString(input.Name));
+            
+            switch (input.Type)
+            {
+                case ConnectionType.Event:
+                {
+                    _hashCacheEInputs.Remove(Utils.HashString(input.Name));
+                } break;
+                case ConnectionType.Link:
+                {
+                    _hashCacheLInputs.Remove(Utils.HashString(input.Name));
+                } break;
+                case ConnectionType.Property:
+                {
+                    _hashCachePInputs.Remove(Utils.HashString(input.Name));
+                } break;
+            }
+            
             Inputs.Remove(input);
         }
         
-        public void RemoveOutput(string name)
+        public void RemoveOutput(string name, ConnectionType type)
         {
-            EntityOutput output = GetOutput(name);
+            EntityOutput output = GetOutput(name, type);
             if (output == null)
                 return;
             
@@ -593,7 +837,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public void RemoveOutput(EntityOutput output)
         {
             NodeWrangler.ClearConnections(output);
-            _hashCacheOutputs.Remove(Utils.HashString(output.Name));
+
+            switch (output.Type)
+            {
+                case ConnectionType.Event:
+                {
+                    _hashCacheEOutputs.Remove(Utils.HashString(output.Name));
+                } break;
+                case ConnectionType.Link:
+                {
+                    _hashCacheLOutputs.Remove(Utils.HashString(output.Name));
+                } break;
+                case ConnectionType.Property:
+                {
+                    _hashCachePOutputs.Remove(Utils.HashString(output.Name));
+                } break;
+            }
+            
             Outputs.Remove(output);
         }
 
@@ -819,7 +1079,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             if (createId)
             {
-                EntityNodeWrangler entityWrangler = (EntityNodeWrangler)wrangler;
                 AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
                     App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(fileGuid)).Objects,
                     entity.GetType(),

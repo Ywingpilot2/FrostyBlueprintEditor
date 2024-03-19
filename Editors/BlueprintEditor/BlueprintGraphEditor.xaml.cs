@@ -18,9 +18,9 @@ using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
-using Frosty.Core;
 using Frosty.Core.Controls;
 using Frosty.Core.Windows;
+using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -144,7 +144,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        sourceNode = wrangler.GetEntityNode(source.External.FileGuid, source.External.ClassGuid);
+                        // Import the node
+                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
+                        sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                        
+                        wrangler.AddNodeTransient(sourceNode);
                     } break;
                 }
                 
@@ -168,22 +172,26 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        targetNode = wrangler.GetEntityNode(target.External.FileGuid, target.External.ClassGuid);
+                        // Import the node
+                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
+                        targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        
+                        wrangler.AddNodeTransient(targetNode);
                     } break;
                 }
                 
-                if (sourceNode.GetOutput(propertyConnection.SourceField) == null)
+                if (sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property) == null)
                 {
                     sourceNode.AddOutput(new PropertyOutput(propertyConnection.SourceField, sourceNode));
                 }
                 
-                if (targetNode.GetInput(propertyConnection.TargetField) == null)
+                if (targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property) == null)
                 {
                     targetNode.AddInput(new PropertyInput(propertyConnection.TargetField, targetNode));
                 }
 
-                PropertyOutput output = (PropertyOutput)sourceNode.GetOutput(propertyConnection.SourceField);
-                PropertyInput input = (PropertyInput)targetNode.GetInput(propertyConnection.TargetField);
+                PropertyOutput output = (PropertyOutput)sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property);
+                PropertyInput input = (PropertyInput)targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property);
                 
                 wrangler.AddConnectionTransient(output, input, propertyConnection);
             }
@@ -216,7 +224,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        sourceNode = wrangler.GetEntityNode(source.External.FileGuid, source.External.ClassGuid);
+                        // Import the node
+                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
+                        sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+
+                        wrangler.AddNodeTransient(sourceNode);
                     } break;
                 }
                 
@@ -240,22 +252,26 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        targetNode = wrangler.GetEntityNode(target.External.FileGuid, target.External.ClassGuid);
+                        // Import the node
+                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
+                        targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        
+                        wrangler.AddNodeTransient(targetNode);
                     } break;
                 }
                 
-                if (sourceNode.GetOutput(linkConnection.SourceField) == null)
+                if (sourceNode.GetOutput(linkConnection.SourceField, ConnectionType.Link) == null)
                 {
                     sourceNode.AddOutput(new LinkOutput(linkConnection.SourceField, sourceNode));
                 }
                 
-                if (targetNode.GetInput(linkConnection.TargetField) == null)
+                if (targetNode.GetInput(linkConnection.TargetField, ConnectionType.Link) == null)
                 {
                     targetNode.AddInput(new LinkInput(linkConnection.TargetField, targetNode));
                 }
 
-                LinkOutput output = (LinkOutput)sourceNode.GetOutput(linkConnection.SourceField);
-                LinkInput input = (LinkInput)targetNode.GetInput(linkConnection.TargetField);
+                LinkOutput output = (LinkOutput)sourceNode.GetOutput(linkConnection.SourceField, ConnectionType.Link);
+                LinkInput input = (LinkInput)targetNode.GetInput(linkConnection.TargetField, ConnectionType.Link);
                 
                 wrangler.AddConnectionTransient(output, input, linkConnection);
             }
@@ -288,7 +304,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        sourceNode = wrangler.GetEntityNode(source.External.FileGuid, source.External.ClassGuid);
+                        // Import the node
+                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
+                        sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+
+                        wrangler.AddNodeTransient(sourceNode);
                     } break;
                 }
                 
@@ -312,22 +332,26 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        targetNode = wrangler.GetEntityNode(target.External.FileGuid, target.External.ClassGuid);
+                        // Import the node
+                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
+                        targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        
+                        wrangler.AddNodeTransient(targetNode);
                     } break;
                 }
                 
-                if (sourceNode.GetOutput(eventConnection.SourceEvent.Name) == null)
+                if (sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event) == null)
                 {
                     sourceNode.AddOutput(new EventOutput(eventConnection.SourceEvent.Name, sourceNode));
                 }
                 
-                if (targetNode.GetInput(eventConnection.TargetEvent.Name) == null)
+                if (targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event) == null)
                 {
                     targetNode.AddInput(new EventInput(eventConnection.TargetEvent.Name, targetNode));
                 }
 
-                EventOutput output = (EventOutput)sourceNode.GetOutput(eventConnection.SourceEvent.Name);
-                EventInput input = (EventInput)targetNode.GetInput(eventConnection.TargetEvent.Name);
+                EventOutput output = (EventOutput)sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event);
+                EventInput input = (EventInput)targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event);
 
                 wrangler.AddConnectionTransient(output, input, eventConnection);
             }

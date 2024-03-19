@@ -73,19 +73,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
         }
 
-        public EntityInput GetInput(string name)
+
+        public EntityInput GetInput(string name, ConnectionType type)
         {
-            if (Inputs.Count == 0)
-                return null;
-            
             return (EntityInput)Inputs[0];
         }
 
-        public EntityOutput GetOutput(string name)
+        public EntityOutput GetOutput(string name, ConnectionType type)
         {
-            if (Outputs.Count == 0)
-                return null;
-            
             return (EntityOutput)Outputs[0];
         }
 
@@ -186,8 +181,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             Object = obj;
             InternalGuid = ((dynamic)obj).GetInstanceGuid();
-            int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-            Header = Utils.GetString(hash);
+            if (name.StartsWith("0x"))
+            {
+                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                Header = Utils.GetString(hash);
+            }
+            else
+            {
+                Header = name;
+            }
             ConnectionType = type;
             NodeWrangler = wrangler;
             
