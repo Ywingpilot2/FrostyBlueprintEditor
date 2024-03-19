@@ -48,8 +48,8 @@ namespace BlueprintEditorPlugin.Models.Nodes
 
         #endregion
 
-        public virtual ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
-        public virtual ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
+        public ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
+        public ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
 
         #region Port Management
 
@@ -100,17 +100,17 @@ namespace BlueprintEditorPlugin.Models.Nodes
 
         #endregion
         
-        public void OnInputUpdated(IPort port)
+        public virtual void OnInputUpdated(IPort port)
         {
             
         }
 
-        public void OnOutputUpdated(IPort port)
+        public virtual void OnOutputUpdated(IPort port)
         {
             
         }
 
-        public void AddPort(IPort port)
+        public virtual void AddPort(IPort port)
         {
             if (port.Direction == PortDirection.In)
             {
@@ -137,11 +137,12 @@ namespace BlueprintEditorPlugin.Models.Nodes
         {
             return true;
         }
+        
+        public virtual void OnCreation()
+        {
+        }
 
-        /// <summary>
-        /// Occurs whenever a node is first created
-        /// </summary>
-        public void OnCreation()
+        public virtual void OnDestruction()
         {
         }
 

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -41,6 +42,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 NotifyPropertyChanged(nameof(IsConnected));
             }
         }
+
         public abstract PortDirection Direction { get; }
 
         #endregion
@@ -58,6 +60,54 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             else
             {
                 ((EntityNode)Node).RemoveOutput((EntityOutput)this);
+            }
+        }
+        
+        public ICommand RedirectCommand => new DelegateCommand(Redirect);
+
+        private protected void Redirect()
+        {
+            if (Direction == PortDirection.In)
+            {
+                EntityInputRedirect redirectTarget = new EntityInputRedirect(this, PortDirection.Out, Node.NodeWrangler);
+                EntityInputRedirect redirectSource = new EntityInputRedirect(this, PortDirection.In, Node.NodeWrangler);
+
+                redirectSource.TargetRedirect = redirectTarget;
+                redirectTarget.SourceRedirect = redirectSource;
+
+                redirectTarget.Location = new Point(Anchor.X - (Node.Size.Width * 0.5), Anchor.Y);
+                redirectSource.Location = new Point(Anchor.X - (Node.Size.Width * 1.0), Anchor.Y); // TODO: Average out connection Source positions
+                
+                Node.NodeWrangler.AddNode(redirectSource);
+                Node.NodeWrangler.AddNode(redirectTarget);
+
+                foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+                {
+                    connection.Target = redirectSource.Inputs[0];
+                }
+
+                Node.NodeWrangler.AddConnection(new TransientConnection(redirectTarget.Outputs[0], this, Type));
+            }
+            else
+            {
+                EntityOutputRedirect redirectTarget = new EntityOutputRedirect(this, PortDirection.In, Node.NodeWrangler);
+                EntityOutputRedirect redirectSource = new EntityOutputRedirect(this, PortDirection.Out, Node.NodeWrangler);
+
+                redirectSource.TargetRedirect = redirectTarget;
+                redirectTarget.SourceRedirect = redirectSource;
+                
+                redirectTarget.Location = new Point(Anchor.X + (Node.Size.Width * 0.5), Anchor.Y);
+                redirectSource.Location = new Point(Anchor.X + (Node.Size.Width * 1.0), Anchor.Y); // TODO: Average out connection Source positions
+                
+                Node.NodeWrangler.AddNode(redirectSource);
+                Node.NodeWrangler.AddNode(redirectTarget);
+
+                foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+                {
+                    connection.Source = redirectSource.Outputs[0];
+                }
+
+                Node.NodeWrangler.AddConnection(new TransientConnection(this, redirectTarget.Inputs[0], Type));
             }
         }
 
@@ -112,7 +162,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 NotifyPropertyChanged(nameof(Anchor));
             }
         }
-        public INode Node { get; protected set; }
+
+        private INode _node;
+        public INode Node
+        {
+            get => _node;
+            protected set
+            {
+                _node = value;
+                NotifyPropertyChanged(nameof(Node));
+            }
+        }
 
         #endregion
 

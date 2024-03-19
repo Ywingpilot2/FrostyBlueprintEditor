@@ -715,7 +715,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid
 
             OnModifiedCommand?.Execute(e);
             OnModified?.Invoke(sender, e);
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)GraphEditor.NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)GraphEditor.NodeWrangler).Asset);
         }
     }
 

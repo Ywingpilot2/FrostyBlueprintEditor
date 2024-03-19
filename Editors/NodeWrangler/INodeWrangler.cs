@@ -11,22 +11,20 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
 {
     public interface INodeWrangler
     {
-        ObservableCollection<INode> Nodes { get; }
-        ObservableCollection<INode> SelectedNodes { get; }
+        ObservableCollection<IVertex> Nodes { get; }
+        ObservableCollection<IVertex> SelectedNodes { get; }
         ObservableCollection<IConnection> Connections { get; }
         IPendingConnection PendingConnection { get; }
         ICommand RemoveConnectionsCommand { get; }
 
-        void AddNode(INode node);
-        void RemoveNode(INode node);
+        void AddNode(IVertex vertex);
+        void RemoveNode(IVertex vertex);
 
         void AddConnection(IConnection connection);
         void RemoveConnection(IConnection connection);
 
         void ClearConnections(INode node);
         void ClearConnections(IPort port);
-
-        void LayoutNodes();
 
         IEnumerable<IConnection> GetConnections(INode node);
         IEnumerable<IConnection> GetConnections(IPort port);

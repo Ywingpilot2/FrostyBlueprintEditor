@@ -7,6 +7,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
@@ -38,7 +39,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
         public ICommand EditCommand => new DelegateCommand(Edit);
 
-        public void Edit()
+        public virtual void Edit()
         {
             if (Type == ConnectionType.Property)
             {
@@ -66,8 +67,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         
         public ICommand RemoveCommand => new DelegateCommand(Remove);
 
-        private void Remove()
+        protected virtual void Remove()
         {
+            if (Source.Node is IRedirect || Target.Node is IRedirect)
+                return;
+            
             Target.Node.NodeWrangler.RemoveConnection(this);
         }
         
@@ -183,6 +187,58 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 NotifyPropertyChanged(nameof(PropType));
                 UpdateStatus();
             }
+        }
+
+        /// <summary>
+        /// Updates the <see cref="Object"/>'s target pointer ref to that of the current <see cref="BaseConnection.Source"/> value
+        /// <seealso cref="FixRealm"/>
+        /// <seealso cref="ForceFixRealm"/>
+        /// </summary>
+        public void UpdateSourceRef()
+        {
+            UpdateSourceRef((EntityPort)Source);
+        }
+
+        /// <summary>
+        /// Updates the <see cref="Object"/>'s source pointer ref to that of the specified entity port
+        /// <seealso cref="FixRealm"/>
+        /// <seealso cref="ForceFixRealm"/>
+        /// </summary>
+        /// <param name="source"></param>
+        public virtual void UpdateSourceRef(EntityPort source)
+        {
+            HasPlayer = source.HasPlayer;
+            if (source.IsInterface)
+            {
+                PropType = PropertyType.Interface;
+            }
+            UpdateStatus();
+        }
+
+        /// <summary>
+        /// Updates the <see cref="Object"/>'s target pointer ref to that of the current <see cref="BaseConnection.Target"/> value
+        /// <seealso cref="FixRealm"/>
+        /// <seealso cref="ForceFixRealm"/>
+        /// </summary>
+        public void UpdateTargetRef()
+        {
+            UpdateTargetRef((EntityPort)Target);
+        }
+
+        /// <summary>
+        /// Updates the <see cref="Object"/>'s target pointer ref to that of the specified entity port
+        /// <seealso cref="FixRealm"/>
+        /// <seealso cref="ForceFixRealm"/>
+        /// </summary>
+        /// <param name="target"></param>
+        public virtual void UpdateTargetRef(EntityPort target)
+        {
+            HasPlayer = target.HasPlayer;
+            if (target.IsInterface)
+            {
+                PropType = PropertyType.Interface;
+            }
+            UpdateStatus();
         }
 
         #endregion
@@ -330,8 +386,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         public EntityConnection(IPort source, IPort target, object obj) : base(source, target)
         {
             Object = obj;
-            EntityPort entitySource = (EntityPort)source;
-            EntityPort entityTarget = (EntityPort)target;
         }
         
         public EntityConnection(IPort source, IPort target) : base(source, target)

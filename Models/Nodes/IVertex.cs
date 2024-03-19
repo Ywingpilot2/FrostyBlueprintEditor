@@ -16,5 +16,6 @@ namespace BlueprintEditorPlugin.Models.Nodes
 
         bool IsValid();
         void OnCreation();
+        void OnDestruction();
     }
 }

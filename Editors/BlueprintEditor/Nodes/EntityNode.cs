@@ -331,7 +331,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             Header = ObjectType;
         }
-        
+
+        public virtual void OnDestruction()
+        {
+        }
+
         public virtual void OnInputUpdated(IPort port)
         {
             EntityPort entityPort = (EntityPort)port;

@@ -8,8 +8,8 @@ namespace BlueprintEditorPlugin.Models.Connections
 {
     public interface IConnection : INotifyPropertyChanged
     {
-        IPort Source { get; }
-        IPort Target { get; }
+        IPort Source { get; set; }
+        IPort Target { get; set; }
         bool IsSelected { get; set; }
     }
 }

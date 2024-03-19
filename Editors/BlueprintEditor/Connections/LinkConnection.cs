@@ -10,9 +10,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
     public class LinkConnection : EntityConnection
     {
         public override ConnectionType Type => ConnectionType.Link;
-        public LinkConnection(LinkOutput source, LinkInput target, object obj) : base(source, target, obj)
+        
+        public sealed override void UpdateSourceRef(EntityPort source)
         {
-            Object = obj;
+            base.UpdateSourceRef(source);
             
             PointerRef sourceRef;
             if (((IObjectNode)source.Node).Type == PointerRefType.Internal)
@@ -28,6 +29,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 });
             }
             
+            ((dynamic)Object).Source = sourceRef;
+            ((dynamic)Object).SourceField = source.Name;
+        }
+
+        public sealed override void UpdateTargetRef(EntityPort target)
+        {
+            base.UpdateTargetRef(target);
+            
             PointerRef targetRef;
             if (((IObjectNode)target.Node).Type == PointerRefType.Internal)
             {
@@ -41,6 +50,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                     ClassGuid = ((IObjectNode)target.Node).ClassGuid
                 });
             }
+            
+            ((dynamic)Object).Target = targetRef;
+            ((dynamic)Object).TargetField = target.Name;
+        }
+        
+        public LinkConnection(LinkOutput source, LinkInput target, object obj) : base(source, target, obj)
+        {
+            Object = obj;
 
             Realm = target.Realm;
             UpdateStatus();
@@ -50,44 +67,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         {
             Object = TypeLibrary.CreateObject("LinkConnection");
             
-            PointerRef sourceRef;
-            if (((IObjectNode)source.Node).Type == PointerRefType.Internal)
-            {
-                sourceRef = new PointerRef(((IObjectNode)source.Node).Object);
-            }
-            else
-            {
-                sourceRef = new PointerRef(new EbxImportReference()
-                {
-                    FileGuid = ((EntityNode)source.Node).FileGuid,
-                    ClassGuid = ((EntityNode)source.Node).ClassGuid
-                });
-            }
-            
-            PointerRef targetRef;
-            if (((IObjectNode)target.Node).Type == PointerRefType.Internal)
-            {
-                targetRef = new PointerRef(((IObjectNode)target.Node).Object);
-            }
-            else
-            {
-                targetRef = new PointerRef(new EbxImportReference()
-                {
-                    FileGuid = ((EntityNode)target.Node).FileGuid,
-                    ClassGuid = ((EntityNode)target.Node).ClassGuid
-                });
-            }
-
-            ((dynamic)Object).Source = sourceRef;
-            ((dynamic)Object).Target = targetRef;
-            ((dynamic)Object).SourceField = source.Name;
-            ((dynamic)Object).TargetField = target.Name;
+            UpdateSourceRef();
+            UpdateTargetRef();
 
             FixRealm();
             UpdateStatus();
         }
         
-        public override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -109,6 +96,43 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 {
                     ((dynamic)Object).SourceField = Source.Name;
                     ((dynamic)Object).TargetField = Target.Name;
+                } break;
+                case "Node":
+                {
+                    PointerRef sourceRef;
+
+                    EntityPort source = (EntityPort)Source;
+                    EntityPort target = (EntityPort)Target;
+                    
+                    if (((IObjectNode)source.Node).Type == PointerRefType.Internal)
+                    {
+                        sourceRef = new PointerRef(((IObjectNode)source.Node).Object);
+                    }
+                    else
+                    {
+                        sourceRef = new PointerRef(new EbxImportReference()
+                        {
+                            FileGuid = ((IObjectNode)source.Node).FileGuid,
+                            ClassGuid = ((IObjectNode)source.Node).ClassGuid
+                        });
+                    }
+            
+                    PointerRef targetRef;
+                    if (((IObjectNode)target.Node).Type == PointerRefType.Internal)
+                    {
+                        targetRef = new PointerRef(((IObjectNode)target.Node).Object);
+                    }
+                    else
+                    {
+                        targetRef = new PointerRef(new EbxImportReference()
+                        {
+                            FileGuid = ((IObjectNode)target.Node).FileGuid,
+                            ClassGuid = ((IObjectNode)target.Node).ClassGuid
+                        });
+                    }
+
+                    ((dynamic)Object).Source = sourceRef;
+                    ((dynamic)Object).Target = targetRef;
                 } break;
             }
         }

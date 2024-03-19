@@ -9,6 +9,7 @@ using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Connections.Pending;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using Frosty.Core;
 using FrostySdk;
 using FrostySdk.Ebx;
@@ -62,7 +63,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             node.OnCreation();
         }
 
-        #region Connections
+        #region Adding Connections
 
         public void AddConnectionTransient(EntityConnection connection)
         {
@@ -121,6 +122,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             }
             
             Connections.Add(connection);
+        }
+
+        #endregion
+
+        #region Removing connections
+
+        public void RemoveConnectionTransient(EntityConnection connection)
+        {
+            Connections.Remove(connection);
         }
 
         #endregion
@@ -193,7 +203,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #region Adding Nodes
 
-        public override void AddNode(INode node)
+        public override void AddNode(IVertex node)
         {
             base.AddNode(node);
             
@@ -205,6 +215,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     Asset.AddObject(entityNode.Object);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Objects.Add(pointerRef);
+                    
+                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
                 } break;
                 case InterfaceNode interfaceNode:
                 {
@@ -220,7 +232,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
             }
             
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
             node.OnCreation();
         }
 
@@ -228,7 +239,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #region Removing Nodes
 
-        public override void RemoveNode(INode node)
+        public override void RemoveNode(IVertex node)
         {
             base.RemoveNode(node);
             switch (node)
@@ -239,6 +250,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     Asset.RemoveObject(entityNode.Object);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Objects.Remove(pointerRef);
+                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
                 } break;
                 case InterfaceNode interfaceNode:
                 {
@@ -253,8 +265,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     }
                 } break;
             }
-            
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
         }
 
         #endregion
@@ -264,6 +274,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         public override void AddConnection(IConnection connection)
         {
             base.AddConnection(connection);
+            
+            // If this connection is transient we shouldn't saved it
+            if (connection is TransientConnection)
+                return;
+            
             EntityConnection entityConnection = (EntityConnection)connection;
             switch (entityConnection.Type)
             {
@@ -297,6 +312,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         public override void RemoveConnection(IConnection connection)
         {
             base.RemoveConnection(connection);
+
+            if (connection is TransientConnection)
+                return;
+
             dynamic root = (dynamic)Asset.RootObject;
             EntityConnection entityConnection = (EntityConnection)connection;
 
@@ -349,42 +368,56 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
                 if (source.Type != ((EntityPort)target).Type)
                     return;
+                
+                if (source.Node is IRedirect || target.Node is IRedirect)
+                    return;
 
-                if (Source.Direction == PortDirection.Out && target.Direction == PortDirection.In)
+                switch (Source.Direction)
                 {
-                    switch (source.Type)
+                    case PortDirection.Out when target.Direction == PortDirection.In:
                     {
-                        case ConnectionType.Event:
+                        switch (source.Type)
                         {
-                            wrangler.AddConnection(new EventConnection((EventOutput)source, (EventInput)target));
-                        } break;
-                        case ConnectionType.Link:
-                        {
-                            wrangler.AddConnection(new LinkConnection((LinkOutput)source, (LinkInput)target));
-                        } break;
-                        case ConnectionType.Property:
-                        {
-                            wrangler.AddConnection(new PropertyConnection((PropertyOutput)source, (PropertyInput)target));
-                        } break;
-                    }
-                }
-                else if (Source.Direction == PortDirection.In && target.Direction == PortDirection.Out)
-                {
-                    switch (source.Type)
+                            case ConnectionType.Event:
+                            {
+                                wrangler.AddConnection(new EventConnection((EventOutput)source, (EventInput)target));
+                            }
+                                break;
+                            case ConnectionType.Link:
+                            {
+                                wrangler.AddConnection(new LinkConnection((LinkOutput)source, (LinkInput)target));
+                            }
+                                break;
+                            case ConnectionType.Property:
+                            {
+                                wrangler.AddConnection(new PropertyConnection((PropertyOutput)source,
+                                    (PropertyInput)target));
+                            }
+                                break;
+                        }
+                    } break;
+                    case PortDirection.In when target.Direction == PortDirection.Out:
                     {
-                        case ConnectionType.Event:
+                        switch (source.Type)
                         {
-                            wrangler.AddConnection(new EventConnection((EventOutput)target, (EventInput)source));
-                        } break;
-                        case ConnectionType.Link:
-                        {
-                            wrangler.AddConnection(new LinkConnection((LinkOutput)target, (LinkInput)source));
-                        } break;
-                        case ConnectionType.Property:
-                        {
-                            wrangler.AddConnection(new PropertyConnection((PropertyOutput)target, (PropertyInput)source));
-                        } break;
-                    }
+                            case ConnectionType.Event:
+                            {
+                                wrangler.AddConnection(new EventConnection((EventOutput)target, (EventInput)source));
+                            }
+                                break;
+                            case ConnectionType.Link:
+                            {
+                                wrangler.AddConnection(new LinkConnection((LinkOutput)target, (LinkInput)source));
+                            }
+                                break;
+                            case ConnectionType.Property:
+                            {
+                                wrangler.AddConnection(new PropertyConnection((PropertyOutput)target,
+                                    (PropertyInput)source));
+                            }
+                                break;
+                        }
+                    } break;
                 }
             });
         }

@@ -9,12 +9,14 @@ using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -339,6 +341,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         #region Static
 
         public static List<Type> Types = new List<Type>();
+        public static List<IVertex> NodeUtils = new List<IVertex>();
 
         static BlueprintGraphEditor()
         {
@@ -347,6 +350,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 Types.Add(type);
             }
+            
+            NodeUtils.Add(new EntityComment("Comment"));
         }
 
         #endregion
@@ -371,6 +376,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 {
                     NodePropertyGrid.Object = entityNode.Object;
                 }
+                
+                if (e.AddedItems[0] is EntityComment comment)
+                {
+                    NodePropertyGrid.Object = comment.Object;
+                }
+
+                if (e.AddedItems[0] is IObjectContainer container)
+                {
+                    NodePropertyGrid.Object = container.Object;
+                }
             }
             else
             {
@@ -387,19 +402,31 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
         {
-            List<INode> oldSelection = new List<INode>(NodeWrangler.SelectedNodes);
-            foreach (INode selectedNode in oldSelection)
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
+            foreach (IVertex selectedNode in oldSelection)
             {
+                if (selectedNode is IRedirect redirect)
+                {
+                    if (redirect.SourceRedirect != null)
+                    {
+                        NodeWrangler.RemoveNode(redirect.SourceRedirect);
+                    }
+                    else
+                    {
+                        NodeWrangler.RemoveNode(redirect.TargetRedirect);
+                    }
+                }
+                
                 NodeWrangler.RemoveNode(selectedNode);
             }
         }
         
         private void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
         {
-            List<INode> oldSelection = new List<INode>(NodeWrangler.SelectedNodes);
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
             NodeWrangler.SelectedNodes.Clear();
             
-            foreach (INode selectedNode in oldSelection)
+            foreach (IVertex selectedNode in oldSelection)
             {
                 if (selectedNode is EntityNode entityNode)
                 {
@@ -415,33 +442,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 }
             }
         }
-
-        #endregion
-
-        #region Class Selector
-
-        private void ClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            
-        }
-
-        private void ClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
-        {
-            NodeWrangler.AddNode(EntityNode.GetNodeFromEntity(ClassSelector.SelectedClass, NodeWrangler));
-        }
-
-        private void TransClassSelector_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            
-        }
-
-        private void TransClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
+        
         private void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)
         {
             // If the user holds down alt that means all selected nodes should have their properties set the same
@@ -449,23 +450,67 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 FrostyTaskWindow.Show("Updating properties...", "", task =>
                 {
-                    foreach (INode selectedNode in NodeWrangler.SelectedNodes)
+                    foreach (IVertex selectedNode in NodeWrangler.SelectedNodes)
                     {
-                        if (selectedNode is EntityNode node)
+                        switch (selectedNode)
                         {
-                            node.TrySetProperty(e.Item.Name, e.NewValue);
-                            node.OnObjectModified(sender, e);
+                            case EntityNode node:
+                            {
+                                node.TrySetProperty(e.Item.Name, e.NewValue);
+                                node.OnObjectModified(sender, e);
+                                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                            } break;
+                            case EntityComment comment:
+                            {
+                                comment.OnObjectModified(sender, e);
+                            } break;
+                            case IObjectContainer container:
+                            {
+                                container.OnObjectModified(sender, e);
+                            } break;
                         }
                     }
                 });
             }
             else
             {
-                if (NodeWrangler.SelectedNodes[0] is EntityNode node)
+                switch (NodeWrangler.SelectedNodes[0])
                 {
-                    node.OnObjectModified(sender, e);
+                    case EntityNode node:
+                    {
+                        node.OnObjectModified(sender, e);
+                        App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                    } break;
+                    case EntityComment comment:
+                    {
+                        comment.OnObjectModified(sender, e);
+                    } break;
+                    case IObjectContainer container:
+                    {
+                        container.OnObjectModified(sender, e);
+                    } break;
                 }
             }
         }
+
+        #endregion
+
+        #region Class Selector
+
+        private void ClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            NodeWrangler.AddNode(EntityNode.GetNodeFromEntity(ClassSelector.SelectedClass, NodeWrangler));
+        }
+
+        private void TransClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (TransTypeList.SelectedItem == null)
+                return;
+            
+            Type type = TransTypeList.SelectedItem.GetType();
+            NodeWrangler.AddNode((IVertex)Activator.CreateInstance(type));
+        }
+
+        #endregion
     }
 }

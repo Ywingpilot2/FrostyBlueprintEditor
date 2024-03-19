@@ -15,6 +15,6 @@ namespace BlueprintEditorPlugin.Models.Nodes
         /// </summary>
         /// <param name="reader"></param>
         ITransient Load(NativeReader reader);
-        ITransient Save(NativeWriter writer);
+        void Save(NativeWriter writer);
     }
 }

@@ -126,6 +126,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
         }
 
+        public void OnDestruction()
+        {
+        }
+
         #endregion
 
         #region Complex implementation
@@ -152,9 +156,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return null;
         }
 
-        public ITransient Save(NativeWriter writer)
+        public void Save(NativeWriter writer)
         {
-            return null;
+            return;
         }
 
         #endregion

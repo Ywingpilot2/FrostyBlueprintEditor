@@ -7,14 +7,16 @@ using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Connections.Pending;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
+using Frosty.Core;
 using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.NodeWrangler
 {
     public class BaseNodeWrangler : INodeWrangler
     {
-        public ObservableCollection<INode> Nodes { get; protected set; } = new ObservableCollection<INode>();
-        public ObservableCollection<INode> SelectedNodes { get; protected set; } = new ObservableCollection<INode>();
+        public ObservableCollection<IVertex> Nodes { get; protected set; } = new ObservableCollection<IVertex>();
+        public ObservableCollection<IVertex> SelectedNodes { get; protected set; } = new ObservableCollection<IVertex>();
         public ObservableCollection<IConnection> Connections { get; protected set; } = new ObservableCollection<IConnection>();
         
         public IPendingConnection PendingConnection { get; protected set; }
@@ -22,15 +24,20 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
 
         #region Node
 
-        public virtual void AddNode(INode node)
+        public virtual void AddNode(IVertex vertex)
         {
-            Nodes.Add(node);
+            Nodes.Add(vertex);
         }
 
-        public virtual void RemoveNode(INode node)
+        public virtual void RemoveNode(IVertex vertex)
         {
-            ClearConnections(node);
-            Nodes.Remove(node);
+            if (vertex is INode node && !(vertex is IRedirect))
+            {
+                ClearConnections(node);
+            }
+
+            vertex.OnDestruction();
+            Nodes.Remove(vertex);
         }
 
         #endregion
@@ -44,18 +51,27 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
 
         public virtual void RemoveConnection(IConnection connection)
         {
-            connection.Source.IsConnected = false;
-            connection.Target.IsConnected = false;
-            Connections.Remove(connection);
-        }
+            if (GetConnections(connection.Source).FirstOrDefault() == null)
+            {
+                connection.Source.IsConnected = false;
+            }
 
-        public void LayoutNodes()
-        {
-            throw new System.NotImplementedException();
+            if (GetConnections(connection.Target).FirstOrDefault() == null)
+            {
+                connection.Target.IsConnected = false;
+            }
+
+            Connections.Remove(connection);
         }
 
         public virtual void ClearConnections(INode node)
         {
+            if (node is IRedirect)
+            {
+                App.Logger.LogError("Cannot clear connections of IRedirects");
+                return;
+            }
+            
             List<IConnection> connections = GetConnections(node).ToList();
             foreach (IConnection connection in connections)
             {
@@ -65,9 +81,18 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
         
         public virtual void ClearConnections(IPort port)
         {
+            if (port.Node is IRedirect)
+            {
+                App.Logger.LogError("Cannot clear connections of IRedirects");
+                return;
+            }
+            
             List<IConnection> connections = GetConnections(port).ToList();
             foreach (IConnection connection in connections)
             {
+                if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                    continue;
+                
                 RemoveConnection(connection);
             }
         }

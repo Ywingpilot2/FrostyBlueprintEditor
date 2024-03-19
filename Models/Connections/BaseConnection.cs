@@ -10,9 +10,56 @@ namespace BlueprintEditorPlugin.Models.Connections
 {
     public class BaseConnection : IConnection, IStatusItem
     {
-        public IPort Source { get; protected set; }
+        private IPort _source;
+        public IPort Source
+        {
+            get => _source;
+            set
+            {
+                //Unsubscribed! L! Cope! Seethe!
+                if (_source != null)
+                {
+                    _source.PropertyChanged -= NotifyPropertyChanged;
+                    _source.Node.PropertyChanged -= NotifyPropertyChanged;
+                    _source.IsConnected = false;
+                }
+                
+                //Subscribed! Liked! W!
+                value.PropertyChanged += NotifyPropertyChanged;
+                value.Node.PropertyChanged += NotifyPropertyChanged;
+                
+                _source = value;
+                _source.IsConnected = true;
+                NotifyPropertyChanged(nameof(Source));
+                NotifyPropertyChanged(nameof(CurvePoint1));
+            }
+        }
+
+        private IPort _target;
+        public IPort Target
+        {
+            get => _target;
+            set
+            {
+                //Unsubscribed! L! Cope! Seethe!
+                if (_target != null)
+                {
+                    _target.PropertyChanged -= NotifyPropertyChanged;
+                    _target.Node.PropertyChanged -= NotifyPropertyChanged;
+                    _target.IsConnected = false;
+                }
+                
+                //Subscribed! Liked! W!
+                value.PropertyChanged += NotifyPropertyChanged;
+                value.Node.PropertyChanged += NotifyPropertyChanged;
+                
+                _target = value;
+                _target.IsConnected = true;
+                NotifyPropertyChanged(nameof(Target));
+                NotifyPropertyChanged(nameof(CurvePoint2));
+            }
+        }
         
-        public IPort Target { get; protected set; }
         public bool IsSelected { get; set; }
 
         #region Property changing
@@ -28,7 +75,7 @@ namespace BlueprintEditorPlugin.Models.Connections
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public virtual void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected virtual void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -142,7 +189,6 @@ namespace BlueprintEditorPlugin.Models.Connections
         
         public BaseConnection(IPort source, IPort target)
         {
-            
             Source = source;
             Source.IsConnected = true;
             Target = target;

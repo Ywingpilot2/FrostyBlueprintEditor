@@ -86,6 +86,12 @@
     <Resource Include="Images\CollapsedWindow.png" />
     <None Remove="Images\InterfaceIcon.png" />
     <Resource Include="Images\InterfaceIcon.png" />
+    <None Remove="Images\RedirectIcon.png" />
+    <Resource Include="Images\InputRedirectIcon.png" />
+    <None Remove="Images\AddRedirectIcon.png" />
+    <Resource Include="Images\AddRedirectIcon.png" />
+    <None Remove="Images\OutputRedirectIcon.png" />
+    <Resource Include="Images\OutputRedirectIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -108,6 +114,7 @@
 
   <ItemGroup>
     <Folder Include="Editors\BlueprintEditor\PropertyGrid" />
+    <Folder Include="Models\Converters" />
   </ItemGroup>
 
   <ItemGroup>
