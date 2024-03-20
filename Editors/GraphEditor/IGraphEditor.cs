@@ -1,4 +1,5 @@
 ﻿using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.NodeWrangler.LayoutManager;
 using BlueprintEditorPlugin.Models.Status;
 using FrostySdk.Managers;
 
@@ -7,6 +8,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor
     public interface IGraphEditor
     {
         INodeWrangler NodeWrangler { get; set; }
+        ILayoutManager LayoutManager { get; set; }
 
         /// <summary>
         /// This method is used to determine if a GraphEditor is valid

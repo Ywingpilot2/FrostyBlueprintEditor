@@ -14,6 +14,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.NodeWrangler.LayoutManager;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
@@ -34,6 +35,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         #region Graph Editor Implementation
 
         public INodeWrangler NodeWrangler { get; set; }
+        public ILayoutManager LayoutManager { get; set; }
 
         public bool IsValid()
         {

@@ -114,6 +114,7 @@
 
   <ItemGroup>
     <Folder Include="Editors\BlueprintEditor\PropertyGrid" />
+    <Folder Include="Editors\NodeWrangler\LayoutManager\Algorithms" />
     <Folder Include="Models\Converters" />
   </ItemGroup>
 
