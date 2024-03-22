@@ -13,8 +13,9 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid;
 using BlueprintEditorPlugin.Editors.GraphEditor;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
-using BlueprintEditorPlugin.Editors.NodeWrangler.LayoutManager;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
@@ -103,11 +104,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler));
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Event, PortDirection.In, NodeWrangler));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler));
                     }
                     
                     continue;
@@ -361,6 +362,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             #endregion
 
             InitializeComponent();
+
             NodePropertyGrid.GraphEditor = this;
         }
 
@@ -538,5 +540,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
+
+        private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            // TODO: Use ILayoutManager
+            SugiyamaMethod method = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
+            method.SortGraph();
+        }
     }
 }

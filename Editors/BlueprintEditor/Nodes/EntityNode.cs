@@ -330,6 +330,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public virtual void OnCreation()
         {
             Header = ObjectType;
+            if (TryGetProperty("Realm") == null)
+            {
+                Realm = Realm.Any;
+            }
+            else
+            {
+                Realm = ParseRealm(TryGetProperty("Realm"));
+            }
         }
 
         public virtual void OnDestruction()

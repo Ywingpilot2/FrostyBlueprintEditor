@@ -1,5 +1,5 @@
-﻿using BlueprintEditorPlugin.Editors.NodeWrangler;
-using BlueprintEditorPlugin.Editors.NodeWrangler.LayoutManager;
+﻿using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
+using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Status;
 using FrostySdk.Managers;
 

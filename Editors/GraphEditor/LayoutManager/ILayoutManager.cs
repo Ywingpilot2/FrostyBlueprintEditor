@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using BlueprintEditorPlugin.Models.Connections;
-using BlueprintEditorPlugin.Models.Nodes;
+﻿using BlueprintEditorPlugin.Editors.NodeWrangler;
 
-namespace BlueprintEditorPlugin.Editors.NodeWrangler.LayoutManager
+namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
 {
     /// <summary>
     /// Base implementation for a Layout manager
@@ -16,6 +14,7 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler.LayoutManager
         /// </summary>
         void SortLayout();
 
+        bool LayoutExists(string path);
         bool LoadLayout(string path);
         bool SaveLayout(string path);
     }
