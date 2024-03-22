@@ -15,7 +15,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
     public interface IEntityObject : IObjectContainer
     {
         PointerRefType Type { get; }
-        AssetClassGuid InternalGuid { get; set; }
+        AssetClassGuid InternalGuid { get; }
         Guid FileGuid { get; }
         Guid ClassGuid { get; }
     }

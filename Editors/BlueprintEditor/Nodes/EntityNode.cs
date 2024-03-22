@@ -121,10 +121,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Node data
 
-        public ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
-        public ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
+        public ObservableCollection<IPort> Inputs { get; protected set; } = new ObservableCollection<IPort>();
+        public ObservableCollection<IPort> Outputs { get; protected set; } = new ObservableCollection<IPort>();
 
-        public INodeWrangler NodeWrangler { get; }
+        public INodeWrangler NodeWrangler { get; private set; }
 
         #endregion
 
@@ -223,7 +223,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
 
-        public object Object { get; }
+        public object Object { get; private set; }
         public virtual string ObjectType { get; }
 
         private bool _hasPlayerEvent;
@@ -239,14 +239,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Location
 
-        public PointerRefType Type { get; }
+        public PointerRefType Type { get; private set; }
         
         // Internal
-        public AssetClassGuid InternalGuid { get; set; }
+        public AssetClassGuid InternalGuid { get; private set; }
         
         // External
-        public Guid FileGuid { get; }
-        public Guid ClassGuid { get; }
+        public Guid FileGuid { get; private set; }
+        public Guid ClassGuid { get; private set; }
 
         #endregion
 
@@ -714,6 +714,35 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
 
+        public void AddInput(string name, ConnectionType type, Realm realm = Realm.Any, bool isInterface = false)
+        {
+            switch (type)
+            {
+                case ConnectionType.Event:
+                {
+                    AddInput(new EventInput(name, this)
+                    {
+                        Realm = realm
+                    });
+                } break;
+                case ConnectionType.Link:
+                {
+                    AddInput(new LinkInput(name, this)
+                    {
+                        Realm = realm
+                    });
+                } break;
+                case ConnectionType.Property:
+                {
+                    AddInput(new PropertyInput(name, this)
+                    {
+                        Realm = realm,
+                        IsInterface = isInterface
+                    });
+                } break;
+            }
+        }
+
         public virtual void AddOutput(EntityOutput output)
         {
             if (output.Name.StartsWith("0x"))
@@ -793,6 +822,35 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             
                     Outputs.Add(output);
                     _hashCachePOutputs.Add(Utils.HashString(output.Name), (PropertyOutput)output);
+                } break;
+            }
+        }
+        
+        public void AddOutput(string name, ConnectionType type, Realm realm = Realm.Any, bool hasPlayer = false)
+        {
+            switch (type)
+            {
+                case ConnectionType.Event:
+                {
+                    AddOutput(new EventOutput(name, this)
+                    {
+                        Realm = realm,
+                        HasPlayer = hasPlayer
+                    });
+                } break;
+                case ConnectionType.Link:
+                {
+                    AddOutput(new EventOutput(name, this)
+                    {
+                        Realm = realm
+                    });
+                } break;
+                case ConnectionType.Property:
+                {
+                    AddOutput(new EventOutput(name, this)
+                    {
+                        Realm = realm
+                    });
                 } break;
             }
         }
@@ -945,12 +1003,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public EntityNode(Type type, INodeWrangler nodeWrangler)
         {
             object obj = TypeLibrary.CreateObject(type.Name);
-            
-            if (obj.GetType().GetProperty("Realm") != null)
-            {
-                Realm = ParseRealm(((dynamic)obj).Realm);
-            }
-            
+
             EntityNodeWrangler entityWrangler = (EntityNodeWrangler)nodeWrangler;
             AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
                 entityWrangler.Asset.Objects,
@@ -974,11 +1027,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <param name="nodeWrangler"></param>
         public EntityNode(object obj, Guid fileGuid, INodeWrangler nodeWrangler)
         {
-            if (obj.GetType().GetProperty("Realm") != null)
-            {
-                Realm = ParseRealm(((dynamic)obj).Realm);
-            }
-
             Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
@@ -987,11 +1035,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             FileGuid = fileGuid;
             ClassGuid = InternalGuid.ExportedGuid;
             Type = PointerRefType.External;
-        }
-
-        public EntityNode(INodeWrangler nodeWrangler)
-        {
-            NodeWrangler = nodeWrangler;
         }
 
         public EntityNode()
@@ -1049,7 +1092,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             
             if (_extensions.ContainsKey(entity.GetType().Name))
             {
-                return (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name], entity, wrangler);
+                // We need to construct it manually(since node extensions likely just have blank constructors)
+                EntityNode node = (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name]);
+
+                node.NodeWrangler = wrangler;
+                node.Object = entity;
+                
+                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
+                node.Type = PointerRefType.Internal;
+                
+                return node;
             }
             else
             {
@@ -1067,7 +1119,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             if (_extensions.ContainsKey(type.Name))
             {
-                return (EntityNode)Activator.CreateInstance(_extensions[type.Name], type, wrangler);
+                // We need to construct it manually(since node extensions likely just have blank constructors)
+                EntityNode node = (EntityNode)Activator.CreateInstance(_extensions[type.Name]);
+
+                node.NodeWrangler = wrangler;
+                object entity = TypeLibrary.CreateObject(type.Name);
+                node.Object = entity;
+                
+                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
+                node.Type = PointerRefType.Internal;
+                
+                return node;
             }
             else
             {
@@ -1096,7 +1158,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             
             if (_extensions.ContainsKey(entity.GetType().Name))
             {
-                return (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name], entity, fileGuid, wrangler);
+                EntityNode node = (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name]);
+                
+                node.Object = entity;
+                node.NodeWrangler = wrangler;
+
+                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
+                node.FileGuid = fileGuid;
+                node.ClassGuid = ((dynamic)entity).GetInstanceGuid();
+                node.Type = PointerRefType.External;
+
+                return node;
             }
             else
             {

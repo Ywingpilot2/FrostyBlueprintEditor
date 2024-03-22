@@ -113,6 +113,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Editors\BlueprintEditor\Nodes\TypeMapping\ObjectReference" />
     <Folder Include="Editors\BlueprintEditor\PropertyGrid" />
     <Folder Include="Models\Converters" />
   </ItemGroup>

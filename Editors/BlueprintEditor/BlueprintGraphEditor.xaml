@@ -965,7 +965,7 @@
                                                                VerticalAlignment="Top">
                                                         <TextBlock.Style>
                                                             <Style TargetType="{x:Type TextBlock}">
-                                                                <Setter Property="FontSize" Value="8" />
+                                                                <Setter Property="FontSize" Value="10" />
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding Footer}"
                                                                         Value="{x:Null}">
@@ -1126,10 +1126,10 @@
 
                                                 <TextBlock Grid.Row="1" FontFamily="Consolas"
                                                            Text="{Binding Footer}"
-                                                           FontSize="5"
+                                                           FontSize="6"
                                                            Foreground="DarkGray"
                                                            HorizontalAlignment="Left"
-                                                           VerticalAlignment="Bottom">
+                                                           VerticalAlignment="Top">
                                                     <TextBlock.Style>
                                                         <Style TargetType="{x:Type TextBlock}">
                                                             <Setter Property="Visibility" Value="Visible" />
