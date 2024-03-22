@@ -170,7 +170,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             {
                 if (vertex is INode node)
                 {
-                    CycleBreaker cycleBreaker = new CycleBreaker(_connections);
+                    CycleRemover cycleBreaker = new CycleRemover(_connections);
                     cycleBreaker.RemoveCycles(node);
                 }
             }
@@ -179,6 +179,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             List<IVertex> sortedVerts = topologicalSort.SortGraph();
 
             RemoveEmpty();
+            RemoveLoops();
 
             LayerMaker layerMaker = new LayerMaker(sortedVerts, _connections);
             _layers = layerMaker.CreateLayers();
