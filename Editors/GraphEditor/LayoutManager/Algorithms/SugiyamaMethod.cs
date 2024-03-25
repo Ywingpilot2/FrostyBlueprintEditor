@@ -14,6 +14,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         private List<IVertex> _vertices;
 
         private List<NodeLayer> _layers = new List<NodeLayer>();
+        private List<VertexIsland> _islands = new List<VertexIsland>();
 
         private double XDist => 64;
         private double YDist => 16;
@@ -23,7 +24,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             List<IConnection> connections = new List<IConnection>();
             foreach (IConnection connection in _connections)
             {
-                if (connection.Source.Node == node)
+                if (connection.Source.Node == node || connection.Target.Node == node)
                 {
                     connections.Add(connection);
                 }
@@ -129,8 +130,6 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         /// </summary>
         private void MergeLayers()
         {
-            bool isDirty = false;
-            
             for (var i = 0; i < _layers.Count; i++)
             {
                 NodeLayer layer = _layers[i];
@@ -165,7 +164,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         {
             // This will remove our loops and topologically sort the graph
             RemoveLoops();
-            
+
             foreach (IVertex vertex in _vertices)
             {
                 if (vertex is INode node)
@@ -180,6 +179,20 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
 
             RemoveEmpty();
             RemoveLoops();
+            
+            // Create islands
+            IslandSolver islandSolver = new IslandSolver(_connections);
+            foreach (IVertex vertex in _vertices)
+            {
+                if (vertex is INode node)
+                {
+                    VertexIsland island = islandSolver.GetIsland(node);
+                    if (island != null)
+                    {
+                        _islands.Add(island);
+                    }
+                }
+            }
 
             LayerMaker layerMaker = new LayerMaker(sortedVerts, _connections);
             _layers = layerMaker.CreateLayers();

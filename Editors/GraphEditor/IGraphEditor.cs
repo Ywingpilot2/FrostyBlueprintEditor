@@ -29,5 +29,10 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor
         /// <param name="objs"></param>
         /// <returns>True if it is valid, false if it is not.</returns>
         bool IsValid(params object[] args);
+
+        /// <summary>
+        /// Executes when the GraphEditor has been closed
+        /// </summary>
+        void Closed();
     }
 }

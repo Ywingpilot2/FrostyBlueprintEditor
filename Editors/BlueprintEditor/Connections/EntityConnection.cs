@@ -30,6 +30,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             (Realm.Client, Realm.NetworkedClient),
             (Realm.Client, Realm.ClientAndServer),
             (Realm.Server, Realm.ClientAndServer),
+            (Realm.Server, Realm.NetworkedClientAndServer),
             (Realm.NetworkedClientAndServer, Realm.ClientAndServer),
             (Realm.Server, Realm.Client)
         };
@@ -400,7 +401,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
         public override string ToString()
         {
-            return $"Connection {Source.Node}({Source.Name}) -> {Target.Node}({Target.Name})";
+            return $"{Source.Node}({Source.Name}) -> {Target.Node}({Target.Name})";
         }
     }
 

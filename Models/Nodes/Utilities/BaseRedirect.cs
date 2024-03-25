@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -140,9 +141,9 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
 
         #endregion
 
-        public abstract ITransient Load(NativeReader reader);
+        public abstract bool Load(LayoutReader reader);
 
-        public abstract void Save(NativeWriter writer);
+        public abstract void Save(LayoutWriter writer);
         
         #region Property Changing
 

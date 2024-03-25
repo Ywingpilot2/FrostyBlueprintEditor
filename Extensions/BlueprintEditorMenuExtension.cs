@@ -16,7 +16,13 @@ namespace BlueprintEditorPlugin.Extensions
         {
             if (App.SelectedAsset != null)
             {
-                App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", new BlueprintEditor());
+                BlueprintEditor editor = new BlueprintEditor();
+                App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", editor);
+                
+                editor.Loaded += (sender, args) =>
+                {
+                    editor.LoadBlueprint(App.SelectedAsset);
+                };
             }
             else
             {

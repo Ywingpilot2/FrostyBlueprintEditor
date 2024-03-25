@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using Frosty.Core.Controls;
@@ -50,14 +51,33 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             Object = new EditCommentArgs(this);
         }
 
-        public override ITransient Load(NativeReader reader)
+        public override bool Load(LayoutReader reader)
         {
-            throw new System.NotImplementedException();
+            Header = reader.ReadNullTerminatedString();
+            HeaderColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadNullTerminatedString()));
+            Location = reader.ReadPoint();
+            double width = reader.ReadDouble();
+            double height = reader.ReadDouble();
+            Size = new System.Windows.Size(width, height);
+            CommentSize = new System.Windows.Size(width, height);
+            return true;
         }
 
-        public override void Save(NativeWriter writer)
+        /// <summary>
+        /// FORMAT STRUCTURE:
+        /// NullTerminatedString - Header
+        /// Point - Location
+        /// Double - Width
+        /// Double - Height
+        /// </summary>
+        /// <param name="writer"></param>
+        public override void Save(LayoutWriter writer)
         {
-            throw new System.NotImplementedException();
+            writer.WriteNullTerminatedString(Header);
+            writer.WriteNullTerminatedString(HeaderColor.Color.ToString());
+            writer.Write(Location);
+            writer.Write(Size.Width);
+            writer.Write(Size.Height);
         }
 
         

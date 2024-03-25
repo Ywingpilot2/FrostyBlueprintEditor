@@ -201,5 +201,10 @@ namespace BlueprintEditorPlugin.Models.Connections
 
             CurrentStatus = new EditorStatusArgs(EditorStatus.Alright);
         }
+        
+        public override string ToString()
+        {
+            return $"{Source.Node}({Source.Name}) -> {Target.Node}({Target.Name})";
+        }
     }
 }

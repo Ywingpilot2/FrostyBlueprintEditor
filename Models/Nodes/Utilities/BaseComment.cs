@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using FrostySdk.IO;
 
@@ -30,14 +31,21 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
                 NotifyPropertyChanged(nameof(Location));
             }
         }
+        
+        public Size Size { get; set; }
 
         private Size _size;
-        public Size Size
+        
+        /// <summary>
+        /// Use this for setting the size of comments, sorry!
+        /// </summary>
+        public Size CommentSize
         {
             get => _size;
             set
             {
                 _size = value;
+                NotifyPropertyChanged(nameof(CommentSize));
             }
         }
 
@@ -70,9 +78,9 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
         {
         }
 
-        public abstract ITransient Load(NativeReader reader);
+        public abstract bool Load(LayoutReader reader);
 
-        public abstract void Save(NativeWriter writer);
+        public abstract void Save(LayoutWriter writer);
 
         #region Property changing
 

@@ -1663,7 +1663,7 @@
                                                      Header="{Binding Header}"
                                                      Background="{Binding HeaderColor}"
                                                      MovementMode="Self"
-                                                     ActualSize="{Binding Size}">
+                                                     ActualSize="{Binding CommentSize, Mode=TwoWay}">
                                     <nodify:GroupingNode.Template>
                                         <ControlTemplate TargetType="{x:Type nodify:GroupingNode}">
                                             <Border BorderBrush="{TemplateBinding BorderBrush}"
@@ -1716,13 +1716,11 @@
                                     </nodify:GroupingNode.Template>
                                     <nodify:GroupingNode.ContextMenu>
                                         <ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Delete" Click="DeleteNode_OnClick">
-                                                    <MenuItem.Icon>
-                                                        <Image Source="pack://application:,,,/FrostyCore;component/images/clear.png"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
+                                            <MenuItem Header="Delete" Click="DeleteNode_OnClick">
+                                                <MenuItem.Icon>
+                                                    <Image Source="pack://application:,,,/FrostyCore;component/images/clear.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </nodify:GroupingNode.ContextMenu>
                                 </nodify:GroupingNode>
@@ -2209,7 +2207,8 @@
                                                     <Image
                                                         Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/InputRedirectIcon.png"
                                                         Width="18"
-                                                        HorizontalAlignment="Center" />
+                                                        HorizontalAlignment="Center" 
+                                                        ToolTip="This node is redirecting an Input" />
                                                 </Grid>
                                             </Grid>
                                         </DataTemplate>
@@ -2709,7 +2708,8 @@
                                                     <Image
                                                         Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/OutputRedirectIcon.png"
                                                         Width="18"
-                                                        HorizontalAlignment="Center" />
+                                                        HorizontalAlignment="Center" 
+                                                        ToolTip="This node is redirecting an Output"/>
                                                 </Grid>
                                             </Grid>
                                         </DataTemplate>
@@ -2740,7 +2740,7 @@
                 </Grid>
             
                 <!--Toolbox(for adding and removing nodes)-->
-                <Grid Grid.Column="0" x:Name="Toolbox"
+                <Grid Grid.Column="0" x:Name="ToolboxPanel"
                       Background="{StaticResource MenuItemBackground}">
                     <!--This contains a list of all of the types we can use and a filter box-->
                     <Border BorderBrush="{StaticResource ScrollbarBackground}"
@@ -2947,7 +2947,8 @@
                                     Height="20"
                                     Margin="2,0,2,0"
                                     HorizontalAlignment="Left"
-                                    ToolTip="Save the current layout">
+                                    ToolTip="Save the current layout"
+                                    Click="SaveOrganizationButton_OnClick">
                                 <Image Source="pack://application:,,,/FrostyEditor;component/Images/Save.png"
                                        Width="20" />
                             </Button>

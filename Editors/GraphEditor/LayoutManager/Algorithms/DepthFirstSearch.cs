@@ -18,7 +18,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             List<IConnection> connections = new List<IConnection>();
             foreach (IConnection connection in Connections)
             {
-                if (connection.Source.Node == node)
+                if (connection.Source.Node == node || connection.Target.Node == node)
                 {
                     connections.Add(connection);
                 }
@@ -49,7 +49,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         protected virtual void RemoveNode(INode node)
         {
             VisitedNodes.Remove(node);
-            foreach (IConnection connection in GetConnections(node))
+            foreach (IConnection connection in GetConnections(node, PortDirection.Out))
             {
                 Connections.Remove(connection);
             }
@@ -63,7 +63,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             }
             
             VisitedNodes.Add(node);
-            foreach (IConnection connection in GetConnections(node))
+            foreach (IConnection connection in GetConnections(node, PortDirection.Out))
             {
                 DepthSearch(connection.Target.Node);
             }
@@ -77,7 +77,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             }
             
             VisitedNodes.Add(start.Target.Node);
-            foreach (IConnection connection in GetConnections(start.Target.Node))
+            foreach (IConnection connection in GetConnections(start.Target.Node, PortDirection.Out))
             {
                 DepthSearch(connection);
             }

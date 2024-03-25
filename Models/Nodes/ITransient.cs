@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Models.Status;
 using FrostySdk.IO;
 
@@ -11,10 +12,11 @@ namespace BlueprintEditorPlugin.Models.Nodes
     public interface ITransient : IVertex
     {
         /// <summary>
-        /// 
+        /// This method is called whenever the Layout Manager tries to load a node of this type
         /// </summary>
         /// <param name="reader"></param>
-        ITransient Load(NativeReader reader);
-        void Save(NativeWriter writer);
+        /// <returns>A bool on whether the operation was a success. If it wasn't, the node will not be added</returns>
+        bool Load(LayoutReader reader);
+        void Save(LayoutWriter writer);
     }
 }

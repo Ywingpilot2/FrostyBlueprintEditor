@@ -111,6 +111,36 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             }
         }
 
+        public void Redirect(EntityInputRedirect redirectTarget)
+        {
+            if (Direction != PortDirection.In)
+                return;
+
+            //Node.NodeWrangler.AddNode(redirectTarget);
+
+            foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+            {
+                connection.Target = redirectTarget.SourceRedirect.Inputs[0];
+            }
+
+            Node.NodeWrangler.AddConnection(new TransientConnection(redirectTarget.Outputs[0], this, Type));
+        }
+        
+        public void Redirect(EntityOutputRedirect redirectTarget)
+        {
+            if (Direction != PortDirection.Out)
+                return;
+
+            //Node.NodeWrangler.AddNode(redirectTarget);
+
+            foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+            {
+                connection.Source = redirectTarget.SourceRedirect.Outputs[0];
+            }
+
+            Node.NodeWrangler.AddConnection(new TransientConnection(this, redirectTarget.Inputs[0], Type));
+        }
+
         public ICommand EditCommand => new DelegateCommand(Edit);
         
         private protected void Edit()

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
+using BlueprintEditorPlugin.Models.Nodes.Ports;
 
 namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
 {
@@ -16,7 +17,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         public void RemoveCycles(INode start)
         {
             VisitedNodes.Add(start);
-            foreach (IConnection connection in GetConnections(start))
+            foreach (IConnection connection in GetConnections(start, PortDirection.Out))
             {
                 DepthSearch(connection);
             }
@@ -27,9 +28,14 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             if (VisitedNodes.Contains(start.Target.Node))
             {
                 Connections.Remove(start);
+                return;
             }
-            
-            base.DepthSearch(start);
+
+            VisitedNodes.Add(start.Target.Node);
+            foreach (IConnection connection in GetConnections(start.Target.Node, PortDirection.Out))
+            {
+                DepthSearch(connection);
+            }
         }
 
         public CycleRemover(List<IConnection> connections) : base(connections)

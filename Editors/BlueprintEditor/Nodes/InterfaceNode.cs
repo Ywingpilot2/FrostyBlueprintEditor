@@ -6,6 +6,7 @@ using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -18,7 +19,7 @@ using FrostySdk.IO;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
-    public class InterfaceNode : IObjectNode, ITransient
+    public class InterfaceNode : ITransient, IObjectNode
     {
         private string _header;
         private Point _location;
@@ -145,15 +146,34 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         #endregion
 
         #region Interface implementation
-
-        public ITransient Load(NativeReader reader)
+        
+        public bool Load(LayoutReader reader)
         {
-            return null;
+            string name = reader.ReadNullTerminatedString();
+
+            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+            InterfaceNode real;
+            if (reader.ReadBoolean()) // Is an output
+            {
+                real = wrangler.GetInterfaceNode(name, PortDirection.Out);
+            }
+            else
+            {
+                real = wrangler.GetInterfaceNode(name, PortDirection.In);
+            }
+
+            real.Location = reader.ReadPoint();
+            
+            // TODO HACK: We create interface nodes before we read layouts. So in order to read transient data from them, we can't add new ones.
+            // Resulting in this hack of a method
+            return false;
         }
 
-        public void Save(NativeWriter writer)
+        public void Save(LayoutWriter writer)
         {
-            return;
+            writer.WriteNullTerminatedString(Header);
+            writer.Write(Inputs.Count == 0);
+            writer.Write(Location);
         }
 
         #endregion
@@ -257,8 +277,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
 
+        public InterfaceNode(INodeWrangler nodeWrangler)
+        {
+            NodeWrangler = nodeWrangler;
+        }
+
         public InterfaceNode()
         {
+        }
+
+        public override string ToString()
+        {
+            return Header ?? base.ToString();
         }
     }
 }

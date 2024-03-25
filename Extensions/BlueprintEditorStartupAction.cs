@@ -13,6 +13,8 @@ namespace BlueprintEditorPlugin.Extensions
         {
             logger.Log("Updating Blueprint Editor options...");
             EditorOptions.Update();
+            logger.Log("Registering Blueprint Editor extensions...");
+            ExtensionsManager.Initiate();
         }
     }
 }

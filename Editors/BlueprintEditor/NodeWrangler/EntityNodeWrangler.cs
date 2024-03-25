@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
@@ -35,7 +36,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         /// <param name="node"></param>
         public void AddNodeTransient(INode node)
         {
-            Nodes.Add(node);
+            // TODO: This is a work around to fix UI being on a different thread, causing crashes
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Nodes.Add(node);
+            });
 
             switch (node)
             {
@@ -60,14 +65,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
             }
             
-            node.OnCreation();
+            // Incase extensions aren't threadsafe
+            Application.Current.Dispatcher.Invoke(node.OnCreation);
         }
 
         #region Adding Connections
 
         public void AddConnectionTransient(EntityConnection connection)
         {
-            Connections.Add(connection);
+            // TODO: This is a work around to fix UI being on a different thread, causing crashes
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Connections.Add(connection);
+            });
         }
         
         public void AddConnectionTransient(EntityOutput source, EntityInput target, object obj)
@@ -99,7 +109,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 target.Realm = connection.Realm;
             }
             
-            Connections.Add(connection);
+            // TODO: This is a work around to fix UI being on a different thread, causing crashes
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Connections.Add(connection);
+            });
         }
         
         public void AddConnectionTransient(EntityOutput source, EntityInput target)
@@ -121,7 +135,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
             }
             
-            Connections.Add(connection);
+            // TODO: This is a work around to fix UI being on a different thread, causing crashes
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Connections.Add(connection);
+            });
         }
 
         #endregion
@@ -130,7 +148,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         public void RemoveConnectionTransient(EntityConnection connection)
         {
-            Connections.Remove(connection);
+            // TODO: This is a work around to fix UI being on a different thread, causing crashes
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Connections.Remove(connection);
+            });
         }
 
         #endregion
@@ -218,18 +240,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     
                     App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
                 } break;
-                case InterfaceNode interfaceNode:
-                {
-                    throw new NotImplementedException();
-                    if (interfaceNode.Inputs.Count != 0)
-                    {
-                        _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
-                    }
-                    else
-                    {
-                        _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
-                    }
-                } break;
             }
             
             node.OnCreation();
@@ -255,14 +265,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 case InterfaceNode interfaceNode:
                 {
                     throw new NotImplementedException();
-                    if (interfaceNode.Inputs.Count != 0)
-                    {
-                        _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
-                    }
-                    else
-                    {
-                        _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
-                    }
                 } break;
             }
         }

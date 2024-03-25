@@ -4,6 +4,7 @@ using System.Linq;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -11,6 +12,7 @@ using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using FrostySdk.Ebx;
 using FrostySdk.IO;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
@@ -40,14 +42,141 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             Header = string.IsNullOrEmpty(edit.Header) ? null : edit.Header;
         }
 
-        public override ITransient Load(NativeReader reader)
+        public override bool Load(LayoutReader reader)
         {
-            throw new System.NotImplementedException();
-        }
+            if (reader.ReadBoolean())
+            {
+                return false;
+            }
+            
+            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+            
+            string header = reader.ReadNullTerminatedString();
+            if (header != "{None}")
+            {
+                Header = header;
+            }
 
-        public override void Save(NativeWriter writer)
+            bool isInterface = reader.ReadBoolean();
+            if (isInterface)
+            {
+                reader.ReadInt();
+                reader.ReadInt();
+                ConnectionType type = (ConnectionType)reader.ReadInt();
+                string portName = reader.ReadNullTerminatedString();
+                // TODO: Implementation for interface nodes
+            }
+            else
+            {
+                PointerRefType nodeType = (PointerRefType)reader.ReadInt();
+                EntityNode node;
+                if (nodeType == PointerRefType.External)
+                {
+                    Guid fileGuid = reader.ReadGuid();
+                    AssetClassGuid internalGuid = reader.ReadAssetClassGuid();
+                    node = wrangler.GetEntityNode(fileGuid, internalGuid);
+                }
+                else
+                {
+                    node = wrangler.GetEntityNode(new AssetClassGuid(reader.ReadInt()));
+                }
+                
+                ConnectionType type = (ConnectionType)reader.ReadInt();
+                EntityPort port = node.GetInput(reader.ReadNullTerminatedString(), type);
+
+                RedirectTarget = port;
+
+                Direction = PortDirection.Out;
+                switch (port.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        Outputs.Add(new EventOutput(port.Name, this)
+                        {
+                            HasPlayer = port.HasPlayer,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        Outputs.Add(new LinkOutput(port.Name, this)
+                        {
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        Outputs.Add(new PropertyOutput(port.Name, this)
+                        {
+                            IsInterface = port.IsInterface,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                }
+
+                Location = reader.ReadPoint();
+
+                SourceRedirect = new EntityInputRedirect(port, PortDirection.In, NodeWrangler);
+                SourceRedirect.Location = reader.ReadPoint();
+                SourceRedirect.TargetRedirect = this;
+                
+                NodeWrangler.AddNode(SourceRedirect);
+                
+                port.Redirect(this);
+            }
+
+            return true;
+        }
+        
+        /// <summary>
+        /// FORMAT STRUCTURE:
+        /// bool - Skip(informs the loader this should be skipped)
+        /// NullTerminatedString - header
+        /// bool - IsInterface
+        /// int - NodeType
+        /// guid - FileGuid(missing if NodeType internal)
+        /// AssetClassGuid - internalid
+        /// int - PortType
+        /// NullTerminatedString - portname
+        ///
+        /// GENERIC VERTEX FORMAT:
+        /// Point - OurPosition
+        /// Point - SourcePosition
+        /// </summary>
+        /// <param name="writer"></param>
+        public override void Save(LayoutWriter writer)
         {
-            throw new System.NotImplementedException();
+            if (Direction != PortDirection.Out)
+            {
+                writer.Write(true);
+                return;
+            }
+            
+            IObjectNode node = (IObjectNode)RedirectTarget.Node;
+            
+            writer.Write(false);
+            writer.WriteNullTerminatedString(Header ?? "{None}");
+            
+            bool isInterface = node is InterfaceNode;
+            writer.Write(isInterface);
+            
+            writer.Write((int)node.Type);
+            if (node.Type == PointerRefType.External)
+            {
+                writer.Write(node.FileGuid);
+                writer.Write(node.InternalGuid);
+            }
+            else
+            {
+                writer.Write(node.InternalGuid.InternalId);
+            }
+            
+            EntityPort redirectTarget = (EntityPort)RedirectTarget;
+            writer.Write((int)redirectTarget.Type);
+            writer.WriteNullTerminatedString(RedirectTarget.Name);
+            
+            writer.Write(Location);
+            writer.Write(SourceRedirect.Location);
         }
 
         protected override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -140,6 +269,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             RedirectTarget.PropertyChanged += NotifyPropertyChanged;
             Object = new EditRedirectArgs(this);
         }
+
+        public EntityInputRedirect(INodeWrangler wrangler)
+        {
+            NodeWrangler = wrangler;
+        }
+
+        public EntityInputRedirect()
+        {
+        }
     }
     
     public class EntityOutputRedirect : BaseRedirect, IObjectContainer
@@ -183,14 +321,125 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             Header = string.IsNullOrEmpty(edit.Header) ? null : edit.Header;
         }
 
-        public override ITransient Load(NativeReader reader)
+        public override bool Load(LayoutReader reader)
         {
-            throw new System.NotImplementedException();
-        }
+            if (reader.ReadBoolean())
+            {
+                return false;
+            }
+            
+            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+            
+            string header = reader.ReadNullTerminatedString();
+            if (header != "{None}")
+            {
+                Header = header;
+            }
 
-        public override void Save(NativeWriter writer)
+            bool isInterface = reader.ReadBoolean();
+            if (isInterface)
+            {
+                reader.ReadInt();
+                reader.ReadInt();
+                ConnectionType type = (ConnectionType)reader.ReadInt();
+                string portName = reader.ReadNullTerminatedString();
+                // TODO: Implementation for interface nodes
+            }
+            else
+            {
+                PointerRefType nodeType = (PointerRefType)reader.ReadInt();
+                EntityNode node;
+                if (nodeType == PointerRefType.External)
+                {
+                    Guid fileGuid = reader.ReadGuid();
+                    AssetClassGuid internalGuid = reader.ReadAssetClassGuid();
+                    node = wrangler.GetEntityNode(fileGuid, internalGuid);
+                }
+                else
+                {
+                    node = wrangler.GetEntityNode(new AssetClassGuid(reader.ReadInt()));
+                }
+                
+                ConnectionType type = (ConnectionType)reader.ReadInt();
+                EntityPort port = node.GetOutput(reader.ReadNullTerminatedString(), type);
+
+                RedirectTarget = port;
+
+                Direction = PortDirection.In;
+                switch (port.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        Inputs.Add(new EventInput(port.Name, this)
+                        {
+                            HasPlayer = port.HasPlayer,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        Inputs.Add(new LinkInput(port.Name, this)
+                        {
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        Inputs.Add(new PropertyInput(port.Name, this)
+                        {
+                            IsInterface = port.IsInterface,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                }
+
+                Location = reader.ReadPoint();
+
+                SourceRedirect = new EntityOutputRedirect(port, PortDirection.Out, NodeWrangler);
+                SourceRedirect.Location = reader.ReadPoint();
+                SourceRedirect.TargetRedirect = this;
+                
+                NodeWrangler.AddNode(SourceRedirect);
+                
+                port.Redirect(this);
+            }
+
+            return true;
+        }
+        
+        public override void Save(LayoutWriter writer)
         {
-            throw new System.NotImplementedException();
+            if (Direction != PortDirection.In)
+            {
+                writer.Write(true);
+                return;
+            }
+            
+            IObjectNode node = (IObjectNode)RedirectTarget.Node;
+            
+            writer.Write(false);
+            writer.WriteNullTerminatedString(Header ?? "{None}");
+            
+            bool isInterface = node is InterfaceNode;
+            writer.Write(isInterface);
+            
+            writer.Write((int)node.Type);
+            if (node.Type == PointerRefType.External)
+            {
+                writer.Write(node.FileGuid);
+                writer.Write(node.InternalGuid);
+            }
+            else
+            {
+                writer.Write(node.InternalGuid.InternalId);
+            }
+            
+            EntityPort redirectTarget = (EntityPort)RedirectTarget;
+            writer.Write((int)redirectTarget.Type);
+            writer.WriteNullTerminatedString(RedirectTarget.Name);
+            
+            writer.Write(Location);
+            writer.Write(SourceRedirect.Location);
         }
 
         protected override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -297,6 +546,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
 
             RedirectTarget.PropertyChanged += NotifyPropertyChanged;
             Object = new EditRedirectArgs(this);
+        }
+
+        public EntityOutputRedirect(INodeWrangler wrangler)
+        {
+            NodeWrangler = wrangler;
+        }
+
+        public EntityOutputRedirect()
+        {
         }
     }
     

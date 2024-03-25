@@ -646,7 +646,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                         Inputs.Add(input);
                         _hashCacheEInputs.Add(hash, (EventInput)input);
                         return;
-                    } break;
+                    }
                     case ConnectionType.Link:
                     {
                         int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
@@ -656,7 +656,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                         Inputs.Add(input);
                         _hashCacheLInputs.Add(hash, (LinkInput)input);
                         return;
-                    } break;
+                    }
                     case ConnectionType.Property:
                     {
                         int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
@@ -666,7 +666,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                         Inputs.Add(input);
                         _hashCachePInputs.Add(hash, (PropertyInput)input);
                         return;
-                    } break;
+                    }
                 }
             }
 
@@ -714,33 +714,40 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
 
-        public void AddInput(string name, ConnectionType type, Realm realm = Realm.Any, bool isInterface = false)
+        public EntityInput AddInput(string name, ConnectionType type, Realm realm = Realm.Any, bool isInterface = false)
         {
+            EntityInput input = null;
+            
             switch (type)
             {
                 case ConnectionType.Event:
                 {
-                    AddInput(new EventInput(name, this)
+                    input = new EventInput(name, this)
                     {
                         Realm = realm
-                    });
+                    };
+                    AddInput(input);
                 } break;
                 case ConnectionType.Link:
                 {
-                    AddInput(new LinkInput(name, this)
+                    input = new LinkInput(name, this)
                     {
                         Realm = realm
-                    });
+                    };
+                    AddInput(input);
                 } break;
                 case ConnectionType.Property:
                 {
-                    AddInput(new PropertyInput(name, this)
+                    input = new PropertyInput(name, this)
                     {
                         Realm = realm,
                         IsInterface = isInterface
-                    });
+                    };
+                    AddInput(input);
                 } break;
             }
+
+            return input;
         }
 
         public virtual void AddOutput(EntityOutput output)
@@ -826,33 +833,40 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
         
-        public void AddOutput(string name, ConnectionType type, Realm realm = Realm.Any, bool hasPlayer = false)
+        public EntityOutput AddOutput(string name, ConnectionType type, Realm realm = Realm.Any, bool hasPlayer = false)
         {
+            EntityOutput output = null;
             switch (type)
             {
                 case ConnectionType.Event:
                 {
-                    AddOutput(new EventOutput(name, this)
+                    output = new EventOutput(name, this)
                     {
                         Realm = realm,
                         HasPlayer = hasPlayer
-                    });
+                    };
+                    
+                    AddOutput(output);
                 } break;
                 case ConnectionType.Link:
                 {
-                    AddOutput(new EventOutput(name, this)
+                    output = new EventOutput(name, this)
                     {
                         Realm = realm
-                    });
+                    };
+                    AddOutput(output);
                 } break;
                 case ConnectionType.Property:
                 {
-                    AddOutput(new EventOutput(name, this)
+                    output = new EventOutput(name, this)
                     {
                         Realm = realm
-                    });
+                    };
+                    AddOutput(output);
                 } break;
             }
+
+            return output;
         }
 
         #endregion
@@ -1045,32 +1059,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Static construction
 
-        private static Dictionary<string, Type> _extensions = new Dictionary<string, Type>();
-
-        static EntityNode()
-        {
-            foreach (var type in Assembly.GetCallingAssembly().GetTypes())
-            {
-                if (type.IsSubclassOf(typeof(EntityNode)))
-                {
-                    try
-                    {
-                        EntityNode node = (EntityNode)Activator.CreateInstance(type);
-                        if (node.IsValid() && !_extensions.ContainsKey(node.ObjectType))
-                        {
-                            _extensions.Add(node.ObjectType, type);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        App.Logger.LogError("Entity node {0} caused an exception when processing! Exception: {1}", type.Name, e.Message);
-                    }
-                }
-            }
-            
-            // TODO: External extensions(external extensions should always take priority over internal ones if they are valid)
-        }
-
         /// <summary>
         /// Gets a proper Node from an internal object. This will return subclasses if they are found.
         /// </summary>
@@ -1090,10 +1078,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 ((dynamic)entity).SetInstanceGuid(guid);
             }
             
-            if (_extensions.ContainsKey(entity.GetType().Name))
+            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(entity.GetType().Name))
             {
                 // We need to construct it manually(since node extensions likely just have blank constructors)
-                EntityNode node = (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name]);
+                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[entity.GetType().Name]);
 
                 node.NodeWrangler = wrangler;
                 node.Object = entity;
@@ -1117,10 +1105,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <returns>The object type as an EntityNode</returns>
         public static EntityNode GetNodeFromEntity(Type type, INodeWrangler wrangler)
         {
-            if (_extensions.ContainsKey(type.Name))
+            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(type.Name))
             {
                 // We need to construct it manually(since node extensions likely just have blank constructors)
-                EntityNode node = (EntityNode)Activator.CreateInstance(_extensions[type.Name]);
+                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[type.Name]);
 
                 node.NodeWrangler = wrangler;
                 object entity = TypeLibrary.CreateObject(type.Name);
@@ -1156,9 +1144,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 ((dynamic)entity).SetInstanceGuid(guid);
             }
             
-            if (_extensions.ContainsKey(entity.GetType().Name))
+            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(entity.GetType().Name))
             {
-                EntityNode node = (EntityNode)Activator.CreateInstance(_extensions[entity.GetType().Name]);
+                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[entity.GetType().Name]);
                 
                 node.Object = entity;
                 node.NodeWrangler = wrangler;

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
@@ -27,6 +29,7 @@ using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
+using Nodify;
 using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor
@@ -45,12 +48,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         public bool IsValid(EbxAssetEntry assetEntry)
         {
-            return true;
+            EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+            Type assetType = asset.RootObject.GetType();
+            
+            // We only check property connections since we can assume if it has property connections it has everything else
+            if (assetType.GetProperty("Objects") != null 
+                && assetType.GetProperty("PropertyConnections") != null 
+                && assetType.GetProperty("Interface") != null)
+            {
+                return true;
+            }
+            
+            return false;
         }
 
         public bool IsValid(params object[] args)
         {
-            return true;
+            return false; // Only valid for assets
+        }
+
+        public void Closed()
+        {
+            EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+            LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
         }
 
         #endregion
@@ -58,9 +78,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         public BlueprintGraphEditor()
         {
             NodeWrangler = new EntityNodeWrangler();
+            
+            InitializeComponent();
+            NodePropertyGrid.GraphEditor = this;
+            LayoutManager = new EntityLayoutManager(NodeWrangler);
         }
 
-        public void OpenAsset(EbxAssetEntry assetEntry)
+        public void LoadAsset(EbxAssetEntry assetEntry)
         {
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
             wrangler.Asset = App.AssetManager.GetEbx(assetEntry);
@@ -185,12 +209,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 
                 if (sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property) == null)
                 {
-                    sourceNode.AddOutput(new PropertyOutput(propertyConnection.SourceField, sourceNode));
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        sourceNode.AddOutput(new PropertyOutput(propertyConnection.SourceField, sourceNode));
+                    });
                 }
                 
                 if (targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property) == null)
                 {
-                    targetNode.AddInput(new PropertyInput(propertyConnection.TargetField, targetNode));
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        targetNode.AddInput(new PropertyInput(propertyConnection.TargetField, targetNode));
+                    });
                 }
 
                 PropertyOutput output = (PropertyOutput)sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property);
@@ -265,12 +295,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 
                 if (sourceNode.GetOutput(linkConnection.SourceField, ConnectionType.Link) == null)
                 {
-                    sourceNode.AddOutput(new LinkOutput(linkConnection.SourceField, sourceNode));
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        sourceNode.AddOutput(new LinkOutput(linkConnection.SourceField, sourceNode));
+                    });
                 }
                 
                 if (targetNode.GetInput(linkConnection.TargetField, ConnectionType.Link) == null)
                 {
-                    targetNode.AddInput(new LinkInput(linkConnection.TargetField, targetNode));
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        targetNode.AddInput(new LinkInput(linkConnection.TargetField, targetNode));
+                    });
                 }
 
                 LinkOutput output = (LinkOutput)sourceNode.GetOutput(linkConnection.SourceField, ConnectionType.Link);
@@ -345,12 +381,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 
                 if (sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event) == null)
                 {
-                    sourceNode.AddOutput(new EventOutput(eventConnection.SourceEvent.Name, sourceNode));
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        sourceNode.AddOutput(new EventOutput(eventConnection.SourceEvent.Name, sourceNode));
+                    });
                 }
                 
                 if (targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event) == null)
                 {
-                    targetNode.AddInput(new EventInput(eventConnection.TargetEvent.Name, targetNode));
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        targetNode.AddInput(new EventInput(eventConnection.TargetEvent.Name, targetNode));
+                    });
                 }
 
                 EventOutput output = (EventOutput)sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event);
@@ -361,9 +403,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
             #endregion
 
-            InitializeComponent();
-
-            NodePropertyGrid.GraphEditor = this;
+            if (LayoutManager.LayoutExists($"{assetEntry.Name}.lyt"))
+            {
+                LayoutManager.LoadLayoutRelative($"{assetEntry.Name}.lyt");
+            }
+            else
+            {
+                LayoutManager.SortLayout();
+            }
         }
 
         #region Static
@@ -373,6 +420,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         static BlueprintGraphEditor()
         {
+            NodifyEditor.EnableRenderingContainersOptimizations = true;
+            NodifyEditor.OptimizeRenderingMinimumContainers = 20;
+            NodifyEditor.OptimizeRenderingZoomOutPercent = 0.25;
+            
             //populate types list
             foreach (Type type in TypeLibrary.GetTypes("GameDataContainer"))
             {
@@ -543,9 +594,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            // TODO: Use ILayoutManager
-            SugiyamaMethod method = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
-            method.SortGraph();
+            LayoutManager.SortLayout();
+        }
+
+        private void SaveOrganizationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+            LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
         }
     }
 }

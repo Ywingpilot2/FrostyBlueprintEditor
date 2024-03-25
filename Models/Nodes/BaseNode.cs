@@ -154,5 +154,10 @@ namespace BlueprintEditorPlugin.Models.Nodes
         {
             NodeWrangler = nodeWrangler;
         }
+
+        public override string ToString()
+        {
+            return Header ?? ToolTip ?? base.ToString();
+        }
     }
 }

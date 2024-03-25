@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configurations>Developer - Debug;Release - Alpha;Release - Beta;Release - Final</Configurations>
+    <Configurations>Developer - Debug;Release - Final</Configurations>
     <Platforms>x64</Platforms>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>BlueprintEditorPlugin</AssemblyTitle>
@@ -16,18 +16,6 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Developer\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release - Alpha|x64' ">
-    <OutputPath>bin\Release\Alpha\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Beta|x64'">
-    <OutputPath>bin\Release\Beta\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'">
@@ -126,12 +114,14 @@
   <!-- This is for copying our binaries into the plugins folder -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!-- Replace the second directory with the directory to your frosty's plugins folder -->
-    <Exec Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Exec Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
+    
     <!-- And replace the DestinationFolder here to be your frosty's plugins directory as well -->
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
   </Target>
 
   <PropertyGroup>

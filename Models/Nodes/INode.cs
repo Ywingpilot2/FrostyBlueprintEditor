@@ -11,7 +11,6 @@ namespace BlueprintEditorPlugin.Models.Nodes
     /// </summary>
     public interface INode : IVertex
     {
-        string Header { get; set; }
         ObservableCollection<IPort> Inputs { get; }
         ObservableCollection<IPort> Outputs { get; }
 

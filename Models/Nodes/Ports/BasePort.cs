@@ -51,7 +51,11 @@ namespace BlueprintEditorPlugin.Models.Nodes.Ports
         
         public BasePort(string name, INode node)
         {
-            
+        }
+        
+        public override string ToString()
+        {
+            return $"{Direction}put - {Name}";
         }
     }
     public class BaseInput : BasePort
