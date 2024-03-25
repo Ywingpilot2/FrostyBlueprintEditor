@@ -22,6 +22,7 @@ using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
+using BlueprintEditorPlugin.Windows;
 using Frosty.Core.Controls;
 using Frosty.Core.Windows;
 using FrostyEditor;
@@ -437,6 +438,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         #region Nodes
 
+        #region Visuals
+
         private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach (object addedItem in e.AddedItems)
@@ -479,49 +482,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             node.IsFlatted = !node.IsFlatted;
         }
 
-        private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
-        {
-            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
-            foreach (IVertex selectedNode in oldSelection)
-            {
-                if (selectedNode is IRedirect redirect)
-                {
-                    if (redirect.SourceRedirect != null)
-                    {
-                        NodeWrangler.RemoveNode(redirect.SourceRedirect);
-                    }
-                    else
-                    {
-                        NodeWrangler.RemoveNode(redirect.TargetRedirect);
-                    }
-                }
-                
-                NodeWrangler.RemoveNode(selectedNode);
-            }
-        }
-        
-        private void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
-        {
-            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
-            NodeWrangler.SelectedNodes.Clear();
-            
-            foreach (IVertex selectedNode in oldSelection)
-            {
-                if (selectedNode is EntityNode entityNode)
-                {
-                    FrostyClipboard.Current.SetData(entityNode.Object); // TODO: Work around, need to copy data
-                    EntityNode newNode = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
-                    NodeWrangler.AddNode(newNode);
-                    NodeWrangler.SelectedNodes.Add(newNode);
-                }
+        #endregion
 
-                if (selectedNode is InterfaceNode interfaceNode)
-                {
-                    App.Logger.LogError("Cannot duplicate interface nodes.");
-                }
-            }
-        }
-        
         private void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)
         {
             // If the user holds down alt that means all selected nodes should have their properties set the same
@@ -571,6 +533,88 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 }
             }
         }
+        
+        #region Adding & removing nodes
+
+        private void AddButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (TabControl.SelectedIndex == 0)
+            {
+                ClassSelector_OnItemDoubleClicked(this, null); // Lazy workaround lol
+            }
+            else
+            {
+                TransClassSelector_OnItemDoubleClicked(this, null);
+            }
+        }
+
+        private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            while (NodeWrangler.SelectedNodes.Count != 0)
+            {
+                NodeWrangler.RemoveNode(NodeWrangler.SelectedNodes[0]);
+            }
+        }
+        
+        private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
+        {
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
+            foreach (IVertex selectedNode in oldSelection)
+            {
+                if (selectedNode is IRedirect redirect)
+                {
+                    if (redirect.SourceRedirect != null)
+                    {
+                        NodeWrangler.RemoveNode(redirect.SourceRedirect);
+                    }
+                    else
+                    {
+                        NodeWrangler.RemoveNode(redirect.TargetRedirect);
+                    }
+                }
+                
+                NodeWrangler.RemoveNode(selectedNode);
+            }
+        }
+        
+        private void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
+        {
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
+            NodeWrangler.SelectedNodes.Clear();
+            
+            foreach (IVertex selectedNode in oldSelection)
+            {
+                if (selectedNode is EntityNode entityNode)
+                {
+                    FrostyClipboard.Current.SetData(entityNode.Object); // TODO: Work around, need to copy data
+                    EntityNode newNode = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
+                    newNode.Location = new Point(selectedNode.Location.X + 15, selectedNode.Location.Y + 15);
+                    NodeWrangler.AddNode(newNode);
+                    NodeWrangler.SelectedNodes.Add(newNode);
+                }
+
+                if (selectedNode is InterfaceNode interfaceNode)
+                {
+                    App.Logger.LogError("Cannot duplicate interface nodes.");
+                }
+            }
+        }
+
+        #endregion
+        
+        private void PasteObject(object sender, RoutedEventArgs e)
+        {
+            // Item is not valid for pasting
+            if (FrostyClipboard.Current.GetData() == null ||
+                !TypeLibrary.IsSubClassOf(FrostyClipboard.Current.GetData(), "GameDataContainer"))
+                return;
+            
+            EntityNode node = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
+            node.Location = Editor.MouseLocation;
+            
+            NodeWrangler.AddNode(node);
+            NodeWrangler.SelectedNodes.Add(node);
+        }
 
         #endregion
 
@@ -578,7 +622,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void ClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
         {
-            NodeWrangler.AddNode(EntityNode.GetNodeFromEntity(ClassSelector.SelectedClass, NodeWrangler));
+            if (ClassList.SelectedClass == null)
+                return;
+            
+            EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedClass, NodeWrangler);
+            node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
+            NodeWrangler.AddNode(node);
         }
 
         private void TransClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
@@ -587,10 +636,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 return;
             
             Type type = TransTypeList.SelectedItem.GetType();
-            NodeWrangler.AddNode((IVertex)Activator.CreateInstance(type));
+            IVertex vertex = (IVertex)Activator.CreateInstance(type);
+            vertex.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
+            
+            NodeWrangler.AddNode(vertex);
         }
 
         #endregion
+
+        #region Layouts
 
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
@@ -601,6 +655,104 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         {
             EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
             LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
+        }
+
+        #endregion
+
+        #region Visibility
+
+        private void ControlsMenuVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            BlueprintEditorControlsWindow controlsWindow = new BlueprintEditorControlsWindow();
+            controlsWindow.Show();
+        }
+
+        #endregion
+
+        #region Controls
+
+        private void Editor_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Delete:
+                {
+                    while (NodeWrangler.SelectedNodes.Count != 0)
+                    {
+                        NodeWrangler.RemoveNode(NodeWrangler.SelectedNodes[0]);
+                    }
+                } break;
+                case Key.D when (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift:
+                {
+                    List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
+                    NodeWrangler.SelectedNodes.Clear();
+            
+                    foreach (IVertex selectedNode in oldSelection)
+                    {
+                        if (selectedNode is EntityNode entityNode)
+                        {
+                            FrostyClipboard.Current.SetData(entityNode.Object); // TODO: Work around, need to copy data
+                            EntityNode newNode = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
+                            newNode.Location = new Point(selectedNode.Location.X + 15, selectedNode.Location.Y + 15);
+                            NodeWrangler.AddNode(newNode);
+                            NodeWrangler.SelectedNodes.Add(newNode);
+                        }
+
+                        if (selectedNode is InterfaceNode)
+                        {
+                            App.Logger.LogError("Cannot duplicate interface nodes.");
+                        }
+                    }
+                } break;
+                case Key.S when (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift:
+                {
+                    EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+                    LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
+                } break;
+            }
+        }
+
+        private void Editor_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Right && (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                if (TabControl.SelectedIndex == 0)
+                {
+                    if (ClassList.SelectedClass == null)
+                        return;
+                    
+                    EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedClass, NodeWrangler);
+                    node.Location = Editor.MouseLocation;
+                    NodeWrangler.AddNode(node);
+                }
+                else
+                {
+                    if (TransTypeList.SelectedItem == null)
+                        return;
+            
+                    Type type = TransTypeList.SelectedItem.GetType();
+                    IVertex vertex = (IVertex)Activator.CreateInstance(type);
+                    vertex.Location = Editor.MouseLocation;
+            
+                    NodeWrangler.AddNode(vertex);
+                }
+            }
+        }
+
+        #endregion
+
+        private void SearchForNode_Click(object sender, RoutedEventArgs e)
+        {
+            ClassSelector classSelector = new ClassSelector(Types.ToArray());
+            if (classSelector.ShowDialog() == true)
+            {
+                if (classSelector.SelectedClass == null)
+                    return;
+                
+                EntityNode node = EntityNode.GetNodeFromEntity(classSelector.SelectedClass, NodeWrangler);
+                node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
+                NodeWrangler.AddNode(node);
+            }
         }
     }
 }

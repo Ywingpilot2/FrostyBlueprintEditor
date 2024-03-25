@@ -475,7 +475,7 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="225" />
+                    <ColumnDefinition Width="225"/>
                     <ColumnDefinition />
                     <ColumnDefinition Width="425"/>
                 </Grid.ColumnDefinitions>
@@ -492,7 +492,9 @@
                                          ItemContainerStyle="{StaticResource NodeStyle}"
                                          DisplayConnectionsOnTop="{x:Static options:EditorOptions.WiresOververts}"
                                          ConnectionTemplate="{StaticResource ConnectionTemplate}"
-                                         PendingConnectionTemplate="{StaticResource PendingConnectionTemplate}">
+                                         PendingConnectionTemplate="{StaticResource PendingConnectionTemplate}"
+                                         KeyUp="Editor_OnKeyUp"
+                                         MouseUp="Editor_OnMouseUp">
                         <nodify:NodifyEditor.Resources>
                             <DataTemplate DataType="{x:Type nodes:EntityNode}">
                                 <nodify:Node Header="{Binding Header}"
@@ -2736,6 +2738,24 @@
                                           Transform="{Binding ViewportTransform, ElementName=Editor}"
                                           Drawing="{StaticResource SmallGridGeometry}" />
                         </nodify:NodifyEditor.Background>
+                        
+                        <nodify:NodifyEditor.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Node"
+                                          Click="SearchForNode_Click">
+                                    <MenuItem.Icon>
+                                        <Image Source="pack://application:,,,/FrostyEditor;component/images/add.png"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Paste"
+                                          Click="PasteObject">
+                                    <MenuItem.Icon>
+                                        <Image
+                                            Source="pack://application:,,,/FrostyCore;component/images/paste.png" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </nodify:NodifyEditor.ContextMenu>
                     </nodify:NodifyEditor>
                 </Grid>
             
@@ -2745,7 +2765,7 @@
                     <!--This contains a list of all of the types we can use and a filter box-->
                     <Border BorderBrush="{StaticResource ScrollbarBackground}"
                             BorderThickness="0">
-                        <controls:FrostyTabControl SelectedIndex="0">
+                        <controls:FrostyTabControl x:Name="TabControl">
                             <controls:FrostyTabControl.Items>
                                 <controls:FrostyTabItem Header="Toolbox"
                                                         Icon="pack://application:,,,/FrostyEditor;component/Images/Database.png">
@@ -2757,7 +2777,7 @@
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                         
-                                            <controls1:FrostyClassSelector x:Name="ClassSelector"
+                                            <controls1:FrostyClassSelector x:Name="ClassList"
                                                                            Grid.Row="1"
                                                                            ItemDoubleClicked="ClassSelector_OnItemDoubleClicked"
                                                                            Types="{x:Static local:BlueprintGraphEditor.Types}"/>
@@ -2777,7 +2797,7 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <TextBlock FontWeight="Bold" Margin="7 0 0 0" VerticalAlignment="Top"
-                                                                   Text="{Binding ElementName=ClassSelector, Path=SelectedClass.Name}">
+                                                                   Text="{Binding ElementName=ClassList, Path=SelectedClass.Name}">
                                                         </TextBlock>
                                                         <Path Grid.Column="1" Fill="White" Width="11" Height="11"
                                                               Data="m 4 9 h 2 v 2 H 4 Z M 1 4 V 1 H 2 V 0 H 8 V 1 H 9 V 6 H 8 V 7 H 6 V 8 H 4 V 6 H 5 V 5 H 7 V 2 H 3 v 2 z" />
@@ -2824,7 +2844,7 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <TextBlock FontWeight="Bold" Margin="7 0 0 0" VerticalAlignment="Top"
-                                                                   Text="{Binding ElementName=ClassSelector, Path=SelectedClass.Name}">
+                                                                   Text="{Binding ElementName=ClassList, Path=SelectedClass.Name}">
                                                         </TextBlock>
                                                         <Path Grid.Column="1" Fill="White" Width="11" Height="11"
                                                               Data="m 4 9 h 2 v 2 H 4 Z M 1 4 V 1 H 2 V 0 H 8 V 1 H 9 V 6 H 8 V 7 H 6 V 8 H 4 V 6 H 5 V 5 H 7 V 2 H 3 v 2 z" />
@@ -2894,7 +2914,8 @@
                                     Height="20"
                                     Margin="4,0,2,0"
                                     HorizontalAlignment="Left"
-                                    ToolTip="Add a new node(Object) to the Blueprint">
+                                    ToolTip="Add a new node(Object) to the Blueprint"
+                                    Click="AddButton_OnClick">
                                 <Image Source="pack://application:,,,/FrostyEditor;component/Images/Add.png"
                                        Width="20" />
                             </Button>
@@ -2903,7 +2924,8 @@
                                     Height="20"
                                     Margin="2,0,2,0"
                                     HorizontalAlignment="Left"
-                                    ToolTip="Remove the selected node(s) from the Blueprint">
+                                    ToolTip="Remove the selected node(s) from the Blueprint"
+                                    Click="RemoveButton_OnClick">
                                 <Image Source="pack://application:,,,/FrostyEditor;component/Images/Remove.png"
                                        Width="20" />
                             </Button>
@@ -2989,7 +3011,8 @@
                                     Height="20"
                                     Margin="2,0,2,0"
                                     HorizontalAlignment="Left"
-                                    ToolTip="View the list of controls for the editor">
+                                    ToolTip="View the list of controls for the editor"
+                                    Click="ControlsMenuVisible_OnClick">
                                 <Image Source="/FrostyEditor;component/Images/EditLabel.png"
                                        Width="20" />
                             </Button>

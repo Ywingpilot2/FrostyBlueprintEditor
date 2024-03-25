@@ -10,7 +10,7 @@
              xmlns:options="clr-namespace:BlueprintEditorPlugin.Options"
              xmlns:nodes="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes"
              mc:Ignorable="d"
-             d:DesignHeight="NaN" d:DesignWidth="NaN">
+             d:DesignHeight="" d:DesignWidth="">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -136,6 +136,5 @@
     </UserControl.Resources>
     
     <Grid Background="Black">
-        
     </Grid>
 </UserControl>
