@@ -8,6 +8,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Compar
     public class CompareBool : EntityNode
     {
         public override string ObjectType => "CompareBoolEntityData";
+        public override string ToolTip => "This node sends an output event depending on if the Input property is true";
 
         public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
         {

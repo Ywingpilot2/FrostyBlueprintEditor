@@ -24,6 +24,7 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
         void RemoveConnection(IConnection connection);
 
         void ClearConnections(INode node);
+        void ClearConnections(INode node, PortDirection direction);
         void ClearConnections(IPort port);
 
         IEnumerable<IConnection> GetConnections(INode node);

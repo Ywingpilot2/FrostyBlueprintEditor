@@ -79,6 +79,28 @@ namespace BlueprintEditorPlugin.Editors.NodeWrangler
             }
         }
         
+        public virtual void ClearConnections(INode node, PortDirection direction)
+        {
+            if (node is IRedirect)
+            {
+                App.Logger.LogError("Cannot clear connections of IRedirects");
+                return;
+            }
+            
+            List<IConnection> connections = GetConnections(node).ToList();
+            foreach (IConnection connection in connections)
+            {
+                if (direction == PortDirection.In && connection.Target.Node == node)
+                {
+                    RemoveConnection(connection);
+                }
+                else if (direction == PortDirection.Out && connection.Source.Node == node)
+                {
+                    RemoveConnection(connection);
+                }
+            }
+        }
+        
         public virtual void ClearConnections(IPort port)
         {
             if (port.Node is IRedirect)

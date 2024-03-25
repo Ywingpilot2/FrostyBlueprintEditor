@@ -11,7 +11,7 @@ using BlueprintEditorPlugin.Models.Connections.Pending;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
-using Frosty.Core;
+using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -36,16 +36,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         /// <param name="node"></param>
         public void AddNodeTransient(INode node)
         {
-            // TODO: This is a work around to fix UI being on a different thread, causing crashes
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Nodes.Add(node);
-            });
-
             switch (node)
             {
                 case EntityNode entityNode when entityNode.Type == PointerRefType.Internal:
                 {
+                    if (_internalNodeCache.ContainsKey(entityNode.InternalGuid))
+                    {
+                        App.Logger.LogError("An item with the AssetClassGuid {0} has already been added!", entityNode.InternalGuid.ToString());
+                        return;
+                    }
                     _internalNodeCache.Add(entityNode.InternalGuid, entityNode);
                 } break;
                 case EntityNode entityNode:
@@ -56,14 +55,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 {
                     if (interfaceNode.Inputs.Count != 0)
                     {
+                        if (_interfaceInputCache.ContainsKey(interfaceNode.Header))
+                        {
+                            App.Logger.LogError("An interface node with the name {0} has already been added!", interfaceNode.Header);
+                            return;
+                        }
                         _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
                     }
                     else
                     {
+                        if (_interfaceOutputCache.ContainsKey(interfaceNode.Header))
+                        {
+                            App.Logger.LogError("An interface node with the name {0} has already been added!", interfaceNode.Header);
+                            return;
+                        }
                         _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
                     }
                 } break;
             }
+            
+            // TODO: This is a work around to fix UI being on a different thread, causing crashes
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Nodes.Add(node);
+            });
             
             // Incase extensions aren't threadsafe
             Application.Current.Dispatcher.Invoke(node.OnCreation);
@@ -227,12 +242,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         public override void AddNode(IVertex node)
         {
-            base.AddNode(node);
-            
             switch (node)
             {
                 case EntityNode entityNode:
                 {
+                    if (_internalNodeCache.ContainsKey(entityNode.InternalGuid))
+                    {
+                        App.Logger.LogError("An item with the AssetClassGuid {0} has already been added!", entityNode.InternalGuid.ToString());
+                        return;
+                    }
+                    
                     _internalNodeCache.Add(entityNode.InternalGuid, entityNode);
                     Asset.AddObject(entityNode.Object);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
@@ -241,6 +260,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
                 } break;
             }
+            
+            Nodes.Add(node);
             
             node.OnCreation();
         }

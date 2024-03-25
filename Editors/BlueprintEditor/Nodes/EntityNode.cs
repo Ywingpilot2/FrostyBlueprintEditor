@@ -850,7 +850,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 } break;
                 case ConnectionType.Link:
                 {
-                    output = new EventOutput(name, this)
+                    output = new LinkOutput(name, this)
                     {
                         Realm = realm
                     };
@@ -858,7 +858,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 } break;
                 case ConnectionType.Property:
                 {
-                    output = new EventOutput(name, this)
+                    output = new PropertyOutput(name, this)
                     {
                         Realm = realm
                     };
@@ -935,6 +935,28 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
             
             Outputs.Remove(output);
+        }
+
+        #endregion
+
+        #region Port Clearing
+
+        public void ClearInputs()
+        {
+            NodeWrangler.ClearConnections(this, PortDirection.In);
+            _hashCacheEInputs.Clear();
+            _hashCacheLInputs.Clear();
+            _hashCachePInputs.Clear();
+            Inputs.Clear();
+        }
+        
+        public void ClearOutputs()
+        {
+            NodeWrangler.ClearConnections(this, PortDirection.Out);
+            _hashCachePOutputs.Clear();
+            _hashCacheLOutputs.Clear();
+            _hashCacheEOutputs.Clear();
+            Outputs.Clear();
         }
 
         #endregion
