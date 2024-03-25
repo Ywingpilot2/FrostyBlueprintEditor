@@ -550,9 +550,22 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
-            while (NodeWrangler.SelectedNodes.Count != 0)
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
+            foreach (IVertex selectedNode in oldSelection)
             {
-                NodeWrangler.RemoveNode(NodeWrangler.SelectedNodes[0]);
+                if (selectedNode is IRedirect redirect)
+                {
+                    if (redirect.SourceRedirect != null)
+                    {
+                        NodeWrangler.RemoveNode(redirect.SourceRedirect);
+                    }
+                    else
+                    {
+                        NodeWrangler.RemoveNode(redirect.TargetRedirect);
+                    }
+                }
+                
+                NodeWrangler.RemoveNode(selectedNode);
             }
         }
         
