@@ -701,12 +701,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         
         private void ToolboxVisible_OnClick(object sender, RoutedEventArgs e)
         {
-            ToolboxPanel.Visibility = ToolboxPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (ToolboxPanel.Visibility == Visibility.Visible)
+            {
+                ToolboxPanel.Visibility = Visibility.Collapsed;
+                ToolboxCollum.Width = new GridLength(0, GridUnitType.Pixel);
+            }
+            else
+            {
+                ToolboxPanel.Visibility = Visibility.Visible;
+                ToolboxCollum.Width = new GridLength(225, GridUnitType.Pixel);
+            }
         }
         
         private void PropertyGridVisible_OnClick(object sender, RoutedEventArgs e)
         {
-            PropertyPanel.Visibility = PropertyPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (PropertyPanel.Visibility == Visibility.Visible)
+            {
+                PropertyPanel.Visibility = Visibility.Collapsed;
+                PropertyCollum.Width = new GridLength(0, GridUnitType.Pixel);
+            }
+            else
+            {
+                PropertyPanel.Visibility = Visibility.Visible;
+                PropertyCollum.Width = new GridLength(425, GridUnitType.Pixel);
+            }
         }
 
         #endregion

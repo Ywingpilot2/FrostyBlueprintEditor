@@ -889,10 +889,11 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="225"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="425"/>
+                    <ColumnDefinition Width="225" x:Name="ToolboxCollum"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="425" x:Name="PropertyCollum"/>
                 </Grid.ColumnDefinitions>
+                
                 <!--Node Editor-->
                 <Grid Grid.Column="1" Background="{StaticResource CanvasBackground}">
                     <nodify:NodifyEditor x:Name="Editor"
