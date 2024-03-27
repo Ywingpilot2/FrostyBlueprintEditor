@@ -15,6 +15,7 @@
              xmlns:status="clr-namespace:BlueprintEditorPlugin.Models.Status"
              xmlns:propertygrid="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid"
              xmlns:utilities="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities"
+             xmlns:presentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              mc:Ignorable="d"
              d:DesignHeight="702" d:DesignWidth="1520">
     
@@ -31,7 +32,12 @@
                           x:Key="ConnectionTemplate">
                 <Canvas>
                     <!--TODO: dynamic stroke thickness based on setting-->
-                    <Path StrokeThickness="9">
+                    <Path StrokeThickness="9"
+                          RenderOptions.CachingHint="Cache"
+                          RenderOptions.CacheInvalidationThresholdMaximum="4"
+                          RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                          RenderOptions.BitmapScalingMode="Linear"
+                          RenderOptions.EdgeMode="Aliased">
                         <Path.Style>
                             <Style TargetType="{x:Type Path}">
                                 <Setter Property="Stroke" Value="Transparent" />
@@ -54,8 +60,7 @@
                                     <!--Connection Color-->
 
                                     <!--Wire Style-->
-                                    <DataTrigger
-                                        Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
+                                    <DataTrigger Binding="{Binding Source={x:Static options:EditorOptions.WireStyle}}"
                                         Value="{x:Static options:ConnectionStyle.Curvy}">
                                         <Setter Property="Data">
                                             <Setter.Value>
@@ -64,8 +69,7 @@
                                                         <PathFigure
                                                             StartPoint="{Binding Source.Anchor}"
                                                             IsClosed="False">
-                                                            <BezierSegment
-                                                                Point1="{Binding CurvePoint1}"
+                                                            <BezierSegment Point1="{Binding CurvePoint1}"
                                                                 Point2="{Binding CurvePoint2}"
                                                                 Point3="{Binding Target.Anchor}" />
                                                         </PathFigure>
@@ -110,8 +114,12 @@
                         </Path.Style>
                     </Path>
                                 
-                    <Path>
-                        <Path.Style>
+                    <Path
+                        RenderOptions.CachingHint="Cache"
+                        RenderOptions.CacheInvalidationThresholdMaximum="4"
+                        RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                        RenderOptions.BitmapScalingMode="Linear">
+                    <Path.Style>
                             <Style TargetType="{x:Type Path}">
                                 <Setter Property="StrokeThickness"
                                         Value="{x:Static options:EditorOptions.WireThickness}" />
@@ -380,7 +388,9 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         Padding="{TemplateBinding Padding}"
-                        CornerRadius="3">
+                        CornerRadius="3"
+                        RenderOptions.BitmapScalingMode="Linear"
+                        RenderOptions.EdgeMode="Aliased">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -424,16 +434,6 @@
                                           Grid.Column="2"
                                           Focusable="False" />
                         </Grid>
-
-                        <!--Footer-->
-                        <Border Visibility="{TemplateBinding HasFooter, Converter={StaticResource BoolToVis}}"
-                                Background="{TemplateBinding FooterBrush}"
-                                CornerRadius="0 0 3 3"
-                                Grid.Row="2"
-                                Grid.ColumnSpan="3"
-                                Padding="6 4 6 4">
-                            <ContentPresenter ContentSource="Footer" />
-                        </Border>
                     </Grid>
                 </Border>
             </ControlTemplate>
@@ -481,7 +481,8 @@
                     Width="{x:Static options:EditorOptions.PortSize}"
                     Height="{x:Static options:EditorOptions.PortSize}"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Left">
+                    HorizontalAlignment="Left"
+                    RenderOptions.EdgeMode="Aliased">
                     <Ellipse.RenderTransform>
                         <TranslateTransform
                             X="{x:Static options:EditorOptions.OutputPos}" />
@@ -590,7 +591,12 @@
                                             </Rectangle.Style>
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush
-                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
+                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" 
+                                                    RenderOptions.CachingHint="Cache"
+                                                    RenderOptions.CacheInvalidationThresholdMaximum="8"
+                                                    RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    RenderOptions.EdgeMode="Aliased"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                         <Rectangle Width="6" Height="6"
@@ -630,7 +636,12 @@
                                             </Rectangle.Style>
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush
-                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
+                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" 
+                                                    RenderOptions.CachingHint="Cache"
+                                                    RenderOptions.CacheInvalidationThresholdMaximum="8"
+                                                    RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    RenderOptions.EdgeMode="Aliased"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                         <Rectangle Width="6" Height="6"
@@ -665,7 +676,12 @@
                                             </Rectangle.Style>
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush
-                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
+                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" 
+                                                    RenderOptions.CachingHint="Cache"
+                                                    RenderOptions.CacheInvalidationThresholdMaximum="8"
+                                                    RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    RenderOptions.EdgeMode="Aliased"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                     </StackPanel>
@@ -737,7 +753,9 @@
                                            Foreground="Black"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center"
-                                           Margin="0,0,3,0" />
+                                           Margin="0,0,3,0" 
+                                           RenderOptions.BitmapScalingMode="Linear"
+                                           RenderOptions.EdgeMode="Aliased"/>
 
                                 <!--NCS Grid-->
                                 <Grid Grid.Column="1" VerticalAlignment="Center"
@@ -771,7 +789,12 @@
                                             </Rectangle.Style>
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush
-                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
+                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" 
+                                                    RenderOptions.CachingHint="Cache"
+                                                    RenderOptions.CacheInvalidationThresholdMaximum="8"
+                                                    RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    RenderOptions.EdgeMode="Aliased"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                         <Rectangle Width="6" Height="6"
@@ -811,7 +834,12 @@
                                             </Rectangle.Style>
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush
-                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
+                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" 
+                                                    RenderOptions.CachingHint="Cache"
+                                                    RenderOptions.CacheInvalidationThresholdMaximum="8"
+                                                    RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    RenderOptions.EdgeMode="Aliased"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                         <Rectangle Width="6" Height="6"
@@ -846,7 +874,12 @@
                                             </Rectangle.Style>
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush
-                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
+                                                    ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" 
+                                                    RenderOptions.CachingHint="Cache"
+                                                    RenderOptions.CacheInvalidationThresholdMaximum="8"
+                                                    RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                    RenderOptions.BitmapScalingMode="Linear"
+                                                    RenderOptions.EdgeMode="Aliased"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                     </StackPanel>
@@ -938,7 +971,9 @@
                                                                Text="{Binding Header}"
                                                                Foreground="White"
                                                                HorizontalAlignment="Left"
-                                                               VerticalAlignment="Top">
+                                                               VerticalAlignment="Top"
+                                                               RenderOptions.BitmapScalingMode="Linear"
+                                                               RenderOptions.EdgeMode="Aliased">
                                                         <TextBlock.Style>
                                                             <Style TargetType="{x:Type TextBlock}">
                                                                 <Setter Property="FontSize" Value="10" />
@@ -1050,7 +1085,12 @@
                                                                 </Rectangle.Style>
                                                                 <Rectangle.OpacityMask>
                                                                     <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" />
+                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Networked.png" 
+                                                                        RenderOptions.CachingHint="Cache"
+                                                                        RenderOptions.CacheInvalidationThresholdMaximum="6"
+                                                                        RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                                        RenderOptions.BitmapScalingMode="Linear"
+                                                                        RenderOptions.EdgeMode="Aliased"/>
                                                                 </Rectangle.OpacityMask>
                                                             </Rectangle>
                                                             <Rectangle Width="6" Height="6"
@@ -1089,7 +1129,12 @@
                                                                 </Rectangle.Style>
                                                                 <Rectangle.OpacityMask>
                                                                     <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" />
+                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Client.png" 
+                                                                        RenderOptions.CachingHint="Cache"
+                                                                        RenderOptions.CacheInvalidationThresholdMaximum="6"
+                                                                        RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                                        RenderOptions.BitmapScalingMode="Linear"
+                                                                        RenderOptions.EdgeMode="Aliased"/>
                                                                 </Rectangle.OpacityMask>
                                                             </Rectangle>
                                                             <Rectangle Width="6" Height="6"
@@ -1123,7 +1168,12 @@
                                                                 </Rectangle.Style>
                                                                 <Rectangle.OpacityMask>
                                                                     <ImageBrush
-                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" />
+                                                                        ImageSource="pack://application:,,,/BlueprintEditorPlugin;component/Images/Server.png" 
+                                                                        RenderOptions.CachingHint="Cache"
+                                                                        RenderOptions.CacheInvalidationThresholdMaximum="6"
+                                                                        RenderOptions.CacheInvalidationThresholdMinimum="0.85"
+                                                                        RenderOptions.BitmapScalingMode="Linear"
+                                                                        RenderOptions.EdgeMode="Aliased"/>
                                                                 </Rectangle.OpacityMask>
                                                             </Rectangle>
                                                         </StackPanel>
@@ -1135,7 +1185,9 @@
                                                            FontSize="6"
                                                            Foreground="DarkGray"
                                                            HorizontalAlignment="Left"
-                                                           VerticalAlignment="Top">
+                                                           VerticalAlignment="Top"
+                                                           RenderOptions.BitmapScalingMode="Linear"
+                                                           RenderOptions.EdgeMode="Aliased">
                                                     <TextBlock.Style>
                                                         <Style TargetType="{x:Type TextBlock}">
                                                             <Setter Property="Visibility" Value="Visible" />

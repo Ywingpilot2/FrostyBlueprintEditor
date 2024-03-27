@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
@@ -97,6 +98,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                     } break;
                 }
 
+                List<IConnection> connections = new List<IConnection>();
+                int count = reader.ReadInt();
+                List<EntityConnection> realConnections = wrangler.GetRealConnections();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx = reader.ReadInt();
+                    IConnection connection = realConnections.ElementAtOrDefault(idx);
+                    if (connection == null)
+                        continue;
+                    
+                    connections.Add(connection);
+                }
+
                 Location = reader.ReadPoint();
 
                 SourceRedirect = new EntityInputRedirect(input, PortDirection.In, NodeWrangler);
@@ -105,7 +119,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 
                 NodeWrangler.AddNode(SourceRedirect);
                 
-                input.Redirect(this);
+                input.Redirect(this, connections);
             }
             else
             {
@@ -154,6 +168,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+                
+                List<IConnection> connections = new List<IConnection>();
+                int count = reader.ReadInt();
+                List<EntityConnection> realConnections = wrangler.GetRealConnections();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx = reader.ReadInt();
+                    
+                    IConnection connection = realConnections.ElementAtOrDefault(idx);
+                    if (connection == null)
+                        continue;
+                    
+                    connections.Add(connection);
+                }
 
                 Location = reader.ReadPoint();
 
@@ -164,7 +192,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 
                 NodeWrangler.AddNode(SourceRedirect);
                 
-                port.Redirect(this);
+                port.Redirect(this, connections);
             }
 
             return true;
@@ -180,6 +208,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
         /// AssetClassGuid - internalid
         /// int - PortType
         /// NullTerminatedString - portname
+        ///
+        /// int - ConnectionsCount
+        /// int - ConnectionIdx
         ///
         /// GENERIC VERTEX FORMAT:
         /// Point - OurPosition
@@ -216,6 +247,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             EntityPort redirectTarget = (EntityPort)RedirectTarget;
             writer.Write((int)redirectTarget.Type);
             writer.WriteNullTerminatedString(RedirectTarget.Name);
+
+
+            List<IConnection> connections = NodeWrangler.GetConnections(SourceRedirect.Inputs[0]).ToList();
+            writer.Write(connections.Count);
+            
+            List<EntityConnection> realConnections = ((EntityNodeWrangler)NodeWrangler).GetRealConnections();
+            foreach (EntityConnection connection in connections)
+            {
+                writer.Write(realConnections.IndexOf(connection));
+            }
             
             writer.Write(Location);
             writer.Write(SourceRedirect.Location);
@@ -396,14 +437,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
         {
             if (Direction == PortDirection.Out)
             {
-                foreach (BaseConnection connection in NodeWrangler.GetConnections(Outputs[0]))
+                foreach (IConnection connection in NodeWrangler.GetConnections(Outputs[0]))
                 {
+                    if (connection.Target != Outputs[0])
+                        return;
                     connection.Source = RedirectTarget;
                 }
             }
             else
             {
-                IConnection connection = NodeWrangler.GetConnections(Inputs[0]).First();
+                IConnection connection = NodeWrangler.GetConnections(Inputs[0]).FirstOrDefault();
                 NodeWrangler.RemoveConnection(connection);
             }
         }
@@ -468,6 +511,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+                
+                List<IConnection> connections = new List<IConnection>();
+                int count = reader.ReadInt();
+                List<EntityConnection> realConnections = wrangler.GetRealConnections();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx = reader.ReadInt();
+                    IConnection connection = realConnections.ElementAtOrDefault(idx);
+                    if (connection == null)
+                        continue;
+                    
+                    connections.Add(connection);
+                }
 
                 Location = reader.ReadPoint();
 
@@ -477,7 +533,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 
                 NodeWrangler.AddNode(SourceRedirect);
                 
-                output.Redirect(this);
+                output.Redirect(this, connections);
             }
             else
             {
@@ -527,6 +583,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                     } break;
                 }
                 Inputs[0].PropertyChanged += OurPropertyChanged;
+                
+                List<IConnection> connections = new List<IConnection>();
+                int count = reader.ReadInt();
+                List<EntityConnection> realConnections = wrangler.GetRealConnections();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx = reader.ReadInt();
+                    IConnection connection = realConnections.ElementAtOrDefault(idx);
+                    if (connection == null)
+                        continue;
+                    
+                    connections.Add(connection);
+                }
 
                 Location = reader.ReadPoint();
 
@@ -537,7 +606,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 
                 NodeWrangler.AddNode(SourceRedirect);
                 
-                port.Redirect(this);
+                port.Redirect(this, connections);
             }
 
             return true;
@@ -573,6 +642,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             EntityPort redirectTarget = (EntityPort)RedirectTarget;
             writer.Write((int)redirectTarget.Type);
             writer.WriteNullTerminatedString(RedirectTarget.Name);
+
+            List<IConnection> connections = NodeWrangler.GetConnections(SourceRedirect.Outputs[0]).ToList();
+            writer.Write(connections.Count);
+
+            List<EntityConnection> realConnections = ((EntityNodeWrangler)NodeWrangler).GetRealConnections();
+            foreach (EntityConnection connection in connections)
+            {
+                writer.Write(realConnections.IndexOf(connection));
+            }
             
             writer.Write(Location);
             writer.Write(SourceRedirect.Location);

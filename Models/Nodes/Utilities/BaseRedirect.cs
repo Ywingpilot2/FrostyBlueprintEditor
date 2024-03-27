@@ -83,8 +83,11 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
         {
             if (Direction == PortDirection.In)
             {
-                foreach (BaseConnection connection in NodeWrangler.GetConnections(Inputs[0]))
+                foreach (IConnection connection in NodeWrangler.GetConnections(Inputs[0]))
                 {
+                    if (connection.Target != Inputs[0])
+                        return;
+                    
                     connection.Target = RedirectTarget;
                 }
             }

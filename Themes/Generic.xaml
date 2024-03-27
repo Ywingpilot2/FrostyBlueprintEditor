@@ -13,40 +13,65 @@
     xmlns:nodes="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes"
     xmlns:ports="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports"
     xmlns:options="clr-namespace:BlueprintEditorPlugin.Options"
-    xmlns:connections="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Connections">
+    xmlns:connections="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Connections"
+    xmlns:presentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
     <SolidColorBrush x:Key="EventConnectionColor"
-                     Color="#F8F8F8" />
+                     Color="#F8F8F8" 
+                     presentationOptions:Freeze="True" />
     <Color x:Key="PropertyColor" R="95" G="217" B="95"/> <!--Work around lol-->
     <SolidColorBrush x:Key="PropertyConnectionColor"
-                     Color="#5FD95F" />
+                     Color="#5FD95F" 
+                     presentationOptions:Freeze="True" />
     <SolidColorBrush x:Key="LinkConnectionColor"
-                     Color="#6FA9CE" />
+                     Color="#6FA9CE" 
+                     presentationOptions:Freeze="True" />
     <SolidColorBrush x:Key="NodeHeaderColor"
-                     Color="#3F3F3F" />
+                     Color="#3F3F3F" 
+                     presentationOptions:Freeze="True" />
     <SolidColorBrush x:Key="NodeBackgroundColor"
-                     Color="#C2C2C2" />
+                     Color="#C2C2C2" 
+                     presentationOptions:Freeze="True" />
     
     <SolidColorBrush x:Key="NodeBorderColor"
-                     Color="Transparent" />
+                     Color="Transparent" 
+                     presentationOptions:Freeze="True" />
     <SolidColorBrush x:Key="NodeSelectedColor"
-                     Color="#EEE8AB" />
+                     Color="#EEE8AB" 
+                     presentationOptions:Freeze="True" />
     
-    <SolidColorBrush x:Key="CanvasBackground" Color="#141414"/>
-    <SolidColorBrush x:Key="CanvasGridMajor" Color="#000000"/>
-    <SolidColorBrush x:Key="CanvasGridMinor" Color="#1C1C1C"/>
+    <SolidColorBrush x:Key="CanvasBackground" Color="#141414"
+                     presentationOptions:Freeze="True" 
+                     RenderOptions.CachingHint="Cache"
+                     RenderOptions.CacheInvalidationThresholdMaximum="2"
+                     RenderOptions.CacheInvalidationThresholdMinimum="0.35"
+                     RenderOptions.BitmapScalingMode="Linear"/>
+    <SolidColorBrush x:Key="CanvasGridMajor" Color="#000000"
+                     presentationOptions:Freeze="True" 
+                     RenderOptions.CachingHint="Cache"
+                     RenderOptions.CacheInvalidationThresholdMaximum="2"
+                     RenderOptions.CacheInvalidationThresholdMinimum="0.35"
+                     RenderOptions.BitmapScalingMode="Linear"/>
+    <SolidColorBrush x:Key="CanvasGridMinor" Color="#1C1C1C"
+                     presentationOptions:Freeze="True" 
+                     RenderOptions.CachingHint="Cache"
+                     RenderOptions.CacheInvalidationThresholdMaximum="2"
+                     RenderOptions.CacheInvalidationThresholdMinimum="0.35"
+                     RenderOptions.BitmapScalingMode="Linear"/>
     
     <GeometryDrawing x:Key="SmallGridGeometry"
                      Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
-                     Brush="{StaticResource CanvasGridMinor}" />
+                     Brush="{StaticResource CanvasGridMinor}" 
+                     presentationOptions:Freeze="True" />
 
     <GeometryDrawing x:Key="LargeGridGeometry"
                      Geometry="M0,0 L0,1 0.015,1 0.015,0.015 1,0.015 1,0 Z"
-                     Brush="{StaticResource CanvasGridMajor}" />
+                     Brush="{StaticResource CanvasGridMajor}" 
+                     presentationOptions:Freeze="True" />
     
     <!--Blueprint Editor-->
     <Style TargetType="{x:Type blueprintEditor:BlueprintEditor}">
@@ -95,6 +120,79 @@
                 <Setter Property="Panel.ZIndex" Value="1" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="{x:Type nodify:NodifyEditor}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type nodify:NodifyEditor}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Canvas RenderTransform="{TemplateBinding ViewportTransform}">
+                            <nodify:NodifyCanvas x:Name="PART_ItemsHost"
+                                                IsItemsHost="True"
+                                                Extent="{Binding ItemsExtent, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}" />
+
+                            <ItemsControl ItemsSource="{TemplateBinding Connections}"
+                                          ItemTemplate="{TemplateBinding ConnectionTemplate}"
+                                          IsTabStop="False">
+                                <ItemsControl.Style>
+                                    <Style TargetType="ItemsControl">
+                                        <Setter Property="Panel.ZIndex"
+                                                Value="-1" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DisplayConnectionsOnTop, RelativeSource={RelativeSource TemplatedParent}}"
+                                                         Value="True">
+                                                <Setter Property="Panel.ZIndex"
+                                                        Value="0" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ItemsControl.Style>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                            <ContentPresenter ContentSource="PendingConnection" />
+
+                            <Rectangle Style="{TemplateBinding SelectionRectangleStyle}"
+                                       RenderTransform="{Binding ViewportTransform, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource UnscaleTransformConverter}}"
+                                       Canvas.Top="{Binding SelectedArea.Y, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Canvas.Left="{Binding SelectedArea.X, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Visibility="{TemplateBinding IsSelecting, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Rectangle.Width>
+                                    <MultiBinding Converter="{StaticResource UnscaleDoubleConverter}">
+                                        <Binding Path="SelectedArea.Width" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="ViewportZoom" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    </MultiBinding>
+                                </Rectangle.Width>
+                                <Rectangle.Height>
+                                    <MultiBinding Converter="{StaticResource UnscaleDoubleConverter}">
+                                        <Binding Path="SelectedArea.Height" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="ViewportZoom" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    </MultiBinding>
+                                </Rectangle.Height>
+                            </Rectangle>
+
+                            <nodify:DecoratorsControl ItemsSource="{TemplateBinding Decorators}"
+                                                      ItemContainerStyle="{TemplateBinding DecoratorContainerStyle}"
+                                                      ItemTemplate="{TemplateBinding DecoratorTemplate}"
+                                                      IsTabStop="False">
+                                <nodify:DecoratorsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <nodify:NodifyCanvas Extent="{Binding DecoratorsExtent, Mode=OneWayToSource, RelativeSource={RelativeSource AncestorType=nodify:NodifyEditor}}"/>
+                                    </ItemsPanelTemplate>
+                                </nodify:DecoratorsControl.ItemsPanel>
+                            </nodify:DecoratorsControl>
+                        </Canvas>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     
 </ResourceDictionary>

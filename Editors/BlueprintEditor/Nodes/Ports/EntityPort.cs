@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Options;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
@@ -81,8 +84,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 Node.NodeWrangler.AddNode(redirectSource);
                 Node.NodeWrangler.AddNode(redirectTarget);
 
-                foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+                foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {
+                    if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                        continue;
+                    
                     connection.Target = redirectSource.Inputs[0];
                 }
 
@@ -102,8 +108,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 Node.NodeWrangler.AddNode(redirectSource);
                 Node.NodeWrangler.AddNode(redirectTarget);
 
-                foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+                foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {
+                    if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                        continue;
+                    
                     connection.Source = redirectSource.Outputs[0];
                 }
 
@@ -111,30 +120,42 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             }
         }
 
-        public void Redirect(EntityInputRedirect redirectTarget)
+        public void Redirect(EntityInputRedirect redirectTarget, List<IConnection> connections)
         {
             if (Direction != PortDirection.In)
                 return;
 
             //Node.NodeWrangler.AddNode(redirectTarget);
 
-            foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+            foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
             {
+                if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                    continue;
+                
+                if (!connections.Contains(connection))
+                    continue;
+                
                 connection.Target = redirectTarget.SourceRedirect.Inputs[0];
             }
 
             Node.NodeWrangler.AddConnection(new TransientConnection(redirectTarget.Outputs[0], this, Type));
         }
         
-        public void Redirect(EntityOutputRedirect redirectTarget)
+        public void Redirect(EntityOutputRedirect redirectTarget, List<IConnection> connections)
         {
             if (Direction != PortDirection.Out)
                 return;
 
             //Node.NodeWrangler.AddNode(redirectTarget);
 
-            foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
+            foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
             {
+                if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                    continue;
+                
+                if (!connections.Contains(connection))
+                    continue;
+                
                 connection.Source = redirectTarget.SourceRedirect.Outputs[0];
             }
 

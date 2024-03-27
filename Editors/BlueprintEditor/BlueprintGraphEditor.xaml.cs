@@ -446,8 +446,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         static BlueprintGraphEditor()
         {
             NodifyEditor.EnableRenderingContainersOptimizations = true;
-            NodifyEditor.OptimizeRenderingMinimumContainers = 20;
-            NodifyEditor.OptimizeRenderingZoomOutPercent = 0.25;
+            NodifyEditor.OptimizeRenderingMinimumContainers = 10;
+            NodifyEditor.OptimizeRenderingZoomOutPercent = 0.1;
             
             //populate types list
             foreach (Type type in TypeLibrary.GetTypes("GameDataContainer"))
@@ -623,8 +623,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         private void PasteObject(object sender, RoutedEventArgs e)
         {
             // Item is not valid for pasting
-            if (FrostyClipboard.Current.GetData() == null ||
-                !TypeLibrary.IsSubClassOf(FrostyClipboard.Current.GetData(), "GameDataContainer"))
+            if (FrostyClipboard.Current.GetData() == null)
+                return;
+            
+            if (!TypeLibrary.IsSubClassOf(FrostyClipboard.Current.GetData(), "GameDataContainer"))
                 return;
             
             EntityNode node = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);

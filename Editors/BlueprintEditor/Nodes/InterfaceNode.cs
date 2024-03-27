@@ -101,6 +101,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 EditArgs.Name = args.OldValue.ToString();
                 return;
             }
+            
+            
 
             ((dynamic)SubObject).Name = new CString(EditArgs.Name);
             Header = EditArgs.Name;

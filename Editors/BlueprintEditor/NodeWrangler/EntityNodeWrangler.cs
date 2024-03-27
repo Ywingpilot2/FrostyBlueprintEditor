@@ -292,6 +292,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #endregion
 
+        #region Getting connections
+
+        /// <summary>
+        /// Gets a list of real connections, so not <see cref="TransientConnection"/>
+        /// </summary>
+        /// <returns></returns>
+        public List<EntityConnection> GetRealConnections()
+        {
+            List<EntityConnection> entityConnections = new List<EntityConnection>();
+
+            foreach (EntityConnection connection in Connections)
+            {
+                if (connection is TransientConnection)
+                    continue;
+                
+                entityConnections.Add(connection);
+            }
+
+            return entityConnections;
+        }
+
+        #endregion
+
         #region Creating connections
 
         public override void AddConnection(IConnection connection)
