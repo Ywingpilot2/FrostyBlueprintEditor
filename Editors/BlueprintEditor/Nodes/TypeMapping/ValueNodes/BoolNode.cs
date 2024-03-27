@@ -1,5 +1,6 @@
 ﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.ValueNodes
 {
@@ -24,6 +25,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.ValueN
             AddInput("SetFalse", ConnectionType.Event, Realm);
 
             AddOutput("Value", ConnectionType.Property, Realm);
+        }
+
+        public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
+        {
+            base.OnObjectModified(sender, args);
+            
+            if ((bool)TryGetProperty("DefaultValue"))
+            {
+                Footer = "Defaults to true";
+            }
+            else
+            {
+                Footer = "Defaults to false";
+            }
         }
     }
 }

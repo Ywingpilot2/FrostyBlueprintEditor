@@ -104,36 +104,60 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             case "FieldAccessType_Source":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
+                                {
+                                    SubObject = field
+                                });
                             } break;
                             case "FieldAccessType_Target":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
+                                {
+                                    SubObject = field
+                                });
                             } break;
                             case "FieldAccessType_SourceAndTarget":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler));
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler));
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
+                                {
+                                    SubObject = field
+                                });
+                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
+                                {
+                                    SubObject = field
+                                });
                             } break;
                         }
                     }
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler)
+                        {
+                            SubObject = inputEvent
+                        });
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler)
+                        {
+                            SubObject = outputEvent
+                        });
                     }
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler)
+                        {
+                            SubObject = inputLink
+                        });
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler));
+                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler)
+                        {
+                            SubObject = outputLink
+                        });
                     }
                     
                     continue;
@@ -454,19 +478,24 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
             if (e.AddedItems.Count != 0)
             {
-                if (e.AddedItems[0] is EntityNode entityNode)
+                switch (e.AddedItems[0])
                 {
-                    NodePropertyGrid.Object = entityNode.Object;
-                }
-                
-                if (e.AddedItems[0] is EntityComment comment)
-                {
-                    NodePropertyGrid.Object = comment.Object;
-                }
-
-                if (e.AddedItems[0] is IObjectContainer container)
-                {
-                    NodePropertyGrid.Object = container.Object;
+                    case EntityNode entityNode:
+                    {
+                        NodePropertyGrid.Object = entityNode.Object;
+                    } break;
+                    case EntityComment comment:
+                    {
+                        NodePropertyGrid.Object = comment.Object;
+                    } break;
+                    case InterfaceNode interfaceNode:
+                    {
+                        NodePropertyGrid.Object = interfaceNode.EditArgs;
+                    } break;
+                    case IObjectContainer container:
+                    {
+                        NodePropertyGrid.Object = container.Object;
+                    } break;
                 }
             }
             else
@@ -501,6 +530,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                                 node.OnObjectModified(sender, e);
                                 App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
                             } break;
+                            case InterfaceNode interfaceNode:
+                            {
+                                interfaceNode.OnObjectModified(sender, e);
+                                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                            } break;
                             case EntityComment comment:
                             {
                                 comment.OnObjectModified(sender, e);
@@ -522,6 +556,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         node.OnObjectModified(sender, e);
                         App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
                     } break;
+                    case InterfaceNode interfaceNode:
+                    {
+                        interfaceNode.OnObjectModified(sender, e);
+                        App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                    } break;
                     case EntityComment comment:
                     {
                         comment.OnObjectModified(sender, e);
@@ -535,40 +574,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
         
         #region Adding & removing nodes
-
-        private void AddButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (TabControl.SelectedIndex == 0)
-            {
-                ClassSelector_OnItemDoubleClicked(this, null); // Lazy workaround lol
-            }
-            else
-            {
-                TransClassSelector_OnItemDoubleClicked(this, null);
-            }
-        }
-
-        private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
-            foreach (IVertex selectedNode in oldSelection)
-            {
-                if (selectedNode is IRedirect redirect)
-                {
-                    if (redirect.SourceRedirect != null)
-                    {
-                        NodeWrangler.RemoveNode(redirect.SourceRedirect);
-                    }
-                    else
-                    {
-                        NodeWrangler.RemoveNode(redirect.TargetRedirect);
-                    }
-                }
-                
-                NodeWrangler.RemoveNode(selectedNode);
-            }
-        }
-        
         private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
         {
             List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
@@ -606,7 +611,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     NodeWrangler.SelectedNodes.Add(newNode);
                 }
 
-                if (selectedNode is InterfaceNode interfaceNode)
+                if (selectedNode is InterfaceNode)
                 {
                     App.Logger.LogError("Cannot duplicate interface nodes.");
                 }
@@ -654,6 +659,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             
             NodeWrangler.AddNode(vertex);
         }
+        
+        private void SearchForClass_Click(object sender, RoutedEventArgs e)
+        {
+            ClassSelector classSelector = new ClassSelector(Types.ToArray());
+            if (classSelector.ShowDialog() == true)
+            {
+                if (classSelector.SelectedClass == null)
+                    return;
+                
+                EntityNode node = EntityNode.GetNodeFromEntity(classSelector.SelectedClass, NodeWrangler);
+                node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
+                NodeWrangler.AddNode(node);
+            }
+        }
 
         #endregion
 
@@ -678,6 +697,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         {
             BlueprintEditorControlsWindow controlsWindow = new BlueprintEditorControlsWindow();
             controlsWindow.Show();
+        }
+        
+        private void ToolboxVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToolboxPanel.Visibility = ToolboxPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        }
+        
+        private void PropertyGridVisible_OnClick(object sender, RoutedEventArgs e)
+        {
+            PropertyPanel.Visibility = PropertyPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         #endregion
@@ -753,19 +782,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
-
-        private void SearchForNode_Click(object sender, RoutedEventArgs e)
+        
+        private void ImportOrganizationButton_OnClick(object sender, RoutedEventArgs e)
         {
-            ClassSelector classSelector = new ClassSelector(Types.ToArray());
-            if (classSelector.ShowDialog() == true)
-            {
-                if (classSelector.SelectedClass == null)
-                    return;
-                
-                EntityNode node = EntityNode.GetNodeFromEntity(classSelector.SelectedClass, NodeWrangler);
-                node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
-                NodeWrangler.AddNode(node);
-            }
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Layout", "Blueprint Layout (*.lyt)|*.lyt|Text File (*.txt)|*.txt", "BlueprintLayout");
+            if (!ofd.ShowDialog())
+                return;
+
+            LayoutManager.LoadLayout(ofd.FileName);
         }
     }
 }

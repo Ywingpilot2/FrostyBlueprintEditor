@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
@@ -12,10 +13,13 @@ using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
+using BlueprintEditorPlugin.Windows;
 using Frosty.Core.Controls;
+using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
+using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
@@ -34,6 +38,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 NotifyPropertyChanged(nameof(Header));
             }
         }
+
+        /// <summary>
+        /// The direction this node goes
+        /// </summary>
+        public PortDirection Direction => Inputs.Count != 0 ? PortDirection.In : PortDirection.Out;
 
         public ObservableCollection<IPort> Inputs { get; } = new ObservableCollection<IPort>();
         public ObservableCollection<IPort> Outputs { get; } = new ObservableCollection<IPort>();
@@ -64,6 +73,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         public object Object { get; }
         
+        /// <summary>
+        /// The part of the interface <see cref="Object"/> which contains this nodes information
+        /// </summary>
+        public object SubObject { get; set; }
+        
+        /// <summary>
+        /// blehhh
+        /// </summary>
+        public EditInterfaceArgs EditArgs { get; set; }
+
         public PointerRefType Type => PointerRefType.Internal;
         public AssetClassGuid InternalGuid { get; set; }
         
@@ -72,8 +91,28 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         public void OnObjectModified(object sender, ItemModifiedEventArgs args)
         {
-        }
+            if (args.OldValue == args.NewValue)
+                return;
+            
+            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+            if (wrangler.GetInterfaceNode(EditArgs.Name, Direction) != null)
+            {
+                App.Logger.LogError("Cannot have 2 interface nodes of the same name.");
+                EditArgs.Name = args.OldValue.ToString();
+                return;
+            }
 
+            ((dynamic)SubObject).Name = new CString(EditArgs.Name);
+            Header = EditArgs.Name;
+            if (Direction == PortDirection.In)
+            {
+                Inputs[0].Name = Header;
+            }
+            else
+            {
+                Outputs[0].Name = Header;
+            }
+        }
 
         public EntityInput GetInput(string name, ConnectionType type)
         {
@@ -275,6 +314,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     } break;
                 }
             }
+
+            EditArgs = new EditInterfaceArgs(this);
         }
 
         public InterfaceNode(INodeWrangler nodeWrangler)
@@ -289,6 +330,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public override string ToString()
         {
             return Header ?? base.ToString();
+        }
+    }
+
+    public class EditInterfaceArgs
+    {
+        [DisplayName("Name")]
+        [Description("The name of this interface")]
+        public string Name { get; set; }
+
+        public EditInterfaceArgs(InterfaceNode node)
+        {
+            Name = node.Header;
+        }
+
+        public EditInterfaceArgs()
+        {
+            Name = "";
         }
     }
 }

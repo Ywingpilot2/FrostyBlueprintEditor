@@ -19,18 +19,16 @@
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <SolidColorBrush x:Key="EventConnection"
+    <SolidColorBrush x:Key="EventConnectionColor"
                      Color="#F8F8F8" />
     <Color x:Key="PropertyColor" R="95" G="217" B="95"/> <!--Work around lol-->
-    <SolidColorBrush x:Key="PropertyConnection"
+    <SolidColorBrush x:Key="PropertyConnectionColor"
                      Color="#5FD95F" />
-    <SolidColorBrush x:Key="LinkConnection"
+    <SolidColorBrush x:Key="LinkConnectionColor"
                      Color="#6FA9CE" />
-    <SolidColorBrush x:Key="NodeText"
-                     Color="#3B3B3B" />
-    <SolidColorBrush x:Key="TitleBackground"
+    <SolidColorBrush x:Key="NodeHeaderColor"
                      Color="#3F3F3F" />
-    <SolidColorBrush x:Key="Background"
+    <SolidColorBrush x:Key="NodeBackgroundColor"
                      Color="#C2C2C2" />
     
     <SolidColorBrush x:Key="NodeBorderColor"
@@ -61,6 +59,42 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    
+    <!--Generic node style-->
+    <Style TargetType="{x:Type nodify:Node}">
+        <Setter Property="Background" Value="{StaticResource NodeBackgroundColor}"/>
+        <Setter Property="ContentBrush" Value="{StaticResource NodeBackgroundColor}"/>
+        <Setter Property="HeaderBrush" Value="{StaticResource NodeHeaderColor}" />
+        <Setter Property="FontFamily" Value="Consolas" />
+        <Setter Property="BorderBrush" Value="#555555" />
+    </Style>
+    
+    <!--Item container style-->
+    <Style TargetType="{x:Type nodify:ItemContainer}"
+           BasedOn="{StaticResource {x:Type nodify:ItemContainer}}"
+           x:Key="VertexStyle">
+        <Setter Property="Location"
+                Value="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Setter Property="BorderThickness"
+                Value="2">
+        </Setter>
+        <Setter Property="HighlightBrush"
+                Value="{StaticResource NodeSelectedColor}">
+        </Setter>
+        <Setter Property="BorderBrush"
+                Value="{StaticResource NodeBorderColor}">
+        </Setter>
+        <Setter Property="SelectedBrush"
+                Value="{StaticResource NodeSelectedColor}">
+        </Setter>
+        <Setter Property="ActualSize"
+                Value="{Binding Size, Mode=OneWayToSource}" />
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Panel.ZIndex" Value="1" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     
 </ResourceDictionary>

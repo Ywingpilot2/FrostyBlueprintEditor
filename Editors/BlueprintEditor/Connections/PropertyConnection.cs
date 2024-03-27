@@ -93,7 +93,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             }
 
             EntityPort target = (EntityPort)Target;
-            if (PropType == PropertyType.Interface && !target.IsInterface)
+            EntityPort source = (EntityPort)Source;
+            if (PropType == PropertyType.Interface && !(target.IsInterface || source.IsInterface))
             {
                 SetStatus(EditorStatus.Flawed, "Property type is set to interface, despite not plugging into an interface");
             }
@@ -115,7 +116,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         public PropertyConnection(PropertyOutput source, PropertyInput target) : base(source, target)
         {
             Object = TypeLibrary.CreateObject("PropertyConnection");
-            PropType = target.IsInterface ? PropertyType.Interface : PropertyType.Default;
+            PropType = target.IsInterface || source.IsInterface ? PropertyType.Interface : PropertyType.Default;
             
             UpdateSourceRef();
             UpdateTargetRef();

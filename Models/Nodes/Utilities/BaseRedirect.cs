@@ -122,7 +122,6 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
             set
             {
                 _source = value;
-                _source.PropertyChanged += NotifyPropertyChanged;
             }
         }
 
@@ -134,7 +133,6 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
             set
             {
                 _target = value;
-                _target.PropertyChanged += NotifyPropertyChanged;
             }
         }
         public IPort RedirectTarget { get; set; }
@@ -159,7 +157,7 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected virtual void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected virtual void RedirectTargetPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -182,6 +180,10 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
             }
         }
 
+        protected virtual void OurPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+        }
+
         #endregion
 
         public BaseRedirect(IPort redirectTarget, PortDirection direction, INodeWrangler wrangler)
@@ -189,8 +191,8 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
             RedirectTarget = redirectTarget;
             Direction = direction;
 
-            RedirectTarget.PropertyChanged += NotifyPropertyChanged;
-            RedirectTarget.Node.PropertyChanged += NotifyPropertyChanged;
+            RedirectTarget.PropertyChanged += RedirectTargetPropertyChanged;
+            RedirectTarget.Node.PropertyChanged += RedirectTargetPropertyChanged;
             NodeWrangler = wrangler;
         }
 

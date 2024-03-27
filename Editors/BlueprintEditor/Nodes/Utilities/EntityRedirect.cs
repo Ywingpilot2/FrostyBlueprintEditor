@@ -64,7 +64,48 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 reader.ReadInt();
                 ConnectionType type = (ConnectionType)reader.ReadInt();
                 string portName = reader.ReadNullTerminatedString();
-                // TODO: Implementation for interface nodes
+                InterfaceNode node = wrangler.GetInterfaceNode(portName, PortDirection.In);
+                EntityInput input = node.GetInput(portName, type);
+
+                RedirectTarget = input;
+                
+                Direction = PortDirection.Out;
+                switch (input.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        Outputs.Add(new EventOutput(input.Name, this)
+                        {
+                            HasPlayer = input.HasPlayer,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        Outputs.Add(new LinkOutput(input.Name, this)
+                        {
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        Outputs.Add(new PropertyOutput(input.Name, this)
+                        {
+                            IsInterface = input.IsInterface,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                }
+
+                Location = reader.ReadPoint();
+
+                SourceRedirect = new EntityInputRedirect(input, PortDirection.In, NodeWrangler);
+                SourceRedirect.Location = reader.ReadPoint();
+                SourceRedirect.TargetRedirect = this;
+                
+                NodeWrangler.AddNode(SourceRedirect);
+                
+                input.Redirect(this);
             }
             else
             {
@@ -116,6 +157,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
 
                 Location = reader.ReadPoint();
 
+                RedirectTarget.PropertyChanged += RedirectTargetPropertyChanged;
                 SourceRedirect = new EntityInputRedirect(port, PortDirection.In, NodeWrangler);
                 SourceRedirect.Location = reader.ReadPoint();
                 SourceRedirect.TargetRedirect = this;
@@ -179,15 +221,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             writer.Write(SourceRedirect.Location);
         }
 
-        protected override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override void RedirectTargetPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            base.NotifyPropertyChanged(sender, e);
+            base.RedirectTargetPropertyChanged(sender, e);
             switch (e.PropertyName)
             {
                 case "IsInterface":
                 {
                     if (Direction == PortDirection.In)
                     {
+                        if (((EntityPort)Inputs[0]).IsInterface == ((EntityPort)RedirectTarget).IsInterface)
+                                return;
+                        
                         ((EntityPort)Inputs[0]).IsInterface = ((EntityPort)RedirectTarget).IsInterface;
                     }
                 } break;
@@ -195,7 +240,51 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 {
                     if (Direction == PortDirection.In)
                     {
+                        if (((EntityPort)Inputs[0]).Realm == ((EntityPort)RedirectTarget).Realm)
+                            return;
+                        
                         ((EntityPort)Inputs[0]).Realm = ((EntityPort)RedirectTarget).Realm;
+                    }
+                } break;
+            }
+        }
+
+        protected override void OurPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "IsInterface":
+                {
+                    if (Direction == PortDirection.In)
+                    {
+                        if (((EntityPort)RedirectTarget).IsInterface == ((EntityPort)Inputs[0]).IsInterface)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).IsInterface = ((EntityPort)Inputs[0]).IsInterface;
+                    }
+                    else
+                    {
+                        if (((EntityPort)RedirectTarget).IsInterface == ((EntityPort)Outputs[0]).IsInterface)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).IsInterface = ((EntityPort)Outputs[0]).IsInterface;
+                    }
+                } break;
+                case "Realm":
+                {
+                    if (Direction == PortDirection.In)
+                    {
+                        if (((EntityPort)RedirectTarget).Realm == ((EntityPort)Inputs[0]).Realm)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).Realm = ((EntityPort)Inputs[0]).Realm;
+                    }
+                    else
+                    {
+                        if (((EntityPort)RedirectTarget).Realm == ((EntityPort)Outputs[0]).Realm)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).Realm = ((EntityPort)Outputs[0]).Realm;
                     }
                 } break;
             }
@@ -235,6 +324,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+
+                Inputs[0].PropertyChanged += OurPropertyChanged;
             }
             else
             {
@@ -264,9 +355,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+
+                Outputs[0].PropertyChanged += OurPropertyChanged;
             }
 
-            RedirectTarget.PropertyChanged += NotifyPropertyChanged;
+            RedirectTarget.PropertyChanged += RedirectTargetPropertyChanged;
             Object = new EditRedirectArgs(this);
         }
 
@@ -343,7 +436,48 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 reader.ReadInt();
                 ConnectionType type = (ConnectionType)reader.ReadInt();
                 string portName = reader.ReadNullTerminatedString();
-                // TODO: Implementation for interface nodes
+                InterfaceNode node = wrangler.GetInterfaceNode(portName, PortDirection.Out);
+                EntityOutput output = node.GetOutput(portName, type);
+
+                RedirectTarget = output;
+                
+                Direction = PortDirection.In;
+                switch (output.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        Inputs.Add(new EventInput(output.Name, this)
+                        {
+                            HasPlayer = output.HasPlayer,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        Inputs.Add(new LinkInput(output.Name, this)
+                        {
+                            Realm = Realm.Any
+                        });
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        Inputs.Add(new PropertyInput(output.Name, this)
+                        {
+                            IsInterface = output.IsInterface,
+                            Realm = Realm.Any
+                        });
+                    } break;
+                }
+
+                Location = reader.ReadPoint();
+
+                SourceRedirect = new EntityOutputRedirect(output, PortDirection.Out, NodeWrangler);
+                SourceRedirect.Location = reader.ReadPoint();
+                SourceRedirect.TargetRedirect = this;
+                
+                NodeWrangler.AddNode(SourceRedirect);
+                
+                output.Redirect(this);
             }
             else
             {
@@ -392,9 +526,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+                Inputs[0].PropertyChanged += OurPropertyChanged;
 
                 Location = reader.ReadPoint();
 
+                RedirectTarget.PropertyChanged += RedirectTargetPropertyChanged;
                 SourceRedirect = new EntityOutputRedirect(port, PortDirection.Out, NodeWrangler);
                 SourceRedirect.Location = reader.ReadPoint();
                 SourceRedirect.TargetRedirect = this;
@@ -442,7 +578,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             writer.Write(SourceRedirect.Location);
         }
 
-        protected override void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override void RedirectTargetPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -464,16 +600,63 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 }
                 case "IsInterface":
                 {
+                    if (Direction == PortDirection.Out)
+                    {
+                        if (((EntityPort)Outputs[0]).IsInterface == ((EntityPort)RedirectTarget).IsInterface)
+                            return;
+                        
+                        ((EntityPort)Outputs[0]).IsInterface = ((EntityPort)RedirectTarget).IsInterface;
+                    }
+                } break;
+                case "Realm":
+                {
+                    if (Direction == PortDirection.Out)
+                    {
+                        if (((EntityPort)Outputs[0]).Realm == ((EntityPort)RedirectTarget).Realm)
+                            return;
+                        
+                        ((EntityPort)Outputs[0]).Realm = ((EntityPort)RedirectTarget).Realm;
+                    }
+                } break;
+            }
+        }
+
+        protected override void OurPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "IsInterface":
+                {
                     if (Direction == PortDirection.In)
                     {
-                        ((EntityPort)Outputs[0]).IsInterface = ((EntityPort)RedirectTarget).IsInterface;
+                        if (((EntityPort)RedirectTarget).IsInterface == ((EntityPort)Inputs[0]).IsInterface)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).IsInterface = ((EntityPort)Inputs[0]).IsInterface;
+                    }
+                    else
+                    {
+                        if (((EntityPort)RedirectTarget).IsInterface == ((EntityPort)Outputs[0]).IsInterface)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).IsInterface = ((EntityPort)Outputs[0]).IsInterface;
                     }
                 } break;
                 case "Realm":
                 {
                     if (Direction == PortDirection.In)
                     {
-                        ((EntityPort)Outputs[0]).Realm = ((EntityPort)RedirectTarget).Realm;
+                        if (((EntityPort)RedirectTarget).Realm == ((EntityPort)Inputs[0]).Realm)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).Realm = ((EntityPort)Inputs[0]).Realm;
+                    }
+                    else
+                    {
+                        if (((EntityPort)RedirectTarget).Realm == ((EntityPort)Outputs[0]).Realm)
+                            return;
+                        
+                        ((EntityPort)RedirectTarget).Realm = ((EntityPort)Outputs[0]).Realm;
                     }
                 } break;
             }
@@ -513,6 +696,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+                Inputs[0].PropertyChanged += OurPropertyChanged;
             }
             else
             {
@@ -542,9 +726,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         });
                     } break;
                 }
+                Outputs[0].PropertyChanged += OurPropertyChanged;
             }
 
-            RedirectTarget.PropertyChanged += NotifyPropertyChanged;
+            RedirectTarget.PropertyChanged += RedirectTargetPropertyChanged;
             Object = new EditRedirectArgs(this);
         }
 
