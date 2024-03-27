@@ -1,5 +1,0 @@
-Type = PlayerAbilityWeaponUpgradeInfoEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-DisplayName = PlayerAbilityWeaponUpgradeInfoEntityData
-InputProperty = WeaponUpgradeIdData, Client
-OutputProperty = MetaData, Client

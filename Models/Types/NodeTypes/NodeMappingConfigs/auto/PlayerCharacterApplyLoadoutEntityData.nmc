@@ -1,5 +1,0 @@
-Type = PlayerCharacterApplyLoadoutEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-DisplayName = PlayerCharacterApplyLoadoutEntityData
-InputProperty = ApplyWeaponOnly, ObjectRealm
-InputEvent = 0xe3da9419, Server

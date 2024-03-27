@@ -1,7 +1,0 @@
-Type = PathfindingStreamEntityData
-DisplayName = PathfindingStreamEntityData
-InputProperty = PathfindingBlobs, ObjectRealm
-InputProperty = Autoload, ObjectRealm
-InputEvent = StreamIn, Server
-InputEvent = StreamOut, Server
-OutputEvent = OnStreamedIn, Server

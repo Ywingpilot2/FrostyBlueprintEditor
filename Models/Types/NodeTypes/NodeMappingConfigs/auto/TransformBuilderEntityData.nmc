@@ -1,9 +1,0 @@
-Type = TransformBuilderEntityData
-DisplayName = TransformBuilderEntityData
-InputProperty = Left, ObjectRealm
-InputProperty = Up, ObjectRealm
-InputProperty = Forward, ObjectRealm
-InputProperty = Trans, ObjectRealm
-InputProperty = OrthoNormalMode, ObjectRealm
-InputProperty = IsWorldSpace, ObjectRealm
-OutputProperty = Transform, ObjectRealm

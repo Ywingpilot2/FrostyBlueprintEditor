@@ -1,9 +1,0 @@
-Type = CompareFloatRangeEntityData
-DisplayName = CompareFloatRangeEntityData
-InputProperty = Value, ObjectRealm
-InputProperty = Min, ObjectRealm
-InputProperty = Max, ObjectRealm
-InputEvent = In, ObjectRealm
-OutputEvent = InRange, ObjectRealm
-OutputEvent = Less, ObjectRealm
-OutputEvent = Greater, ObjectRealm

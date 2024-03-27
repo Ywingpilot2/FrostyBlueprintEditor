@@ -1,6 +1,0 @@
-Type = AlternateSpawnEntityData
-DisplayName = AlternateSpawnEntityData
-InputProperty = Team, ObjectRealm
-InputProperty = Priority, ObjectRealm
-InputProperty = Enabled, ObjectRealm
-InputProperty = Transform, ObjectRealm

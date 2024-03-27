@@ -1,6 +1,0 @@
-Type = Vec4SplitterEntityData
-DisplayName = Vec4SplitterEntityData
-InputProperty = In, Client
-OutputProperty = X, Client
-OutputProperty = Y, Client
-OutputProperty = Z, Client

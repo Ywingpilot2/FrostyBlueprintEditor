@@ -1,4 +1,0 @@
-Type = AICancelOrderEntityData
-DisplayName = AICancelOrder
-InputEvent = IssueOrder, Server
-OutputEvent = OnComplete, Server

@@ -1,7 +1,0 @@
-Type = AIAwarenessEntityData
-DisplayName = AIAwareness
-ValidGameExecutableName = starwarsbattlefrontii
-InputProperty = EnableAlertnessStates, ObjectRealm
-InputProperty = EnableSounds, ObjectRealm
-InputEvent = Deactivate, Server
-OutputLink = Soldier, ObjectRealm

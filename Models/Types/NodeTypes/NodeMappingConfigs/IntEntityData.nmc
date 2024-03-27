@@ -1,7 +1,0 @@
-﻿Type = IntEntityData
-DisplayName = Integer
-InputProperty = Value, ObjectRealm
-InputEvent = Increment, ObjectRealm
-InputEvent = Decrement, ObjectRealm
-OutputProperty = Value, ObjectRealm
-Documentation = This node stores a simple Integer value, which can also be incremented and decremented.

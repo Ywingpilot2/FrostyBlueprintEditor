@@ -1,6 +1,0 @@
-Type = KillAllEntityData
-DisplayName = KillAllEntityData
-InputProperty = Team, ObjectRealm
-InputProperty = KillPlayers, ObjectRealm
-InputProperty = DamageGivingPlayer, ObjectRealm
-InputEvent = Impulse, Server

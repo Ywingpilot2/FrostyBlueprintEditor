@@ -1,6 +1,0 @@
-Type = ConditionalStringEntityData
-DisplayName = ConditionalStringEntityData
-InputProperty = ValueIfTrue, ObjectRealm
-InputProperty = ValueIfFalse, ObjectRealm
-InputProperty = Condition, ObjectRealm
-OutputProperty = Output, ObjectRealm

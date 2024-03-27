@@ -1,4 +1,0 @@
-Type = Vector3EntityData
-DisplayName = Vector3EntityData
-InputProperty = DefaultVec3, ObjectRealm
-OutputProperty = Vector, ObjectRealm

@@ -1,6 +1,0 @@
-Type = ContainsCharacterIdDataEntityData
-DisplayName = ContainsCharacterIdDataEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-InputProperty = ObjectA, Server
-InputProperty = CollectionB, Server
-OutputProperty = 0xbe1e2f14, Server

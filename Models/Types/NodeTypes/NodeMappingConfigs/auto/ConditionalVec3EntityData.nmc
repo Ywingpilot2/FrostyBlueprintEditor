@@ -1,6 +1,0 @@
-Type = ConditionalVec3EntityData
-DisplayName = ConditionalVec3EntityData
-InputProperty = ValueIfTrue, ObjectRealm
-InputProperty = ValueIfFalse, ObjectRealm
-InputProperty = Condition, ObjectRealm
-OutputProperty = Output, ObjectRealm

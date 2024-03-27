@@ -1,7 +1,0 @@
-Type = TransformBlendEntityData
-DisplayName = TransformBlendEntityData
-InputProperty = In1, ObjectRealm
-InputProperty = In2, ObjectRealm
-InputProperty = BlendValue, ObjectRealm
-InputProperty = BlendValue2, ObjectRealm
-OutputProperty = Out, ObjectRealm

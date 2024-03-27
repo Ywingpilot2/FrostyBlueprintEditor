@@ -1,4 +1,0 @@
-Type = AISearchAreaEntityData
-DisplayName = AISearchAreaEntityData
-InputProperty = IgnoreRotation, ObjectRealm
-InputProperty = AutoActivate, ObjectRealm

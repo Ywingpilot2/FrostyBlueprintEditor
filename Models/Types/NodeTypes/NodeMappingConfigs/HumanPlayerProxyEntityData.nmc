@@ -1,4 +1,0 @@
-Type = HumanPlayerProxyEntityData
-DisplayName = HumanPlayerProxy
-OutputEvent = OnPlayerSpawnEnabled, Server
-OutputEvent = OnPlayerSpawnDisabled, Server

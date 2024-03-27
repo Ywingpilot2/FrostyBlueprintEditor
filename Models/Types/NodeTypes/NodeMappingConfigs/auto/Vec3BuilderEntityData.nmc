@@ -1,6 +1,0 @@
-Type = Vec3BuilderEntityData
-DisplayName = Vec3BuilderEntityData
-InputProperty = Y, ObjectRealm
-InputProperty = Z, ObjectRealm
-InputProperty = X, ObjectRealm
-OutputProperty = Out, ObjectRealm

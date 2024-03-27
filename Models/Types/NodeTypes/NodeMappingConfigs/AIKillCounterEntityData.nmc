@@ -1,7 +1,0 @@
-Type = AIKillCounterEntityData
-DisplayName = AIKillCounter
-InputEvent = Enable, Server
-InputEvent = Disable, Server
-OutputProperty = Alive, Server
-OutputEvent = AliveThresholdTrigger, Server
-OutputLink = Spawners, Server

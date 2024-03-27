@@ -1,7 +1,0 @@
-Type = AIFollowObjectEntityData
-DisplayName = AIFollowObjectEntityData
-InputProperty = GoToPosition, ObjectRealm
-InputEvent = Activate, Server
-InputEvent = Deactivate, Server
-OutputLink = Spawners, ObjectRealm
-OutputLink = ObjectToFollow, ObjectRealm

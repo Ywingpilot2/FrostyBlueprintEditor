@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
+using BlueprintEditorPlugin.Editors.BlueprintEditor;
 using BlueprintEditorPlugin.Extensions;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using Frosty.Core.Windows;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin
 {
@@ -13,25 +16,40 @@ namespace BlueprintEditorPlugin
     {
         private const string GraphEditor = "GraphEditor";
         private BlueprintGraphEditor _graphEditor;
-        public override ImageSource Icon { get; } = ViewBlueprintMenuExtension.iconImageSource;
+        public override ImageSource Icon => ViewBlueprintContextMenuItem.IconImageSource;
 
         static BlueprintEditor()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BlueprintEditor), new FrameworkPropertyMetadata(typeof(BlueprintEditor)));
         }
-
+        
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            
             _graphEditor = GetTemplateChild(GraphEditor) as BlueprintGraphEditor;
-            _graphEditor.File = App.SelectedAsset;
-            GotMouseCapture += _graphEditor.BlueprintEditorWindow_OnGotFocus;
+        }
+
+        private bool _loaded = false;
+        public void LoadBlueprint(EbxAssetEntry assetEntry)
+        {
+            // Stupid fuck why does this happen????
+            if (_loaded == true)
+                return;
+            
+            _loaded = true;
+#if DEVELOPER___DEBUG
+            _graphEditor.LoadAsset(assetEntry);
+#else
+            FrostyTaskWindow.Show("Loading blueprint...", "", task =>
+            {
+                _graphEditor.LoadAsset(assetEntry);
+            });
+#endif
         }
 
         public override void Closed()
         {
-            _graphEditor.BlueprintEditorWindow_OnClosing(this, new CancelEventArgs());
+            base.Closed();
         }
     }
 }

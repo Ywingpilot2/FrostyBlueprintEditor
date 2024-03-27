@@ -1,4 +1,0 @@
-Type = NotEntityData
-DisplayName = Not
-InputProperty = In, ObjectRealm
-OutputProperty = Out, ObjectRealm

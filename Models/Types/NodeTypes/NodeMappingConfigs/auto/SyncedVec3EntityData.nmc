@@ -1,6 +1,0 @@
-Type = SyncedVec3EntityData
-ValidGameExecutableName = starwarsbattlefrontii
-DisplayName = SyncedVec3EntityData
-InputProperty = Interpolate, ObjectRealm
-InputProperty = In, Server
-OutputProperty = Out, ObjectRealm

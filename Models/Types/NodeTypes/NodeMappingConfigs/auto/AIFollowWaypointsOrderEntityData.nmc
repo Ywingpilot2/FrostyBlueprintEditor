@@ -1,9 +1,0 @@
-Type = AIFollowWaypointsOrderEntityData
-DisplayName = AIFollowWaypointsOrderEntityData
-InputProperty = StartAtGeometricallyClosestWaypoint, ObjectRealm
-InputProperty = UsePhysicsDrivenLocomotion, ObjectRealm
-InputEvent = IssueOrder, Server
-InputEvent = 0x3524dd7f, Server
-InputEvent = TeleportToEnd, Server
-OutputEvent = OnDestinationReached, ObjectRealm
-OutputEvent = OnComplete, ObjectRealm

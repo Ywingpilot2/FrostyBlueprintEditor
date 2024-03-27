@@ -1,7 +1,0 @@
-Type = PauseEntityData
-DisplayName = PauseEntityData
-InputProperty = PauseVideos, ObjectRealm
-InputEvent = Pause, Client
-InputEvent = Unpause, Client
-OutputProperty = IsPaused, Client
-OutputProperty = 0xc7bae519, Client

@@ -1,4 +1,0 @@
-Type = TeamEntityData
-DisplayName = TeamEntityData
-InputProperty = Id, ObjectRealm
-InputProperty = Team, ObjectRealm

@@ -1,5 +1,0 @@
-Type = AISoundEntityData
-DisplayName = AISoundEntityData
-InputProperty = SoundParams, ObjectRealm
-InputProperty = SendOnce, ObjectRealm
-InputProperty = Transform, ObjectRealm

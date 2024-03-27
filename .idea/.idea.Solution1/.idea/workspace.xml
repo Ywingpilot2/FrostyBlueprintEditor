@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="154c8aed-9ea1-4ada-ae75-063e712baad5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Editors/GraphEditor/BaseGraphEditor.xaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Editors/GraphEditor/BaseGraphEditor.xaml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Editors/NodeTest/NodeTest.xaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Editors/NodeTest/NodeTest.xaml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Editors/NodeWrangler/BaseNodeWrangler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Editors/NodeWrangler/INodeWrangler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Connections/BaseConnection.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Connections/IConnection.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Nodes/INode.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Nodes/Ports/IPort.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Status/EditorStatus.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Models/Status/StatusItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Solution1/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Solution1/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Attributes/RegisterEbxGraphExtension.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Attributes/RegisterNodeExtension.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlueprintEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlueprintEditorPlugin.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/BlueprintEditorPlugin.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Extensions/BlueprintEditorMenuExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Extensions/BlueprintEditorMenuExtension.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Extensions/BlueprintEditorStartupAction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Extensions/BlueprintEditorStartupAction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Connections/ConnectionFlags.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Connections/ConnectionTypes.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Connections/ConnectionViewModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/BlueprintPropertyGrid.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/EditorStatus.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/Items/BlueprintArrayEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/Items/BlueprintGuidEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/Items/BlueprintNumberEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/Items/BlueprintPointerRefEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/Items/BlueprintResourceRefEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/Items/BlueprintTypeEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Editor/NodeEditorViewModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/EbxEditorTypes/EbxBaseEditor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/EbxEditorTypes/ObjectFlags.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/EbxLoaderTypes/EbxBaseLoader.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/EbxLoaderTypes/ScalableEmitterDocumentLoader.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/ExampleTypes/CompareBoolEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/ExampleTypes/SelectEventEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/NodeEntityViewModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/AndEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/BoolEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/EventSwitch.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/Hubs/FloatHubEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/Hubs/IntHubEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/Hubs/StringHubEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/InterfaceDataNode.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/ObjectReference/CharacterSpawnReferenceObjectData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/ObjectReference/LogicPrefabReferenceObjectData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/ObjectReference/ObjectReferenceObjectData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/ObjectReference/SpatialPrefabReferenceObjectData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/ObjectReference/VehicleSpawnReferenceObjectData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/OrEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/ScalableEmitterDocument/EmitterTemplateData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Entity/Shared/SchematicChannelEntityData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeBaseViewModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AICombatBehaviorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AICombatGroupEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AIDefendAreaEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AIKillCounterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AISensingParameterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AIUseCoverEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AIVehicleBehaviorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AutoPlayerActionObjectiveEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AutoPlayerDefendObjectiveEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AutoPlayerInteractObjectiveEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AutoPlayerMoveObjectiveEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/AutoPlayerObjectiveEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/CheckGameModeEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/CompareFloatEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/CompareIntEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/ConditionalIntEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/ConditionalTransformEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/ConsoleCommandTriggerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/CoopSpawnHelperEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/CoopSplitterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/CustomizeSoldierEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/DelayEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/EventGateEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/EventMemoryEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/EventSplitterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/EventSyncEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/FadeEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/FloatEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/HumanPlayerProxyEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/IntEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/LocalPlayerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/LocalPlayerGateEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/LocatorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/MathIntOpEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/NotEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/PbrSphereLightEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/PlayerInputTrigger.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/ProjectileStateEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/PropertyCacheEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/PropertyCastEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/SendEventEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/SoundEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/StringConstantEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/SubLevelStatusEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/SyncedBoolEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/SyncedFloatEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/SyncedIntEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/TeamFilterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/TeamIdToIntEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/TeamRelationEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/UIntEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/WSPlayerFilterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIAwarenessEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIBlockerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AICancelOrderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIConcealmentVolumeEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AICoverQueryEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AICoverZonesOverrideEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIFollowObjectEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIFollowWaypointsOrderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIGotoPlaceOrderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIHearingParameterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIPlayerProviderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIPlayerProviderManagerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIPlayerSpawnerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIPreferredAreaEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AISearchAreaEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AIShootAtTargetsEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AISoundEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AITemplateFilterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AbilityResourceEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AbsEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ActorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AddFakeCollisionEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AffectorApplyEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AffectorQueryFilterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AffectorReceiveEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AffectorStreamEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AimingAngularSpeedConstraintDataProviderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AimingConstraintEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AlternateSpawnEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AutoPartnerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AutoPlayerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AutoPlayerManagerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AutoTeamEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/AutoplayerIsGameplayEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/BoolChangedEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareCharacterIdDataEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareEmoteIdDataEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareEnumEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareFloatRangeEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareIntRangeEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareStringEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareUintEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareVec4EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CompareVoiceLineIdDataEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ConditionalFloatEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ConditionalPropertyEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ConditionalStringEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ConditionalVec2EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ConditionalVec3EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ConditionalVec4EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ContainsCharacterIdDataEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CurrentLevelEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CurrentPlayerInfoEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/CustomizationDataEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/HumanPlayerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/IconEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ImmediateANDEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/ImmediateOREntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/InclusionSettingEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/KillAllEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/KillCounterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/KillswitchEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/LevelControlEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PathfindingStreamEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PathfindingSystemEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PauseEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityFilterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityIdDataEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityInfoEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityPickupEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityPropertyOutputEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerAbilityWeaponUpgradeInfoEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerCharacterApplyLoadoutEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/PlayerCharacterSpawnEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/StringEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/SyncedQueryEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/SyncedVec3EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TeamEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TeleportEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TrackPlayerEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformBlendEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformBuilderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformHubEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformInterpolatorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformModifierEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformMultiplierEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformQueryEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformSelectorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformSnapToGroundEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformSplitterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/TransformToRotationEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec2BuilderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec2HubEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec2InterpolatorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec2SplitterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec3BuilderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec3ChangedEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec3HubEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec3InterpolatorEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec3SplitterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec4BuilderEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec4HubEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vec4SplitterEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vector3EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/Vector4EntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/VectorMathOpEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/NodeMappingConfigs/auto/VectorShapeInfoEntityData.nmc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Types/NodeTypes/Transient/NodeTransientViewModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Options/BlueprintEditorOptions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Options/BlueprintEditorOptions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Properties/AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Properties/AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Themes/Generic.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Themes/Generic.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utils/EditorUtils.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utils/NodeUtils.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/BlueprintEditorPortMenu.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/BlueprintEditorPortMenu.xaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/BlueprintEditorWindow.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/BlueprintEditorWindow.xaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/BlueprintGraphEditor.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/BlueprintGraphEditor.xaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Windows/PropertyGridWindow.xaml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/obj/x64/Developer - Debug/Models/Editors/GraphEditor/BaseGraphEditor.g.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="SWEA" />
+  </component>
+  <component name="ProjectId" id="2dQMRZ4nwWmhwFiRuQyoOmtE7BH" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "settings.editor.selected.configurable": "SolutionBuilderGeneralOptionsPage",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected=".NET Executable.Debug">
+    <configuration name="Debug" type="RunExe" factoryName=".NET Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../1063/FrostyToolsuite/FrostyEditor/bin/Developer/Debug/FrostyEditor.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../1063/FrostyToolsuite/FrostyEditor/bin/Developer/Debug" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <method v="2">
+        <option name="Build Solution" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Release" type="RunExe" factoryName=".NET Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../1063/FrostyToolsuite/FrostyEditor/bin/Release/Final/FrostyEditor.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../1063/FrostyToolsuite/FrostyEditor/bin/Release/Final" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <method v="2">
+        <option name="Build Solution" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue=".NET Executable.Debug" />
+      <item itemvalue=".NET Executable.Release" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="154c8aed-9ea1-4ada-ae75-063e712baad5" name="Changes" comment="" />
+      <created>1709935883980</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1709935883980</updated>
+      <workItem from="1709935884063" duration="11057000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>

@@ -1,5 +1,0 @@
-Type = Vec2SplitterEntityData
-DisplayName = Vec2SplitterEntityData
-InputProperty = In, Client
-OutputProperty = X, Client
-OutputProperty = Y, Client

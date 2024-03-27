@@ -1,8 +1,0 @@
-Type = CompareEntityData
-DisplayName = CompareEntityData
-InputProperty = Operator, ObjectRealm
-InputProperty = FloatIn0, ObjectRealm
-InputProperty = FloatIn1, ObjectRealm
-InputProperty = IntIn0, Client
-InputProperty = IntIn1, ObjectRealm
-OutputProperty = Out, Client

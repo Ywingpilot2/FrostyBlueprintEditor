@@ -1,5 +1,0 @@
-Type = PlayerAbilityIdDataEntityData
-DisplayName = PlayerAbilityIdDataEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-InputProperty = AbilityId, ObjectRealm
-OutputProperty = AbilityIdData, Client

@@ -1,4 +1,0 @@
-Type = TeamIdToIntEntityData
-DisplayName = TeamIdToInt
-InputProperty = TeamId, ObjectRealm
-OutputProperty = IntOut, ObjectRealm

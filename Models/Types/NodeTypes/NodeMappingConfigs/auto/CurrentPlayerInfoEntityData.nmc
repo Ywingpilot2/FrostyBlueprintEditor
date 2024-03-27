@@ -1,5 +1,0 @@
-Type = CurrentPlayerInfoEntityData
-DisplayName = CurrentPlayerInfoEntityData
-OutputProperty = Id, Client
-OutputProperty = LocalizedName, Client
-OutputProperty = 0x9ba55589, Client

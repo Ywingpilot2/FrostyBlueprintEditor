@@ -1,6 +1,0 @@
-Type = ConditionalVec2EntityData
-DisplayName = ConditionalVec2EntityData
-InputProperty = ValueIfTrue, Client
-InputProperty = ValueIfFalse, Client
-InputProperty = Condition, Client
-OutputProperty = Output, Client

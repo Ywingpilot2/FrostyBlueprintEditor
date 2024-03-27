@@ -1,6 +1,0 @@
-Type = Vec3SplitterEntityData
-DisplayName = Vec3SplitterEntityData
-InputProperty = In, ObjectRealm
-OutputProperty = X, ObjectRealm
-OutputProperty = Y, ObjectRealm
-OutputProperty = Z, ObjectRealm

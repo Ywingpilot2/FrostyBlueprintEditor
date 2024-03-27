@@ -1,8 +1,0 @@
-Type = AIHearingParameterEntityData
-DisplayName = AIHearingParameter
-InputProperty = SensingShotFiredDistance, ObjectRealm
-InputProperty = SensingHumanDrivenVehicleDistance, ObjectRealm
-InputProperty = SensingExplosionDistance, ObjectRealm
-InputProperty = SensingGrenadeDistance, ObjectRealm
-InputProperty = AutoActivate, ObjectRealm
-OutputLink = Spawners, ObjectRealm

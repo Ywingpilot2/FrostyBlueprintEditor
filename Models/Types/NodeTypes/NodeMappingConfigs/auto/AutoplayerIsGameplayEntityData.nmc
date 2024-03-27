@@ -1,6 +1,0 @@
-Type = AutoplayerIsGameplayEntityData
-DisplayName = Is AutoPlayer Gameplay
-Documentation = This fires an event based on whether or not autoplayers are gameplay or testing.
-InputEvent = 0xf517333a, ObjectRealm
-OutputEvent = 0x07ca1d2c, ObjectRealm
-OutputEvent = 0x689618d3, ObjectRealm

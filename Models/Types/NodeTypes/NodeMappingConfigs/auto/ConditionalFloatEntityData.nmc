@@ -1,6 +1,0 @@
-Type = ConditionalFloatEntityData
-DisplayName = ConditionalFloatEntityData
-InputProperty = ValueIfTrue, ObjectRealm
-InputProperty = ValueIfFalse, ObjectRealm
-InputProperty = Condition, ObjectRealm
-OutputProperty = Output, ObjectRealm

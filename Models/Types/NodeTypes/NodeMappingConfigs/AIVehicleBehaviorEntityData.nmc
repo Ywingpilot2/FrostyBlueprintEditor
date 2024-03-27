@@ -1,8 +1,0 @@
-﻿Type = AIVehicleBehaviorEntityData
-DisplayName = Character Vehicle Behavior
-OutputLink = Spawners, Server
-OutputLink = Vehicle, Server
-InputProperty = AllowFire, Server
-InputProperty = AllowDetectHuman, Server
-InputProperty = AllowFireDuringScriptedAnimations, Server
-Documentation = This node is in charge of managing a Character's vehicle behavior

@@ -1,4 +1,0 @@
-Type = SubLevelStatusEntityData
-DisplayName = SubLevelStatus
-OutputProperty = IsLoaded, ObjectRealm
-Documentation = This node returns a boolean on whether or not the specified sublevel is currently loaded

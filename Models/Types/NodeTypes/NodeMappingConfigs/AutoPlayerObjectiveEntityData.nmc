@@ -1,8 +1,0 @@
-﻿Type = AutoPlayerObjectiveEntityData
-DisplayName = Auto Players base Objective
-InputEvent = Activate, ObjectRealm
-InputProperty = Players, ObjectRealm
-InputProperty = MoveModeOverrideInt, ObjectRealm
-OutputEvent = OnActivated, ObjectRealm
-OutputEvent = 0x9519963a, ObjectRealm
-Documentation = The base objective for autoplayers, all other autoplayer objectives are built on top of this. Using Activate, you can trigger this. With the Players property, you can assign a list of players for this objective, though this is not needed.

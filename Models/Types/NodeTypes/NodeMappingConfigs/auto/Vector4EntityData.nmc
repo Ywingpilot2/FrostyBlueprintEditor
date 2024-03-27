@@ -1,4 +1,0 @@
-Type = Vector4EntityData
-DisplayName = Vector4EntityData
-InputProperty = DefaultVec4, ObjectRealm
-OutputProperty = Vector, Client

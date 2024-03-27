@@ -1,5 +1,0 @@
-Type = SyncedQueryEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-DisplayName = SyncedQueryEntityData
-InputProperty = InputQuery, Server
-OutputProperty = OutputQuery, ObjectRealm
