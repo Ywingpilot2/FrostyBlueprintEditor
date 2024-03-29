@@ -8,7 +8,7 @@ using System.Windows.Media;
 using Frosty.Controls;
 using Frosty.Core.Controls;
 
-namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items
+namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
 {
     class BlueprintNumberEditor : BlueprintTypeEditor<FrostyEllipsedTextBox>
     {

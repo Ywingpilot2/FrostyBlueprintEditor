@@ -10,8 +10,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
-using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items;
+using BlueprintEditorPlugin.Editors.BlueprintEditor;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.PropertyGrid.Items;
 using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -22,7 +23,7 @@ using FrostySdk.Attributes;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 
-namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid
+namespace BlueprintEditorPlugin.Editors.PropertyGrid
 { 
     public class BlueprintPropertyGridItem : FrostyPropertyGridItem
     {
@@ -100,7 +101,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid
                     object editor = Activator.CreateInstance(editorType);
                     if (editorType.BaseType.Name == typeof(BlueprintTypeEditor<>).Name)
                     {
-                        elem = (UIElement)editorType.GetMethod("CreateEditor").Invoke(editor, new object[] { item, GetPropertyGrid().GraphEditor.NodeWrangler });
+                        elem = (UIElement)editorType.GetMethod("CreateEditor").Invoke(editor, new object[] { item, GetPropertyGrid().NodeWrangler });
                     }
                     else
                     {
@@ -338,8 +339,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid
         private const string PART_FilterProgressBar = "PART_FilterProgressBar";
 
         #region -- Properties --
-
-        public BlueprintGraphEditor GraphEditor { get; set; }
+        
+        public INodeWrangler NodeWrangler { get; set; }
 
         #region -- Object --
         public static readonly DependencyProperty ObjectProperty = DependencyProperty.Register("Object", typeof(object), typeof(BlueprintPropertyGrid), new FrameworkPropertyMetadata(null, OnObjectChanged));
@@ -681,7 +682,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid
             OnPreModified?.Invoke(sender, e);
         }
 
-        private void SubItem_Modified(object sender, ItemModifiedEventArgs e)
+        protected virtual void SubItem_Modified(object sender, ItemModifiedEventArgs e)
         {
             object nodeObj;
             if (additionalData != null)

@@ -13,11 +13,11 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
-using BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
@@ -81,7 +81,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             NodeWrangler = new EntityNodeWrangler();
             
             InitializeComponent();
-            NodePropertyGrid.GraphEditor = this;
+            NodePropertyGrid.NodeWrangler = NodeWrangler;
             LayoutManager = new EntityLayoutManager(NodeWrangler);
         }
 

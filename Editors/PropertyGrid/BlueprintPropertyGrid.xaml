@@ -4,8 +4,8 @@
                     xmlns:editors1="clr-namespace:Frosty.Core.Controls.Editors;assembly=FrostyCore"
                     xmlns:controls="clr-namespace:Frosty.Controls;assembly=FrostyControls"
                     xmlns:controls1="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
-                    xmlns:editors="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items"
-                    xmlns:editor="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid">
+                    xmlns:editors="clr-namespace:BlueprintEditorPlugin.Editors.PropertyGrid.Items"
+                    xmlns:editor="clr-namespace:BlueprintEditorPlugin.Editors.PropertyGrid">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/BlueprintEditorPlugin;component/Themes/Generic.xaml"/>
     </ResourceDictionary.MergedDictionaries>

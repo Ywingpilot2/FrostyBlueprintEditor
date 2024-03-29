@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Entities;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;

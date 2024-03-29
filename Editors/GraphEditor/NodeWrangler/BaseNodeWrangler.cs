@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -11,7 +10,7 @@ using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using Frosty.Core;
 using Prism.Commands;
 
-namespace BlueprintEditorPlugin.Editors.NodeWrangler
+namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
 {
     public class BaseNodeWrangler : INodeWrangler
     {

@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;
 

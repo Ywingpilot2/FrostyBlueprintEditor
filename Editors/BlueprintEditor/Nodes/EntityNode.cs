@@ -9,7 +9,8 @@ using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -25,7 +26,7 @@ using Prism.Commands;
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
     /// <summary>
-    /// A basic implementation of an entity in a node form. For creation, please see <see cref="GetNodeFromEntity(object,BlueprintEditorPlugin.Editors.NodeWrangler.INodeWrangler)"/>
+    /// A basic implementation of an entity in a node form. For creation, please see <see cref="GetNodeFromEntity(object,INodeWrangler)"/>
     /// </summary>
     public class EntityNode : IObjectNode, INetworked
     {

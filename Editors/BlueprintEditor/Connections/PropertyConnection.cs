@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Status;
 using FrostySdk;
 using FrostySdk.Ebx;

@@ -1,4 +1,4 @@
-﻿using BlueprintEditorPlugin.Editors.NodeWrangler;
+﻿using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 
 /* FORMAT STRUCTURE:
 int - FormatVersion

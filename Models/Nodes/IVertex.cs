@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 
 namespace BlueprintEditorPlugin.Models.Nodes
 {

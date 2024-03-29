@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using FrostySdk.IO;
 
 namespace BlueprintEditorPlugin.Models.Nodes.Utilities

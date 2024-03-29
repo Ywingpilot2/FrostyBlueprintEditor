@@ -1,6 +1,5 @@
 ﻿using System;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
 using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Comparison

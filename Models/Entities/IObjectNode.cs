@@ -1,12 +1,8 @@
-﻿using System;
-using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes;
-using Frosty.Core.Controls;
-using FrostySdk.Ebx;
-using FrostySdk.IO;
 
-namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
+namespace BlueprintEditorPlugin.Models.Entities
 {
     /// <summary>
     /// Base implementation for a node tied to an entity object

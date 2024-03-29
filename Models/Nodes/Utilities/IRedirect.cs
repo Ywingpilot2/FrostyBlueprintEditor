@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using FrostySdk.IO;

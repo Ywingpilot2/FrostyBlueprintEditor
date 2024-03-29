@@ -2,10 +2,11 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using Frosty.Core.Controls;
 using Frosty.Core.Controls.Editors;
 
-namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items
+namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
 {
     public abstract class BlueprintTypeEditor<T> : FrostyBaseTypeEditor where T : FrameworkElement, new()
     {
@@ -16,9 +17,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items
         public object ValueConverterParameter { get; set; }
         public ValidationRule ValidationRule { get; set; }
         public bool NotifyOnTargetUpdated { get; set; }
-        protected EntityNodeWrangler _graphEditor;
+        protected INodeWrangler _graphEditor;
 
-        public T CreateEditor(FrostyPropertyGridItemData item, EntityNodeWrangler graphEditor)
+        public T CreateEditor(FrostyPropertyGridItemData item, INodeWrangler graphEditor)
         {
             T editor = new T();
             _graphEditor = graphEditor;

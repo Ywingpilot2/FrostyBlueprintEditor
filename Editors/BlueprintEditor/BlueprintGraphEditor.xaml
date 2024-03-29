@@ -13,10 +13,10 @@
              xmlns:controls="clr-namespace:Frosty.Controls;assembly=FrostyControls"
              xmlns:controls1="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
              xmlns:status="clr-namespace:BlueprintEditorPlugin.Models.Status"
-             xmlns:propertygrid="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid"
              xmlns:utilities="clr-namespace:BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities"
              xmlns:presentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              xmlns:wireview="clr-namespace:BlueprintEditorPlugin.Views.Wires"
+             xmlns:propertyGrid="clr-namespace:BlueprintEditorPlugin.Editors.PropertyGrid"
              mc:Ignorable="d"
              d:DesignHeight="702" d:DesignWidth="1520">
     
@@ -24,7 +24,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/BlueprintEditorPlugin;component/Themes/Generic.xaml"/>
-                <ResourceDictionary Source="/BlueprintEditorPlugin;component/Editors/BlueprintEditor/PropertyGrid/BlueprintPropertyGrid.xaml"/>
+                <ResourceDictionary Source="/BlueprintEditorPlugin;component/Editors/PropertyGrid/BlueprintPropertyGrid.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <DataTemplate DataType="{x:Type connections:EntityConnection}"
@@ -767,7 +767,6 @@
                              ToolTip="{Binding ToolTip}"
                              InputConnectorTemplate="{StaticResource GenericInputTemplate}"
                              OutputConnectorTemplate="{StaticResource GenericOutputTemplate}">
-                                    
                     <nodify:Node.HeaderTemplate>
                         <DataTemplate>
                             <Grid
@@ -2605,7 +2604,7 @@
                             <controls:FrostyTabItem.Content>
                                 <Border BorderBrush="{StaticResource SubItemPressed}"
                                         BorderThickness="0,2,0,0">
-                                    <propertygrid:BlueprintPropertyGrid x:Name="NodePropertyGrid"
+                                    <propertyGrid:BlueprintPropertyGrid x:Name="NodePropertyGrid"
                                                                         OnModified="NodePropertyGrid_OnOnModified" />
                                 </Border>
                             </controls:FrostyTabItem.Content>

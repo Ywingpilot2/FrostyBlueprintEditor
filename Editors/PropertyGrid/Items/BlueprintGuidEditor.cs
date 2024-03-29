@@ -5,14 +5,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using Frosty.Controls;
-using Frosty.Core;
 using Frosty.Core.Controls;
-using FrostySdk.Ebx;
-using FrostySdk.Managers;
 
-namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items
+namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
 {
-    class BlueprintResourceRefEditor : BlueprintTypeEditor<TextBox>
+    class BlueprintGuidEditor : BlueprintTypeEditor<TextBox>
     {
         private class NumberToStringConverter : IValueConverter
         {
@@ -26,27 +23,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.PropertyGrid.Items
                 FrostyPropertyGridItemData item = (FrostyPropertyGridItemData)parameter;
                 string strValue = (string)value;
 
-                if (!ulong.TryParse(strValue, NumberStyles.AllowHexSpecifier, null, out ulong tmpValue))
+                if (!Guid.TryParse(strValue, out Guid tmpValue))
                 {
-                    FrostyMessageBox.Show("Value not in the correct format for a Resource reference", "Frosty Editor");
-                    return (ResourceRef)item.Value;
+                    FrostyMessageBox.Show("Value not in the correct format for a Guid", "Frosty Editor");
+                    return (Guid)item.Value;
                 }
 
-                if (tmpValue == 0)
-                    return new ResourceRef();
-
-                ResAssetEntry res = App.AssetManager.GetResEntry(tmpValue);
-                if (res == null)
-                {
-                    FrostyMessageBox.Show("Unable to locate resource with the following id: " + tmpValue.ToString("X16"), "Frosty Editor");
-                    return (ResourceRef)item.Value;
-                }
-
-                return new ResourceRef(tmpValue);
+                return tmpValue;
             }
         }
 
-        public BlueprintResourceRefEditor()
+        public BlueprintGuidEditor()
         {
             ValueProperty = TextBox.TextProperty;
             ValueConverter = new NumberToStringConverter();

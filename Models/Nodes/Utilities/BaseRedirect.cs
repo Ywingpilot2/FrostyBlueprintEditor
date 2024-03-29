@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using Frosty.Core;

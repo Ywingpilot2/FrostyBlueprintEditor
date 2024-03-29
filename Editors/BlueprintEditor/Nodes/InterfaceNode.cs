@@ -8,7 +8,8 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -341,9 +342,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         [Description("The name of this interface")]
         public string Name { get; set; }
 
+        public InterfaceNode Node;
+
         public EditInterfaceArgs(InterfaceNode node)
         {
             Name = node.Header;
+            Node = node;
         }
 
         public EditInterfaceArgs()

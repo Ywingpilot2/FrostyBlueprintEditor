@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
+using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using Frosty.Core.Controls;

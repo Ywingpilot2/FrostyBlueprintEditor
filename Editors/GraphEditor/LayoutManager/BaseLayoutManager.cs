@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
-using BlueprintEditorPlugin.Editors.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
 using Frosty.Controls;
 using FrostyEditor;

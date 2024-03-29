@@ -3,7 +3,7 @@ using Frosty.Core.Controls;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 
-namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
+namespace BlueprintEditorPlugin.Models.Entities
 {
     public interface IObjectContainer
     {
