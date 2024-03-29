@@ -34,20 +34,10 @@ namespace BlueprintEditorPlugin
         public static void Initiate()
         {
             // Register internal Entity Nodes
-            
-            // TODO: Why oh why is GetCallingAssembly returning MSCoreLib?????
-            // This shit fucking sucks, for some reason if a debugger isn't attatched the calling assembly changes
-            // Why??? Just to fuck me and me specifically???
-            // Never ONCE has it done this but now nope fuck you gonna call from a different assembly now because no debugger L Ratio fuckface have fun spending 6 hours trying to figure out why
-            App.Logger.Log("Scanning of types began");
-            App.Logger.Log("Currently calling assembly: {0}", Assembly.GetCallingAssembly().FullName);
-            App.Logger.Log("Assembly this type belongs to: {0}", Assembly.GetAssembly(typeof(ExtensionsManager)));
-            App.Logger.Log("Assembly that is executing this code: {0}", Assembly.GetExecutingAssembly());
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
                 if (type.IsSubclassOf(typeof(EntityNode)) && !type.IsAbstract)
                 {
-                    App.Logger.Log($"{type.Name} is EntityNode");
                     try
                     {
                         EntityNode node = (EntityNode)Activator.CreateInstance(type);
@@ -64,7 +54,6 @@ namespace BlueprintEditorPlugin
                 }
                 if (type.GetInterface("ITransient") != null && !type.IsAbstract)
                 {
-                    App.Logger.Log($"{type.Name} is ITransient");
                     try
                     {
                         ITransient trans = (ITransient)Activator.CreateInstance(type);
