@@ -13,10 +13,10 @@ using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
 {
-    public class BaseNodeWrangler : INodeWrangler
+    public abstract class BaseNodeWrangler : INodeWrangler
     {
-        public ObservableCollection<IVertex> Nodes { get; protected set; } = new ObservableCollection<IVertex>();
-        public ObservableCollection<IVertex> SelectedNodes { get; protected set; } = new ObservableCollection<IVertex>();
+        public ObservableCollection<IVertex> Vertices { get; protected set; } = new ObservableCollection<IVertex>();
+        public ObservableCollection<IVertex> SelectedVertices { get; protected set; } = new ObservableCollection<IVertex>();
         public ObservableCollection<IConnection> Connections { get; protected set; } = new ObservableCollection<IConnection>();
         
         public IPendingConnection PendingConnection { get; protected set; }
@@ -24,17 +24,17 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
 
         #region Node
 
-        public virtual void AddNode(IVertex vertex)
+        public virtual void AddVertex(IVertex vertex)
         {
             // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
             // Asshole!
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Nodes.Add(vertex);
+                Vertices.Add(vertex);
             });
         }
 
-        public virtual void RemoveNode(IVertex vertex)
+        public virtual void RemoveVertex(IVertex vertex)
         {
             if (vertex is INode node && !(vertex is IRedirect))
             {
@@ -47,7 +47,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
             // Asshole!
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Nodes.Remove(vertex);
+                Vertices.Remove(vertex);
             });
         }
 

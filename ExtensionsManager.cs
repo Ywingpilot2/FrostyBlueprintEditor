@@ -11,6 +11,7 @@ using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
 using BlueprintEditorPlugin.Models.Nodes;
 using FrostyEditor;
 using FrostySdk;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin
 {
@@ -77,7 +78,7 @@ namespace BlueprintEditorPlugin
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            IGraphEditor graphEditor = (IGraphEditor)Activator.CreateInstance(type);
+                            IEbxGraphEditor graphEditor = (IEbxGraphEditor)Activator.CreateInstance(type);
                             if (graphEditor.IsValid())
                             {
                                 _graphEditors.Add(type);
@@ -125,7 +126,7 @@ namespace BlueprintEditorPlugin
                         {
                             var extension = (IEbxGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
 
-                            if (extension.IsValid() && extension is UserControl)
+                            if (extension.IsValid() && extension is Control)
                             {
                                 // Override our internal extension with external one
                                 _graphEditors.Add(graphRegister.GraphType);
@@ -148,7 +149,7 @@ namespace BlueprintEditorPlugin
         {
             try
             {
-                IGraphEditor graphEditor = (IGraphEditor)Activator.CreateInstance(registerEbxGraphEditor.GraphType);
+                IEbxGraphEditor graphEditor = (IEbxGraphEditor)Activator.CreateInstance(registerEbxGraphEditor.GraphType);
                 if (graphEditor.IsValid())
                 {
                     _graphEditors.Add(registerEbxGraphEditor.GraphType);
@@ -174,6 +175,25 @@ namespace BlueprintEditorPlugin
             {
                 App.Logger.LogError("Entity node {0} caused an exception when processing! Exception: {1}", registerEntityNode.EntityNodeExtension.Name, e.Message);
             }
+        }
+
+        /// <summary>
+        /// Gets a valid <see cref="IEbxGraphEditor"/> for the specified <see cref="EbxAssetEntry"/>
+        /// </summary>
+        /// <param name="assetEntry"></param>
+        /// <returns></returns>
+        public static IEbxGraphEditor GetValidGraphEditor(EbxAssetEntry assetEntry)
+        {
+            foreach (Type graphType in _graphEditors)
+            {
+                IEbxGraphEditor graphEditor = (IEbxGraphEditor)Activator.CreateInstance(graphType);
+                if (graphEditor.IsValid(assetEntry))
+                {
+                    return graphEditor;
+                }
+            }
+
+            return null;
         }
     }
 }

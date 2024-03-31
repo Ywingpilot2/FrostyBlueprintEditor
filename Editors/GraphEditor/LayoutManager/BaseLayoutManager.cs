@@ -50,7 +50,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                 return;
             }
             
-            SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
+            SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Vertices.ToList());
             sugiyamaMethod.SortGraph();
         }
 
@@ -93,7 +93,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                     ITransient transient = (ITransient)Activator.CreateInstance(transType);
                     if (transient.Load(layoutReader))
                     {
-                        NodeWrangler.AddNode(transient);
+                        NodeWrangler.AddVertex(transient);
                     }
                 }
                 catch (Exception e)
@@ -106,7 +106,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
 
             for (int i = 0; i < layoutReader.ReadInt(); i++)
             {
-                IVertex vertex = NodeWrangler.Nodes[layoutReader.ReadInt()];
+                IVertex vertex = NodeWrangler.Vertices[layoutReader.ReadInt()];
                 vertex.Location = layoutReader.ReadPoint();
                 double width = layoutReader.ReadDouble();
                 double height = layoutReader.ReadDouble();
@@ -135,7 +135,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
             List<IVertex> verts = new List<IVertex>();
             List<ITransient> transients = new List<ITransient>();
 
-            foreach (IVertex vertex in NodeWrangler.Nodes)
+            foreach (IVertex vertex in NodeWrangler.Vertices)
             {
                 if (vertex is ITransient transient)
                 {
@@ -169,7 +169,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
 
             foreach (IVertex vertex in verts)
             {
-                layoutWriter.Write(NodeWrangler.Nodes.IndexOf(vertex));
+                layoutWriter.Write(NodeWrangler.Vertices.IndexOf(vertex));
                 layoutWriter.Write(vertex.Location);
                 layoutWriter.Write(vertex.Size.Width);
                 layoutWriter.Write(vertex.Size.Height);

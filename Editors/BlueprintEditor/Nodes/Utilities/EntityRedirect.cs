@@ -121,7 +121,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 SourceRedirect.Location = reader.ReadPoint();
                 SourceRedirect.TargetRedirect = this;
                 
-                NodeWrangler.AddNode(SourceRedirect);
+                NodeWrangler.AddVertex(SourceRedirect);
                 
                 input.Redirect(this, connections);
             }
@@ -197,7 +197,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 SourceRedirect.Location = reader.ReadPoint();
                 SourceRedirect.TargetRedirect = this;
                 
-                NodeWrangler.AddNode(SourceRedirect);
+                NodeWrangler.AddVertex(SourceRedirect);
                 
                 port.Redirect(this, connections);
             }
@@ -547,7 +547,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 SourceRedirect.Location = reader.ReadPoint();
                 SourceRedirect.TargetRedirect = this;
                 
-                NodeWrangler.AddNode(SourceRedirect);
+                NodeWrangler.AddVertex(SourceRedirect);
                 
                 output.Redirect(this, connections);
             }
@@ -623,7 +623,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 SourceRedirect.Location = reader.ReadPoint();
                 SourceRedirect.TargetRedirect = this;
                 
-                NodeWrangler.AddNode(SourceRedirect);
+                NodeWrangler.AddVertex(SourceRedirect);
                 
                 port.Redirect(this, connections);
             }

@@ -10,14 +10,14 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
 {
     public interface INodeWrangler
     {
-        ObservableCollection<IVertex> Nodes { get; }
-        ObservableCollection<IVertex> SelectedNodes { get; }
+        ObservableCollection<IVertex> Vertices { get; }
+        ObservableCollection<IVertex> SelectedVertices { get; }
         ObservableCollection<IConnection> Connections { get; }
         IPendingConnection PendingConnection { get; }
         ICommand RemoveConnectionsCommand { get; }
 
-        void AddNode(IVertex vertex);
-        void RemoveNode(IVertex vertex);
+        void AddVertex(IVertex vertex);
+        void RemoveVertex(IVertex vertex);
 
         void AddConnection(IConnection connection);
         void RemoveConnection(IConnection connection);

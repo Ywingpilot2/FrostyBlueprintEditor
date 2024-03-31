@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Windows;
@@ -14,20 +15,22 @@ namespace BlueprintEditorPlugin.Extensions
 
         public override RelayCommand ContextItemClicked => new RelayCommand((o) =>
         {
-            if (App.SelectedAsset != null)
+            if (App.SelectedAsset == null) return;
+            
+            IEbxGraphEditor graphEditor = ExtensionsManager.GetValidGraphEditor(App.SelectedAsset);
+            if (graphEditor == null)
             {
-                BlueprintEditor editor = new BlueprintEditor();
-                App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", editor);
+                App.Logger.LogError("No valid graph editor exists for this file");
+                return;
+            }
                 
-                editor.Loaded += (sender, args) =>
-                {
-                    editor.LoadBlueprint(App.SelectedAsset);
-                };
-            }
-            else
+            BlueprintEditor editor = new BlueprintEditor();
+            App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", editor);
+                
+            editor.Loaded += (sender, args) =>
             {
-                App.Logger.LogError("Please open a blueprint(an asset with Property, Link, and Event connections, as well as Objects).");
-            }
+                editor.LoadBlueprint(App.SelectedAsset, graphEditor);
+            };
         });
     }
 }

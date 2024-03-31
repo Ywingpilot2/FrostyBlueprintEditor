@@ -31,7 +31,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager.Sugiyama
                 }
             
                 // Now that redirects have been made, we need to remake our lists
-                _vertices = _nodeWrangler.Nodes.ToList();
+                _vertices = _nodeWrangler.Vertices.ToList();
                 _connections = _nodeWrangler.Connections.ToList();
             }
             

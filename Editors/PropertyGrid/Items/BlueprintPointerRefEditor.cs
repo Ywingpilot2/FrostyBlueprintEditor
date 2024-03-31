@@ -319,17 +319,17 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     {
                         EbxAssetEntry asset;
                 
-                        if (!(NodeWrangler.SelectedNodes[0] is IEntityObject))
+                        if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
                             return;
                         
                         //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
-                        if (((IEntityObject)NodeWrangler.SelectedNodes[0]).Type == PointerRefType.Internal)
+                        if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
                         {
                             asset = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
                         }
                         else
                         {
-                            IEntityObject node = (IEntityObject)NodeWrangler.SelectedNodes[0];
+                            IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices[0];
                             asset = App.AssetManager.GetEbxEntry(node.FileGuid);
                         }
 
@@ -347,17 +347,17 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                         newValue.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(newValue.Internal, value);
                     }
                     
-                    if (!(NodeWrangler.SelectedNodes[0] is IEntityObject))
+                    if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
                         return;
 
                     // add it to the list of objects so it can be assigned places
-                    if (((IEntityObject)NodeWrangler.SelectedNodes[0]).Type == PointerRefType.Internal)
+                    if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
                     {
                         ((EntityNodeWrangler)NodeWrangler).Asset.AddObject(newValue.Internal);
                     }
                     else
                     {
-                        IEntityObject node = (IEntityObject)NodeWrangler.SelectedNodes[0];
+                        IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices[0];
                         EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
                         EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
                         
@@ -425,17 +425,17 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     ClassGuid = guid.ExportedGuid
                 };
                 
-                if (!(NodeWrangler.SelectedNodes[0] is IEntityObject))
+                if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
                     return;
                 
                 //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
-                if (((IEntityObject)NodeWrangler.SelectedNodes[0]).Type == PointerRefType.Internal)
+                if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
                 {
                     ((EntityNodeWrangler)NodeWrangler).Asset.AddDependency(reference.FileGuid);
                 }
                 else
                 {
-                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedNodes[0]);
+                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
                     EbxAssetEntry asset = App.AssetManager.GetEbxEntry(node.FileGuid);
                     EbxAsset ebx = App.AssetManager.GetEbx(asset);
 
@@ -517,16 +517,16 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
             // selected asset is the same as the editing one
             EbxAssetEntry currentAsset;
             
-            if (!(NodeWrangler.SelectedNodes[0] is IEntityObject))
+            if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
                 return;
             
-            if (((IEntityObject)NodeWrangler.SelectedNodes[0]).Type == PointerRefType.Internal)
+            if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
             {
                 currentAsset = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
             }
             else
             {
-                IEntityObject node = ((IEntityObject)NodeWrangler.SelectedNodes[0]);
+                IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
                 currentAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
             }
             
@@ -577,16 +577,16 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     ClassGuid = guid.ExportedGuid
                 };
                 
-                if (!(NodeWrangler.SelectedNodes[0] is IEntityObject))
+                if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
                     return;
                 
-                if (((IEntityObject)NodeWrangler.SelectedNodes[0]).Type == PointerRefType.Internal)
+                if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
                 {
                     ((EntityNodeWrangler)NodeWrangler).Asset.AddDependency(reference.FileGuid);
                 }
                 else
                 {
-                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedNodes[0]);
+                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
                     EbxAssetEntry nodeAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
                     EbxAsset ebx = App.AssetManager.GetEbx(nodeAsset);
 

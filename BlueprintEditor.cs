@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Editors.BlueprintEditor;
+using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Extensions;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
@@ -11,11 +13,11 @@ using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin
 {
-    [TemplatePart (Name = GraphEditor, Type = typeof(BlueprintGraphEditor))]
+    [TemplatePart (Name = ContentPresenter, Type = typeof(ContentPresenter))]
     public class BlueprintEditor : FrostyBaseEditor
     {
-        private const string GraphEditor = "GraphEditor";
-        private BlueprintGraphEditor _graphEditor;
+        private const string ContentPresenter = "ContentPresenter";
+        private ContentPresenter _presenter;
         public override ImageSource Icon => ViewBlueprintContextMenuItem.IconImageSource;
 
         static BlueprintEditor()
@@ -26,23 +28,25 @@ namespace BlueprintEditorPlugin
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _graphEditor = GetTemplateChild(GraphEditor) as BlueprintGraphEditor;
+            _presenter = GetTemplateChild(ContentPresenter) as ContentPresenter;
         }
 
-        private bool _loaded = false;
-        public void LoadBlueprint(EbxAssetEntry assetEntry)
+        private bool _loaded;
+        public void LoadBlueprint(EbxAssetEntry assetEntry, IEbxGraphEditor graphEditor)
         {
             // Stupid fuck why does this happen????
-            if (_loaded == true)
+            if (_loaded)
                 return;
-            
+
+            _presenter.Content = graphEditor;
+
             _loaded = true;
 #if DEVELOPER___DEBUG
-            _graphEditor.LoadAsset(assetEntry);
+            graphEditor.LoadAsset(assetEntry);
 #else
-            FrostyTaskWindow.Show("Loading blueprint...", "", task =>
+            FrostyTaskWindow.Show("Loading Blueprint...", "", task =>
             {
-                _graphEditor.LoadAsset(assetEntry);
+                graphEditor.LoadAsset(assetEntry);
             });
 #endif
         }

@@ -22,9 +22,9 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Che
         private int _idx = 0;
         public void SortGraph()
         {
-            for (; _idx < _nodeWrangler.Nodes.Count; _idx++)
+            for (; _idx < _nodeWrangler.Vertices.Count; _idx++)
             {
-                IVertex vertex = _nodeWrangler.Nodes[_idx];
+                IVertex vertex = _nodeWrangler.Vertices[_idx];
                 
                 if (_assignedVerts.Contains(vertex))
                     continue;

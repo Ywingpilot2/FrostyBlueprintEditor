@@ -81,7 +81,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type blueprintEditor:BlueprintEditor}">
                     <Grid Background="Aqua">
-                        <blueprintEditor1:BlueprintGraphEditor x:Name="GraphEditor" IsEnabled="True"/>
+                        <ContentPresenter x:Name="ContentPresenter"/>
+                        <!--<blueprintEditor1:BlueprintGraphEditor x:Name="GraphEditor" IsEnabled="True"/>-->
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

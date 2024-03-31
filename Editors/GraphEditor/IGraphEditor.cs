@@ -11,26 +11,6 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor
         ILayoutManager LayoutManager { get; set; }
 
         /// <summary>
-        /// This method is used to determine if a GraphEditor is valid
-        /// </summary>
-        /// <returns>True if it is valid, false if it is not.</returns>
-        bool IsValid();
-        
-        /// <summary>
-        /// This method is used to determine if a GraphEditor is valid for editing an Ebx Asset
-        /// </summary>
-        /// <param name="assetEntry"></param>
-        /// <returns>True if it is valid, false if it is not.</returns>
-        bool IsValid(EbxAssetEntry assetEntry);
-
-        /// <summary>
-        /// This method is used to determine if a GraphEditor is valid, using a variety of arguments to decide.
-        /// </summary>
-        /// <param name="objs"></param>
-        /// <returns>True if it is valid, false if it is not.</returns>
-        bool IsValid(params object[] args);
-
-        /// <summary>
         /// Executes when the GraphEditor has been closed
         /// </summary>
         void Closed();

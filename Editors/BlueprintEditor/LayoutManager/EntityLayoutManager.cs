@@ -78,7 +78,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                 List<IVertex> verts = new List<IVertex>();
                 List<ITransient> transients = new List<ITransient>();
 
-                foreach (IVertex vertex in NodeWrangler.Nodes)
+                foreach (IVertex vertex in NodeWrangler.Vertices)
                 {
                     if (vertex is ITransient transient)
                     {
@@ -145,7 +145,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                     else
                     {
                         layoutWriter.Write(false);
-                        layoutWriter.Write(NodeWrangler.Nodes.IndexOf(vertex));
+                        layoutWriter.Write(NodeWrangler.Vertices.IndexOf(vertex));
                         layoutWriter.Write(vertex.Location);
                         layoutWriter.Write(vertex.Size.Width);
                         layoutWriter.Write(vertex.Size.Height);
@@ -214,7 +214,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
 
                     if (transient.Load(layoutReader))
                     {
-                        NodeWrangler.AddNode(transient);
+                        NodeWrangler.AddVertex(transient);
                     }
                 }
                 catch (Exception e)
@@ -291,7 +291,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                 }
                 else
                 {
-                    IVertex vertex = NodeWrangler.Nodes[layoutReader.ReadInt()];
+                    IVertex vertex = NodeWrangler.Vertices[layoutReader.ReadInt()];
                     vertex.Location = layoutReader.ReadPoint();
                     double width = layoutReader.ReadDouble();
                     double height = layoutReader.ReadDouble();
@@ -313,7 +313,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                 return;
             }
             
-            EntitySugiyamaMethod sugiyamaMethod = new EntitySugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList(), NodeWrangler);
+            EntitySugiyamaMethod sugiyamaMethod = new EntitySugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Vertices.ToList(), NodeWrangler);
             sugiyamaMethod.SortGraph();
         }
 

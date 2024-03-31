@@ -2358,8 +2358,8 @@
                 <!--Node Editor-->
                 <Grid Grid.Column="1" Background="{StaticResource CanvasBackground}">
                     <nodify:NodifyEditor x:Name="Editor"
-                                         ItemsSource="{Binding NodeWrangler.Nodes}"
-                                         SelectedItems="{Binding NodeWrangler.SelectedNodes}"
+                                         ItemsSource="{Binding NodeWrangler.Vertices}"
+                                         SelectedItems="{Binding NodeWrangler.SelectedVertices}"
                                          SelectionChanged="Selector_OnSelectionChanged"
                                          Connections="{Binding NodeWrangler.Connections}"
                                          PendingConnection="{Binding NodeWrangler.PendingConnection}"
@@ -2554,86 +2554,79 @@
             <!--Header with buttons and status-->
             <Border Grid.Row="0" BorderBrush="{StaticResource SubItemPressed}" BorderThickness="1">
                 <Border BorderBrush="{StaticResource SubMenuItemHighlight}" 
-                        BorderThickness="0, 1, 0, 1">
-                    <Grid Background="{StaticResource ControlBackground}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="35" />
-                        </Grid.ColumnDefinitions>
+                        BorderThickness="0, 1, 0, 1"
+                        Background="{StaticResource ControlBackground}">
+                    <!--Buttons-->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
+                        <!--Organization Buttons-->
+                        <Button x:Name="OrganizeButton"
+                                Width="20"
+                                Height="20"
+                                Margin="4,0,2,0"
+                                HorizontalAlignment="Left"
+                                ToolTip="Automatically organize the Blueprint's nodes"
+                                Click="OrganizeButton_OnClick">
+                            <Image
+                                Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/AutoSortButton.png"
+                                Width="20" />
+                        </Button>
 
-                        <!--Buttons-->
-                        <StackPanel Grid.Column="0" Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
-                            <!--Organization Buttons-->
-                            <Button x:Name="OrganizeButton"
-                                    Width="20"
-                                    Height="20"
-                                    Margin="4,0,2,0"
-                                    HorizontalAlignment="Left"
-                                    ToolTip="Automatically organize the Blueprint's nodes"
-                                    Click="OrganizeButton_OnClick">
-                                <Image
-                                    Source="pack://application:,,,/BlueprintEditorPlugin;component/Images/AutoSortButton.png"
-                                    Width="20" />
-                            </Button>
+                        <Button x:Name="SaveOrganizationButton"
+                                Width="20"
+                                Height="20"
+                                Margin="2,0,2,0"
+                                HorizontalAlignment="Left"
+                                ToolTip="Save the current layout"
+                                Click="SaveOrganizationButton_OnClick">
+                            <Image Source="pack://application:,,,/FrostyEditor;component/Images/Save.png"
+                                   Width="20" />
+                        </Button>
 
-                            <Button x:Name="SaveOrganizationButton"
-                                    Width="20"
-                                    Height="20"
-                                    Margin="2,0,2,0"
-                                    HorizontalAlignment="Left"
-                                    ToolTip="Save the current layout"
-                                    Click="SaveOrganizationButton_OnClick">
-                                <Image Source="pack://application:,,,/FrostyEditor;component/Images/Save.png"
-                                       Width="20" />
-                            </Button>
+                        <Button x:Name="ImportOrganizationButton"
+                                Width="20"
+                                Height="20"
+                                Margin="2,0,4,0"
+                                HorizontalAlignment="Left"
+                                ToolTip="Import a different layout"
+                                Click="ImportOrganizationButton_OnClick">
+                            <Image Source="pack://application:,,,/FrostyEditor;component/Images/Import.png"
+                                   Width="20" />
+                        </Button>
 
-                            <Button x:Name="ImportOrganizationButton"
-                                    Width="20"
-                                    Height="20"
-                                    Margin="2,0,4,0"
-                                    HorizontalAlignment="Left"
-                                    ToolTip="Import a different layout"
-                                    Click="ImportOrganizationButton_OnClick">
-                                <Image Source="pack://application:,,,/FrostyEditor;component/Images/Import.png"
-                                       Width="20" />
-                            </Button>
+                        <Grid Background="{StaticResource SubMenuItemHighlight}" Width="1" />
 
-                            <Grid Background="{StaticResource SubMenuItemHighlight}" Width="1" />
-
-                            <!--Visibility Buttons-->
-                            <Button x:Name="ToolboxVisible"
-                                    Width="20"
-                                    Height="20"
-                                    Margin="4,0,2,0"
-                                    HorizontalAlignment="Left"
-                                    ToolTip="Open/Close the toolbox window"
-                                    Click="ToolboxVisible_OnClick">
-                                <Image Source="/FrostyEditor;component/Images/Database.png"
-                                       Width="20" />
-                            </Button>
-                            <Button x:Name="PropertyGridVisible"
-                                    Width="20"
-                                    Height="20"
-                                    Margin="2,0,2,0"
-                                    HorizontalAlignment="Left"
-                                    ToolTip="Open/Close the property grid"
-                                    Click="PropertyGridVisible_OnClick">
-                                <Image Source="/FrostyEditor;component/Images/Properties.png"
-                                       Width="20" />
-                            </Button>
-                            <Button x:Name="ControlsMenuVisible"
-                                    Width="20"
-                                    Height="20"
-                                    Margin="2,0,2,0"
-                                    HorizontalAlignment="Left"
-                                    ToolTip="View the list of controls for the editor"
-                                    Click="ControlsMenuVisible_OnClick">
-                                <Image Source="/FrostyEditor;component/Images/EditLabel.png"
-                                       Width="20" />
-                            </Button>
-                        </StackPanel>
-                    </Grid>
+                        <!--Visibility Buttons-->
+                        <Button x:Name="ToolboxVisible"
+                                Width="20"
+                                Height="20"
+                                Margin="4,0,2,0"
+                                HorizontalAlignment="Left"
+                                ToolTip="Open/Close the toolbox window"
+                                Click="ToolboxVisible_OnClick">
+                            <Image Source="/FrostyEditor;component/Images/Database.png"
+                                   Width="20" />
+                        </Button>
+                        <Button x:Name="PropertyGridVisible"
+                                Width="20"
+                                Height="20"
+                                Margin="2,0,2,0"
+                                HorizontalAlignment="Left"
+                                ToolTip="Open/Close the property grid"
+                                Click="PropertyGridVisible_OnClick">
+                            <Image Source="/FrostyEditor;component/Images/Properties.png"
+                                   Width="20" />
+                        </Button>
+                        <Button x:Name="ControlsMenuVisible"
+                                Width="20"
+                                Height="20"
+                                Margin="2,0,2,0"
+                                HorizontalAlignment="Left"
+                                ToolTip="View the list of controls for the editor"
+                                Click="ControlsMenuVisible_OnClick">
+                            <Image Source="/FrostyEditor;component/Images/EditLabel.png"
+                                   Width="20" />
+                        </Button>
+                    </StackPanel>
                 </Border>
             </Border>
         </Grid>

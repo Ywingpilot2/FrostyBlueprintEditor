@@ -77,7 +77,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             // TODO: This is a work around to fix UI being on a different thread, causing crashes
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Nodes.Add(node);
+                Vertices.Add(node);
             });
             
             // Incase extensions aren't threadsafe
@@ -284,7 +284,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #region Adding Nodes
 
-        public override void AddNode(IVertex node)
+        public override void AddVertex(IVertex node)
         {
             switch (node)
             {
@@ -359,7 +359,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             // Asshole!
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Nodes.Add(node);
+                Vertices.Add(node);
             });
 
             node.OnCreation();
@@ -369,9 +369,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #region Removing Nodes
 
-        public override void RemoveNode(IVertex node)
+        public override void RemoveVertex(IVertex node)
         {
-            base.RemoveNode(node);
+            base.RemoveVertex(node);
             switch (node)
             {
                 case EntityNode entityNode when entityNode.Type == PointerRefType.Internal:
@@ -420,7 +420,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                                     if (interfaceNode2 == null)
                                         break;
                                     
-                                    RemoveNode(interfaceNode2);
+                                    RemoveVertex(interfaceNode2);
                                 }
                             }
                             else
@@ -433,7 +433,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                                     if (interfaceNode2 == null)
                                         break;
                                     
-                                    RemoveNode(interfaceNode2);
+                                    RemoveVertex(interfaceNode2);
                                 }
                             }
                         } break;
@@ -568,6 +568,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             {
                 if (target == null)
                     return;
+                
                 EntityPort source = (EntityPort)Source;
 
                 if (source.Type != ((EntityPort)target).Type)

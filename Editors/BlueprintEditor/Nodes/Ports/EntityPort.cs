@@ -84,8 +84,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 redirectTarget.Location = new Point(Anchor.X - (Node.Size.Width * 0.5), Anchor.Y);
                 redirectSource.Location = new Point(Anchor.X - (Node.Size.Width * 1.0), Anchor.Y); // TODO: Average out connection Source positions
 
-                Node.NodeWrangler.AddNode(redirectSource);
-                Node.NodeWrangler.AddNode(redirectTarget);
+                Node.NodeWrangler.AddVertex(redirectSource);
+                Node.NodeWrangler.AddVertex(redirectTarget);
 
                 foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {
@@ -108,8 +108,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 redirectTarget.Location = new Point(Anchor.X + (Node.Size.Width * 0.5), Anchor.Y);
                 redirectSource.Location = new Point(Anchor.X + (Node.Size.Width * 1.0), Anchor.Y); // TODO: Average out connection Source positions
 
-                Node.NodeWrangler.AddNode(redirectSource);
-                Node.NodeWrangler.AddNode(redirectTarget); 
+                Node.NodeWrangler.AddVertex(redirectSource);
+                Node.NodeWrangler.AddVertex(redirectTarget); 
 
                 foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {

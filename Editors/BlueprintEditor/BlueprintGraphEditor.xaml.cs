@@ -65,11 +65,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             return false;
         }
 
-        public bool IsValid(params object[] args)
-        {
-            return false; // Only valid for assets
-        }
-
         public void Closed()
         {
             EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
@@ -131,7 +126,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                                 });
                             } break;
                         }
-                        cheap.SortGraph(wrangler.Nodes.Last());
+                        cheap.SortGraph(wrangler.Vertices.Last());
                     }
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
@@ -140,7 +135,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = inputEvent
                         });
-                        cheap.SortGraph(wrangler.Nodes.Last());
+                        cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
@@ -148,7 +143,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = outputEvent
                         });
-                        cheap.SortGraph(wrangler.Nodes.Last());
+                        cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
@@ -157,7 +152,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = inputLink
                         });
-                        cheap.SortGraph(wrangler.Nodes.Last());
+                        cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
@@ -165,7 +160,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = outputLink
                         });
-                        cheap.SortGraph(wrangler.Nodes.Last());
+                        cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     
                     cheap.SortGraph();
@@ -528,7 +523,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 FrostyTaskWindow.Show("Updating properties...", "", task =>
                 {
-                    foreach (IVertex selectedNode in NodeWrangler.SelectedNodes)
+                    foreach (IVertex selectedNode in NodeWrangler.SelectedVertices)
                     {
                         switch (selectedNode)
                         {
@@ -557,7 +552,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             }
             else
             {
-                switch (NodeWrangler.SelectedNodes[0])
+                switch (NodeWrangler.SelectedVertices[0])
                 {
                     case EntityNode node:
                     {
@@ -585,29 +580,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         
         private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
         {
-            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedVertices);
             foreach (IVertex selectedNode in oldSelection)
             {
                 if (selectedNode is IRedirect redirect)
                 {
                     if (redirect.SourceRedirect != null)
                     {
-                        NodeWrangler.RemoveNode(redirect.SourceRedirect);
+                        NodeWrangler.RemoveVertex(redirect.SourceRedirect);
                     }
                     else
                     {
-                        NodeWrangler.RemoveNode(redirect.TargetRedirect);
+                        NodeWrangler.RemoveVertex(redirect.TargetRedirect);
                     }
                 }
                 
-                NodeWrangler.RemoveNode(selectedNode);
+                NodeWrangler.RemoveVertex(selectedNode);
             }
         }
         
         private void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
         {
-            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
-            NodeWrangler.SelectedNodes.Clear();
+            List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedVertices);
+            NodeWrangler.SelectedVertices.Clear();
             
             foreach (IVertex selectedNode in oldSelection)
             {
@@ -616,8 +611,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     FrostyClipboard.Current.SetData(entityNode.Object); // TODO: Work around, need to copy data
                     EntityNode newNode = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
                     newNode.Location = new Point(selectedNode.Location.X + 15, selectedNode.Location.Y + 15);
-                    NodeWrangler.AddNode(newNode);
-                    NodeWrangler.SelectedNodes.Add(newNode);
+                    NodeWrangler.AddVertex(newNode);
+                    NodeWrangler.SelectedVertices.Add(newNode);
                 }
 
                 if (selectedNode is InterfaceNode)
@@ -641,8 +636,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             EntityNode node = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
             node.Location = Editor.MouseLocation;
             
-            NodeWrangler.AddNode(node);
-            NodeWrangler.SelectedNodes.Add(node);
+            NodeWrangler.AddVertex(node);
+            NodeWrangler.SelectedVertices.Add(node);
         }
 
         #endregion
@@ -656,7 +651,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             
             EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedClass, NodeWrangler);
             node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
-            NodeWrangler.AddNode(node);
+            NodeWrangler.AddVertex(node);
         }
 
         private void TransClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
@@ -668,7 +663,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             IVertex vertex = (IVertex)Activator.CreateInstance(type);
             vertex.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
             
-            NodeWrangler.AddNode(vertex);
+            NodeWrangler.AddVertex(vertex);
         }
         
         private void SearchForClass_Click(object sender, RoutedEventArgs e)
@@ -681,7 +676,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 
                 EntityNode node = EntityNode.GetNodeFromEntity(classSelector.SelectedClass, NodeWrangler);
                 node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
-                NodeWrangler.AddNode(node);
+                NodeWrangler.AddVertex(node);
             }
         }
 
@@ -692,7 +687,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Use default Sugiyama instead to prevent issues
-            SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
+            SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Vertices.ToList());
             sugiyamaMethod.SortGraph();
         }
 
@@ -759,15 +754,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 case Key.Delete:
                 {
-                    while (NodeWrangler.SelectedNodes.Count != 0)
+                    while (NodeWrangler.SelectedVertices.Count != 0)
                     {
-                        NodeWrangler.RemoveNode(NodeWrangler.SelectedNodes[0]);
+                        NodeWrangler.RemoveVertex(NodeWrangler.SelectedVertices[0]);
                     }
                 } break;
                 case Key.D when (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift:
                 {
-                    List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
-                    NodeWrangler.SelectedNodes.Clear();
+                    List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedVertices);
+                    NodeWrangler.SelectedVertices.Clear();
             
                     foreach (IVertex selectedNode in oldSelection)
                     {
@@ -776,8 +771,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                             FrostyClipboard.Current.SetData(entityNode.Object); // TODO: Work around, need to copy data
                             EntityNode newNode = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
                             newNode.Location = new Point(selectedNode.Location.X + 15, selectedNode.Location.Y + 15);
-                            NodeWrangler.AddNode(newNode);
-                            NodeWrangler.SelectedNodes.Add(newNode);
+                            NodeWrangler.AddVertex(newNode);
+                            NodeWrangler.SelectedVertices.Add(newNode);
                         }
 
                         if (selectedNode is InterfaceNode)
@@ -805,7 +800,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     
                     EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedClass, NodeWrangler);
                     node.Location = Editor.MouseLocation;
-                    NodeWrangler.AddNode(node);
+                    NodeWrangler.AddVertex(node);
                 }
                 else
                 {
@@ -816,7 +811,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     IVertex vertex = (IVertex)Activator.CreateInstance(type);
                     vertex.Location = Editor.MouseLocation;
             
-                    NodeWrangler.AddNode(vertex);
+                    NodeWrangler.AddVertex(vertex);
                 }
             }
         }
@@ -848,7 +843,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
                         subObj.Name = new CString(args.Name);
 
-                        wrangler.AddNode(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
                         {
                             SubObject = subObj
                         });
@@ -858,7 +853,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
                         subObj.Name = new CString(args.Name);
 
-                        wrangler.AddNode(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
                         {
                             SubObject = subObj
                         });
@@ -874,7 +869,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                             subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
                         }
 
-                        wrangler.AddNode(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
                         {
                             SubObject = subObj
                         });
