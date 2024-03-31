@@ -16,6 +16,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.CheapGraph;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Entities;
@@ -91,6 +92,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
             wrangler.Asset = App.AssetManager.GetEbx(assetEntry);
 
+            CheapMethod cheap = new CheapMethod(NodeWrangler);
             foreach (object assetObject in wrangler.Asset.Objects)
             {
                 if (assetObject == wrangler.Asset.RootObject)
@@ -129,6 +131,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                                 });
                             } break;
                         }
+                        cheap.SortGraph(wrangler.Nodes.Last());
                     }
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
@@ -137,6 +140,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = inputEvent
                         });
+                        cheap.SortGraph(wrangler.Nodes.Last());
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
@@ -144,6 +148,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = outputEvent
                         });
+                        cheap.SortGraph(wrangler.Nodes.Last());
                     }
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
@@ -152,6 +157,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = inputLink
                         });
+                        cheap.SortGraph(wrangler.Nodes.Last());
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
@@ -159,12 +165,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             SubObject = outputLink
                         });
+                        cheap.SortGraph(wrangler.Nodes.Last());
                     }
                     
+                    cheap.SortGraph();
                     continue;
                 }
+
+                EntityNode node = EntityNode.GetNodeFromEntity(assetObject, NodeWrangler);
+                cheap.SortGraph(node);
                 
-                wrangler.AddNodeTransient(EntityNode.GetNodeFromEntity(assetObject, NodeWrangler));
+                wrangler.AddNodeTransient(node);
             }
 
             #region Populating connections
@@ -429,11 +440,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
             #endregion
 
-            if (LayoutManager.LayoutExists($"{assetEntry.Name}.lyt"))
-            {
-                LayoutManager.LoadLayoutRelative($"{assetEntry.Name}.lyt");
-            }
-            else
+            if (!LayoutManager.LayoutExists($"{assetEntry.Name}.lyt"))
             {
                 LayoutManager.SortLayout();
             }

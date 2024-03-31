@@ -50,7 +50,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
         /// <param name="path">The path relative to the current layout path</param>
         /// <returns>Whether or not the operation was a success</returns>
         bool LoadLayoutRelative(string path);
-        
+
         /// <summary>
         /// Saves a layout.
         /// </summary>

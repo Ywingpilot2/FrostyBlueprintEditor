@@ -69,8 +69,8 @@ namespace BlueprintEditorPlugin.Options
         public float PortPosition { get; set; }
         
         [Category("Layouts")]
-        [DisplayName("Automatically redirect")]
-        [Description("Automatically redirects ports if they have weak connections or loops")]
+        [DisplayName("Redirect Cycles")]
+        [Description("Creates redirects for cyclical graphs, thus removing loops(e.g a->b, b->c, c->a)")]
         public bool AutoRedirects { get; set; }
         
         [Category("Layouts")]
@@ -155,7 +155,7 @@ namespace BlueprintEditorPlugin.Options
         public static double InputPos { get; internal set; }
         public static double OutputPos { get; internal set; }
 
-        public static bool AutoRedirects { get; internal set; }
+        public static bool RedirectCycles { get; internal set; }
         public static double VertXSpacing { get; internal set; }
         public static double VertYSpacing { get; internal set; }
 
@@ -184,7 +184,7 @@ namespace BlueprintEditorPlugin.Options
             OutputPos = Config.Get("PortPos", 0.0f);
             InputPos = OutputPos * -1.0f;
             
-            AutoRedirects = Config.Get("AutoRedirects", false);
+            RedirectCycles = Config.Get("AutoRedirects", false);
             VertXSpacing = Config.Get("VertXSpacing", 64.0f);
             VertYSpacing = Config.Get("VertYSpacing", 16.0f);
         }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.CheapGraph;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
@@ -42,6 +43,13 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
         
         public virtual void SortLayout(bool optimized = false)
         {
+            if (optimized)
+            {
+                CheapMethod cheap = new CheapMethod(NodeWrangler);
+                cheap.SortGraph();
+                return;
+            }
+            
             SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
             sugiyamaMethod.SortGraph();
         }

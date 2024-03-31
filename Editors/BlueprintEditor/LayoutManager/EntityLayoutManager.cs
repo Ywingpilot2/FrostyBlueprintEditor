@@ -9,6 +9,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.CheapGraph;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Entities;
@@ -305,6 +306,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
 
         public override void SortLayout(bool optimized = false)
         {
+            if (optimized)
+            {
+                CheapMethod cheap = new CheapMethod(NodeWrangler);
+                cheap.SortGraph();
+                return;
+            }
+            
             EntitySugiyamaMethod sugiyamaMethod = new EntitySugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList(), NodeWrangler);
             sugiyamaMethod.SortGraph();
         }

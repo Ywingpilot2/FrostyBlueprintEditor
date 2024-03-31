@@ -19,7 +19,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager.Sugiyama
             // This will remove our loops and topologically sort the graph
             RemoveLoops();
 
-            if (EditorOptions.AutoRedirects)
+            if (EditorOptions.RedirectCycles)
             {
                 foreach (IVertex vertex in _vertices)
                 {
