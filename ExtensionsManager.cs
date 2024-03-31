@@ -71,7 +71,7 @@ namespace BlueprintEditorPlugin
                         App.Logger.LogError("Transient node {0} caused an exception when processing! Exception: {1}", type.Name, e.Message);
                     }
                 }
-                if (type.GetInterface("IGraphEditor") != null && !type.IsAbstract)
+                if (type.GetInterface("IEbxGraphEditor") != null && !type.IsAbstract)
                 {
                     try
                     {
@@ -119,11 +119,11 @@ namespace BlueprintEditorPlugin
                             App.Logger.LogError("Could not load node extension {0}", entityRegister.EntityNodeExtension.Name);
                         }
                     }
-                    else if (attribute is RegisterGraphEditor graphRegister)
+                    else if (attribute is RegisterEbxGraphEditor graphRegister)
                     {
                         try
                         {
-                            var extension = (IGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
+                            var extension = (IEbxGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
 
                             if (extension.IsValid() && extension is UserControl)
                             {
@@ -144,19 +144,19 @@ namespace BlueprintEditorPlugin
             }
         }
 
-        public static void RegisterExtension(RegisterGraphEditor registerGraphEditor)
+        public static void RegisterExtension(RegisterEbxGraphEditor registerEbxGraphEditor)
         {
             try
             {
-                IGraphEditor graphEditor = (IGraphEditor)Activator.CreateInstance(registerGraphEditor.GraphType);
+                IGraphEditor graphEditor = (IGraphEditor)Activator.CreateInstance(registerEbxGraphEditor.GraphType);
                 if (graphEditor.IsValid())
                 {
-                    _graphEditors.Add(registerGraphEditor.GraphType);
+                    _graphEditors.Add(registerEbxGraphEditor.GraphType);
                 }
             }
             catch (Exception e)
             {
-                App.Logger.LogError("Graph Editor {0} caused an exception when processing! Exception: {1}", registerGraphEditor.GraphType.Name, e.Message);
+                App.Logger.LogError("Graph Editor {0} caused an exception when processing! Exception: {1}", registerEbxGraphEditor.GraphType.Name, e.Message);
             }
         }
 

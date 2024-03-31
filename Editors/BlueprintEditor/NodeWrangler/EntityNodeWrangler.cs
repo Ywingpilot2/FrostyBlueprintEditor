@@ -236,6 +236,50 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             }
         }
 
+        /// <summary>
+        /// Updates the input interface cache so that the keys align with the names of the interfaces
+        /// </summary>
+        public void UpdateInputInterfaceCache()
+        {
+            List<string> keysToUpdate = new List<string>();
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceInputCache)
+            {
+                if (keyValuePair.Key == keyValuePair.Value.Header)
+                    continue;
+                
+                keysToUpdate.Add(keyValuePair.Key);
+            }
+
+            foreach (string key in keysToUpdate)
+            {
+                InterfaceNode node = _interfaceInputCache[key];
+                _interfaceInputCache.Remove(key);
+                _interfaceInputCache.Add(node.Header, node);
+            }
+        }
+        
+        /// <summary>
+        /// Updates the input interface cache so that the keys align with the names of the interfaces
+        /// </summary>
+        public void UpdateOutputInterfaceCache()
+        {
+            List<string> keysToUpdate = new List<string>();
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceOutputCache)
+            {
+                if (keyValuePair.Key == keyValuePair.Value.Header)
+                    continue;
+                
+                keysToUpdate.Add(keyValuePair.Key);
+            }
+
+            foreach (string key in keysToUpdate)
+            {
+                InterfaceNode node = _interfaceOutputCache[key];
+                _interfaceOutputCache.Remove(key);
+                _interfaceOutputCache.Add(node.Header, node);
+            }
+        }
+
         #endregion
 
         #region Adding Nodes
@@ -256,6 +300,56 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     Asset.AddObject(entityNode.Object);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Objects.Add(pointerRef);
+                    
+                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                } break;
+                case InterfaceNode interfaceNode:
+                {
+                    switch (interfaceNode.ConnectionType)
+                    {
+                        case ConnectionType.Event:
+                        {
+                            dynamic intrfc = ((dynamic)Asset.RootObject).Interface.Internal;
+                            if (interfaceNode.Direction == PortDirection.In)
+                            {
+                                intrfc.OutputEvents.Add((dynamic)interfaceNode.SubObject);
+                                _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                            }
+                            else
+                            {
+                                intrfc.InputEvents.Add((dynamic)interfaceNode.SubObject);
+                                _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                            }
+                        } break;
+                        case ConnectionType.Link:
+                        {
+                            dynamic intrfc = ((dynamic)Asset.RootObject).Interface.Internal;
+                            if (interfaceNode.Direction == PortDirection.In)
+                            {
+                                intrfc.OutputLinks.Add((dynamic)interfaceNode.SubObject);
+                                _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                            }
+                            else
+                            {
+                                intrfc.InputLinks.Add((dynamic)interfaceNode.SubObject);
+                                _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                            }
+                        } break;
+                        case ConnectionType.Property:
+                        {
+                            dynamic intrfc = ((dynamic)Asset.RootObject).Interface.Internal;
+                            intrfc.Fields.Add((dynamic)interfaceNode.SubObject);
+                            
+                            if (interfaceNode.Direction == PortDirection.In)
+                            {
+                                _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                            }
+                            else
+                            {
+                                _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                            }
+                        } break;
+                    }
                     
                     App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
                 } break;
@@ -290,7 +384,69 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
                 case InterfaceNode interfaceNode:
                 {
-                    throw new NotImplementedException();
+                    switch (interfaceNode.ConnectionType)
+                    {
+                        case ConnectionType.Event:
+                        {
+                            if (interfaceNode.Direction == PortDirection.In)
+                            {
+                                ((dynamic)interfaceNode.Object).OutputEvents.Remove((dynamic)interfaceNode.SubObject);
+                            }
+                            else
+                            {
+                                ((dynamic)interfaceNode.Object).InputEvents.Remove((dynamic)interfaceNode.SubObject);
+                            }
+                        } break;
+                        case ConnectionType.Link:
+                        {
+                            if (interfaceNode.Direction == PortDirection.In)
+                            {
+                                ((dynamic)interfaceNode.Object).OutputLinks.Remove((dynamic)interfaceNode.SubObject);
+                            }
+                            else
+                            {
+                                ((dynamic)interfaceNode.Object).InputLinks.Remove((dynamic)interfaceNode.SubObject);
+                            }
+                        } break;
+                        case ConnectionType.Property:
+                        {
+                            if (interfaceNode.Direction == PortDirection.In)
+                            {
+                                ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
+                                if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                                {
+                                    InterfaceNode interfaceNode2 = GetInterfaceNode(interfaceNode.Header, PortDirection.Out);
+                                    
+                                    if (interfaceNode2 == null)
+                                        break;
+                                    
+                                    RemoveNode(interfaceNode2);
+                                }
+                            }
+                            else
+                            {
+                                ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
+                                if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                                {
+                                    InterfaceNode interfaceNode2 = GetInterfaceNode(interfaceNode.Header, PortDirection.In);
+                                    
+                                    if (interfaceNode2 == null)
+                                        break;
+                                    
+                                    RemoveNode(interfaceNode2);
+                                }
+                            }
+                        } break;
+                    }
+
+                    if (interfaceNode.Direction == PortDirection.In)
+                    {
+                        _interfaceInputCache.Remove(interfaceNode.Header);
+                    }
+                    else
+                    {
+                        _interfaceOutputCache.Remove(interfaceNode.Header);
+                    }
                 } break;
             }
         }
@@ -417,7 +573,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 if (source.Type != ((EntityPort)target).Type)
                     return;
                 
-                if (source.Node is IRedirect || target.Node is IRedirect)
+                if (source.RedirectNode != null || target.RedirectNode != null)
                     return;
 
                 switch (Source.Direction)

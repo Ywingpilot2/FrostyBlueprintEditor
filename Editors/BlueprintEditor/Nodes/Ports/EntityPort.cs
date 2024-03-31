@@ -89,7 +89,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
 
                 foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {
-                    if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                    if (connection.Source.RedirectNode != null || connection.Target.RedirectNode != null)
                         continue;
                     
                     connection.Target = redirectSource.Inputs[0];
@@ -113,7 +113,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
 
                 foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {
-                    if (connection.Source.Node is IRedirect || connection.Target.Node is IRedirect)
+                    if (connection.Source.RedirectNode != null || connection.Target.RedirectNode != null)
                         continue;
                     
                     connection.Source = redirectSource.Outputs[0];

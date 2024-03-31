@@ -36,7 +36,7 @@ using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 {
-    public partial class BlueprintGraphEditor : UserControl, IGraphEditor
+    public partial class BlueprintGraphEditor : UserControl, IEbxGraphEditor
     {
         #region Graph Editor Implementation
 
@@ -575,6 +575,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
         
         #region Adding & removing nodes
+        
         private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
         {
             List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedNodes);
@@ -693,6 +694,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
             LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
         }
+        
+        private void ImportOrganizationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Layout", "Blueprint Layout (*.lyt)|*.lyt|Text File (*.txt)|*.txt", "BlueprintLayout");
+            if (!ofd.ShowDialog())
+                return;
+
+            LayoutManager.LoadLayout(ofd.FileName);
+        }
 
         #endregion
 
@@ -805,14 +815,65 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
-        
-        private void ImportOrganizationButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Layout", "Blueprint Layout (*.lyt)|*.lyt|Text File (*.txt)|*.txt", "BlueprintLayout");
-            if (!ofd.ShowDialog())
-                return;
 
-            LayoutManager.LoadLayout(ofd.FileName);
+        private void AddInterface_OnClick(object sender, RoutedEventArgs e)
+        {
+            AddInterfaceArgs args = new AddInterfaceArgs();
+            MessageBoxResult result = EditPromptWindow.Show(args, "Add Interface");
+            if (result == MessageBoxResult.Yes)
+            {
+                EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+                
+                // Ensure that the interface exists
+                PointerRef interfaceRef = ((dynamic)wrangler.Asset.RootObject).Interface;
+                if (interfaceRef.Type == PointerRefType.Null)
+                {
+                    dynamic intrfc = TypeLibrary.CreateObject("InterfaceDescriptorData");
+                    wrangler.Asset.AddObject(intrfc);
+                    interfaceRef = new PointerRef(intrfc);
+                    ((dynamic)wrangler.Asset.RootObject).Interface = interfaceRef;
+                }
+                
+                switch (args.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
+                        subObj.Name = new CString(args.Name);
+
+                        wrangler.AddNode(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
+                        {
+                            SubObject = subObj
+                        });
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
+                        subObj.Name = new CString(args.Name);
+
+                        wrangler.AddNode(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
+                        {
+                            SubObject = subObj
+                        });
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        dynamic subObj = TypeLibrary.CreateObject("DataField");
+                        subObj.Name = new CString(args.Name);
+
+                        if (args.Direction == PortDirection.Out)
+                        {
+                            Type enumType = subObj.AccessType.GetType();
+                            subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
+                        }
+
+                        wrangler.AddNode(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
+                        {
+                            SubObject = subObj
+                        });
+                    } break;
+                }
+            }
         }
     }
 }

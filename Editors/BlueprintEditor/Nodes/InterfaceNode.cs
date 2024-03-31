@@ -36,6 +36,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             set
             {
                 _header = value;
+                if (Direction == PortDirection.In)
+                {
+                    ((EntityNodeWrangler)NodeWrangler).UpdateInputInterfaceCache();
+                }
+                else
+                {
+                    ((EntityNodeWrangler)NodeWrangler).UpdateOutputInterfaceCache();
+                }
                 NotifyPropertyChanged(nameof(Header));
             }
         }
@@ -103,17 +111,35 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 return;
             }
             
-            
-
             ((dynamic)SubObject).Name = new CString(EditArgs.Name);
             Header = EditArgs.Name;
             if (Direction == PortDirection.In)
             {
                 Inputs[0].Name = Header;
+                
+                if (ConnectionType == ConnectionType.Property)
+                {
+                    if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                    {
+                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.Out);
+                        interfaceNode.Header = Header;
+                        interfaceNode.Outputs[0].Name = Header;
+                    }
+                }
             }
             else
             {
                 Outputs[0].Name = Header;
+                
+                if (ConnectionType == ConnectionType.Property)
+                {
+                    if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                    {
+                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.In);
+                        interfaceNode.Header = Header;
+                        interfaceNode.Inputs[0].Name = Header;
+                    }
+                }
             }
         }
 
@@ -251,11 +277,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             if (name.StartsWith("0x"))
             {
                 int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                Header = Utils.GetString(hash);
+                _header = Utils.GetString(hash);
+                NotifyPropertyChanged(nameof(Header));
             }
             else
             {
-                Header = name;
+                _header = name;
+                NotifyPropertyChanged(nameof(Header));
             }
             ConnectionType = type;
             NodeWrangler = wrangler;
@@ -343,7 +371,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
     public class EditInterfaceArgs
     {
-        [DisplayName("Name")]
         [Description("The name of this interface")]
         public string Name { get; set; }
 
@@ -356,6 +383,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         public EditInterfaceArgs()
+        {
+            Name = "";
+        }
+    }
+
+    public class AddInterfaceArgs
+    {
+        [Description("The name of this interface")]
+        public string Name { get; set; }
+        
+        [Description("The direction of this interface. Out means it will have 1 output, and when referenced externally will be an input. In is the inverse")]
+        public PortDirection Direction { get; set; }
+        
+        [Description("The type of connection that can plug into this interface")]
+        public ConnectionType Type { get; set; }
+
+        public AddInterfaceArgs()
         {
             Name = "";
         }
