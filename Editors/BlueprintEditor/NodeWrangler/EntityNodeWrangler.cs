@@ -260,9 +260,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
                 } break;
             }
-            
-            Nodes.Add(node);
-            
+
+            // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
+            // Asshole!
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Nodes.Add(node);
+            });
+
             node.OnCreation();
         }
 
@@ -344,10 +349,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     ((dynamic)Asset.RootObject).PropertyConnections.Add((dynamic)propertyConnection.Object);
                 } break;
             }
-            
-            entityConnection.Source.Node.OnOutputUpdated(entityConnection.Source);
-            entityConnection.Target.Node.OnOutputUpdated(entityConnection.Target);
-            
+
             App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
         }
 

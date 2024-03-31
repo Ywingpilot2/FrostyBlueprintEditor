@@ -16,6 +16,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -682,7 +683,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void OrganizeButton_OnClick(object sender, RoutedEventArgs e)
         {
-            LayoutManager.SortLayout();
+            // Use default Sugiyama instead to prevent issues
+            SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
+            sugiyamaMethod.SortGraph();
         }
 
         private void SaveOrganizationButton_OnClick(object sender, RoutedEventArgs e)

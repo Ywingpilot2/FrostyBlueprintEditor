@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager.Sugiyama;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
@@ -299,6 +301,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
             layoutReader.Dispose();
 
             return true;
+        }
+
+        public override void SortLayout(bool optimized = false)
+        {
+            EntitySugiyamaMethod sugiyamaMethod = new EntitySugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList(), NodeWrangler);
+            sugiyamaMethod.SortGraph();
         }
 
         public EntityLayoutManager(INodeWrangler nodeWrangler) : base(nodeWrangler)

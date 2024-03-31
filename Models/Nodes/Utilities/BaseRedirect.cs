@@ -109,6 +109,10 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
         public void AddPort(IPort port)
         {
         }
+        
+        public void RemovePort(IPort port)
+        {
+        }
 
         #endregion
 

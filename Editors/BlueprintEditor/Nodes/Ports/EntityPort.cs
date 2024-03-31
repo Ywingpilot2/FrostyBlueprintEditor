@@ -68,8 +68,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
         
         public ICommand RedirectCommand => new DelegateCommand(Redirect);
 
-        private protected void Redirect()
+        public void Redirect()
         {
+            if (RedirectNode != null)
+                return;
+            
             if (Direction == PortDirection.In)
             {
                 EntityInputRedirect redirectTarget = new EntityInputRedirect(this, PortDirection.Out, Node.NodeWrangler);
@@ -80,7 +83,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
 
                 redirectTarget.Location = new Point(Anchor.X - (Node.Size.Width * 0.5), Anchor.Y);
                 redirectSource.Location = new Point(Anchor.X - (Node.Size.Width * 1.0), Anchor.Y); // TODO: Average out connection Source positions
-                
+
                 Node.NodeWrangler.AddNode(redirectSource);
                 Node.NodeWrangler.AddNode(redirectTarget);
 
@@ -104,9 +107,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 
                 redirectTarget.Location = new Point(Anchor.X + (Node.Size.Width * 0.5), Anchor.Y);
                 redirectSource.Location = new Point(Anchor.X + (Node.Size.Width * 1.0), Anchor.Y); // TODO: Average out connection Source positions
-                
+
                 Node.NodeWrangler.AddNode(redirectSource);
-                Node.NodeWrangler.AddNode(redirectTarget);
+                Node.NodeWrangler.AddNode(redirectTarget); 
 
                 foreach (IConnection connection in Node.NodeWrangler.GetConnections(this))
                 {
@@ -224,6 +227,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                 NotifyPropertyChanged(nameof(Node));
             }
         }
+        
+        /// <summary>
+        /// If this port belongs to a Redirect, this returns the Redirect Node it belongs to. Otherwise null.
+        /// </summary>
+        public IRedirect RedirectNode { get; set; }
 
         #endregion
 

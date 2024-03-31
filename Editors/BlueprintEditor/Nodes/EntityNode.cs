@@ -873,6 +873,18 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         #endregion
 
         #region Port Removing
+        
+        public void RemovePort(IPort port)
+        {
+            if (port.Direction == PortDirection.In)
+            {
+                RemoveInput((EntityInput)port);
+            }
+            else
+            {
+                RemoveOutput((EntityOutput)port);
+            }
+        }
 
         public void RemoveInput(string name, ConnectionType type)
         {

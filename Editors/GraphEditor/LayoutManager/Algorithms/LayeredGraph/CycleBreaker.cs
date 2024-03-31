@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Models.Connections;
 
 namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.LayeredGraph
@@ -10,7 +11,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Lay
     {
         public override void DepthSearch(IConnection start)
         {
-            if (VisitedNodes.Contains(start.Target.Node))
+            if (VisitedNodes.Contains(start.Target.Node) && !(start.Target.RedirectNode != null && !VisitedNodes.Contains(start.Target.RedirectNode)))
             {
                 Connections.Remove(start);
                 Connections.Add(new BaseConnection(start.Target, start.Source));

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Connections.Pending;
@@ -25,7 +26,12 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
 
         public virtual void AddNode(IVertex vertex)
         {
-            Nodes.Add(vertex);
+            // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
+            // Asshole!
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Nodes.Add(vertex);
+            });
         }
 
         public virtual void RemoveNode(IVertex vertex)
@@ -36,7 +42,13 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
             }
 
             vertex.OnDestruction();
-            Nodes.Remove(vertex);
+            
+            // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
+            // Asshole!
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Nodes.Remove(vertex);
+            });
         }
 
         #endregion
@@ -45,7 +57,12 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
 
         public virtual void AddConnection(IConnection connection)
         {
-            Connections.Add(connection);
+            // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
+            // Asshole!
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Connections.Add(connection);
+            });
         }
 
         public virtual void RemoveConnection(IConnection connection)
@@ -60,7 +77,15 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
                 connection.Target.IsConnected = false;
             }
 
-            Connections.Remove(connection);
+            // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
+            // Asshole!
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Connections.Remove(connection);
+            });
+            
+            connection.Source.Node.OnOutputUpdated(connection.Source);
+            connection.Target.Node.OnInputUpdated(connection.Target);
         }
 
         public virtual void ClearConnections(INode node)

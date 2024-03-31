@@ -2,24 +2,24 @@
 using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.LayeredGraph;
+using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Options;
 
-namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
+namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama
 {
-    public class SugiyamaMethod
+    public class SugiyamaMethod : IGraphAlgorithm
     {
-        private List<IConnection> _connections;
-        private List<IVertex> _vertices;
+        protected INodeWrangler _nodeWrangler;
+        protected List<IConnection> _connections;
+        protected List<IVertex> _vertices;
 
-        private List<NodeLayer> _layers = new List<NodeLayer>();
-        private List<VertexIsland> _islands = new List<VertexIsland>();
+        protected List<NodeLayer> _layers = new List<NodeLayer>();
+        protected List<VertexIsland> _islands = new List<VertexIsland>();
 
-        private double XDist => 64;
-        private double YDist => 16;
-
-        private List<IConnection> GetConnections(INode node)
+        protected List<IConnection> GetConnections(INode node)
         {
             List<IConnection> connections = new List<IConnection>();
             foreach (IConnection connection in _connections)
@@ -33,7 +33,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             return connections;
         }
         
-        private List<IConnection> GetConnections(INode node, PortDirection direction)
+        protected List<IConnection> GetConnections(INode node, PortDirection direction)
         {
             List<IConnection> connections = new List<IConnection>();
             foreach (IConnection connection in _connections)
@@ -52,7 +52,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             return connections;
         }
         
-        private void RemoveLoops()
+        protected void RemoveLoops()
         {
             List<IConnection> enumeration = new List<IConnection>(_connections);
             foreach (IConnection connection in enumeration)
@@ -67,7 +67,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         /// <summary>
         /// Gets rid of verts lacking connections
         /// </summary>
-        private void RemoveEmpty()
+        protected void RemoveEmpty()
         {
             List<IVertex> verts = new List<IVertex>(_vertices);
             foreach (IVertex vertex in verts)
@@ -86,7 +86,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             }
         }
 
-        private void AssignHorizontalPositions()
+        protected void AssignHorizontalPositions()
         {
             double current = 0.0;
             foreach (NodeLayer layer in _layers)
@@ -96,11 +96,11 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
                     node.Location = new Point(current + (node.Size.Width * 0.5), 0);
                 }
 
-                current += XDist + layer.GetWidth();
+                current += EditorOptions.VertXSpacing + layer.GetWidth();
             }
         }
 
-        private void AssignVerticalPositions()
+        protected void AssignVerticalPositions()
         {
             foreach (NodeLayer layer in _layers)
             {
@@ -108,12 +108,12 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
                 foreach (INode node in layer.Nodes)
                 {
                     node.Location = new Point(node.Location.X, current);
-                    current += (node.Size.Height) + YDist;
+                    current += (node.Size.Height) + EditorOptions.VertYSpacing;
                 }
             }
         }
         
-        private int GetLayerFromNode(INode node)
+        protected int GetLayerFromNode(INode node)
         {
             for (var i = 0; i < _layers.Count; i++)
             {
@@ -128,7 +128,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         /// <summary>
         /// Move verts into different layers if their edge is too far away
         /// </summary>
-        private void MergeLayers()
+        protected void MergeLayers()
         {
             for (var i = 0; i < _layers.Count; i++)
             {
@@ -160,7 +160,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             }
         }
 
-        public void SortGraph()
+        public virtual void SortGraph()
         {
             // This will remove our loops and topologically sort the graph
             RemoveLoops();

@@ -3,7 +3,7 @@ using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 
-namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
+namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama
 {
     /// <summary>
     /// This class removes cycles found in a graph using Depth First search 
@@ -25,13 +25,20 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
 
         public override void DepthSearch(IConnection start)
         {
-            if (VisitedNodes.Contains(start.Target.Node))
+            if (VisitedNodes.Contains(start.Target.Node) && !(start.Target.RedirectNode != null && !VisitedNodes.Contains(start.Target.RedirectNode)))
             {
                 Connections.Remove(start);
                 return;
             }
 
-            VisitedNodes.Add(start.Target.Node);
+            if (start.Target.RedirectNode == null)
+            {
+                VisitedNodes.Add(start.Target.Node);
+            }
+            else
+            {
+                VisitedNodes.Add(start.Target.RedirectNode);
+            }
             foreach (IConnection connection in GetConnections(start.Target.Node, PortDirection.Out))
             {
                 DepthSearch(connection);

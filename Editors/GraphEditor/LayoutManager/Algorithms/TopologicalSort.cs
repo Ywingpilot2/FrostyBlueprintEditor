@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -24,7 +25,14 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             VisitedNodes.Add(node);
             foreach (IConnection connection in GetConnections(node, PortDirection.In))
             {
-                DepthSearch(connection.Source.Node);
+                if (connection.Source.RedirectNode == null)
+                {
+                    DepthSearch(connection.Source.Node);
+                }
+                else
+                {
+                    DepthSearch(connection.Source.RedirectNode);
+                }
             }
 
             if (!_orderedNodes.Contains(node))

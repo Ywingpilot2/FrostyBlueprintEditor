@@ -79,14 +79,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new EventOutput(input.Name, this)
                         {
                             HasPlayer = input.HasPlayer,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Outputs.Add(new LinkOutput(input.Name, this)
                         {
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -94,7 +96,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new PropertyOutput(input.Name, this)
                         {
                             IsInterface = input.IsInterface,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -150,14 +153,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new EventOutput(port.Name, this)
                         {
                             HasPlayer = port.HasPlayer,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Outputs.Add(new LinkOutput(port.Name, this)
                         {
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -165,7 +170,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new PropertyOutput(port.Name, this)
                         {
                             IsInterface = port.IsInterface,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -347,14 +353,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new EventInput(redirectTarget.Name, redirectTarget.Node)
                         {
                             HasPlayer = redirectTarget.HasPlayer,
-                            Realm = redirectTarget.Realm
+                            Realm = redirectTarget.Realm,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Inputs.Add(new LinkInput(redirectTarget.Name, redirectTarget.Node)
                         {
-                            Realm = redirectTarget.Realm
+                            Realm = redirectTarget.Realm,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -362,7 +370,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new PropertyInput(redirectTarget.Name, redirectTarget.Node)
                         {
                             IsInterface = redirectTarget.IsInterface,
-                            Realm = redirectTarget.Realm
+                            Realm = redirectTarget.Realm,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -378,14 +387,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new EventOutput(redirectTarget.Name, this)
                         {
                             HasPlayer = redirectTarget.HasPlayer,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Outputs.Add(new LinkOutput(redirectTarget.Name, this)
                         {
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -393,7 +404,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new PropertyOutput(redirectTarget.Name, this)
                         {
                             IsInterface = redirectTarget.IsInterface,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -493,14 +505,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new EventInput(output.Name, this)
                         {
                             HasPlayer = output.HasPlayer,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Inputs.Add(new LinkInput(output.Name, this)
                         {
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -508,7 +522,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new PropertyInput(output.Name, this)
                         {
                             IsInterface = output.IsInterface,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -564,14 +579,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new EventInput(port.Name, this)
                         {
                             HasPlayer = port.HasPlayer,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Inputs.Add(new LinkInput(port.Name, this)
                         {
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -579,7 +596,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new PropertyInput(port.Name, this)
                         {
                             IsInterface = port.IsInterface,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -756,14 +774,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new EventInput(redirectTarget.Name, this)
                         {
                             HasPlayer = redirectTarget.HasPlayer,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Inputs.Add(new LinkInput(redirectTarget.Name, this)
                         {
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -771,7 +791,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Inputs.Add(new PropertyInput(redirectTarget.Name, this)
                         {
                             IsInterface = redirectTarget.IsInterface,
-                            Realm = Realm.Any
+                            Realm = Realm.Any,
+                            RedirectNode = this
                         });
                     } break;
                 }
@@ -786,14 +807,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new EventOutput(redirectTarget.Name, redirectTarget.Node)
                         {
                             HasPlayer = redirectTarget.HasPlayer,
-                            Realm = redirectTarget.Realm
+                            Realm = redirectTarget.Realm,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Link:
                     {
                         Outputs.Add(new LinkOutput(redirectTarget.Name, redirectTarget.Node)
                         {
-                            Realm = redirectTarget.Realm
+                            Realm = redirectTarget.Realm,
+                            RedirectNode = this
                         });
                     } break;
                     case ConnectionType.Property:
@@ -801,7 +824,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                         Outputs.Add(new PropertyOutput(redirectTarget.Name, redirectTarget.Node)
                         {
                             IsInterface = redirectTarget.IsInterface,
-                            Realm = redirectTarget.Realm
+                            Realm = redirectTarget.Realm,
+                            RedirectNode = this
                         });
                     } break;
                 }

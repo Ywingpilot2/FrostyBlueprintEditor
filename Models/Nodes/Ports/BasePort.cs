@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 
 namespace BlueprintEditorPlugin.Models.Nodes.Ports
 {
@@ -31,7 +32,8 @@ namespace BlueprintEditorPlugin.Models.Nodes.Ports
             }
         }
         public INode Node { get; protected set; }
-        
+        public IRedirect RedirectNode { get; set; }
+
         private bool _isConnected;
 
         public bool IsConnected

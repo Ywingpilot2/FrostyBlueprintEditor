@@ -2,6 +2,7 @@
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 
 namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
 {
@@ -16,11 +17,26 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         protected List<IConnection> GetConnections(INode node)
         {
             List<IConnection> connections = new List<IConnection>();
-            foreach (IConnection connection in Connections)
+
+            // Redirects need to be handled differently
+            if (node is IRedirect)
             {
-                if (connection.Source.Node == node || connection.Target.Node == node)
+                foreach (IConnection connection in Connections)
                 {
-                    connections.Add(connection);
+                    if (connection.Source.RedirectNode == node || connection.Target.RedirectNode == node)
+                    {
+                        connections.Add(connection);
+                    }
+                }
+            }
+            else
+            {
+                foreach (IConnection connection in Connections)
+                {
+                    if (connection.Source.Node == node || connection.Target.Node == node)
+                    {
+                        connections.Add(connection);
+                    }
                 }
             }
 
@@ -30,16 +46,36 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
         protected List<IConnection> GetConnections(INode node, PortDirection direction)
         {
             List<IConnection> connections = new List<IConnection>();
-            foreach (IConnection connection in Connections)
+            
+            // Redirects need to be handled differently
+            if (node is IRedirect)
             {
-                if (connection.Target.Node == node && direction == PortDirection.In)
+                foreach (IConnection connection in Connections)
                 {
-                    connections.Add(connection);
-                }
+                    if (connection.Target.RedirectNode == node && direction == PortDirection.In)
+                    {
+                        connections.Add(connection);
+                    }
 
-                if (connection.Source.Node == node && direction == PortDirection.Out)
+                    if (connection.Source.RedirectNode == node && direction == PortDirection.Out)
+                    {
+                        connections.Add(connection);
+                    }
+                }
+            }
+            else
+            {
+                foreach (IConnection connection in Connections)
                 {
-                    connections.Add(connection);
+                    if (connection.Target.Node == node && direction == PortDirection.In && connection.Target.RedirectNode == null)
+                    {
+                        connections.Add(connection);
+                    }
+
+                    if (connection.Source.Node == node && direction == PortDirection.Out && connection.Source.RedirectNode == null)
+                    {
+                        connections.Add(connection);
+                    }
                 }
             }
 
@@ -65,18 +101,32 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
             VisitedNodes.Add(node);
             foreach (IConnection connection in GetConnections(node, PortDirection.Out))
             {
-                DepthSearch(connection.Target.Node);
+                if (node is IRedirect)
+                {
+                    DepthSearch(connection.Target.RedirectNode);
+                }
+                else
+                {
+                    DepthSearch(connection.Target.Node);
+                }
             }
         }
 
         public virtual void DepthSearch(IConnection start)
         {
-            if (VisitedNodes.Contains(start.Target.Node))
+            if (VisitedNodes.Contains(start.Target.Node) && !(start.Target.RedirectNode != null && !VisitedNodes.Contains(start.Target.RedirectNode)))
             {
                 return;
             }
             
-            VisitedNodes.Add(start.Target.Node);
+            if (start.Target.RedirectNode == null)
+            {
+                VisitedNodes.Add(start.Target.Node);
+            }
+            else
+            {
+                VisitedNodes.Add(start.Target.RedirectNode);
+            }
             foreach (IConnection connection in GetConnections(start.Target.Node, PortDirection.Out))
             {
                 DepthSearch(connection);

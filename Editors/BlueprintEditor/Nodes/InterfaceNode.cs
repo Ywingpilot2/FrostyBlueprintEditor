@@ -185,6 +185,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             Inputs.Add(port);
         }
 
+        public void RemovePort(IPort port)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region Interface implementation

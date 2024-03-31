@@ -17,6 +17,10 @@ namespace BlueprintEditorPlugin.Models.Nodes
         /// <param name="reader"></param>
         /// <returns>A bool on whether the operation was a success. If it wasn't, the node will not be added</returns>
         bool Load(LayoutReader reader);
+        /// <summary>
+        /// This saves the Transient into the layout.
+        /// </summary>
+        /// <param name="writer"></param>
         void Save(LayoutWriter writer);
     }
 }

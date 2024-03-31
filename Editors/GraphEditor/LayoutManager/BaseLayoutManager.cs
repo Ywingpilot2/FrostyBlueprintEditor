@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -39,7 +40,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
             }
         }
         
-        public void SortLayout(bool optimized = false)
+        public virtual void SortLayout(bool optimized = false)
         {
             SugiyamaMethod sugiyamaMethod = new SugiyamaMethod(NodeWrangler.Connections.ToList(), NodeWrangler.Nodes.ToList());
             sugiyamaMethod.SortGraph();

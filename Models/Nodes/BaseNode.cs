@@ -122,6 +122,18 @@ namespace BlueprintEditorPlugin.Models.Nodes
             }
         }
 
+        public void RemovePort(IPort port)
+        {
+            if (port.Direction == PortDirection.In)
+            {
+                Inputs.Remove(port);
+            }
+            else
+            {
+                Outputs.Remove(port);
+            }
+        }
+
         #region Property Changing
 
         public event PropertyChangedEventHandler PropertyChanged;

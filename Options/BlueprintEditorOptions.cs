@@ -67,6 +67,21 @@ namespace BlueprintEditorPlugin.Options
         [Editor(typeof(FrostySliderEditor))]
         [SliderMinMax(0.0f, 10.0f, 0.1f, 2.0f, true)]
         public float PortPosition { get; set; }
+        
+        [Category("Layouts")]
+        [DisplayName("Automatically redirect")]
+        [Description("Automatically redirects ports if they have weak connections or loops")]
+        public bool AutoRedirects { get; set; }
+        
+        [Category("Layouts")]
+        [DisplayName("Horizontal padding")]
+        [Description("The amount of horizontal spacing between each node to maintain whenever automatically sorting")]
+        public float VertXSpacing { get; set; }
+        
+        [Category("Layouts")]
+        [DisplayName("Vertical padding")]
+        [Description("The amount of vertical spacing between each node to maintain whenever automatically sorting")]
+        public float VertYSpacing { get; set; }
 
         public override void Load()
         {
@@ -92,6 +107,10 @@ namespace BlueprintEditorPlugin.Options
             
             PortSize = Config.Get("PortSize", 6.0f);
             PortPosition = Config.Get("PortPos", 0.0f);
+            
+            AutoRedirects = Config.Get("AutoRedirects", false);
+            VertXSpacing = Config.Get("VertXSpacing", 64.0f);
+            VertYSpacing = Config.Get("VertYSpacing", 16.0f);
         }
 
         public override void Save()
@@ -117,6 +136,11 @@ namespace BlueprintEditorPlugin.Options
             
             Config.Add("PortSize", PortSize);
             Config.Add("PortPos", PortPosition);
+            
+            Config.Add("AutoRedirects", AutoRedirects);
+            Config.Add("VertXSpacing", VertXSpacing);
+            Config.Add("VertYSpacing", VertYSpacing);
+            
             EditorOptions.Update();
         }
     }
@@ -130,6 +154,10 @@ namespace BlueprintEditorPlugin.Options
         public static double PortSize { get; internal set; }
         public static double InputPos { get; internal set; }
         public static double OutputPos { get; internal set; }
+
+        public static bool AutoRedirects { get; internal set; }
+        public static double VertXSpacing { get; internal set; }
+        public static double VertYSpacing { get; internal set; }
 
         public static void Update()
         {
@@ -155,6 +183,10 @@ namespace BlueprintEditorPlugin.Options
             PortSize = (Config.Get("PortSize", 6.0f) * 0.1) * 15;
             OutputPos = Config.Get("PortPos", 0.0f);
             InputPos = OutputPos * -1.0f;
+            
+            AutoRedirects = Config.Get("AutoRedirects", false);
+            VertXSpacing = Config.Get("VertXSpacing", 64.0f);
+            VertYSpacing = Config.Get("VertYSpacing", 16.0f);
         }
     }
 }

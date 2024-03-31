@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Nodes;
+using BlueprintEditorPlugin.Models.Nodes.Utilities;
 
-namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.LayeredGraph
+namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms
 {
     /// <summary>
     /// Gets an island from this node. Returns null if the island was already found
@@ -21,13 +22,29 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Lay
             
             foreach (IConnection connection in GetConnections(node))
             {
-                if (connection.Target.Node != node)
+                // This hurt my head for some reason
+                // Account for redirects
+                if (connection.Target.RedirectNode != null)
                 {
-                    DepthSearch(connection.Target.Node);
+                    if (connection.Target.RedirectNode != node)
+                    {
+                        DepthSearch(connection.Target.RedirectNode);
+                    }
+                    else
+                    {
+                        DepthSearch(connection.Source.Node);
+                    }
                 }
                 else
                 {
-                    DepthSearch(connection.Source.Node);
+                    if (connection.Target.Node != node)
+                    {
+                        DepthSearch(connection.Target.Node);
+                    }
+                    else
+                    {
+                        DepthSearch(connection.Source.Node);
+                    }
                 }
             }
         }
