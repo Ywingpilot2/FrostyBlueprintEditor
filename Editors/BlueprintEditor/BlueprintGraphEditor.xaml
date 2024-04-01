@@ -195,10 +195,10 @@
                                     <Setter Property="Fill"
                                             Value="{StaticResource LinkConnectionColor}" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding IsPendingConnection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeOutput}}">
+                                <DataTrigger Binding="{Binding IsPendingConnection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeInput}}">
                                     <Setter Property="Fill" Value="{StaticResource NodeSelectedColor}" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeOutput}}">
+                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeInput}}">
                                     <Setter Property="Fill" Value="{StaticResource NodeSelectedColor}" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -237,10 +237,12 @@
                                     <Setter Property="Fill"
                                             Value="{StaticResource LinkConnectionColor}" />
                                 </DataTrigger>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Fill"
-                                            Value="{StaticResource NodeSelectedColor}" />
-                                </Trigger>
+                                <DataTrigger Binding="{Binding IsPendingConnection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeOutput}}">
+                                    <Setter Property="Fill" Value="{StaticResource NodeSelectedColor}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=nodify:NodeOutput}}">
+                                    <Setter Property="Fill" Value="{StaticResource NodeSelectedColor}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Ellipse.Style>
