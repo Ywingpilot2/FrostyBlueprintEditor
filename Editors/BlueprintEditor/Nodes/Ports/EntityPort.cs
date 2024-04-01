@@ -34,7 +34,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             }
         }
 
-        public string ToolTip => $"{Realm} Port";
+        public string ToolTip => $"{Realm} Realm";
 
         private bool _isConnected;
 
