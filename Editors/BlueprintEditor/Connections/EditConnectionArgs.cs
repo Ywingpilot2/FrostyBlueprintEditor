@@ -1,4 +1,5 @@
 ﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using FrostySdk.Attributes;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections

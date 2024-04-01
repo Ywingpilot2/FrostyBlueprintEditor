@@ -1,4 +1,4 @@
-﻿namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
+﻿namespace BlueprintEditorPlugin.Models.Entities.Networking
 {
     /// <summary>
     /// The "Realm" or machines this entity operates on.

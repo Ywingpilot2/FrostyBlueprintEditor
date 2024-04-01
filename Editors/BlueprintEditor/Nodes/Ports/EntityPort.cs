@@ -7,7 +7,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
-using BlueprintEditorPlugin.Models.Networking;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;

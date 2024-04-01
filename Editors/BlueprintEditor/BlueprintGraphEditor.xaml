@@ -17,6 +17,7 @@
              xmlns:presentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              xmlns:wireview="clr-namespace:BlueprintEditorPlugin.Views.Wires"
              xmlns:propertyGrid="clr-namespace:BlueprintEditorPlugin.Editors.PropertyGrid"
+             xmlns:networking="clr-namespace:BlueprintEditorPlugin.Models.Entities.Networking"
              mc:Ignorable="d"
              d:DesignHeight="702" d:DesignWidth="1520">
     
@@ -70,7 +71,7 @@
                                                 Value="This connection has a Player Event attatched to it" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding PropType}"
-                                                 Value="{x:Static nodes:PropertyType.Interface}">
+                                                 Value="{x:Static networking:PropertyType.Interface}">
                                         <Setter Property="Effect">
                                             <Setter.Value>
                                                 <DropShadowEffect RenderingBias="Performance"
@@ -313,17 +314,17 @@
                                                 <Setter Property="Fill" Value="DimGray" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClient}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Invalid}">
+                                                                 Value="{x:Static networking:Realm.Invalid}">
                                                         <Setter Property="Fill"
                                                                 Value="DarkRed" />
                                                     </DataTrigger>
@@ -348,27 +349,27 @@
                                                 <Setter Property="Fill" Value="DimGray" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClient}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Client}">
+                                                                 Value="{x:Static networking:Realm.Client}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.ClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Invalid}">
+                                                                 Value="{x:Static networking:Realm.Invalid}">
                                                         <Setter Property="Fill"
                                                                 Value="DarkRed" />
                                                     </DataTrigger>
@@ -393,22 +394,22 @@
                                                 <Setter Property="Fill" Value="DimGray" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Server}">
+                                                                 Value="{x:Static networking:Realm.Server}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.ClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Invalid}">
+                                                                 Value="{x:Static networking:Realm.Invalid}">
                                                         <Setter Property="Fill"
                                                                 Value="DarkRed" />
                                                     </DataTrigger>
@@ -522,17 +523,17 @@
                                                 <Setter Property="Fill" Value="DimGray" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClient}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Invalid}">
+                                                                 Value="{x:Static networking:Realm.Invalid}">
                                                         <Setter Property="Fill"
                                                                 Value="DarkRed" />
                                                     </DataTrigger>
@@ -557,27 +558,27 @@
                                                 <Setter Property="Fill" Value="DimGray" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClient}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Client}">
+                                                                 Value="{x:Static networking:Realm.Client}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.ClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Invalid}">
+                                                                 Value="{x:Static networking:Realm.Invalid}">
                                                         <Setter Property="Fill"
                                                                 Value="DarkRed" />
                                                     </DataTrigger>
@@ -602,22 +603,22 @@
                                                 <Setter Property="Fill" Value="DimGray" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Server}">
+                                                                 Value="{x:Static networking:Realm.Server}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                 Value="{x:Static networking:Realm.ClientAndServer}">
                                                         <Setter Property="Fill"
                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Realm}"
-                                                                 Value="{x:Static nodes:Realm.Invalid}">
+                                                                 Value="{x:Static networking:Realm.Invalid}">
                                                         <Setter Property="Fill"
                                                                 Value="DarkRed" />
                                                     </DataTrigger>
@@ -798,17 +799,17 @@
                                                         <Setter Property="Fill" Value="DimGray" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                         Value="{x:Static networking:Realm.NetworkedClient}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                         Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.Invalid}">
+                                                                         Value="{x:Static networking:Realm.Invalid}">
                                                                 <Setter Property="Fill" Value="DarkRed" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -832,27 +833,27 @@
                                                         <Setter Property="Fill" Value="DimGray" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                         Value="{x:Static networking:Realm.NetworkedClient}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                         Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.Client}">
+                                                                         Value="{x:Static networking:Realm.Client}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                         Value="{x:Static networking:Realm.ClientAndServer}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.Invalid}">
+                                                                         Value="{x:Static networking:Realm.Invalid}">
                                                                 <Setter Property="Fill" Value="DarkRed" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -876,22 +877,22 @@
                                                         <Setter Property="Fill" Value="DimGray" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.Server}">
+                                                                         Value="{x:Static networking:Realm.Server}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                         Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                         Value="{x:Static networking:Realm.ClientAndServer}">
                                                                 <Setter Property="Fill"
                                                                         Value="{StaticResource NodeSelectedColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Realm}"
-                                                                         Value="{x:Static nodes:Realm.Invalid}">
+                                                                         Value="{x:Static networking:Realm.Invalid}">
                                                                 <Setter Property="Fill" Value="DarkRed" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -1030,19 +1031,19 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1063,31 +1064,31 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            Value="{x:Static networking:Realm.Client}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1108,25 +1109,25 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            Value="{x:Static networking:Realm.Server}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1235,19 +1236,19 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1268,31 +1269,31 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            Value="{x:Static networking:Realm.Client}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1313,25 +1314,25 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            Value="{x:Static networking:Realm.Server}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1548,19 +1549,19 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1581,31 +1582,31 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            Value="{x:Static networking:Realm.Client}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1626,25 +1627,25 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            Value="{x:Static networking:Realm.Server}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1743,19 +1744,19 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1776,31 +1777,31 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            Value="{x:Static networking:Realm.Client}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1821,25 +1822,25 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            Value="{x:Static networking:Realm.Server}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -1979,19 +1980,19 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -2012,31 +2013,31 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            Value="{x:Static networking:Realm.Client}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -2057,25 +2058,25 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            Value="{x:Static networking:Realm.Server}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -2174,19 +2175,19 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -2207,31 +2208,31 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClient}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClient}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Client}">
+                                                                            Value="{x:Static networking:Realm.Client}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>
@@ -2252,25 +2253,25 @@
                                                                     <Style.Triggers>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Server}">
+                                                                            Value="{x:Static networking:Realm.Server}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.NetworkedClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.NetworkedClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.ClientAndServer}">
+                                                                            Value="{x:Static networking:Realm.ClientAndServer}">
                                                                             <Setter Property="Fill"
                                                                                 Value="{StaticResource NodeSelectedColor}" />
                                                                         </DataTrigger>
                                                                         <DataTrigger
                                                                             Binding="{Binding Realm}"
-                                                                            Value="{x:Static nodes:Realm.Invalid}">
+                                                                            Value="{x:Static networking:Realm.Invalid}">
                                                                             <Setter Property="Fill"
                                                                                 Value="DarkRed" />
                                                                         </DataTrigger>

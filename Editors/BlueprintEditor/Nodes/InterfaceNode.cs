@@ -10,7 +10,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Entities;
-using BlueprintEditorPlugin.Models.Networking;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Status;

@@ -5,7 +5,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
-using BlueprintEditorPlugin.Models.Networking;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
@@ -34,6 +34,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             (Realm.NetworkedClientAndServer, Realm.ClientAndServer),
             (Realm.Server, Realm.Client)
         };
+
+        /// <summary>
+        /// Nodes never have things like <see cref="Realm"/>.NetworkedClient, but connections do.
+        /// These are the same to nodes, as they do not differentiate between the 2
+        /// </summary>
+        public static readonly List<(Realm, Realm)> IdenticalTargetCombos = new List<(Realm, Realm)>
+        {
+            (Realm.Client, Realm.NetworkedClient),
+            (Realm.NetworkedClient, Realm.Client),
+            (Realm.ClientAndServer, Realm.NetworkedClientAndServer),
+            (Realm.NetworkedClientAndServer, Realm.ClientAndServer)
+        };
+
         public virtual Realm Realm { get; set; }
 
         #region Commands
@@ -374,7 +387,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 return;
             }
 
-            if (Realm != target.Realm && target.Realm != Realm.Any)
+            if (Realm != target.Realm && target.Realm != Realm.Any && !IdenticalTargetCombos.Contains((target.Realm, Realm)))
             {
                 SetStatus(EditorStatus.Flawed, "Connection realm should be the same as target realm");
                 return;

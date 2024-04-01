@@ -1,6 +1,4 @@
-﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
-
-namespace BlueprintEditorPlugin.Models.Networking
+﻿namespace BlueprintEditorPlugin.Models.Entities.Networking
 {
     public interface INetworked
     {

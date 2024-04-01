@@ -8,6 +8,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Connections.Pending;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
@@ -49,6 +50,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
                 case EntityNode entityNode:
                 {
+                    if (_externalNodeCache.ContainsKey((entityNode.FileGuid, entityNode.ClassGuid)))
+                    {
+                        App.Logger.LogError("Multiple imported items with the same guids detected!");
+                        return;
+                    }
                     _externalNodeCache.Add((entityNode.FileGuid, entityNode.ClassGuid), entityNode);
                 } break;
                 case InterfaceNode interfaceNode:

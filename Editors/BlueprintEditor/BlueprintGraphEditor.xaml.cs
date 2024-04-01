@@ -203,11 +203,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        // Import the node
-                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
-                        sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                        sourceNode = wrangler.GetEntityNode(source.External.FileGuid, source.External.ClassGuid);
+                        if (sourceNode == null)
+                        {
+                            // Import the node
+                            EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
+                            sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
                         
-                        wrangler.AddNodeTransient(sourceNode);
+                            wrangler.AddNodeTransient(sourceNode);
+                        }
                     } break;
                 }
                 
@@ -231,11 +235,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        // Import the node
-                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
-                        targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        targetNode = wrangler.GetEntityNode(target.External.FileGuid, target.External.ClassGuid);
                         
-                        wrangler.AddNodeTransient(targetNode);
+                        // Import the node
+                        if (targetNode == null)
+                        {
+                            EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
+                            targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        
+                            wrangler.AddNodeTransient(targetNode);
+                        }
                     } break;
                 }
                 
@@ -289,11 +298,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        // Import the node
-                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
-                        sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
-
-                        wrangler.AddNodeTransient(sourceNode);
+                        sourceNode = wrangler.GetEntityNode(source.External.FileGuid, source.External.ClassGuid);
+                        if (sourceNode == null)
+                        {
+                            // Import the node
+                            EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
+                            sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                        
+                            wrangler.AddNodeTransient(sourceNode);
+                        }
                     } break;
                 }
                 
@@ -317,11 +330,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        // Import the node
-                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
-                        targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        targetNode = wrangler.GetEntityNode(target.External.FileGuid, target.External.ClassGuid);
                         
-                        wrangler.AddNodeTransient(targetNode);
+                        // Import the node
+                        if (targetNode == null)
+                        {
+                            EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
+                            targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        
+                            wrangler.AddNodeTransient(targetNode);
+                        }
                     } break;
                 }
                 
@@ -375,11 +393,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        // Import the node
-                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
-                        sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
-
-                        wrangler.AddNodeTransient(sourceNode);
+                        sourceNode = wrangler.GetEntityNode(source.External.FileGuid, source.External.ClassGuid);
+                        if (sourceNode == null)
+                        {
+                            // Import the node
+                            EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
+                            sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                        
+                            wrangler.AddNodeTransient(sourceNode);
+                        }
                     } break;
                 }
                 
@@ -403,11 +425,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     } break;
                     case PointerRefType.External:
                     {
-                        // Import the node
-                        EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
-                        targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        targetNode = wrangler.GetEntityNode(target.External.FileGuid, target.External.ClassGuid);
                         
-                        wrangler.AddNodeTransient(targetNode);
+                        // Import the node
+                        if (targetNode == null)
+                        {
+                            EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
+                            targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                        
+                            wrangler.AddNodeTransient(targetNode);
+                        }
                     } break;
                 }
                 

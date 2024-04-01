@@ -13,6 +13,7 @@ using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.CheapGr
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.IO;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Entities;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using Frosty.Controls;

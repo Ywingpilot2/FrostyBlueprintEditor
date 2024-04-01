@@ -1,4 +1,5 @@
 ﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.ValueNodes.Synced
 {
