@@ -34,6 +34,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             }
         }
 
+        public string ToolTip => $"{Realm} Port";
+
         private bool _isConnected;
 
         public bool IsConnected
@@ -247,6 +249,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             {
                 _realm = value;
                 NotifyPropertyChanged(nameof(Realm));
+                NotifyPropertyChanged(nameof(ToolTip));
             }
         }
 

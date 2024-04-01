@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BlueprintEditorPlugin.Editors.GraphEditor;
 using Frosty.Core;
 using Frosty.Core.Controls.Editors;
 using Frosty.Core.Misc;
@@ -145,6 +146,9 @@ namespace BlueprintEditorPlugin.Options
         }
     }
 
+    /// <summary>
+    /// This class stores all of the users options for the <see cref="IGraphEditor"/>
+    /// </summary>
     public static class EditorOptions
     {
         public static ConnectionStyle WireStyle { get; internal set; }
