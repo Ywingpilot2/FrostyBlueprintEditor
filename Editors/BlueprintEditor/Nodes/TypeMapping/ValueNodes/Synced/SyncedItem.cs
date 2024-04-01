@@ -3,7 +3,7 @@ using BlueprintEditorPlugin.Models.Entities.Networking;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.ValueNodes.Synced
 {
-    public abstract class SyncedItem : EntityNode
+    public abstract class SyncedNode : EntityNode
     {
         public override string ToolTip => "This node syncs a value between client and server.";
 

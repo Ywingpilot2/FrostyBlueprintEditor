@@ -390,6 +390,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             return $"{Realm} {Type} {Direction}put - {Name}";
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            if (!(obj is EntityPort entityPort))
+                return false;
+
+            return entityPort.Node == Node && entityPort.Name == Name && entityPort.HasPlayer == HasPlayer 
+                   && entityPort.IsInterface == IsInterface
+                   && entityPort.Type == Type && entityPort.Realm == Realm;
+        }
+
         public EntityPort(string name, INode node)
         {
             Name = name;

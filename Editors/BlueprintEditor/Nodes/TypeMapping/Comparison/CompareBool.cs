@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Ports;
 using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Comparison
 {
-    public class CompareBool : EntityNode
+    public class CompareBoolNode : EntityNode
     {
         public override string ObjectType => "CompareBoolEntityData";
         public override string ToolTip => "This node sends an output event depending on if the Input property is true";
@@ -58,11 +61,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Compar
         public override void OnCreation()
         {
             base.OnCreation();
-            AddOutput("OnTrue", ConnectionType.Event, Realm);
-            AddOutput("OnFalse", ConnectionType.Event, Realm);
-            
-            AddInput("Bool", ConnectionType.Property, Realm);
-            AddInput("In", ConnectionType.Event, Realm);
 
             if ((bool)TryGetProperty("TriggerOnStart"))
             {
@@ -102,6 +100,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Compar
 
                 Footer += "Always sends when In is triggered";
             }
+        }
+
+        public CompareBoolNode()
+        {
+            Inputs = new ObservableCollection<IPort>()
+            {
+                new PropertyInput("Bool", this),
+                new EventInput("In", this)
+            };
+            Outputs = new ObservableCollection<IPort>()
+            {
+                new EventOutput("OnTrue", this),
+                new EventOutput("OnFalse", this)
+            };
         }
     }
 }

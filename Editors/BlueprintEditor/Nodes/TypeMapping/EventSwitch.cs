@@ -3,7 +3,7 @@ using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
 {
-    public class EventSwitch : EntityNode
+    public class EventSwitchNode : EntityNode
     {
         public override string ObjectType => "EventSwitchEntityData";
         public override string ToolTip => "A switch which changes what event it outputs depending on the current OutEvent";

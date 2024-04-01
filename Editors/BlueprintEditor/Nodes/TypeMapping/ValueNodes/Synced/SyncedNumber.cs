@@ -1,11 +1,11 @@
 ﻿namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.ValueNodes.Synced
 {
-    public class SyncedInt : SyncedItem
+    public class SyncedIntNode : SyncedNode
     {
         public override string ObjectType => "SyncedIntEntityData";
     }
     
-    public class SyncedFloat : SyncedItem
+    public class SyncedFloatNode : SyncedNode
     {
         public override string ObjectType => "SyncedFloatEntityData";
     }

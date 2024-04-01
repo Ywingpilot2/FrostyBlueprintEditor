@@ -9,7 +9,7 @@ using FrostySdk.Ebx;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
 {
-    public class SelectEvent : EntityNode
+    public class SelectEventNode : EntityNode
     {
         public override string ObjectType => "SelectEventEntityData";
         public override string ToolTip => "This node lets you to select between a list of output events";

@@ -122,8 +122,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #region Node data
 
-        public ObservableCollection<IPort> Inputs { get; protected set; } = new ObservableCollection<IPort>();
-        public ObservableCollection<IPort> Outputs { get; protected set; } = new ObservableCollection<IPort>();
+        public ObservableCollection<IPort> Inputs { get; protected set; }
+        public ObservableCollection<IPort> Outputs { get; protected set; }
 
         public INodeWrangler NodeWrangler { get; private set; }
 
@@ -338,6 +338,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             else
             {
                 Realm = ParseRealm(TryGetProperty("Realm"));
+                
+                // Update our input/output realms 
+                foreach (EntityInput input in Inputs)
+                {
+                    if (input.Realm == Realm.Invalid)
+                    {
+                        input.Realm = Realm;
+                    }
+                }
+                
+                foreach (EntityOutput output in Outputs)
+                {
+                    if (output.Realm == Realm.Invalid)
+                    {
+                        output.Realm = Realm;
+                    }
+                }
             }
         }
 
@@ -464,6 +481,116 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         private Dictionary<int, PropertyOutput> _hashCachePOutputs = new Dictionary<int, PropertyOutput>();
         private Dictionary<int, LinkOutput> _hashCacheLOutputs = new Dictionary<int, LinkOutput>();
         private Dictionary<int, EventOutput> _hashCacheEOutputs = new Dictionary<int, EventOutput>();
+
+        #region Caching
+
+        /// <summary>
+        /// Remakes the port cache based on <see cref="Inputs"/> and <see cref="Outputs"/>
+        /// </summary>
+        protected void RefreshCache()
+        {
+            _hashCachePInputs.Clear();
+            _hashCacheLInputs.Clear();
+            _hashCacheEInputs.Clear();
+            
+            _hashCachePOutputs.Clear();
+            _hashCacheLOutputs.Clear();
+            _hashCacheEOutputs.Clear();
+
+            foreach (EntityInput input in Inputs)
+            {
+                switch (input.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        if (input.Name.StartsWith("0x"))
+                        {
+                            int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                            _hashCacheEInputs.Add(hash, (EventInput)input);
+                        }
+                        else
+                        {
+                            int hash = Utils.HashString(input.Name);
+                            _hashCacheEInputs.Add(hash, (EventInput)input);
+                        }
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        if (input.Name.StartsWith("0x"))
+                        {
+                            int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                            _hashCacheLInputs.Add(hash, (LinkInput)input);
+                        }
+                        else
+                        {
+                            int hash = Utils.HashString(input.Name);
+                            _hashCacheLInputs.Add(hash, (LinkInput)input);
+                        }
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        if (input.Name.StartsWith("0x"))
+                        {
+                            int hash = int.Parse(input.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                            _hashCachePInputs.Add(hash, (PropertyInput)input);
+                        }
+                        else
+                        {
+                            int hash = Utils.HashString(input.Name);
+                            _hashCachePInputs.Add(hash, (PropertyInput)input);
+                        }
+                    } break;
+                }
+            }
+            
+            foreach (EntityOutput output in Outputs)
+            {
+                switch (output.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        if (output.Name.StartsWith("0x"))
+                        {
+                            int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                            _hashCacheEOutputs.Add(hash, (EventOutput)output);
+                        }
+                        else
+                        {
+                            int hash = Utils.HashString(output.Name);
+                            _hashCacheEOutputs.Add(hash, (EventOutput)output);
+                        }
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        if (output.Name.StartsWith("0x"))
+                        {
+                            int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                            _hashCacheLOutputs.Add(hash, (LinkOutput)output);
+                        }
+                        else
+                        {
+                            int hash = Utils.HashString(output.Name);
+                            _hashCacheLOutputs.Add(hash, (LinkOutput)output);
+                        }
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        if (output.Name.StartsWith("0x"))
+                        {
+                            int hash = int.Parse(output.Name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                            _hashCachePOutputs.Add(hash, (PropertyOutput)output);
+                        }
+                        else
+                        {
+                            int hash = Utils.HashString(output.Name);
+                            _hashCachePOutputs.Add(hash, (PropertyOutput)output);
+                        }
+                    } break;
+                }
+            }
+        }
+
+        #endregion
 
         #region Port retrieval
 
@@ -1039,6 +1166,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
+            
+            Inputs = new ObservableCollection<IPort>();
+            Outputs = new ObservableCollection<IPort>();
 
             InternalGuid = ((dynamic)obj).GetInstanceGuid();
             Type = PointerRefType.Internal;
@@ -1063,6 +1193,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
+            
+            Inputs = new ObservableCollection<IPort>();
+            Outputs = new ObservableCollection<IPort>();
 
             InternalGuid = ((dynamic)obj).GetInstanceGuid();
             Type = PointerRefType.Internal;
@@ -1084,10 +1217,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             FileGuid = fileGuid;
             ClassGuid = InternalGuid.ExportedGuid;
             Type = PointerRefType.External;
+            
+            Inputs = new ObservableCollection<IPort>();
+            Outputs = new ObservableCollection<IPort>();
         }
 
         public EntityNode()
         {
+            Inputs = new ObservableCollection<IPort>();
+            Outputs = new ObservableCollection<IPort>();
+            RefreshCache();
         }
 
         #endregion
@@ -1123,6 +1262,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 
                 node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.Type = PointerRefType.Internal;
+                node.RefreshCache();
                 
                 return node;
             }
