@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configurations>Developer - Debug;Release - Alpha;Release - Beta;Release - Final</Configurations>
+    <Configurations>Developer - Debug;Release - Final</Configurations>
     <Platforms>x64</Platforms>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>BlueprintEditorPlugin</AssemblyTitle>
@@ -18,45 +18,35 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release - Alpha|x64' ">
-    <OutputPath>bin\Release\Alpha\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Beta|x64'">
-    <OutputPath>bin\Release\Beta\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'">
     <OutputPath>bin\Release\Final\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
+  <!-- This item group is for referencing all of the binaries frosty has -->
+  <!-- Replace "..\..\1063\" with the directory to your FrostyToolsuite folder -->
   <ItemGroup>
+    <Reference Include="FrostyControls">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyControls.dll</HintPath>
+    </Reference>
+    <Reference Include="FrostyCore">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyCore.dll</HintPath>
+    </Reference>
+    <Reference Include="FrostyEditor">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyEditor.exe</HintPath>
+    </Reference>
+    <Reference Include="FrostyHash">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyHash.dll</HintPath>
+    </Reference>
+    <Reference Include="FrostySdk">
+      <HintPath>..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostySdk.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\FrostyControls\FrostyControls.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FrostyEditor\FrostyEditor.csproj" />
-    <ProjectReference Include="..\..\FrostyHash\FrostyHash.vcxproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FrostyPlugin\FrostyCore.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FrostySdk\FrostySdk.csproj">
-      <Private>false</Private>
-    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +62,24 @@
     <None Remove="Images\github-mark-white.png" />
     <Resource Include="Images\github-mark-white.png" />
     <None Remove="Windows\BlueprintEditorPortMenu.xaml.cs~" />
+    <None Remove="Images\NCS.png" />
+    <Resource Include="Images\NCS.png" />
+    <None Remove="Images\Networked.png" />
+    <Resource Include="Images\Networked.png" />
+    <None Remove="Images\Server.png" />
+    <Resource Include="Images\Server.png" />
+    <None Remove="Images\CollapseWindow.png" />
+    <Resource Include="Images\CollapseWindow.png" />
+    <None Remove="Images\CollapsedWindow.png" />
+    <Resource Include="Images\CollapsedWindow.png" />
+    <None Remove="Images\InterfaceIcon.png" />
+    <Resource Include="Images\InterfaceIcon.png" />
+    <None Remove="Images\RedirectIcon.png" />
+    <Resource Include="Images\InputRedirectIcon.png" />
+    <None Remove="Images\AddRedirectIcon.png" />
+    <Resource Include="Images\AddRedirectIcon.png" />
+    <None Remove="Images\OutputRedirectIcon.png" />
+    <Resource Include="Images\OutputRedirectIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,13 +87,43 @@
     <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Update="Models\Editors\BlueprintGraphEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <XamlRuntime>Wpf</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Editors\BlueprintEditor\BlueprintGraphEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <XamlRuntime>Wpf</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Editors\PropertyGrid\BlueprintPropertyGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Editors\BlueprintEditor\Nodes\TypeMapping\ObjectReference" />
+    <Folder Include="Models\Converters" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Images\Client.png" />
+    <Resource Include="Images\Client.png" />
+  </ItemGroup>
+
+  <!-- This is for copying our binaries into the plugins folder -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)$(OutDir)Plugins\" />
-    <Exec Command="xcopy /Y $(ProjectDir)Models\Types\NodeTypes\NodeMappingConfigs $(SolutionDir)$(OutDir)BlueprintEditor\NodeMappings\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="$(SolutionDir)$(OutDir)Plugins\" />
+    <!-- Replace the second directory with the directory to your frosty's plugins folder -->
+    <Exec Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
+    
+    <!-- And replace the DestinationFolder here to be your frosty's plugins directory as well -->
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
   </Target>
 
   <PropertyGroup>

@@ -10,12 +10,12 @@ namespace BlueprintEditorPlugin.Windows
         {
             InitializeComponent();
             ControlsText.Text = "Delete: Removes the selected nodes " +
+                                "\nShift + S: Save the current layout" +
                                 "\nShift + D: Duplicate the selected nodes" +
-                                "\nShift + Left Click: Add a node to the current selection" +
-                                "\nAlt + Left Click: Remove a node from the current selection" +
-                                "\nShift + Right Click: Place the currently selected node in the toolbox at the mouse position";
+                                "\nShift + Right Click: Place the currently selected node in the toolbox at the mouse position" +
+                                "\nAlt + Enter: When editing in the property grid, this will apply the edit to all selected nodes.";
 
-            CreditsText.Text = "Emanuel Miroiu - Nodify library used for Node Editor controls\n" +
+            CreditsText.Text = "Emanuel Miroiu - Nodify library used for Graph Editor\n" +
                                "MagixGames - Optimizations to loading Ebx into graphed form\n" +
                                "Mophead01 - Original ObjectFlags calculation implementation\n" +
                                "CosmicDreams - Assistance with determining realms automatically\n" +

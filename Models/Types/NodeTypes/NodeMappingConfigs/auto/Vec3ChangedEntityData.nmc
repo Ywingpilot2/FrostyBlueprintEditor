@@ -1,6 +1,0 @@
-Type = Vec3ChangedEntityData
-DisplayName = Vec3ChangedEntityData
-InputProperty = Value, ObjectRealm
-InputProperty = AlwaysSend, ObjectRealm
-OutputProperty = NewValue, ObjectRealm
-OutputEvent = ValueChanged, ObjectRealm

@@ -1,9 +1,0 @@
-Type = AutoPlayerManagerEntityData
-DisplayName = AutoPlayer Manager
-Documentation = This entity is useful for managing autoplayers, TriggerOrphans resets an autoplayers current objective. The Orphan output contains a PlayerEvent which can be used to get an autoplayer. 
-InputProperty = PlayerCount, ObjectRealm
-InputProperty = FillGameplayBotsTeam1, ObjectRealm
-InputProperty = FillGameplayBotsTeam2, ObjectRealm
-InputEvent = TriggerOrphans, Server
-InputEvent = 0x18156c34, Server
-OutputEvent = Orphan, Server

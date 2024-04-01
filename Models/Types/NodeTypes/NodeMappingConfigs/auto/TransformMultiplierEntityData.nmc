@@ -1,5 +1,0 @@
-Type = TransformMultiplierEntityData
-DisplayName = TransformMultiplierEntityData
-InputProperty = In1, ObjectRealm
-InputProperty = In2, ObjectRealm
-OutputProperty = Out, ObjectRealm

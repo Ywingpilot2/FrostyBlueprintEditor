@@ -1,7 +1,0 @@
-Type = TransformSplitterEntityData
-DisplayName = TransformSplitterEntityData
-InputProperty = Transform, ObjectRealm
-OutputProperty = Trans, ObjectRealm
-OutputProperty = Up, ObjectRealm
-OutputProperty = Forward, ObjectRealm
-OutputProperty = Left, ObjectRealm

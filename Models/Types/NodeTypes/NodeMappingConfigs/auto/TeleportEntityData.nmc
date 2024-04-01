@@ -1,7 +1,0 @@
-Type = TeleportEntityData
-DisplayName = TeleportEntityData
-InputProperty = CheckBelowGround, ObjectRealm
-InputProperty = DefaultTeleportPlayer, ObjectRealm
-InputProperty = NewPositionTransform, Server
-InputEvent = Teleport, Server
-OutputLink = CharacterToTeleport, ObjectRealm

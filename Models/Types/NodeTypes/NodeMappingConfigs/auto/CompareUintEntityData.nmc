@@ -1,7 +1,0 @@
-Type = CompareUintEntityData
-DisplayName = CompareUintEntityData
-InputProperty = A, Client
-InputProperty = B, ObjectRealm
-InputEvent = In, Client
-OutputEvent = A=B, Client
-OutputEvent = A!=B, Client

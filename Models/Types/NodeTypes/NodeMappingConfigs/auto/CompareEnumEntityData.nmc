@@ -1,9 +1,0 @@
-Type = CompareEnumEntityData
-DisplayName = CompareEnumEntityData
-InputProperty = TypeNameHash, ObjectRealm
-InputProperty = A, Client
-InputProperty = B, Client
-InputEvent = Compare, Client
-OutputProperty = IsEqual, Client
-OutputEvent = Equal, Client
-OutputEvent = NotEqual, Client

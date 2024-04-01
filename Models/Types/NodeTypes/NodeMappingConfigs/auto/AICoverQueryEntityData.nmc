@@ -1,6 +1,0 @@
-Type = AICoverQueryEntityData
-DisplayName = AICoverQueryEntityData
-InputProperty = Priority, ObjectRealm
-InputEvent = Activate, Server
-InputEvent = Deactivate, Server
-OutputLink = Soldier, ObjectRealm

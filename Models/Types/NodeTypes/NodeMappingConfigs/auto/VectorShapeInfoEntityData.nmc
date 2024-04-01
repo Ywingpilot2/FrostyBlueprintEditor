@@ -1,6 +1,0 @@
-Type = VectorShapeInfoEntityData
-DisplayName = VectorShapeInfoEntityData
-InputProperty = PointIndex, Client
-OutputProperty = 0x5a7f70f0, Client
-OutputProperty = 0x793a62af, Client
-OutputLink = Shape, ObjectRealm

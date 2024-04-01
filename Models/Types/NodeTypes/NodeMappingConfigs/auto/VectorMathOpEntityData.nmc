@@ -1,8 +1,0 @@
-Type = VectorMathOpEntityData
-DisplayName = VectorMathOpEntityData
-InputProperty = MathOperator, ObjectRealm
-InputProperty = In1_Vec3, ObjectRealm
-InputProperty = In2_Vec3, ObjectRealm
-InputProperty = In2_Float, ClientAndServer
-OutputProperty = Out_Vec3, ObjectRealm
-OutputProperty = Length_Float, ObjectRealm

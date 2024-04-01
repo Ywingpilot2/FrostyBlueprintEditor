@@ -1,7 +1,0 @@
-Type = PlayerAbilityPickupEntityData
-ValidGameExecutableName = starwarsbattlefrontii
-DisplayName = PlayerAbilityPickupEntityData
-InputProperty = PlayerAbilityIdentifier, ObjectRealm
-InputEvent = Drop, Server
-InputEvent = Pickup, Server
-OutputEvent = 0x4b244d31, Server

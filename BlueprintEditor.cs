@@ -1,37 +1,59 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using BlueprintEditorPlugin.Editors.BlueprintEditor;
+using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Extensions;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using Frosty.Core.Windows;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin
 {
-    [TemplatePart (Name = GraphEditor, Type = typeof(BlueprintGraphEditor))]
+    [TemplatePart (Name = ContentPresenter, Type = typeof(ContentPresenter))]
     public class BlueprintEditor : FrostyBaseEditor
     {
-        private const string GraphEditor = "GraphEditor";
-        private BlueprintGraphEditor _graphEditor;
-        public override ImageSource Icon { get; } = ViewBlueprintMenuExtension.iconImageSource;
+        private const string ContentPresenter = "ContentPresenter";
+        private ContentPresenter _presenter;
+        public override ImageSource Icon => ViewBlueprintContextMenuItem.IconImageSource;
 
         static BlueprintEditor()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BlueprintEditor), new FrameworkPropertyMetadata(typeof(BlueprintEditor)));
         }
-
+        
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            
-            _graphEditor = GetTemplateChild(GraphEditor) as BlueprintGraphEditor;
-            _graphEditor.File = App.SelectedAsset;
-            GotMouseCapture += _graphEditor.BlueprintEditorWindow_OnGotFocus;
+            _presenter = GetTemplateChild(ContentPresenter) as ContentPresenter;
+        }
+
+        private bool _loaded;
+        public void LoadBlueprint(EbxAssetEntry assetEntry, IEbxGraphEditor graphEditor)
+        {
+            // Stupid fuck why does this happen????
+            if (_loaded)
+                return;
+
+            _presenter.Content = graphEditor;
+
+            _loaded = true;
+#if DEVELOPER___DEBUG
+            graphEditor.LoadAsset(assetEntry);
+#else
+            FrostyTaskWindow.Show("Loading Blueprint...", "", task =>
+            {
+                graphEditor.LoadAsset(assetEntry);
+            });
+#endif
         }
 
         public override void Closed()
         {
-            _graphEditor.BlueprintEditorWindow_OnClosing(this, new CancelEventArgs());
+            base.Closed();
         }
     }
 }

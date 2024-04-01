@@ -1,4 +1,0 @@
-Type = AIPlayerProviderManagerEntityData
-DisplayName = AIPlayerProviderManagerEntityData
-InputProperty = MaxAIPlayerCount, ObjectRealm
-InputProperty = UseAIScoreManager, ObjectRealm

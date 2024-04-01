@@ -1,5 +1,0 @@
-Type = KillswitchEntityData
-DisplayName = KillswitchEntityData
-InputProperty = Killswitch, ObjectRealm
-InputEvent = 0xa5850924, Client
-OutputProperty = 0x3f6e8d79, ObjectRealm

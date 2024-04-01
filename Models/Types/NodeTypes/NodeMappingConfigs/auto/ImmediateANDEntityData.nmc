@@ -1,8 +1,0 @@
-Type = ImmediateANDEntityData
-DisplayName = ImmediateANDEntityData
-InputProperty = InA, ClientAndServer
-InputProperty = InB, ClientAndServer
-InputProperty = InvertA, ObjectRealm
-InputProperty = InvertB, ObjectRealm
-InputProperty = NAND, ObjectRealm
-OutputProperty = Out, ClientAndServer

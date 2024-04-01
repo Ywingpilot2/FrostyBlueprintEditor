@@ -1,7 +1,0 @@
-Type = TransformToRotationEntityData
-DisplayName = TransformToRotationEntityData
-InputProperty = In, ObjectRealm
-InputProperty = Degrees, ObjectRealm
-OutputProperty = Yaw, ObjectRealm
-OutputProperty = Pitch, ObjectRealm
-OutputProperty = Roll, Client
