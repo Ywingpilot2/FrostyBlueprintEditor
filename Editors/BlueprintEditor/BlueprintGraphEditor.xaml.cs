@@ -304,6 +304,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                             // Import the node
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
                             sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                            cheap.SortGraph(sourceNode);
                         
                             wrangler.AddNodeTransient(sourceNode);
                         }
@@ -337,6 +338,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
                             targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                            cheap.SortGraph(targetNode);
                         
                             wrangler.AddNodeTransient(targetNode);
                         }
@@ -399,6 +401,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                             // Import the node
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
                             sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                            cheap.SortGraph(sourceNode);
                         
                             wrangler.AddNodeTransient(sourceNode);
                         }
@@ -432,6 +435,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
                             targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                            cheap.SortGraph(targetNode);
                         
                             wrangler.AddNodeTransient(targetNode);
                         }
