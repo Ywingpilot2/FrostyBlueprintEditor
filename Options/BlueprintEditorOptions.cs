@@ -71,7 +71,7 @@ namespace BlueprintEditorPlugin.Options
         
         [Category("Layouts")]
         [DisplayName("Redirect Cycles")]
-        [Description("Creates redirects for cyclical graphs, thus removing loops(e.g a->b, b->c, c->a)")]
+        [Description("EXPERIMENTAL!\nCreates redirects for cyclical graphs, thus removing loops(e.g a->b, b->c, c->a)")]
         public bool AutoRedirects { get; set; }
         
         [Category("Layouts")]

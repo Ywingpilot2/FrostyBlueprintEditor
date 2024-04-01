@@ -105,6 +105,9 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Lay
 
         public double GetHeight()
         {
+            if (Nodes.Count == 0)
+                return 0.0;
+            
             return Nodes.Max(node => node.Size.Height);
         }
         
@@ -114,6 +117,9 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Lay
         /// <returns>The height of the highest node in this layer</returns>
         public double GetWidth()
         {
+            if (Nodes.Count == 0)
+                return 0.0;
+            
             return Nodes.Max(node => node.Size.Width);
         }
         
