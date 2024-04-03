@@ -43,6 +43,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
                 EntityOutput output = GetOutput(args.OldValue.ToString(), ConnectionType.Event);
                 input.Name = args.NewValue.ToString();
                 output.Name = $"Select{args.NewValue}";
+                RefreshCache();
             }
             // The list itself was edited
             else if (args.Item.Name == "Events")
@@ -52,17 +53,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
                     case ItemModifiedTypes.Insert:
                     case ItemModifiedTypes.Add:
                     {
-                        foreach (CString evnt in (dynamic)TryGetProperty("Events"))
-                        {
-                            if (evnt.IsNull())
-                                continue;
-                            
-                            if (GetOutput(evnt.ToString(), ConnectionType.Event) != null)
-                                continue;
-
-                            AddOutput(evnt.ToString(), ConnectionType.Event);
-                            AddInput($"Select{evnt.ToString()}", ConnectionType.Event);
-                        }
+                        AddOutput(args.NewValue.ToString(), ConnectionType.Event, Realm);
+                        AddInput($"Select{args.NewValue.ToString()}", ConnectionType.Event, Realm);
                     } break;
                     case ItemModifiedTypes.Remove:
                     {
@@ -92,6 +84,22 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
                             IPort output = outputs[i];
                             RemoveOutput((EntityOutput)output);
                         }
+                    } break;
+                    case ItemModifiedTypes.Assign:
+                    {
+                        Inputs.Clear();
+                        Outputs.Clear();
+                        
+                        foreach (CString evnt in (dynamic)TryGetProperty("Events"))
+                        {
+                            if (evnt.IsNull())
+                                continue;
+                
+                            AddOutput(evnt.ToString(), ConnectionType.Event, Realm);
+                            AddInput($"Select{evnt.ToString()}", ConnectionType.Event, Realm);
+                        }
+                        
+                        RefreshCache();
                     } break;
                 }
             }
