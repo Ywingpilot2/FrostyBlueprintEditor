@@ -235,6 +235,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 real = wrangler.GetInterfaceNode(name, PortDirection.In);
             }
 
+            if (real == null)
+            {
+                reader.ReadPoint();
+                return false;
+            }
+
             real.Location = reader.ReadPoint();
             
             // TODO HACK: We create interface nodes before we read layouts. So in order to read transient data from them, we can't add new ones.

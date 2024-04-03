@@ -247,6 +247,40 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                         AssetClassGuid internalGuid = layoutReader.ReadAssetClassGuid();
                         node = wrangler.GetEntityNode(fileGuid, internalGuid);
                     }
+
+                    // SKIP!
+                    if (node == null)
+                    {
+                        layoutReader.ReadPoint();
+                        layoutReader.ReadDouble();
+                        layoutReader.ReadDouble();
+                        int portcount = layoutReader.ReadInt();
+                        
+                        // Read inputs
+                        for (int j = 0; j < portcount; j++)
+                        {
+                            layoutReader.ReadNullTerminatedString();
+                            layoutReader.ReadInt();
+                            layoutReader.ReadInt();
+
+                            layoutReader.ReadBoolean();
+                            layoutReader.ReadBoolean();
+                        }
+                    
+                        // Read outputs
+                        portcount = layoutReader.ReadInt();
+                        for (int j = 0; j < portcount; j++)
+                        {
+                            layoutReader.ReadNullTerminatedString(); 
+                            layoutReader.ReadInt(); 
+                            layoutReader.ReadInt();
+
+                            layoutReader.ReadBoolean();
+                            layoutReader.ReadBoolean();
+                        }
+                        
+                        continue;
+                    }
                     
                     node.Location = layoutReader.ReadPoint();
                     double width = layoutReader.ReadDouble();
@@ -292,7 +326,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                 }
                 else
                 {
-                    IVertex vertex = NodeWrangler.Vertices[layoutReader.ReadInt()];
+                    IVertex vertex = NodeWrangler.Vertices.ElementAtOrDefault(layoutReader.ReadInt());
+
+                    // SKIP!
+                    if (vertex == null)
+                    {
+                        layoutReader.ReadPoint();
+                        layoutReader.ReadDouble();
+                        layoutReader.ReadDouble();
+                        continue;
+                    }
+                    
                     vertex.Location = layoutReader.ReadPoint();
                     double width = layoutReader.ReadDouble();
                     double height = layoutReader.ReadDouble();
