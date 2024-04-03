@@ -661,23 +661,92 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 }
             }
         }
+        
+        private void AddInterface_OnClick(object sender, RoutedEventArgs e)
+        {
+            AddInterfaceArgs args = new AddInterfaceArgs();
+            MessageBoxResult result = EditPromptWindow.Show(args, "Add Interface");
+            if (result == MessageBoxResult.Yes)
+            {
+                EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+                
+                // Ensure that the interface exists
+                PointerRef interfaceRef = ((dynamic)wrangler.Asset.RootObject).Interface;
+                if (interfaceRef.Type == PointerRefType.Null)
+                {
+                    dynamic intrfc = TypeLibrary.CreateObject("InterfaceDescriptorData");
+                    wrangler.Asset.AddObject(intrfc);
+                    interfaceRef = new PointerRef(intrfc);
+                    ((dynamic)wrangler.Asset.RootObject).Interface = interfaceRef;
+                }
+                
+                switch (args.Type)
+                {
+                    case ConnectionType.Event:
+                    {
+                        dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
+                        subObj.Name = new CString(args.Name);
+
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
+                        {
+                            SubObject = subObj
+                        });
+                    } break;
+                    case ConnectionType.Link:
+                    {
+                        dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
+                        subObj.Name = new CString(args.Name);
+
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
+                        {
+                            SubObject = subObj
+                        });
+                    } break;
+                    case ConnectionType.Property:
+                    {
+                        dynamic subObj = TypeLibrary.CreateObject("DataField");
+                        subObj.Name = new CString(args.Name);
+
+                        if (args.Direction == PortDirection.Out)
+                        {
+                            Type enumType = subObj.AccessType.GetType();
+                            subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
+                        }
+
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
+                        {
+                            SubObject = subObj
+                        });
+                    } break;
+                }
+            }
+        }
 
         #endregion
         
         private void PasteObject(object sender, RoutedEventArgs e)
         {
-            // Item is not valid for pasting
-            if (FrostyClipboard.Current.GetData() == null)
-                return;
-            
-            if (!TypeLibrary.IsSubClassOf(FrostyClipboard.Current.GetData(), "GameDataContainer"))
-                return;
-            
-            EntityNode node = EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
-            node.Location = Editor.MouseLocation;
-            
-            NodeWrangler.AddVertex(node);
-            NodeWrangler.SelectedVertices.Add(node);
+            // If there is no data to paste, clipboard crashes sometimes(dunno why)
+            try
+            {
+                // Item is not valid for pasting
+                if (FrostyClipboard.Current.GetData() == null)
+                    return;
+
+                if (!TypeLibrary.IsSubClassOf(FrostyClipboard.Current.GetData(), "GameDataContainer"))
+                    return;
+
+                EntityNode node =
+                    EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
+                node.Location = Editor.MouseLocation;
+
+                NodeWrangler.AddVertex(node);
+                NodeWrangler.SelectedVertices.Add(node);
+            }
+            catch (Exception exception)
+            {
+                // ignored
+            }
         }
 
         #endregion
@@ -826,6 +895,51 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
                     LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
                 } break;
+                case Key.C when (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control:
+                {
+                    if (NodeWrangler.SelectedVertices.Count == 0)
+                        return;
+
+                    if (NodeWrangler.SelectedVertices.LastOrDefault() is EntityNode node)
+                    {
+                        node.Copy();
+                    }
+                } break;
+                case Key.X when (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control:
+                {
+                    if (NodeWrangler.SelectedVertices.Count == 0)
+                        return;
+
+                    if (NodeWrangler.SelectedVertices.LastOrDefault() is EntityNode node)
+                    {
+                        node.Copy();
+                        NodeWrangler.RemoveVertex(node);
+                    }
+                } break;
+                case Key.V when (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control:
+                {
+                    // If there is no data to paste, clipboard crashes sometimes(dunno why)
+                    try
+                    {
+                        // Item is not valid for pasting
+                        if (FrostyClipboard.Current.GetData() == null)
+                            return;
+
+                        if (!TypeLibrary.IsSubClassOf(FrostyClipboard.Current.GetData(), "GameDataContainer"))
+                            return;
+
+                        EntityNode node =
+                            EntityNode.GetNodeFromEntity(FrostyClipboard.Current.GetData(), NodeWrangler, true);
+                        node.Location = Editor.MouseLocation;
+
+                        NodeWrangler.AddVertex(node);
+                        NodeWrangler.SelectedVertices.Add(node);
+                    }
+                    catch (Exception exception)
+                    {
+                        // ignored
+                    }
+                } break;
             }
         }
 
@@ -857,65 +971,5 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
-
-        private void AddInterface_OnClick(object sender, RoutedEventArgs e)
-        {
-            AddInterfaceArgs args = new AddInterfaceArgs();
-            MessageBoxResult result = EditPromptWindow.Show(args, "Add Interface");
-            if (result == MessageBoxResult.Yes)
-            {
-                EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
-                
-                // Ensure that the interface exists
-                PointerRef interfaceRef = ((dynamic)wrangler.Asset.RootObject).Interface;
-                if (interfaceRef.Type == PointerRefType.Null)
-                {
-                    dynamic intrfc = TypeLibrary.CreateObject("InterfaceDescriptorData");
-                    wrangler.Asset.AddObject(intrfc);
-                    interfaceRef = new PointerRef(intrfc);
-                    ((dynamic)wrangler.Asset.RootObject).Interface = interfaceRef;
-                }
-                
-                switch (args.Type)
-                {
-                    case ConnectionType.Event:
-                    {
-                        dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
-                        subObj.Name = new CString(args.Name);
-
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
-                        {
-                            SubObject = subObj
-                        });
-                    } break;
-                    case ConnectionType.Link:
-                    {
-                        dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
-                        subObj.Name = new CString(args.Name);
-
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
-                        {
-                            SubObject = subObj
-                        });
-                    } break;
-                    case ConnectionType.Property:
-                    {
-                        dynamic subObj = TypeLibrary.CreateObject("DataField");
-                        subObj.Name = new CString(args.Name);
-
-                        if (args.Direction == PortDirection.Out)
-                        {
-                            Type enumType = subObj.AccessType.GetType();
-                            subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
-                        }
-
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
-                        {
-                            SubObject = subObj
-                        });
-                    } break;
-                }
-            }
-        }
     }
 }

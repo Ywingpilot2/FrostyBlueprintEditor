@@ -129,11 +129,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
+        #endregion
+        
         #region Commands
 
         public ICommand CopyCommand => new DelegateCommand(Copy);
 
-        private protected void Copy()
+        public void Copy()
         {
             FrostyClipboard.Current.SetData(Object);
         }
@@ -206,8 +208,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 }
             }
         }
-
-        #endregion
 
         #endregion
 

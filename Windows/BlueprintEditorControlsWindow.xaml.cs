@@ -13,7 +13,10 @@ namespace BlueprintEditorPlugin.Windows
                                 "\nShift + S: Save the current layout" +
                                 "\nShift + D: Duplicate the selected nodes" +
                                 "\nShift + Right Click: Place the currently selected node in the toolbox at the mouse position" +
-                                "\nAlt + Enter: When editing in the property grid, this will apply the edit to all selected nodes.";
+                                "\nAlt + Enter: When editing in the property grid, this will apply the edit to all selected nodes." +
+                                "\nCtrl + C: Copies the selected node/object in the graph editor to the clipboard" +
+                                "\nCtrl + X: Cuts the selected node/object from the graph editor and copies it to the clipboard" +
+                                "\nCtrl + V: Pastes the object from the clipboard to the graph editor";
 
             CreditsText.Text = "Emanuel Miroiu - Nodify library used for Graph Editor\n" +
                                "MagixGames - Optimizations to loading Ebx into graphed form\n" +
