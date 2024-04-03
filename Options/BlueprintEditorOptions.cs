@@ -88,6 +88,11 @@ namespace BlueprintEditorPlugin.Options
         [DisplayName("Save on close")]
         [Description("Saves a layout file whenever closing a graph editor")]
         public bool SaveLayoutExit { get; set; }
+        
+        [Category("Editor")]
+        [DisplayName("Load before Opening")]
+        [Description("If true, this will load the EBX before opening the graph editor itself, similar to how normally opening assets works.")]
+        public bool LoadBeforeOpen { get; set; }
 
         public override void Load()
         {
@@ -119,6 +124,8 @@ namespace BlueprintEditorPlugin.Options
             VertYSpacing = Config.Get("VertYSpacing", 16.0f);
 
             SaveLayoutExit = Config.Get("SaveLayoutOnExit", true);
+            
+            LoadBeforeOpen = Config.Get("LoadBeforeOpen", false);
         }
 
         public override void Save()
@@ -151,6 +158,8 @@ namespace BlueprintEditorPlugin.Options
             
             Config.Add("SaveLayoutOnExit", SaveLayoutExit);
             
+            Config.Add("LoadBeforeOpen", LoadBeforeOpen);
+            
             EditorOptions.Update();
         }
     }
@@ -173,6 +182,8 @@ namespace BlueprintEditorPlugin.Options
         public static double VertYSpacing { get; internal set; }
         
         public static bool SaveOnExit { get; internal set; }
+        
+        public static bool LoadBeforeOpen { get; internal set; }
 
         public static void Update()
         {
@@ -203,6 +214,8 @@ namespace BlueprintEditorPlugin.Options
             VertXSpacing = Config.Get("VertXSpacing", 64.0f);
             VertYSpacing = Config.Get("VertYSpacing", 16.0f);
             SaveOnExit = Config.Get("SaveLayoutOnExit", true);
+
+            LoadBeforeOpen = Config.Get("LoadBeforeOpen", false);
         }
     }
 }

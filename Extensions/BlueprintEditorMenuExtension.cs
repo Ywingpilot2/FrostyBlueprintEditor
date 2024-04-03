@@ -1,5 +1,6 @@
 ﻿using System.Windows.Media;
 using BlueprintEditorPlugin.Editors.GraphEditor;
+using BlueprintEditorPlugin.Options;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Windows;
@@ -24,13 +25,18 @@ namespace BlueprintEditorPlugin.Extensions
                 return;
             }
                 
-            BlueprintEditor editor = new BlueprintEditor();
-            App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", editor);
-                
-            editor.Loaded += (sender, args) =>
+            BlueprintEditor editor;
+            if (EditorOptions.LoadBeforeOpen)
             {
+                editor = new BlueprintEditor();
                 editor.LoadBlueprint(App.SelectedAsset, graphEditor);
-            };
+            }
+            else
+            {
+                editor = new BlueprintEditor(App.SelectedAsset, graphEditor);
+            }
+            
+            App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", editor);
         });
     }
 }

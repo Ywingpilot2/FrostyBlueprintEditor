@@ -40,7 +40,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                 return $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\{projectName}\";
             }
         }
-        
+
         public virtual void SortLayout(bool optimized = false)
         {
             if (optimized)

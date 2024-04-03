@@ -18,6 +18,9 @@ namespace BlueprintEditorPlugin
     {
         private const string ContentPresenter = "ContentPresenter";
         private ContentPresenter _presenter;
+        private IEbxGraphEditor _graphEditor;
+        private EbxAssetEntry _assetEntry;
+        private bool _hasLoaded;
         public override ImageSource Icon => ViewBlueprintContextMenuItem.IconImageSource;
 
         static BlueprintEditor()
@@ -29,24 +32,34 @@ namespace BlueprintEditorPlugin
         {
             base.OnApplyTemplate();
             _presenter = GetTemplateChild(ContentPresenter) as ContentPresenter;
+            _presenter.Content = _graphEditor;
+            
+            Loaded += (sender, args) =>
+            {
+                if (_hasLoaded)
+                    return;
+                
+                _hasLoaded = true;
+                InternalLoad();
+            };
         }
-
-        private bool _loaded;
+        
         public void LoadBlueprint(EbxAssetEntry assetEntry, IEbxGraphEditor graphEditor)
         {
-            // Stupid fuck why does this happen????
-            if (_loaded)
-                return;
+            _graphEditor = graphEditor;
+            _assetEntry = assetEntry;
+            InternalLoad();
+        }
 
-            _presenter.Content = graphEditor;
-
-            _loaded = true;
+        private void InternalLoad()
+        {
+            _hasLoaded = true;
 #if DEVELOPER___DEBUG
             graphEditor.LoadAsset(assetEntry);
 #else
             FrostyTaskWindow.Show("Loading Blueprint...", "", task =>
             {
-                graphEditor.LoadAsset(assetEntry);
+                _graphEditor.LoadAsset(_assetEntry);
             });
 #endif
         }
@@ -54,6 +67,17 @@ namespace BlueprintEditorPlugin
         public override void Closed()
         {
             base.Closed();
+            _graphEditor.Closed();
+        }
+
+        public BlueprintEditor()
+        {
+        }
+
+        public BlueprintEditor(EbxAssetEntry assetEntry, IEbxGraphEditor graphEditor)
+        {
+            _graphEditor = graphEditor;
+            _assetEntry = assetEntry;
         }
     }
 }
