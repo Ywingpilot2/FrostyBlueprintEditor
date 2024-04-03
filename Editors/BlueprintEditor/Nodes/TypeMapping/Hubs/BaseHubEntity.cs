@@ -17,11 +17,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Hubs
         {
             base.OnCreation();
 
-            foreach (UInt32 hashedInput in (dynamic)TryGetProperty("HashedInput"))
+            dynamic hashedInputs = TryGetProperty("HashedInput");
+            foreach (UInt32 hashedInput in hashedInputs)
             {
                 string unHash = Utils.GetString((int)hashedInput);
-                
-                Inputs.Add(new PropertyInput(unHash, this) {Realm = Realm});
+
+                AddInput(new PropertyInput(unHash, this) { Realm = Realm });
             }
         }
 
