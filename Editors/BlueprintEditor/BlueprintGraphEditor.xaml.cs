@@ -24,6 +24,7 @@ using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
+using BlueprintEditorPlugin.Options;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core.Controls;
 using Frosty.Core.Windows;
@@ -67,8 +68,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         public void Closed()
         {
-            EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
-            LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
+            if (EditorOptions.SaveOnExit)
+            {
+                EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+                LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
+            }
         }
 
         #endregion

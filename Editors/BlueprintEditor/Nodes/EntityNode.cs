@@ -367,7 +367,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             EntityPort entityPort = (EntityPort)port;
             entityPort.FixRealm();
 
-            object value = TryGetProperty("flags");
+            object value = TryGetProperty("Flags");
             if (value == null)
                 return;
 
@@ -408,7 +408,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 } break;
             }
             
-            TrySetProperty("flags", flagsHelper.GetAsFlags());
+            TrySetProperty("Flags", flagsHelper.GetAsFlags());
         }
 
         public virtual void OnOutputUpdated(IPort port)
@@ -419,7 +419,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             if (entityPort.Type != ConnectionType.Link)
                 return;
             
-            object value = TryGetProperty("flags");
+            object value = TryGetProperty("Flags");
             if (value == null)
                 return;
             
@@ -444,7 +444,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 } break;
             }
 
-            TrySetProperty("flags", flagsHelper.GetAsFlags());
+            TrySetProperty("Flags", flagsHelper.GetAsFlags());
         }
         
         public virtual void OnObjectModified(object sender, ItemModifiedEventArgs args)
@@ -1190,6 +1190,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 entityWrangler.Asset.FileGuid), -1); // TODO: Should we always be setting inId as -1?
             ((dynamic)obj).SetInstanceGuid(guid);
             
+            byte[] b = guid.ExportedGuid.ToByteArray();
+            uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
+            TrySetProperty("Flags", value);
+            
             Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
@@ -1226,7 +1230,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             Inputs = new ObservableCollection<IPort>();
             Outputs = new ObservableCollection<IPort>();
-            RefreshCache();
         }
 
         #endregion
@@ -1287,6 +1290,21 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
                 node.NodeWrangler = wrangler;
                 object entity = TypeLibrary.CreateObject(type.Name);
+                
+                EntityNodeWrangler entityWrangler = (EntityNodeWrangler)wrangler;
+                AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
+                    entityWrangler.Asset.Objects,
+                    entity.GetType(),
+                    entityWrangler.Asset.FileGuid), -1); // TODO: Should we always be setting inId as -1?
+                ((dynamic)entity).SetInstanceGuid(guid);
+                
+                if (TypeLibrary.IsSubClassOf(entity, "DataBusPeer"))
+                {
+                    byte[] b = guid.ExportedGuid.ToByteArray();
+                    uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
+                    entity.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(entity, value);
+                }
+                
                 node.Object = entity;
                 
                 node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
@@ -1317,6 +1335,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     entity.GetType(),
                     fileGuid), -1); // TODO: Should we always be setting inId as -1?
                 ((dynamic)entity).SetInstanceGuid(guid);
+                
+                if (TypeLibrary.IsSubClassOf(entity, "DataBusPeer"))
+                {
+                    byte[] b = guid.ExportedGuid.ToByteArray();
+                    uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
+                    entity.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(entity, value);
+                }
             }
             
             if (ExtensionsManager.EntityNodeExtensions.ContainsKey(entity.GetType().Name))

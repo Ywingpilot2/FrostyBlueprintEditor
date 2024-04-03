@@ -104,7 +104,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Editors\BlueprintEditor\Nodes\TypeMapping\ObjectReference" />
     <Folder Include="Models\Converters" />
   </ItemGroup>
 

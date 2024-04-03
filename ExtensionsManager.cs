@@ -42,6 +42,10 @@ namespace BlueprintEditorPlugin
                     try
                     {
                         EntityNode node = (EntityNode)Activator.CreateInstance(type);
+                        if (node.ObjectType == null)
+                        {
+                            App.Logger.LogError("Object Type for node {0} was not specified.", type.Name);
+                        }
                         if (node.IsValid() && !EntityNodeExtensions.ContainsKey(node.ObjectType))
                         {
                             EntityNodeExtensions.Add(node.ObjectType, type);

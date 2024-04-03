@@ -83,6 +83,11 @@ namespace BlueprintEditorPlugin.Options
         [DisplayName("Vertical padding")]
         [Description("The amount of vertical spacing between each node to maintain whenever automatically sorting")]
         public float VertYSpacing { get; set; }
+        
+        [Category("Layouts")]
+        [DisplayName("Save on close")]
+        [Description("Saves a layout file whenever closing a graph editor")]
+        public bool SaveLayoutExit { get; set; }
 
         public override void Load()
         {
@@ -112,6 +117,8 @@ namespace BlueprintEditorPlugin.Options
             AutoRedirects = Config.Get("AutoRedirects", false);
             VertXSpacing = Config.Get("VertXSpacing", 64.0f);
             VertYSpacing = Config.Get("VertYSpacing", 16.0f);
+
+            SaveLayoutExit = Config.Get("SaveLayoutOnExit", true);
         }
 
         public override void Save()
@@ -142,6 +149,8 @@ namespace BlueprintEditorPlugin.Options
             Config.Add("VertXSpacing", VertXSpacing);
             Config.Add("VertYSpacing", VertYSpacing);
             
+            Config.Add("SaveLayoutOnExit", SaveLayoutExit);
+            
             EditorOptions.Update();
         }
     }
@@ -162,6 +171,8 @@ namespace BlueprintEditorPlugin.Options
         public static bool RedirectCycles { get; internal set; }
         public static double VertXSpacing { get; internal set; }
         public static double VertYSpacing { get; internal set; }
+        
+        public static bool SaveOnExit { get; internal set; }
 
         public static void Update()
         {
@@ -191,6 +202,7 @@ namespace BlueprintEditorPlugin.Options
             RedirectCycles = Config.Get("AutoRedirects", false);
             VertXSpacing = Config.Get("VertXSpacing", 64.0f);
             VertYSpacing = Config.Get("VertYSpacing", 16.0f);
+            SaveOnExit = Config.Get("SaveLayoutOnExit", true);
         }
     }
 }

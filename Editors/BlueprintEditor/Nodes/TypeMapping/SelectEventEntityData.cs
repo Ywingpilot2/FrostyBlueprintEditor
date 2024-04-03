@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
@@ -94,6 +95,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
                     } break;
                 }
             }
+        }
+
+        public SelectEventNode()
+        {
+            Inputs = new ObservableCollection<IPort>
+            {
+                new EventInput("In", this),
+                new PropertyInput("Selected", this)
+            };
         }
     }
 }

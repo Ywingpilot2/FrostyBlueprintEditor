@@ -1,4 +1,7 @@
-﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+﻿using System.Collections.ObjectModel;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Nodes.Ports;
 using Frosty.Core.Controls;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
@@ -54,6 +57,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping
                     }
                 }
             }
+        }
+
+        public EventSwitchNode()
+        {
+            Inputs = new ObservableCollection<IPort>
+            {
+                new EventInput("In", this),
+                new EventInput("NextOut", this),
+                new EventInput("Reset", this)
+            };
         }
     }
 }
