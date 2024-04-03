@@ -260,7 +260,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
 
                         if (port == null)
                         {
-                            port = node.AddInput(name, type, realm);
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                port = node.AddInput(name, type, realm);
+                            });
                         }
 
                         port.HasPlayer = layoutReader.ReadBoolean();
@@ -278,7 +281,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                         
                         if (port == null)
                         {
-                            port = node.AddOutput(name, type, realm);
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                port = node.AddOutput(name, type, realm);
+                            });
                         }
 
                         port.HasPlayer = layoutReader.ReadBoolean();
