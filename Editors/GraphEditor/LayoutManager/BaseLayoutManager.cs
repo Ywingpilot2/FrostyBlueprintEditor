@@ -18,7 +18,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
     public abstract class BaseLayoutManager : ILayoutManager
     {
         public INodeWrangler NodeWrangler { get; set; }
-        public virtual int Version => 1000;
+        public virtual int Version => 1001;
 
         public static string RootLayoutPath => $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BlueprintLayouts\{ProfilesLibrary.ProfileName}\";
         
@@ -77,8 +77,19 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                 }
             }
 
+            int count = layoutReader.ReadInt();
+            for (int i = 0; i < count; i++)
+            {
+                IVertex vertex = NodeWrangler.Vertices[layoutReader.ReadInt()];
+                vertex.Location = layoutReader.ReadPoint();
+                double width = layoutReader.ReadDouble();
+                double height = layoutReader.ReadDouble();
+                vertex.Size = new Size(width, height);
+            }
+            
             // Read through all trans
-            for (int i = 0; i < layoutReader.ReadInt(); i++)
+            count = layoutReader.ReadInt();
+            for (int i = 0; i < count; i++)
             {
                 string key = layoutReader.ReadNullTerminatedString();
                 if (!ExtensionsManager.TransientNodeExtensions.ContainsKey(key))
@@ -102,15 +113,6 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                     App.Logger.LogError("Stacktrace: {0}", e.StackTrace);
                     return false;
                 }
-            }
-
-            for (int i = 0; i < layoutReader.ReadInt(); i++)
-            {
-                IVertex vertex = NodeWrangler.Vertices[layoutReader.ReadInt()];
-                vertex.Location = layoutReader.ReadPoint();
-                double width = layoutReader.ReadDouble();
-                double height = layoutReader.ReadDouble();
-                vertex.Size = new Size(width, height);
             }
             
             layoutReader.Dispose();
@@ -147,8 +149,17 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                 }
             }
 
-            layoutWriter.Write(transients.Count);
+            layoutWriter.Write(verts.Count);
 
+            foreach (IVertex vertex in verts)
+            {
+                layoutWriter.Write(NodeWrangler.Vertices.IndexOf(vertex));
+                layoutWriter.Write(vertex.Location);
+                layoutWriter.Write(vertex.Size.Width);
+                layoutWriter.Write(vertex.Size.Height);
+            }
+            
+            layoutWriter.Write(transients.Count);
             foreach (ITransient transient in transients)
             {
                 try
@@ -163,16 +174,6 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
                     App.Logger.LogWarning("Careful, layout maybe corrupted!");
                     return false;
                 }
-            }
-            
-            layoutWriter.Write(verts.Count);
-
-            foreach (IVertex vertex in verts)
-            {
-                layoutWriter.Write(NodeWrangler.Vertices.IndexOf(vertex));
-                layoutWriter.Write(vertex.Location);
-                layoutWriter.Write(vertex.Size.Width);
-                layoutWriter.Write(vertex.Size.Height);
             }
             
             layoutWriter.Dispose();

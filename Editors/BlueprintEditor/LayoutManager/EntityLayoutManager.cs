@@ -59,7 +59,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
     /// </summary>
     public class EntityLayoutManager : BaseLayoutManager
     {
-        public override int Version => 1004;
+        public override int Version => 1005;
 
         public override bool SaveLayout(string path)
         {
@@ -88,24 +88,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                     else
                     {
                         verts.Add(vertex);
-                    }
-                }
-
-                layoutWriter.Write(transients.Count);
-
-                foreach (ITransient transient in transients)
-                {
-                    try
-                    {
-                        layoutWriter.WriteNullTerminatedString(transient.GetType().Name);
-                        transient.Save(layoutWriter);
-                    }
-                    catch (Exception e)
-                    {
-                        App.Logger.LogError("Transient {0} failed with error {1}", transient.ToString(), e.Message);
-                        App.Logger.LogError("Stacktrace: {0}", e.StackTrace);
-                        App.Logger.LogWarning("Careful, layout maybe corrupted!");
-                        return false;
                     }
                 }
 
@@ -152,6 +134,24 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                         layoutWriter.Write(vertex.Size.Height);
                     }
                 }
+                
+                layoutWriter.Write(transients.Count);
+                
+                foreach (ITransient transient in transients)
+                {
+                    try
+                    {
+                        layoutWriter.WriteNullTerminatedString(transient.GetType().Name);
+                        transient.Save(layoutWriter);
+                    }
+                    catch (Exception e)
+                    {
+                        App.Logger.LogError("Transient {0} failed with error {1}", transient.ToString(), e.Message);
+                        App.Logger.LogError("Stacktrace: {0}", e.StackTrace);
+                        App.Logger.LogWarning("Careful, layout maybe corrupted!");
+                        return false;
+                    }
+                }
 
                 layoutWriter.Dispose();
             }
@@ -188,48 +188,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                 }
             }
 
-            // Read through all trans
-            int count = layoutReader.ReadInt();
-            for (int i = 0; i < count; i++)
-            {
-                string key = layoutReader.ReadNullTerminatedString();
-                if (!ExtensionsManager.TransientNodeExtensions.ContainsKey(key))
-                {
-                    layoutReader.Dispose();
-                    App.Logger.LogError("Unable to find transient node {0}", key);
-                    return false;
-                }
-
-                Type transType = ExtensionsManager.TransientNodeExtensions[key];
-                try
-                {
-                    ITransient transient;
-                    if (transType.GetConstructor(new Type[] { typeof(INodeWrangler) }) != null)
-                    {
-                        transient = (ITransient)Activator.CreateInstance(transType, NodeWrangler);
-                    }
-                    else
-                    {
-                        transient = (ITransient)Activator.CreateInstance(transType);
-                    }
-
-                    if (transient.Load(layoutReader))
-                    {
-                        NodeWrangler.AddVertex(transient);
-                    }
-                }
-                catch (Exception e)
-                {
-                    App.Logger.LogError("Transient {0} failed with error {1}", transType.ToString(), e.Message);
-                    App.Logger.LogError("Stacktrace: {0}", e.StackTrace);
-                    layoutReader.Dispose();
-                    return false;
-                }
-            }
-
             // Read through all the nodes
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
-            count = layoutReader.ReadInt();
+            int count = layoutReader.ReadInt();
             for (int i = 0; i < count; i++)
             {
                 if (layoutReader.ReadBoolean())
@@ -341,6 +302,45 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                     double width = layoutReader.ReadDouble();
                     double height = layoutReader.ReadDouble();
                     vertex.Size = new Size(width, height);
+                }
+            }
+            
+            // Read through all trans
+            count = layoutReader.ReadInt();
+            for (int i = 0; i < count; i++)
+            {
+                string key = layoutReader.ReadNullTerminatedString();
+                if (!ExtensionsManager.TransientNodeExtensions.ContainsKey(key))
+                {
+                    layoutReader.Dispose();
+                    App.Logger.LogError("Unable to find transient node {0}", key);
+                    return false;
+                }
+
+                Type transType = ExtensionsManager.TransientNodeExtensions[key];
+                try
+                {
+                    ITransient transient;
+                    if (transType.GetConstructor(new Type[] { typeof(INodeWrangler) }) != null)
+                    {
+                        transient = (ITransient)Activator.CreateInstance(transType, NodeWrangler);
+                    }
+                    else
+                    {
+                        transient = (ITransient)Activator.CreateInstance(transType);
+                    }
+
+                    if (transient.Load(layoutReader))
+                    {
+                        NodeWrangler.AddVertex(transient);
+                    }
+                }
+                catch (Exception e)
+                {
+                    App.Logger.LogError("Transient {0} failed with error {1}", transType.ToString(), e.Message);
+                    App.Logger.LogError("Stacktrace: {0}", e.StackTrace);
+                    layoutReader.Dispose();
+                    return false;
                 }
             }
             
