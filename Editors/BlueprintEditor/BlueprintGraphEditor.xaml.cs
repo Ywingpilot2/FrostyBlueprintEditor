@@ -68,11 +68,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         public void Closed()
         {
-            if (EditorOptions.SaveOnExit)
-            {
-                EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
-                LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
-            }
+            if (!EditorOptions.SaveOnExit) return;
+            
+            EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+            LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
         }
 
         #endregion
@@ -473,6 +472,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             if (!LayoutManager.LayoutExists($"{assetEntry.Name}.lyt"))
             {
                 LayoutManager.SortLayout();
+            }
+            else
+            {
+                LayoutManager.LoadLayoutRelative($"{assetEntry.Name}.lyt");
             }
         }
 
