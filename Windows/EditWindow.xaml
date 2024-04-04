@@ -7,7 +7,8 @@
         xmlns:controls="clr-namespace:Frosty.Controls;assembly=FrostyControls"
         xmlns:core="clr-namespace:Frosty.Core.Controls;assembly=FrostyCore"
         mc:Ignorable="d"
-        Title="Fuck you asshole why didnt you set the title" Height="340" Width="400">
+        Title="Fuck you asshole why didnt you set the title" Height="340" Width="400"
+        WindowStartupLocation="CenterScreen">
     <controls:FrostyWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
