@@ -1161,6 +1161,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <returns>Whether or not the property was set</returns>
         public bool TrySetProperty(string name, object value)
         {
+            if (Object == null)
+                return false;
+            
             PropertyInfo property = Object.GetType().GetProperty(name);
             if (property != null)
             {
@@ -1240,12 +1243,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 type,
                 entityWrangler.Asset.FileGuid), -1); // TODO: Should we always be setting inId as -1?
             ((dynamic)obj).SetInstanceGuid(guid);
+
+            Object = obj;
             
             byte[] b = guid.ExportedGuid.ToByteArray();
             uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
             TrySetProperty("Flags", value);
             
-            Object = obj;
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
             
