@@ -223,5 +223,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             propType = (PropertyType)((flags & 48) >> 4);
             sourceCantBeStatic = Convert.ToBoolean((flags & 8) != 0 ? 1 : 0);
         }
+
+        public static Realm GetAsRealm(uint flags)
+        {
+            return (Realm)(flags & 7);
+        }
+        
+        public static PropertyType GetAsPropType(uint flags)
+        {
+            return (PropertyType)(flags & 7);
+        }
     }
 }

@@ -124,6 +124,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                     if (sender == Target || sender == Target.Node)
                         break;
                     
+                    if (HasPlayer == ((EntityPort)Source).HasPlayer)
+                        return;
+                    
                     HasPlayer = ((EntityPort)Source).HasPlayer || ((EntityNode)Source.Node).HasPlayerEvent;
                     if (Target.Node is EntityNode entityNode)
                     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -228,7 +229,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public virtual string ObjectType { get; }
 
         private bool _hasPlayerEvent;
-        public virtual bool HasPlayerEvent
+        public bool HasPlayerEvent
         {
             get => _hasPlayerEvent;
             set
@@ -238,7 +239,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
 
-        #region Location
+        #region Object Location
 
         public PointerRefType Type { get; private set; }
         
@@ -497,8 +498,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             _hashCacheLOutputs.Clear();
             _hashCacheEOutputs.Clear();
 
-            foreach (EntityInput input in Inputs)
+            List<IPort> inputs = Inputs.ToList();
+            foreach (IPort port in inputs)
             {
+                if (!(port is EntityInput))
+                {
+                    App.Logger.LogError("Port {0} on {1} is not a EntityInput, despite not being added to inputs.", port.Name, ToString());
+                    Inputs.Remove(port);
+                }
+                
+                var input = (EntityInput)port;
                 switch (input.Type)
                 {
                     case ConnectionType.Event:
@@ -542,9 +551,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     } break;
                 }
             }
-            
-            foreach (EntityOutput output in Outputs)
+
+            List<IPort> outputs = Outputs.ToList();
+            foreach (IPort port in outputs)
             {
+                if (!(port is EntityOutput))
+                {
+                    App.Logger.LogError("Port {0} on {1} is not a EntityOutput, despite not being added to inputs.", port.Name, ToString());
+                    Outputs.Remove(port);
+                }
+                
+                var output = (EntityOutput)port;
                 switch (output.Type)
                 {
                     case ConnectionType.Event:
@@ -759,7 +776,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
         }
 
-        public virtual void AddInput(EntityInput input)
+        public void AddInput(EntityInput input)
         {
             if (input.Name.StartsWith("0x"))
             {
@@ -878,7 +895,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return input;
         }
 
-        public virtual void AddOutput(EntityOutput output)
+        public void AddOutput(EntityOutput output)
         {
             if (output.Name.StartsWith("0x"))
             {
@@ -1101,6 +1118,37 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
+        #region Footer Text
+
+        public void AddFooter(string value)
+        {
+            if (Footer != null)
+            {
+                Footer += $"\n{value}";
+            }
+            else
+            {
+                Footer = value;
+            }
+        }
+
+        public void RemoveFooter(string value)
+        {
+            if (Footer == null)
+                return;
+            
+            // TODO: Work around, we need to account for value potentially being on a new line
+            Footer = Footer.Replace($"\n{value}", "");
+            Footer = Footer.Replace(value, "");
+        }
+
+        public void ClearFooter()
+        {
+            Footer = null;
+        }
+
+        #endregion
+
         #endregion
 
         #region Object Properties
@@ -1138,6 +1186,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <returns>The value of the property. Null if it was not found</returns>
         public object TryGetProperty(string name)
         {
+            if (Object == null)
+                return null;
+            
             PropertyInfo property = Object.GetType().GetProperty(name);
             if (property != null)
             {
