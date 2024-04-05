@@ -26,15 +26,16 @@ using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
 using BlueprintEditorPlugin.Options;
 using BlueprintEditorPlugin.Windows;
+using Frosty.Core;
 using Frosty.Core.Controls;
 using Frosty.Core.Windows;
-using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 using Nodify;
 using Prism.Commands;
+using App = FrostyEditor.App;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 {
@@ -938,6 +939,41 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     catch (Exception exception)
                     {
                         // ignored
+                    }
+                } break;
+                default:
+                {
+                    List<BlueprintEditorControl> controls = Config.Get("BlueprintEditorControls", new List<BlueprintEditorControl>(), ConfigScope.Game);
+                    foreach (BlueprintEditorControl control in controls)
+                    {
+                        if (e.Key != control.Key)
+                            continue;
+                        
+                        if (control.UseModifierKey)
+                        {
+                            if ((Keyboard.Modifiers & control.ModifierKey) != control.ModifierKey)
+                                continue;
+                        }
+
+                        if (ExtensionsManager.TransientNodeExtensions.ContainsKey(control.TypeName))
+                        {
+                            IVertex vertex = (IVertex)Activator.CreateInstance(ExtensionsManager.TransientNodeExtensions[control.TypeName]);
+                            vertex.Location = Editor.MouseLocation;
+                            NodeWrangler.AddVertex(vertex);
+                            break;
+                        }
+
+                        object obj = TypeLibrary.CreateObject(control.TypeName);
+                        if (obj == null)
+                        {
+                            App.Logger.LogError("The control \"{0}\" is not valid, specified node not found", control.ToString());
+                        }
+                        
+                        EntityNode node = EntityNode.GetNodeFromEntity(obj, NodeWrangler, true);
+                        node.Location = Editor.MouseLocation;
+                        NodeWrangler.AddVertex(node);
+                        
+                        break;
                     }
                 } break;
             }
