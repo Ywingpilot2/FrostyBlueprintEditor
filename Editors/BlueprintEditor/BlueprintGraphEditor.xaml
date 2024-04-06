@@ -1287,20 +1287,10 @@
                                          PendingConnection="{Binding NodeWrangler.PendingConnection}"
                                          DisconnectConnectorCommand="{Binding NodeWrangler.RemoveConnectionsCommand}"
                                          DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=UserControl}}"
-                                         ItemContainerStyle="{StaticResource VertexStyle}"
-                                         DisplayConnectionsOnTop="{x:Static options:EditorOptions.WiresOververts}"
                                          ConnectionTemplate="{StaticResource ConnectionTemplate}"
                                          PendingConnectionTemplate="{StaticResource PendingConnectionTemplate}"
                                          KeyUp="Editor_OnKeyUp"
                                          MouseUp="Editor_OnMouseUp">
-
-                        <nodify:NodifyEditor.Background>
-                            <DrawingBrush TileMode="Tile"
-                                          ViewportUnits="Absolute"
-                                          Viewport="0 0 32 32"
-                                          Transform="{Binding ViewportTransform, ElementName=Editor}"
-                                          Drawing="{StaticResource SmallGridGeometry}" />
-                        </nodify:NodifyEditor.Background>
                         
                         <nodify:NodifyEditor.ContextMenu>
                             <ContextMenu>
