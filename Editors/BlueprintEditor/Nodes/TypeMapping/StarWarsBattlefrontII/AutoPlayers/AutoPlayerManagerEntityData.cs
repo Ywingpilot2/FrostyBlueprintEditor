@@ -3,8 +3,10 @@ using BlueprintEditorPlugin.Models.Entities.Networking;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.StarWarsBattlefrontII.AutoPlayers
 {
-    public class AutoPlayerManagerEntityData : EntityNode
+    public class AutoPlayerManagerNode : EntityNode
     {
+        public override string ObjectType => "AutoPlayerManagerEntityData";
+
         public override void OnCreation()
         {
             base.OnCreation();

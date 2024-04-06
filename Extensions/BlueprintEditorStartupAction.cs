@@ -1,4 +1,5 @@
 ﻿using System;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Options;
 using Frosty.Core;
 using FrostySdk.Interfaces;
@@ -15,6 +16,8 @@ namespace BlueprintEditorPlugin.Extensions
             EditorOptions.Update();
             logger.Log("Registering Blueprint Editor extensions...");
             ExtensionsManager.Initiate();
+            logger.Log("Getting Node Mapping Configs...");
+            EntityMappingNode.Register();
         }
     }
 }

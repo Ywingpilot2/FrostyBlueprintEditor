@@ -116,7 +116,9 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!-- Replace the second directory with the directory to your frosty's plugins folder -->
     <Exec Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
+    <Exec Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" Command="xcopy /Y $(ProjectDir)Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\BlueprintEditor\NodeMappings" />
     <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
+    <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(ProjectDir)Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\BlueprintEditor\NodeMappings" />
     
     <!-- And replace the DestinationFolder here to be your frosty's plugins directory as well -->
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />

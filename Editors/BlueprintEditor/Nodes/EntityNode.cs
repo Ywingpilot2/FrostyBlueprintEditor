@@ -331,7 +331,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         public virtual void OnCreation()
         {
-            Header = ObjectType;
+            if (Header == null)
+            {
+                Header = ObjectType;
+            }
+            
             if (TryGetProperty("Realm") == null)
             {
                 Realm = Realm.Any;
@@ -1324,6 +1328,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 
                 return node;
             }
+            else if (EntityMappingNode.EntityMappings.ContainsKey(entity.GetType().Name))
+            {
+                EntityMappingNode node = new EntityMappingNode();
+
+                node.Object = entity;
+                node.NodeWrangler = wrangler;
+
+                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
+                node.Type = PointerRefType.External;
+                
+                node.Load(entity.GetType().Name);
+
+                return node;
+            }
             else
             {
                 return new EntityNode(entity, wrangler);
@@ -1366,6 +1384,35 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.Type = PointerRefType.Internal;
                 node.RefreshCache();
                 
+                return node;
+            }
+            else if (EntityMappingNode.EntityMappings.ContainsKey(type.Name))
+            {
+                EntityMappingNode node = new EntityMappingNode();
+                object entity = TypeLibrary.CreateObject(type.Name);
+                
+                EntityNodeWrangler entityWrangler = (EntityNodeWrangler)wrangler;
+                AssetClassGuid guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(
+                    entityWrangler.Asset.Objects,
+                    entity.GetType(),
+                    entityWrangler.Asset.FileGuid), -1); // TODO: Should we always be setting inId as -1?
+                ((dynamic)entity).SetInstanceGuid(guid);
+                
+                if (TypeLibrary.IsSubClassOf(entity, "DataBusPeer"))
+                {
+                    byte[] b = guid.ExportedGuid.ToByteArray();
+                    uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
+                    entity.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(entity, value);
+                }
+                
+                node.Object = entity;
+                node.NodeWrangler = wrangler;
+
+                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
+                node.Type = PointerRefType.External;
+                
+                node.Load(entity.GetType().Name);
+
                 return node;
             }
             else
@@ -1412,6 +1459,22 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
                 node.Type = PointerRefType.External;
                 node.RefreshCache();
+
+                return node;
+            }
+            else if (EntityMappingNode.EntityMappings.ContainsKey(entity.GetType().Name))
+            {
+                EntityMappingNode node = new EntityMappingNode();
+                
+                node.Object = entity;
+                node.NodeWrangler = wrangler;
+
+                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
+                node.FileGuid = fileGuid;
+                node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
+                node.Type = PointerRefType.External;
+                
+                node.Load(entity.GetType().Name);
 
                 return node;
             }

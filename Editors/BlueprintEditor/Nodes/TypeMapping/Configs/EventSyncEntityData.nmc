@@ -1,0 +1,4 @@
+Type = "EventSyncEntityData"
+Header = "EventSync"
+InputEvent = "Client"
+OutputEvent = "Out"

@@ -37,7 +37,7 @@ namespace BlueprintEditorPlugin
             // Register internal Entity Nodes
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
-                if (type.IsSubclassOf(typeof(EntityNode)) && !type.IsAbstract)
+                if (type.IsSubclassOf(typeof(EntityNode)) && !type.IsAbstract && type.Name != "EntityMappingNode")
                 {
                     try
                     {
