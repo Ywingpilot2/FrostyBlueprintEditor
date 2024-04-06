@@ -28,4 +28,3 @@ using BlueprintEditorPlugin.Options;
 [assembly: RegisterDataExplorerContextMenu(typeof(ViewBlueprintContextMenuItem))]
 [assembly: RegisterOptionsExtension(typeof(GraphEditorOptions))]
 [assembly: RegisterStartupAction(typeof(BlueprintEditorStartupAction))]
-

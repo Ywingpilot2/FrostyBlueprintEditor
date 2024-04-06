@@ -104,7 +104,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 return;
             
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
-            if (wrangler.GetInterfaceNode(EditArgs.Name, Direction) != null)
+            if (wrangler.GetInterfaceNode(EditArgs.Name, Direction, ConnectionType) != null)
             {
                 App.Logger.LogError("Cannot have 2 interface nodes of the same name.");
                 EditArgs.Name = args.OldValue.ToString();
@@ -121,7 +121,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 {
                     if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                     {
-                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.Out);
+                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.Out, ConnectionType);
                         interfaceNode.Header = Header;
                         interfaceNode.Outputs[0].Name = Header;
                     }
@@ -135,7 +135,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 {
                     if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                     {
-                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.In);
+                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.In, ConnectionType);
                         interfaceNode.Header = Header;
                         interfaceNode.Inputs[0].Name = Header;
                     }
@@ -223,16 +223,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public bool Load(LayoutReader reader)
         {
             string name = reader.ReadNullTerminatedString();
+            ConnectionType = (ConnectionType)reader.ReadInt();
 
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
             InterfaceNode real;
             if (reader.ReadBoolean()) // Is an output
             {
-                real = wrangler.GetInterfaceNode(name, PortDirection.Out);
+                real = wrangler.GetInterfaceNode(name, PortDirection.Out, ConnectionType);
             }
             else
             {
-                real = wrangler.GetInterfaceNode(name, PortDirection.In);
+                real = wrangler.GetInterfaceNode(name, PortDirection.In, ConnectionType);
             }
 
             if (real == null)
@@ -251,6 +252,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public void Save(LayoutWriter writer)
         {
             writer.WriteNullTerminatedString(Header);
+            writer.Write((int)ConnectionType);
             writer.Write(Inputs.Count == 0);
             writer.Write(Location);
         }

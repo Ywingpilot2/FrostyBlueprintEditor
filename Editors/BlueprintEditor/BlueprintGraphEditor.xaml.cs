@@ -198,7 +198,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
-                            sourceNode = wrangler.GetInterfaceNode(propertyConnection.SourceField, PortDirection.Out);
+                            sourceNode = wrangler.GetInterfaceNode(propertyConnection.SourceField, PortDirection.Out, ConnectionType.Property);
                         }
                         else
                         {
@@ -231,7 +231,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
-                            targetNode = wrangler.GetInterfaceNode(propertyConnection.TargetField, PortDirection.In);
+                            targetNode = wrangler.GetInterfaceNode(propertyConnection.TargetField, PortDirection.In, ConnectionType.Property);
                         }
                         else
                         {
@@ -295,7 +295,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
-                            sourceNode = wrangler.GetInterfaceNode(linkConnection.SourceField, PortDirection.Out);
+                            sourceNode = wrangler.GetInterfaceNode(linkConnection.SourceField, PortDirection.Out, ConnectionType.Link);
                         }
                         else
                         {
@@ -328,7 +328,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
-                            targetNode = wrangler.GetInterfaceNode(linkConnection.TargetField, PortDirection.In);
+                            targetNode = wrangler.GetInterfaceNode(linkConnection.TargetField, PortDirection.In, ConnectionType.Link);
                         }
                         else
                         {
@@ -392,7 +392,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
-                            sourceNode = wrangler.GetInterfaceNode(eventConnection.SourceEvent.Name, PortDirection.Out);
+                            sourceNode = wrangler.GetInterfaceNode(eventConnection.SourceEvent.Name, PortDirection.Out, ConnectionType.Event);
                         }
                         else
                         {
@@ -425,7 +425,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
-                            targetNode = wrangler.GetInterfaceNode(eventConnection.TargetEvent.Name, PortDirection.In);
+                            targetNode = wrangler.GetInterfaceNode(eventConnection.TargetEvent.Name, PortDirection.In, ConnectionType.Event);
                         }
                         else
                         {

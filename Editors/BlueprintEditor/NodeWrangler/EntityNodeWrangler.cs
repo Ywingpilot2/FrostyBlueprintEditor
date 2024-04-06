@@ -26,8 +26,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         public AssetClassGuid InterfaceGuid { get; set; }
         private readonly Dictionary<AssetClassGuid, EntityNode> _internalNodeCache = new Dictionary<AssetClassGuid, EntityNode>();
         private readonly Dictionary<(Guid, Guid), EntityNode> _externalNodeCache = new Dictionary<(Guid, Guid), EntityNode>();
-        private readonly Dictionary<string, InterfaceNode> _interfaceInputCache = new Dictionary<string, InterfaceNode>();
-        private readonly Dictionary<string, InterfaceNode> _interfaceOutputCache = new Dictionary<string, InterfaceNode>();
+
+        private readonly Dictionary<string, InterfaceNode> _interfacePICache = new Dictionary<string, InterfaceNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfaceLICache = new Dictionary<string, InterfaceNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfaceEICache = new Dictionary<string, InterfaceNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfacePOCache = new Dictionary<string, InterfaceNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfaceLOCache = new Dictionary<string, InterfaceNode>();
+        private readonly Dictionary<string, InterfaceNode> _interfaceEOCache = new Dictionary<string, InterfaceNode>();
 
         #region Transient edits
 
@@ -61,21 +66,63 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 {
                     if (interfaceNode.Inputs.Count != 0)
                     {
-                        if (_interfaceInputCache.ContainsKey(interfaceNode.Header))
+                        switch (interfaceNode.ConnectionType)
                         {
-                            App.Logger.LogError("An interface node with the name {0} has already been added!", interfaceNode.Header);
-                            return;
+                            case ConnectionType.Event:
+                            {
+                                if (_interfaceEICache.ContainsKey(interfaceNode.Header))
+                                {
+                                    App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                }
+                                _interfaceEICache.Add(interfaceNode.Header, interfaceNode);
+                            } break;
+                            case ConnectionType.Link:
+                            {
+                                if (_interfaceLICache.ContainsKey(interfaceNode.Header))
+                                {
+                                    App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                }
+                                _interfaceLICache.Add(interfaceNode.Header, interfaceNode);
+                            } break;
+                            case ConnectionType.Property:
+                            {
+                                if (_interfacePICache.ContainsKey(interfaceNode.Header))
+                                {
+                                    App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                }
+                                _interfacePICache.Add(interfaceNode.Header, interfaceNode);
+                            } break;
                         }
-                        _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
                     }
                     else
                     {
-                        if (_interfaceOutputCache.ContainsKey(interfaceNode.Header))
+                        switch (interfaceNode.ConnectionType)
                         {
-                            App.Logger.LogError("An interface node with the name {0} has already been added!", interfaceNode.Header);
-                            return;
+                            case ConnectionType.Event:
+                            {
+                                if (_interfaceEOCache.ContainsKey(interfaceNode.Header))
+                                {
+                                    App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                }
+                                _interfaceEOCache.Add(interfaceNode.Header, interfaceNode);
+                            } break;
+                            case ConnectionType.Link:
+                            {
+                                if (_interfaceLOCache.ContainsKey(interfaceNode.Header))
+                                {
+                                    App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                }
+                                _interfaceLOCache.Add(interfaceNode.Header, interfaceNode);
+                            } break;
+                            case ConnectionType.Property:
+                            {
+                                if (_interfacePOCache.ContainsKey(interfaceNode.Header))
+                                {
+                                    App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                }
+                                _interfacePOCache.Add(interfaceNode.Header, interfaceNode);
+                            } break;
                         }
-                        _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
                     }
                 } break;
             }
@@ -210,36 +257,106 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         #region Getting InterfaceNodes
 
-        public InterfaceNode GetInterfaceNode(string name, PortDirection direction)
+        public InterfaceNode GetInterfaceNode(string name, PortDirection direction, ConnectionType type)
         {
             if (direction == PortDirection.In)
             {
-                if (!_interfaceInputCache.ContainsKey(name))
+                switch (type)
                 {
-                    if (name.StartsWith("0x"))
+                    case ConnectionType.Event:
                     {
-                        int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                        return GetInterfaceNode(Utils.GetString(hash), direction);
-                    }
+                        if (!_interfaceEICache.ContainsKey(name))
+                        {
+                            if (name.StartsWith("0x"))
+                            {
+                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
+                            }
 
-                    return null;
+                            return null;
+                        }
+                        return _interfaceEICache[name];
+                    }
+                    case ConnectionType.Link:
+                    {
+                        if (!_interfaceLICache.ContainsKey(name))
+                        {
+                            if (name.StartsWith("0x"))
+                            {
+                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
+                            }
+
+                            return null;
+                        }
+                        return _interfaceLICache[name];
+                    }
+                    case ConnectionType.Property:
+                    {
+                        if (!_interfacePICache.ContainsKey(name))
+                        {
+                            if (name.StartsWith("0x"))
+                            {
+                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
+                            }
+
+                            return null;
+                        }
+                        return _interfacePICache[name];
+                    }
                 }
-                return _interfaceInputCache[name];
             }
             else
             {
-                if (!_interfaceOutputCache.ContainsKey(name))
+                switch (type)
                 {
-                    if (name.StartsWith("0x"))
+                    case ConnectionType.Event:
                     {
-                        int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                        return GetInterfaceNode(Utils.GetString(hash), direction);
+                        if (!_interfaceEOCache.ContainsKey(name))
+                        {
+                            if (name.StartsWith("0x"))
+                            {
+                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
+                            }
+
+                            return null;
+                        }
+                        return _interfaceEOCache[name];
                     }
-                    
-                    return null;
+                    case ConnectionType.Link:
+                    {
+                        if (!_interfaceLOCache.ContainsKey(name))
+                        {
+                            if (name.StartsWith("0x"))
+                            {
+                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
+                            }
+
+                            return null;
+                        }
+                        return _interfaceLOCache[name];
+                    }
+                    case ConnectionType.Property:
+                    {
+                        if (!_interfacePOCache.ContainsKey(name))
+                        {
+                            if (name.StartsWith("0x"))
+                            {
+                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
+                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
+                            }
+
+                            return null;
+                        }
+                        return _interfacePOCache[name];
+                    }
                 }
-                return _interfaceOutputCache[name];
             }
+
+            return null;
         }
 
         /// <summary>
@@ -247,8 +364,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         /// </summary>
         public void UpdateInputInterfaceCache()
         {
+            // Properties
             List<string> keysToUpdate = new List<string>();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceInputCache)
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfacePICache)
             {
                 if (keyValuePair.Key == keyValuePair.Value.Header)
                     continue;
@@ -258,9 +376,43 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
             foreach (string key in keysToUpdate)
             {
-                InterfaceNode node = _interfaceInputCache[key];
-                _interfaceInputCache.Remove(key);
-                _interfaceInputCache.Add(node.Header, node);
+                InterfaceNode node = _interfacePICache[key];
+                _interfacePICache.Remove(key);
+                _interfacePICache.Add(node.Header, node);
+            }
+            
+            // Links
+            keysToUpdate.Clear();
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceLICache)
+            {
+                if (keyValuePair.Key == keyValuePair.Value.Header)
+                    continue;
+                
+                keysToUpdate.Add(keyValuePair.Key);
+            }
+
+            foreach (string key in keysToUpdate)
+            {
+                InterfaceNode node = _interfaceLICache[key];
+                _interfaceLICache.Remove(key);
+                _interfaceLICache.Add(node.Header, node);
+            }
+            
+            // Events
+            keysToUpdate.Clear();
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceEICache)
+            {
+                if (keyValuePair.Key == keyValuePair.Value.Header)
+                    continue;
+                
+                keysToUpdate.Add(keyValuePair.Key);
+            }
+
+            foreach (string key in keysToUpdate)
+            {
+                InterfaceNode node = _interfaceEICache[key];
+                _interfaceEICache.Remove(key);
+                _interfaceEICache.Add(node.Header, node);
             }
         }
         
@@ -269,8 +421,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         /// </summary>
         public void UpdateOutputInterfaceCache()
         {
+            // Properties
             List<string> keysToUpdate = new List<string>();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceOutputCache)
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfacePOCache)
             {
                 if (keyValuePair.Key == keyValuePair.Value.Header)
                     continue;
@@ -280,9 +433,43 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
             foreach (string key in keysToUpdate)
             {
-                InterfaceNode node = _interfaceOutputCache[key];
-                _interfaceOutputCache.Remove(key);
-                _interfaceOutputCache.Add(node.Header, node);
+                InterfaceNode node = _interfacePOCache[key];
+                _interfacePOCache.Remove(key);
+                _interfacePOCache.Add(node.Header, node);
+            }
+            
+            // Links
+            keysToUpdate.Clear();
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceLOCache)
+            {
+                if (keyValuePair.Key == keyValuePair.Value.Header)
+                    continue;
+                
+                keysToUpdate.Add(keyValuePair.Key);
+            }
+
+            foreach (string key in keysToUpdate)
+            {
+                InterfaceNode node = _interfaceLOCache[key];
+                _interfaceLOCache.Remove(key);
+                _interfaceLOCache.Add(node.Header, node);
+            }
+            
+            // Events
+            keysToUpdate.Clear();
+            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in _interfaceEOCache)
+            {
+                if (keyValuePair.Key == keyValuePair.Value.Header)
+                    continue;
+                
+                keysToUpdate.Add(keyValuePair.Key);
+            }
+
+            foreach (string key in keysToUpdate)
+            {
+                InterfaceNode node = _interfaceEOCache[key];
+                _interfaceEOCache.Remove(key);
+                _interfaceEOCache.Add(node.Header, node);
             }
         }
 
@@ -319,12 +506,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             if (interfaceNode.Direction == PortDirection.In)
                             {
                                 intrfc.OutputEvents.Add((dynamic)interfaceNode.SubObject);
-                                _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                                _interfaceEICache.Add(interfaceNode.Header, interfaceNode);
                             }
                             else
                             {
                                 intrfc.InputEvents.Add((dynamic)interfaceNode.SubObject);
-                                _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                                _interfaceEOCache.Add(interfaceNode.Header, interfaceNode);
                             }
                         } break;
                         case ConnectionType.Link:
@@ -333,12 +520,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             if (interfaceNode.Direction == PortDirection.In)
                             {
                                 intrfc.OutputLinks.Add((dynamic)interfaceNode.SubObject);
-                                _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                                _interfaceLICache.Add(interfaceNode.Header, interfaceNode);
                             }
                             else
                             {
                                 intrfc.InputLinks.Add((dynamic)interfaceNode.SubObject);
-                                _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                                _interfaceLOCache.Add(interfaceNode.Header, interfaceNode);
                             }
                         } break;
                         case ConnectionType.Property:
@@ -348,11 +535,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                _interfaceInputCache.Add(interfaceNode.Header, interfaceNode);
+                                _interfacePICache.Add(interfaceNode.Header, interfaceNode);
                             }
                             else
                             {
-                                _interfaceOutputCache.Add(interfaceNode.Header, interfaceNode);
+                                _interfacePOCache.Add(interfaceNode.Header, interfaceNode);
                             }
                         } break;
                     }
@@ -396,10 +583,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
+                                _interfaceEICache.Remove(interfaceNode.Header);
                                 ((dynamic)interfaceNode.Object).OutputEvents.Remove((dynamic)interfaceNode.SubObject);
                             }
                             else
                             {
+                                _interfaceEOCache.Remove(interfaceNode.Header);
                                 ((dynamic)interfaceNode.Object).InputEvents.Remove((dynamic)interfaceNode.SubObject);
                             }
                         } break;
@@ -407,10 +596,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
+                                _interfaceLICache.Remove(interfaceNode.Header);
                                 ((dynamic)interfaceNode.Object).OutputLinks.Remove((dynamic)interfaceNode.SubObject);
                             }
                             else
                             {
+                                _interfaceLOCache.Remove(interfaceNode.Header);
                                 ((dynamic)interfaceNode.Object).InputLinks.Remove((dynamic)interfaceNode.SubObject);
                             }
                         } break;
@@ -418,10 +609,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
+                                _interfacePICache.Remove(interfaceNode.Header);
                                 ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
                                 if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                                 {
-                                    InterfaceNode interfaceNode2 = GetInterfaceNode(interfaceNode.Header, PortDirection.Out);
+                                    InterfaceNode interfaceNode2 = GetInterfaceNode(interfaceNode.Header, PortDirection.Out, ConnectionType.Property);
                                     
                                     if (interfaceNode2 == null)
                                         break;
@@ -431,10 +623,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             }
                             else
                             {
+                                _interfacePOCache.Remove(interfaceNode.Header);
                                 ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
                                 if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                                 {
-                                    InterfaceNode interfaceNode2 = GetInterfaceNode(interfaceNode.Header, PortDirection.In);
+                                    InterfaceNode interfaceNode2 = GetInterfaceNode(interfaceNode.Header, PortDirection.In, ConnectionType.Property);
                                     
                                     if (interfaceNode2 == null)
                                         break;
@@ -443,15 +636,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                                 }
                             }
                         } break;
-                    }
-
-                    if (interfaceNode.Direction == PortDirection.In)
-                    {
-                        _interfaceInputCache.Remove(interfaceNode.Header);
-                    }
-                    else
-                    {
-                        _interfaceOutputCache.Remove(interfaceNode.Header);
                     }
                 } break;
             }

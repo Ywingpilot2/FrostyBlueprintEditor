@@ -59,7 +59,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
     /// </summary>
     public class EntityLayoutManager : BaseLayoutManager
     {
-        public override int Version => 1005;
+        public override int Version => 1006;
 
         public override bool SaveLayout(string path)
         {

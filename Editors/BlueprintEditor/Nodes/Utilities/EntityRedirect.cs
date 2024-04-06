@@ -67,7 +67,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 reader.ReadInt();
                 ConnectionType type = (ConnectionType)reader.ReadInt();
                 string portName = reader.ReadNullTerminatedString();
-                InterfaceNode node = wrangler.GetInterfaceNode(portName, PortDirection.In);
+                InterfaceNode node = wrangler.GetInterfaceNode(portName, PortDirection.In, type);
                 EntityInput input = node.GetInput(portName, type);
 
                 RedirectTarget = input;
@@ -493,7 +493,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 reader.ReadInt();
                 ConnectionType type = (ConnectionType)reader.ReadInt();
                 string portName = reader.ReadNullTerminatedString();
-                InterfaceNode node = wrangler.GetInterfaceNode(portName, PortDirection.Out);
+                InterfaceNode node = wrangler.GetInterfaceNode(portName, PortDirection.Out, type);
                 EntityOutput output = node.GetOutput(portName, type);
 
                 RedirectTarget = output;
