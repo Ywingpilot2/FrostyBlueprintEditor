@@ -9,7 +9,8 @@
         Title="About the Blueprint Editor" 
         Height="620" 
         Width="500"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
     
     <Window.Resources>
         <ResourceDictionary>

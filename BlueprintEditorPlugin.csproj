@@ -105,12 +105,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Converters" />
-    <Folder Include="Views\Editor" />
-    <Folder Include="Views\Themes" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Images\Client.png" />
     <Resource Include="Images\Client.png" />
   </ItemGroup>
