@@ -81,6 +81,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
             HasPlayer = source.HasPlayer;
 
+            // lazy way to double check the node if we lack a player event, just to be sure
+            if (!HasPlayer && source.Node is EntityNode entityNode)
+            {
+                HasPlayer = entityNode.HasPlayerEvent;
+            }
+            
+            if (HasPlayer && target.Node is EntityNode targetNode)
+            {
+                targetNode.HasPlayerEvent = HasPlayer;
+            }
+
             FixRealm();
             UpdateStatus();
         }
@@ -90,6 +101,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             Object = obj;
 
             HasPlayer = source.HasPlayer;
+            
+            // lazy way to double check the node if we lack a player event, just to be sure
+            if (!HasPlayer && source.Node is EntityNode entityNode)
+            {
+                HasPlayer = entityNode.HasPlayerEvent;
+            }
+
+            if (HasPlayer && target.Node is EntityNode targetNode)
+            {
+                targetNode.HasPlayerEvent = HasPlayer;
+            }
 
             Realm = ParseRealm(((dynamic)Object).TargetType.ToString());
             UpdateStatus();
@@ -124,12 +146,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                     if (sender == Target || sender == Target.Node)
                         break;
                     
-                    if (HasPlayer == ((EntityPort)Source).HasPlayer)
+                    // If this is identical, no point in bothering to change it
+                    if (HasPlayer == ((EntityPort)Source).HasPlayer && Target.Node is EntityNode targetNode && HasPlayer == targetNode.HasPlayerEvent)
                         return;
                     
                     HasPlayer = ((EntityPort)Source).HasPlayer || ((EntityNode)Source.Node).HasPlayerEvent;
                     if (Target.Node is EntityNode entityNode)
                     {
+                        if (HasPlayer == entityNode.HasPlayerEvent)
+                            return;
+                        
                         entityNode.HasPlayerEvent = HasPlayer;
                     }
                 } break;

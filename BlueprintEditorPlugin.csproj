@@ -84,7 +84,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nodify" Version="5.0.2" />
     <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
@@ -109,6 +108,10 @@
     <Resource Include="Images\Client.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Themes" />
+  </ItemGroup>
+
   <!-- This is for copying our binaries into the plugins folder -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!-- Replace the second directory with the directory to your frosty's plugins folder -->
@@ -118,8 +121,6 @@
     <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(ProjectDir)Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\BlueprintEditor\NodeMappings" />
     
     <!-- And replace the DestinationFolder here to be your frosty's plugins directory as well -->
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Nodify.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
   </Target>

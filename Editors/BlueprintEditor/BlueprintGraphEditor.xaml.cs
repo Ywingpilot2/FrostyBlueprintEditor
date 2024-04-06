@@ -25,6 +25,7 @@ using BlueprintEditorPlugin.Models.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Nodes.Utilities;
 using BlueprintEditorPlugin.Models.Status;
 using BlueprintEditorPlugin.Options;
+using BlueprintEditorPlugin.Views.Editor;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Controls;
@@ -33,7 +34,6 @@ using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
-using Nodify;
 using Prism.Commands;
 using App = FrostyEditor.App;
 

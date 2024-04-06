@@ -1336,7 +1336,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.NodeWrangler = wrangler;
 
                 node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
-                node.Type = PointerRefType.External;
+                node.Type = PointerRefType.Internal;
                 
                 node.Load(entity.GetType().Name);
 
@@ -1457,7 +1457,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.FileGuid = fileGuid;
                 node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
-                node.Type = PointerRefType.External;
+                node.Type = PointerRefType.Internal;
                 node.RefreshCache();
 
                 return node;
