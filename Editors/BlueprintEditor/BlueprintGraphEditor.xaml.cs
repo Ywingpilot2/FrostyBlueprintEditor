@@ -1010,6 +1010,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void ClassList_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            if (ClassList.SelectedClass == null)
+                return;
+            
             EntDocBoxHeader.Text = ClassList.SelectedClass.Name;
             if (ExtensionsManager.EntityNodeExtensions.ContainsKey(ClassList.SelectedClass.Name))
             {
