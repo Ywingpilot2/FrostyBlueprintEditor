@@ -1280,6 +1280,7 @@
                                             <controls1:FrostyClassSelector x:Name="ClassList"
                                                                            Grid.Row="1"
                                                                            ItemDoubleClicked="ClassSelector_OnItemDoubleClicked"
+                                                                           SelectedItemChanged="ClassList_OnSelectedItemChanged"
                                                                            Types="{x:Static local:BlueprintGraphEditor.Types}"/>
                                         
                                             <!--Documentation on the type-->
@@ -1297,7 +1298,7 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <TextBlock FontWeight="Bold" Margin="7 0 0 0" VerticalAlignment="Top"
-                                                                   Text="{Binding ElementName=ClassList, Path=SelectedClass.Name}" />
+                                                                   x:Name="EntDocBoxHeader" />
                                                         <Path Grid.Column="1" Fill="White" Width="11" Height="11"
                                                               Data="m 4 9 h 2 v 2 H 4 Z M 1 4 V 1 H 2 V 0 H 8 V 1 H 9 V 6 H 8 V 7 H 6 V 8 H 4 V 6 H 5 V 5 H 7 V 2 H 3 v 2 z" />
                                                     </Grid>
@@ -1315,47 +1316,12 @@
                                 <controls:FrostyTabItem Header="Utilities"
                                                         Icon="pack://application:,,,/FrostyEditor;component/Images/ThreeD.png">
                                     <controls:FrostyTabItem.Content>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <Border BorderBrush="{StaticResource SubItemPressed}"
-                                                    BorderThickness="2">
-                                                <ListBox x:Name="TransTypeList" 
-                                                         ItemsSource="{x:Static local:BlueprintGraphEditor.NodeUtils}"
-                                                         MouseDoubleClick="TransClassSelector_OnItemDoubleClicked"/>
-                                            </Border>
-                                        
-                                            <!--Documentation on the type-->
-                                            <Grid Grid.Row="1">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="19" />
-                                                    <RowDefinition />
-                                                </Grid.RowDefinitions>
-
-                                                <Border Background="#454545">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="18" />
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <TextBlock FontWeight="Bold" Margin="7 0 0 0" VerticalAlignment="Top"
-                                                                   Text="{Binding ElementName=ClassList, Path=SelectedClass.Name}" />
-                                                        <Path Grid.Column="1" Fill="White" Width="11" Height="11"
-                                                              Data="m 4 9 h 2 v 2 H 4 Z M 1 4 V 1 H 2 V 0 H 8 V 1 H 9 V 6 H 8 V 7 H 6 V 8 H 4 V 6 H 5 V 5 H 7 V 2 H 3 v 2 z" />
-                                                    </Grid>
-                                                </Border>
-
-                                                <Grid Grid.Row="1">
-                                                    <TextBox Padding="4" IsReadOnly="True" VerticalScrollBarVisibility="Auto"
-                                                             TextWrapping="Wrap"
-                                                             Foreground="{StaticResource FontColor}"
-                                                             x:Name="transDocBox" />
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
+                                        <Border BorderBrush="{StaticResource SubItemPressed}"
+                                                BorderThickness="2">
+                                            <ListBox x:Name="TransTypeList" 
+                                                     ItemsSource="{x:Static local:BlueprintGraphEditor.NodeUtils}"
+                                                     MouseDoubleClick="TransClassSelector_OnItemDoubleClicked"/>
+                                        </Border>
                                     </controls:FrostyTabItem.Content>
                                 </controls:FrostyTabItem>
                             </controls:FrostyTabControl.Items>

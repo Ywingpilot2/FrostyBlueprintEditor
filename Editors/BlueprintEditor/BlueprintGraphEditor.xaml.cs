@@ -1007,5 +1007,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
+
+        private void ClassList_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            EntDocBoxHeader.Text = ClassList.SelectedClass.Name;
+            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(ClassList.SelectedClass.Name))
+            {
+                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[ClassList.SelectedClass.Name]);
+                EntDocBoxText.Text = node.ToolTip;
+            }
+        }
     }
 }
