@@ -198,6 +198,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                     {
                         IsInterface = portArgs.IsInterface;
                     }
+
+                    if (Node is EntityNode entityNode)
+                    {
+                        entityNode.RefreshCache();
+                    }
                 });
                 EntityNodeWrangler wrangler = (EntityNodeWrangler)Node.NodeWrangler;
                 App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(wrangler.Asset.FileGuid).Name, wrangler.Asset);

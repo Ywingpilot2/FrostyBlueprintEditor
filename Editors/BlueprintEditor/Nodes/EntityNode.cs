@@ -492,7 +492,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <summary>
         /// Remakes the port cache based on <see cref="Inputs"/> and <see cref="Outputs"/>
         /// </summary>
-        protected void RefreshCache()
+        public void RefreshCache()
         {
             _hashCachePInputs.Clear();
             _hashCacheLInputs.Clear();
