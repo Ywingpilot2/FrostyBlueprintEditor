@@ -10,6 +10,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <UseWPF>true</UseWPF>
     <OutputType>Library</OutputType>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Developer - Debug|x64' ">
@@ -105,6 +106,8 @@
 
   <ItemGroup>
     <Folder Include="Models\Converters" />
+    <Folder Include="Views\Editor" />
+    <Folder Include="Views\Themes" />
   </ItemGroup>
 
   <ItemGroup>
