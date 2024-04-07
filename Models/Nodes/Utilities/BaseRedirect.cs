@@ -93,7 +93,10 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
             }
             else
             {
-                IConnection connection = NodeWrangler.GetConnections(Outputs[0]).First();
+                IConnection connection = NodeWrangler.GetConnections(Outputs[0]).FirstOrDefault();
+                if (connection == null)
+                    return;
+                
                 NodeWrangler.RemoveConnection(connection);
             }
         }

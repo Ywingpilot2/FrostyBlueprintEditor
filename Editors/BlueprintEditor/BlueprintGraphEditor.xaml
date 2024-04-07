@@ -655,6 +655,16 @@
                                     <Image Source="pack://application:,,,/FrostyEditor;component/images/more.png"/>
                                 </MenuItem.Icon>
                             </MenuItem>
+                            <MenuItem Header="Redirect Inputs" Command="{Binding RedirectInCommand}">
+                                <MenuItem.Icon>
+                                    <Image Source="pack://application:,,,/BlueprintEditorPlugin;component/images/AddRedirectIcon.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Redirect Outputs" Command="{Binding RedirectOutCommand}">
+                                <MenuItem.Icon>
+                                    <Image Source="pack://application:,,,/BlueprintEditorPlugin;component/images/AddRedirectIcon.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem Header="Copy" Command="{Binding CopyCommand}">
                                 <MenuItem.Icon>
                                     <Image Source="pack://application:,,,/FrostyCore;component/images/copy.png"/>

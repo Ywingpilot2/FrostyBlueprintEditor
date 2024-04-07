@@ -461,6 +461,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             else
             {
                 IConnection connection = NodeWrangler.GetConnections(Inputs[0]).FirstOrDefault();
+                if (connection == null)
+                {
+                    return;
+                }
                 NodeWrangler.RemoveConnection(connection);
             }
         }

@@ -19,6 +19,7 @@ using BlueprintEditorPlugin.Models.Status;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Controls;
+using Frosty.Core.Windows;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -139,6 +140,38 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public void Copy()
         {
             FrostyClipboard.Current.SetData(Object);
+        }
+        
+        public ICommand RedirectInCommand => new DelegateCommand(RedirectIn);
+
+        private void RedirectIn()
+        {
+            FrostyTaskWindow.Show("Redirecting...", "", task =>
+            {
+                foreach (IPort input in Inputs)
+                {
+                    if (input is EntityInput entityInput)
+                    {
+                        entityInput.Redirect();
+                    }
+                }
+            });
+        }
+        
+        public ICommand RedirectOutCommand => new DelegateCommand(RedirectOut);
+
+        private void RedirectOut()
+        {
+            FrostyTaskWindow.Show("Redirecting...", "", task =>
+            {
+                foreach (IPort output in Outputs)
+                {
+                    if (output is EntityOutput entityOutput)
+                    {
+                        entityOutput.Redirect();
+                    }
+                }
+            });
         }
         
         public ICommand AddPortCommand => new DelegateCommand(UserAddPort);

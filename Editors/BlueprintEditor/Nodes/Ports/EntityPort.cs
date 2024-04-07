@@ -405,7 +405,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
 
             return entityPort.Node == Node && entityPort.Name == Name && entityPort.HasPlayer == HasPlayer 
                    && entityPort.IsInterface == IsInterface
-                   && entityPort.Type == Type && entityPort.Realm == Realm;
+                   && entityPort.Type == Type && entityPort.Realm == Realm
+                   && entityPort.RedirectNode == RedirectNode
+                   && entityPort.Direction == Direction;
         }
 
         public EntityPort(string name, INode node)

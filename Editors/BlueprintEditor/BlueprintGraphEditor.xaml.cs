@@ -46,20 +46,22 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         public INodeWrangler NodeWrangler { get; set; }
         public ILayoutManager LayoutManager { get; set; }
 
-        public bool IsValid()
+        public virtual bool IsValid()
         {
             return true;
         }
 
-        public bool IsValid(EbxAssetEntry assetEntry)
+        public virtual bool IsValid(EbxAssetEntry assetEntry)
         {
             EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
             Type assetType = asset.RootObject.GetType();
             
             // We only check property connections since we can assume if it has property connections it has everything else
+            // We also don't want this to have an Object, just objects. BaseComponentGraphEditor handles graphs with components
             if (assetType.GetProperty("Objects") != null 
                 && assetType.GetProperty("PropertyConnections") != null 
-                && assetType.GetProperty("Interface") != null)
+                && assetType.GetProperty("Interface") != null
+                && assetType.GetProperty("Object") == null)
             {
                 return true;
             }
@@ -67,7 +69,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             return false;
         }
 
-        public void Closed()
+        public virtual void Closed()
         {
             if (!EditorOptions.SaveOnExit) return;
             
@@ -86,7 +88,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             LayoutManager = new EntityLayoutManager(NodeWrangler);
         }
 
-        public void LoadAsset(EbxAssetEntry assetEntry)
+        public virtual void LoadAsset(EbxAssetEntry assetEntry)
         {
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
             wrangler.Asset = App.AssetManager.GetEbx(assetEntry);
@@ -557,7 +559,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         #endregion
 
-        private void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)
+        protected virtual void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)
         {
             // If the user holds down alt that means all selected nodes should have their properties set the same
             if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
@@ -789,6 +791,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 NodeWrangler.AddVertex(node);
             }
         }
+        
+        private void ClassList_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (ClassList.SelectedClass == null)
+            {
+                EntDocBoxHeader.Text = "";
+                EntDocBoxText.Text = "";
+                return;
+            }
+            
+            EntDocBoxHeader.Text = ClassList.SelectedClass.Name;
+            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(ClassList.SelectedClass.Name))
+            {
+                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[ClassList.SelectedClass.Name]);
+                EntDocBoxText.Text = node.ToolTip;
+            }
+        }
 
         #endregion
 
@@ -1007,22 +1026,5 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
-
-        private void ClassList_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (ClassList.SelectedClass == null)
-            {
-                EntDocBoxHeader.Text = "";
-                EntDocBoxText.Text = "";
-                return;
-            }
-            
-            EntDocBoxHeader.Text = ClassList.SelectedClass.Name;
-            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(ClassList.SelectedClass.Name))
-            {
-                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[ClassList.SelectedClass.Name]);
-                EntDocBoxText.Text = node.ToolTip;
-            }
-        }
     }
 }
