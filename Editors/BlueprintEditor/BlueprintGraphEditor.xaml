@@ -61,6 +61,31 @@
                                                 Value="{StaticResource NodeSelectedColor}" />
                                     </DataTrigger>
                                     
+                                    <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                 Value="{x:Static status:EditorStatus.Flawed}">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect RenderingBias="Performance"
+                                                                  Color="Goldenrod"
+                                                                  Direction="315" />
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="ToolTip"
+                                                Value="{Binding CurrentStatus.ToolTip}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentStatus.Status}"
+                                                 Value="{x:Static status:EditorStatus.Broken}">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect RenderingBias="Performance"
+                                                                  Color="Red"
+                                                                  Direction="315" />
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="ToolTip"
+                                                Value="{Binding CurrentStatus.ToolTip}" />
+                                    </DataTrigger>
+                                    
                                     <DataTrigger Binding="{Binding HasPlayer}" Value="true">
                                         <Setter Property="Effect">
                                             <Setter.Value>

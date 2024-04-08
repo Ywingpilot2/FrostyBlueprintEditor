@@ -2,6 +2,7 @@
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Entities;
+using BlueprintEditorPlugin.Models.Entities.Networking;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -11,7 +12,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
     public class LinkConnection : EntityConnection
     {
         public override ConnectionType Type => ConnectionType.Link;
-        
+        public override Realm Realm => Realm.Any; // TODO: Link connection realms
+
         public sealed override void UpdateSourceRef(EntityPort source)
         {
             base.UpdateSourceRef(source);

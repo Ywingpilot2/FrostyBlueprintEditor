@@ -1488,7 +1488,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
                 node.FileGuid = fileGuid;
                 node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
-                node.Type = PointerRefType.Internal;
+                node.Type = PointerRefType.External;
                 node.RefreshCache();
 
                 return node;

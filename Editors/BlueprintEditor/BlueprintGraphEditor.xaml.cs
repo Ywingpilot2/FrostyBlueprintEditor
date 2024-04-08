@@ -549,14 +549,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 NodePropertyGrid.Object = new object();
             }
         }
-
-        private void NodeFlatten_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = sender as Button;
-            EntityNode node = (EntityNode)button.DataContext;
-            node.IsFlatted = !node.IsFlatted;
-        }
-
+        
         #endregion
 
         protected virtual void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)

@@ -54,6 +54,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             }
 
             PointerRef interfaceRef = ((dynamic)asset.RootObject).Interface;
+            if (interfaceRef.Type == PointerRefType.Null)
+            {
+                return;
+            }
+            
             AssetClassGuid interfaceGuid = ((dynamic)interfaceRef.Internal).GetInstanceGuid();
 
             foreach (dynamic field in ((dynamic)interfaceRef.Internal).Fields)
