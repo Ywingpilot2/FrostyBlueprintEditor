@@ -47,6 +47,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
         public ComponentGraphEditor()
         {
             NodeWrangler = new ComponentNodeWrangler();
+            NodePropertyGrid.NodeWrangler = NodeWrangler;
         }
 
         public override void LoadAsset(EbxAssetEntry assetEntry)
