@@ -6,6 +6,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Status;
+using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -22,6 +23,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             get => _realm;
             set
             {
+                if (value == Realm.Any)
+                {
+                    App.Logger.LogError("Cannot set the realm of a connection to any.");
+                    return;
+                }
+                
                 _realm = value;
                 ((dynamic)Object).Flags = PropertyFlagsHelper.GetAsFlags(Realm, PropType, SourceCantBeStatic);
                 NotifyPropertyChanged(nameof(Realm));

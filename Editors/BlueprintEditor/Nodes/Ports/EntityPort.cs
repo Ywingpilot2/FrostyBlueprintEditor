@@ -354,14 +354,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
             Realm realm = Realm;
             if ((realm == Realm.Any || realm == Realm.Invalid) || ignoreCurrent)
             {
-                EntityNode entityNode = (EntityNode)Node;
-                if (entityNode.Realm != Realm.Any && entityNode.Realm != Realm.Invalid)
+                if (!(Node is INetworked networked)) return realm;
+                
+                if (networked.Realm != Realm.Any && networked.Realm != Realm.Invalid)
                 {
-                    realm = entityNode.Realm;
+                    realm = networked.Realm;
+                }
+                else if (networked.DetermineRealm(ignoreCurrent) != Realm.Any &&
+                         networked.DetermineRealm(ignoreCurrent) != Realm.Invalid)
+                {
+                    realm = networked.DetermineRealm(ignoreCurrent);
                 }
                 else
                 {
-                    foreach (EntityConnection connection in entityNode.NodeWrangler.GetConnections(this))
+                    foreach (EntityConnection connection in Node.NodeWrangler.GetConnections(this))
                     {
                         if (connection.Realm != Realm.Any)
                         {

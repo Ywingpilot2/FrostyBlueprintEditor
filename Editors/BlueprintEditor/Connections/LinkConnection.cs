@@ -12,7 +12,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
     public class LinkConnection : EntityConnection
     {
         public override ConnectionType Type => ConnectionType.Link;
-        public override Realm Realm => Realm.Any; // TODO: Link connection realms
+        public override Realm Realm => Realm.ClientAndServer; // TODO: Link connection realms
 
         public sealed override void UpdateSourceRef(EntityPort source)
         {

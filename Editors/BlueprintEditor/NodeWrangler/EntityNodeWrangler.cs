@@ -20,7 +20,7 @@ using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 {
-    public class EntityNodeWrangler : BaseNodeWrangler
+    public class EntityNodeWrangler : BaseNodeWrangler, IEbxNodeWrangler
     {
         public EbxAsset Asset { get; set; }
         public AssetClassGuid InterfaceGuid { get; set; }
@@ -39,10 +39,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         /// <summary>
         /// Add a node to the Graph Editor without editing EBX
         /// </summary>
-        /// <param name="node"></param>
-        public void AddNodeTransient(INode node)
+        /// <param name="vert"></param>
+        public void AddVertexTransient(IVertex vert)
         {
-            switch (node)
+            switch (vert)
             {
                 case EntityNode entityNode when entityNode.Type == PointerRefType.Internal:
                 {
@@ -130,16 +130,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             // TODO: This is a work around to fix UI being on a different thread, causing crashes
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Vertices.Add(node);
+                Vertices.Add(vert);
             });
             
             // Incase extensions aren't threadsafe
-            Application.Current.Dispatcher.Invoke(node.OnCreation);
+            Application.Current.Dispatcher.Invoke(vert.OnCreation);
         }
 
         #region Adding Connections
 
-        public void AddConnectionTransient(EntityConnection connection)
+        public void AddConnectionTransient(IConnection connection)
         {
             // TODO: This is a work around to fix UI being on a different thread, causing crashes
             Application.Current.Dispatcher.Invoke(() =>

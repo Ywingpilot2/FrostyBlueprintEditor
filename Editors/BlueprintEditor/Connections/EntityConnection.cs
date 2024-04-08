@@ -105,10 +105,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 for (int i = 0; i < 16; i++)
                 {
                     if (CurrentStatus.Status == EditorStatus.Alright)
+                    {
+                        task.Update(null, 100.0);
                         break; // Yay!
+                    }
                     
                     switch (CurrentStatus.ToolTip)
                     {
+                        case "A connection cannot have its realm set to any":
+                        {
+                            if (target.DetermineRealm() != Realm.Any)
+                            {
+                                Realm = target.DetermineRealm();
+                            }
+                            else if (source.DetermineRealm() != Realm.Any)
+                            {
+                                Realm = source.DetermineRealm();
+                            }
+                            else
+                            {
+                                source.ForceFixRealm();
+                                target.ForceFixRealm();
+                                ForceFixRealm();
+                            }
+                        } break;
                         case "Connection source or target is not an EntityPort. Please use EntityPorts for Blueprints.":
                         {
                             Target.Node.NodeWrangler.RemoveConnection(this); // Fuck you
@@ -199,6 +219,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                         } break;
                     }
                     
+                    task.Update(null, i / 16.0);
                     UpdateStatus();
                 }
 
@@ -419,20 +440,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             
             if (source.Realm == Realm.Any && target.Realm == Realm.Any)
             {
-                SetStatus(EditorStatus.Flawed, "Cannot implicitly determine the realms of this connection based on ports. Please manually set realms");
+                // If this is the case that means the realm can be determined
+                if (source.DetermineRealm() == Realm.Any && target.DetermineRealm() == Realm.Any)
+                {
+                    SetStatus(EditorStatus.Flawed, "Cannot implicitly determine the realms of this connection based on ports. Please manually set realms");
+                }
+            }
+
+            if (Realm == Realm.Any)
+            {
+                SetStatus(EditorStatus.Broken, "A connection cannot have its realm set to any");
                 return;
             }
 
             if (source.Realm != target.Realm && !ImplicitConnectionCombos.Contains((source.Realm, target.Realm)) && (source.Realm != Realm.Any && target.Realm != Realm.Any))
             {
                 SetStatus(EditorStatus.Flawed, $"{source.Realm} to {target.Realm} is not a valid combination of realms");
-                return;
             }
 
             if (Realm != target.Realm && target.Realm != Realm.Any && !IdenticalTargetCombos.Contains((target.Realm, Realm)))
             {
                 SetStatus(EditorStatus.Flawed, "Connection realm should be the same as target realm");
-                return;
             }
             
         }

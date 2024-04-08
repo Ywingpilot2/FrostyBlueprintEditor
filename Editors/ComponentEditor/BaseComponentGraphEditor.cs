@@ -70,25 +70,25 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                         {
                             case "FieldAccessType_Source":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
                                 {
                                     SubObject = field
                                 });
                             } break;
                             case "FieldAccessType_Target":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
                                 {
                                     SubObject = field
                                 });
                             } break;
                             case "FieldAccessType_SourceAndTarget":
                             {
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
                                 {
                                     SubObject = field
                                 });
-                                wrangler.AddNodeTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
                                 {
                                     SubObject = field
                                 });
@@ -99,7 +99,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler)
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler)
                         {
                             SubObject = inputEvent
                         });
@@ -107,7 +107,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler)
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler)
                         {
                             SubObject = outputEvent
                         });
@@ -116,7 +116,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler)
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler)
                         {
                             SubObject = inputLink
                         });
@@ -124,7 +124,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
-                        wrangler.AddNodeTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler)
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler)
                         {
                             SubObject = outputLink
                         });
@@ -138,7 +138,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                 EntityNode node = EntityNode.GetNodeFromEntity(assetObject, NodeWrangler);
                 cheap.SortGraph(node);
                 
-                wrangler.AddNodeTransient(node);
+                wrangler.AddVertexTransient(node);
             }
 
             #region Populating connections
@@ -179,7 +179,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                             sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
-                            wrangler.AddNodeTransient(sourceNode);
+                            wrangler.AddVertexTransient(sourceNode);
                         }
                     } break;
                 }
@@ -213,7 +213,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                             targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(targetNode);
                         
-                            wrangler.AddNodeTransient(targetNode);
+                            wrangler.AddVertexTransient(targetNode);
                         }
                     } break;
                 }
@@ -276,7 +276,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                             sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
-                            wrangler.AddNodeTransient(sourceNode);
+                            wrangler.AddVertexTransient(sourceNode);
                         }
                     } break;
                 }
@@ -310,7 +310,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                             targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(targetNode);
                         
-                            wrangler.AddNodeTransient(targetNode);
+                            wrangler.AddVertexTransient(targetNode);
                         }
                     } break;
                 }
@@ -373,7 +373,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                             sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
-                            wrangler.AddNodeTransient(sourceNode);
+                            wrangler.AddVertexTransient(sourceNode);
                         }
                     } break;
                 }
@@ -407,7 +407,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                             targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(targetNode);
                         
-                            wrangler.AddNodeTransient(targetNode);
+                            wrangler.AddVertexTransient(targetNode);
                         }
                     } break;
                 }

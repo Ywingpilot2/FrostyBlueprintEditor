@@ -4,6 +4,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Entities.Networking;
+using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
@@ -20,6 +21,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             get => _realm;
             set
             {
+                if (value == Realm.Any)
+                {
+                    App.Logger.LogError("Cannot set the realm of a connection to any.");
+                    return;
+                }
+                
                 _realm = value;
                 Type realmType = ((dynamic)Object).TargetType.GetType();
                 ((dynamic)Object).TargetType = (dynamic)Enum.Parse(realmType, $"EventConnectionTargetType_{_realm.ToString()}");

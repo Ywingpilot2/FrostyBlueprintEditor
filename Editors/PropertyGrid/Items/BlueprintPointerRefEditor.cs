@@ -317,24 +317,31 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     // otherwise a new guid
                     if (!guid.IsExported)
                     {
-                        EbxAssetEntry asset;
-                
-                        if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
-                            return;
-                        
-                        //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
-                        if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                        if (NodeWrangler is IEbxNodeWrangler)
                         {
-                            asset = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+                            EbxAssetEntry asset;
+                
+                            if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                                return;
+                        
+                            //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
+                            if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                            {
+                                asset = App.AssetManager.GetEbxEntry(((IEbxNodeWrangler)NodeWrangler).Asset.FileGuid);
+                            }
+                            else
+                            {
+                                IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices[0];
+                                asset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                            }
+
+                            // set internal id to -1 so it will be set on adding to asset
+                            guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(((IEbxNodeWrangler)NodeWrangler).Asset.Objects, selectedType, asset.Guid), -1);
                         }
                         else
                         {
-                            IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices[0];
-                            asset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                            guid = new AssetClassGuid(Guid.NewGuid(), -1);
                         }
-
-                        // set internal id to -1 so it will be set on adding to asset
-                        guid = new AssetClassGuid(Utils.GenerateDeterministicGuid(((EntityNodeWrangler)NodeWrangler).Asset.Objects, selectedType, asset.Guid), -1);
                     }
 
                     PointerRef newValue = new PointerRef(newObj);
@@ -346,22 +353,28 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                         uint value = (uint)((b[2] << 16) | (b[1] << 8) | b[0]);
                         newValue.Internal.GetType().GetProperty("Flags", BindingFlags.Public | BindingFlags.Instance).SetValue(newValue.Internal, value);
                     }
-                    
-                    if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
-                        return;
 
-                    // add it to the list of objects so it can be assigned places
-                    if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                    if (NodeWrangler is IEbxNodeWrangler wrangler)
                     {
-                        ((EntityNodeWrangler)NodeWrangler).Asset.AddObject(newValue.Internal);
-                    }
-                    else
-                    {
-                        IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices[0];
-                        EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
-                        EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
+                        if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                            return;
+
+                        // add it to the list of objects so it can be assigned places
+                        if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                        {
+                            wrangler.Asset.AddObject(newValue.Internal);
+                        }
+                        else
+                        {
+                            IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices.LastOrDefault();
+                            if (node != null)
+                            {
+                                EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
+                                EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
                         
-                        asset.AddObject(newValue.Internal);
+                                asset.AddObject(newValue.Internal);
+                            }
+                        }
                     }
                     Value = newValue;
                 }
@@ -424,22 +437,25 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     FileGuid = assignFileGuid,
                     ClassGuid = guid.ExportedGuid
                 };
-                
-                if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
-                    return;
-                
-                //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
-                if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
-                {
-                    ((EntityNodeWrangler)NodeWrangler).Asset.AddDependency(reference.FileGuid);
-                }
-                else
-                {
-                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
-                    EbxAssetEntry asset = App.AssetManager.GetEbxEntry(node.FileGuid);
-                    EbxAsset ebx = App.AssetManager.GetEbx(asset);
 
-                    ebx.AddDependency(reference.FileGuid);
+                if (NodeWrangler is IEbxNodeWrangler wrangler)
+                {
+                    if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                        return;
+                
+                    //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
+                    if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                    {
+                        wrangler.Asset.AddDependency(reference.FileGuid);
+                    }
+                    else
+                    {
+                        IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
+                        EbxAssetEntry asset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                        EbxAsset ebx = App.AssetManager.GetEbx(asset);
+
+                        ebx.AddDependency(reference.FileGuid);
+                    }
                 }
                 Value = new PointerRef(reference);
             }
@@ -457,23 +473,26 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
             assignObjs.Clear();
 
             List<PointerRefClassType> types = new List<PointerRefClassType>();
-            
-            foreach (dynamic obj in ((EntityNodeWrangler)NodeWrangler).Asset.Objects)
-            {
-                if (TypeLibrary.IsSubClassOf((object)obj, baseType.Name))
-                {
-                    assignObjs.Add(obj);
-                    AssetClassGuid guid = obj.GetInstanceGuid();
 
-                    types.Add(new PointerRefClassType()
+            if (NodeWrangler is IEbxNodeWrangler wrangler)
+            {
+                foreach (dynamic obj in wrangler.Asset.Objects)
+                {
+                    if (TypeLibrary.IsSubClassOf((object)obj, baseType.Name))
                     {
-                        Name = obj.__Id,
-                        Type = obj.GetType(),
-                        Guid = guid.ExportedGuid,
-                        Id = (uint)guid.InternalId,
-                        Index = assignObjs.Count - 1,
-                        HasCustomTransientId = obj.__Id != obj.GetType().Name
-                    });
+                        assignObjs.Add(obj);
+                        AssetClassGuid guid = obj.GetInstanceGuid();
+
+                        types.Add(new PointerRefClassType()
+                        {
+                            Name = obj.__Id,
+                            Type = obj.GetType(),
+                            Guid = guid.ExportedGuid,
+                            Id = (uint)guid.InternalId,
+                            Index = assignObjs.Count - 1,
+                            HasCustomTransientId = obj.__Id != obj.GetType().Name
+                        });
+                    }
                 }
             }
 
@@ -515,24 +534,27 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                 return;
 
             // selected asset is the same as the editing one
-            EbxAssetEntry currentAsset;
-            
-            if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
-                return;
-            
-            if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+            if (NodeWrangler is IEbxNodeWrangler wrangler)
             {
-                currentAsset = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
-            }
-            else
-            {
-                IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
-                currentAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
-            }
+                EbxAssetEntry currentAsset;
             
-            isInternal = selectedAsset == currentAsset;
-            if (isInternal)
-                return;
+                if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                    return;
+            
+                if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                {
+                    currentAsset = App.AssetManager.GetEbxEntry(wrangler.Asset.FileGuid);
+                }
+                else
+                {
+                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
+                    currentAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                }
+            
+                isInternal = selectedAsset == currentAsset;
+                if (isInternal)
+                    return;
+            }
 
             EbxAsset asset = App.AssetManager.GetEbx(selectedAsset);
             assignFileGuid = asset.FileGuid;
@@ -576,21 +598,24 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     FileGuid = assignFileGuid,
                     ClassGuid = guid.ExportedGuid
                 };
-                
-                if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
-                    return;
-                
-                if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
-                {
-                    ((EntityNodeWrangler)NodeWrangler).Asset.AddDependency(reference.FileGuid);
-                }
-                else
-                {
-                    IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
-                    EbxAssetEntry nodeAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
-                    EbxAsset ebx = App.AssetManager.GetEbx(nodeAsset);
 
-                    ebx.AddDependency(reference.FileGuid);
+                if (NodeWrangler is IEbxNodeWrangler)
+                {
+                    if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                        return;
+                
+                    if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                    {
+                        ((IEbxNodeWrangler)NodeWrangler).Asset.AddDependency(reference.FileGuid);
+                    }
+                    else
+                    {
+                        IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
+                        EbxAssetEntry nodeAsset = App.AssetManager.GetEbxEntry(node.FileGuid);
+                        EbxAsset ebx = App.AssetManager.GetEbx(nodeAsset);
+
+                        ebx.AddDependency(reference.FileGuid);
+                    }
                 }
                 Value = new PointerRef(reference);
             }
@@ -685,9 +710,9 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     return;
                 }
             }
-            else if (pointerRef.Type == PointerRefType.Internal)
+            else if (pointerRef.Type == PointerRefType.Internal && NodeWrangler is IEbxNodeWrangler wrangler)
             {
-                EbxAssetEntry currentAsset = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
+                EbxAssetEntry currentAsset = App.AssetManager.GetEbxEntry(wrangler.Asset.FileGuid);
                 value = pointerRef.Internal;
                 path = currentAsset.Name;
                 type = pointerRef.Internal.GetType().Name;

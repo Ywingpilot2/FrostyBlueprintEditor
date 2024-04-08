@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using FrostyEditor;
@@ -173,21 +175,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                     if (ExtensionsManager.EntityNodeExtensions.ContainsKey(source.Internal.GetType().Name))
                     {
                         // If we have an extension, get a node to use as reference for realm and such
-                        EntityNode refNode = GetNodeFromEntity(source.Internal, NodeWrangler);
-                        EventOutput refOutput = refNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event);
-
-                        if (refOutput == null)
+                        // Extensions may be unstable in this state, though. So don't give them access to us and ignore their cries of pain
+                        try
                         {
-                            output.Realm = output.ParseRealm(eventConnection.TargetType.ToString());
+                            EntityNode refNode = GetNodeFromEntity(source.Internal, new EntityNodeWrangler());
+                            refNode.OnCreation();
+                            EventOutput refOutput = refNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event);
+
+                            if (refOutput == null)
+                            {
+                                output.Realm = output.ParseRealm(eventConnection.TargetType.ToString());
+                                continue;
+                            }
+
+                            if (refOutput.HasPlayer)
+                            {
+                                output.HasPlayer = refOutput.HasPlayer;
+                            }
+                            output.Realm = refOutput.Realm;
                             continue;
                         }
-
-                        if (refOutput.HasPlayer)
+                        catch (Exception)
                         {
-                            output.HasPlayer = refOutput.HasPlayer;
+                            // Empty
                         }
-                        output.Realm = refOutput.Realm;
-                        continue;
                     }
 
                     output.Realm = output.ParseRealm(eventConnection.TargetType.ToString());
