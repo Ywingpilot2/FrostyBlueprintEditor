@@ -442,16 +442,16 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid
         public event EventHandler<ItemModifiedEventArgs> OnModified;
         public event EventHandler<ItemPreModifiedEventArgs> OnPreModified;
 
-        private BaseTypeOverride additionalData;
+        protected BaseTypeOverride additionalData;
 
-        private TreeView tv;
+        protected TreeView tv;
         private FrostyWatermarkTextBox filterBox;
         private Border filterInProgressBorder;
         private ProgressBar filterProgressBar;
-        public ObservableCollection<FrostyPropertyGridItemData> items;
-        private FrostyPropertyGridItemData rootChild;
-        private EbxAsset asset;
-        private IEnumerable classes;
+        protected ObservableCollection<FrostyPropertyGridItemData> items;
+        protected FrostyPropertyGridItemData rootChild;
+        protected EbxAsset asset;
+        protected IEnumerable classes;
 
         public static readonly DependencyProperty OnPreModifiedCommandProperty = DependencyProperty.Register("OnPreModifiedCommand", typeof(ICommand), typeof(BlueprintPropertyGrid), new UIPropertyMetadata(null));
         public ICommand OnPreModifiedCommand
@@ -676,7 +676,7 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid
             return categories.Values.ToArray();
         }
 
-        private void SubItem_PreModified(object sender, ItemPreModifiedEventArgs e)
+        protected void SubItem_PreModified(object sender, ItemPreModifiedEventArgs e)
         {
             OnPreModifiedCommand?.Execute(e);
             OnPreModified?.Invoke(sender, e);

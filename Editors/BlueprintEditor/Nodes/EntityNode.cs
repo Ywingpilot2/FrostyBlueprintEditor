@@ -277,7 +277,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public PointerRefType Type { get; private set; }
         
         // Internal
-        public AssetClassGuid InternalGuid { get; private set; }
+        public AssetClassGuid InternalGuid
+        {
+            get
+            {
+                return ((dynamic)Object).GetInstanceGuid();
+            }
+        }
         
         // External
         public Guid FileGuid { get; private set; }
@@ -321,7 +327,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 {
                     if (connection.Realm != Realm.Any && connection.Realm != Realm.Invalid)
                     {
-                        realm = connection.Realm;
+                        realm = connection.DetermineRealm();
                         return realm;
                     }
                 }
@@ -1261,7 +1267,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             Inputs = new ObservableCollection<IPort>();
             Outputs = new ObservableCollection<IPort>();
 
-            InternalGuid = ((dynamic)obj).GetInstanceGuid();
             Type = PointerRefType.Internal;
         }
         
@@ -1293,7 +1298,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             Inputs = new ObservableCollection<IPort>();
             Outputs = new ObservableCollection<IPort>();
 
-            InternalGuid = ((dynamic)obj).GetInstanceGuid();
             Type = PointerRefType.Internal;
         }
 
@@ -1309,7 +1313,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             ObjectType = obj.GetType().Name;
             NodeWrangler = nodeWrangler;
 
-            InternalGuid = ((dynamic)obj).GetInstanceGuid();
             FileGuid = fileGuid;
             ClassGuid = InternalGuid.ExportedGuid;
             Type = PointerRefType.External;
@@ -1355,7 +1358,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.NodeWrangler = wrangler;
                 node.Object = entity;
                 
-                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.Type = PointerRefType.Internal;
                 node.RefreshCache();
                 
@@ -1368,7 +1370,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.Object = entity;
                 node.NodeWrangler = wrangler;
 
-                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.Type = PointerRefType.Internal;
                 
                 node.Load(entity.GetType().Name);
@@ -1413,7 +1414,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 
                 node.Object = entity;
                 
-                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.Type = PointerRefType.Internal;
                 node.RefreshCache();
                 
@@ -1441,8 +1441,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.Object = entity;
                 node.NodeWrangler = wrangler;
 
-                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
-                node.Type = PointerRefType.External;
+                node.Type = PointerRefType.Internal;
                 
                 node.Load(entity.GetType().Name);
 
@@ -1487,7 +1486,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.Object = entity;
                 node.NodeWrangler = wrangler;
 
-                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.FileGuid = fileGuid;
                 node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
                 node.Type = PointerRefType.Internal;
@@ -1502,7 +1500,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.Object = entity;
                 node.NodeWrangler = wrangler;
 
-                node.InternalGuid = ((dynamic)entity).GetInstanceGuid();
                 node.FileGuid = fileGuid;
                 node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
                 node.Type = PointerRefType.External;

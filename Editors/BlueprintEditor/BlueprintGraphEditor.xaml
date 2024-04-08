@@ -649,7 +649,7 @@
                     </nodes1:Node.HeaderTemplate>
                                 
                     <nodes1:Node.ContextMenu>
-                        <ContextMenu>
+                        <ContextMenu x:Name="EntityContextMenu">
                             <MenuItem Header="Add Port" Command="{Binding AddPortCommand}">
                                 <MenuItem.Icon>
                                     <Image Source="pack://application:,,,/FrostyEditor;component/images/more.png"/>
@@ -1244,7 +1244,7 @@
                                          MouseUp="Editor_OnMouseUp">
                         
                         <editor:NodifyEditor.ContextMenu>
-                            <ContextMenu>
+                            <ContextMenu x:Name="GraphContextMenu">
                                 <MenuItem Header="Add Node"
                                           Click="SearchForClass_Click">
                                     <MenuItem.Icon>
