@@ -12,6 +12,7 @@ using BlueprintEditorPlugin.Models.Status;
 using BlueprintEditorPlugin.Windows;
 using Frosty.Core;
 using Frosty.Core.Windows;
+using FrostySdk;
 using FrostySdk.IO;
 using Prism.Commands;
 
@@ -98,6 +99,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             
             FrostyTaskWindow.Show("Fixing problems...", "", task =>
             {
+                bool synced = false; // Whether or not we have tried syncing the node to fix the problem
+                
                 // We get 16 attempts to solve all problems... Hopefully they work!
                 for (int i = 0; i < 16; i++)
                 {
@@ -148,6 +151,28 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                         } break;
                         default:
                         {
+                            if (!synced && CurrentStatus.ToolTip == "Client to Server is not a valid combination of realms" && Type == ConnectionType.Event)
+                            {
+                                EntityNode node = EntityNode.GetNodeFromEntity(TypeLibrary.CreateObject("EventSyncEntityData"), Source.Node.NodeWrangler, true);
+                                node.Location = new Point(Source.Node.Location.X + Source.Node.Size.Width, Source.Node.Location.Y);
+                                Source.Node.NodeWrangler.AddVertex(node);
+
+                                // We need to get the EventSync's output regardless of if an NMC exists
+                                EntityOutput output = node.GetOutput("Out", ConnectionType.Event);
+
+                                EntityInput input = node.GetInput("Client", ConnectionType.Event);
+                                
+                                EventConnection eventConnection = new EventConnection((EventOutput)output, (EventInput)Target);
+                                
+                                Source.Node.NodeWrangler.AddConnection(eventConnection);
+                                synced = true;
+
+                                Target = input;
+                                target = input;
+
+                                break;
+                            }
+                            
                             if (CurrentStatus.ToolTip == $"{source.Realm} to {target.Realm} is not a valid combination of realms")
                             {
                                 source.ForceFixRealm();

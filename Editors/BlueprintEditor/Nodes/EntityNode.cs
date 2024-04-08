@@ -277,14 +277,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public PointerRefType Type { get; private set; }
         
         // Internal
-        public AssetClassGuid InternalGuid
-        {
-            get
-            {
-                return ((dynamic)Object).GetInstanceGuid();
-            }
-        }
-        
+        public AssetClassGuid InternalGuid => ((dynamic)Object).GetInstanceGuid();
+
         // External
         public Guid FileGuid { get; private set; }
         public Guid ClassGuid { get; private set; }

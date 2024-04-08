@@ -489,8 +489,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         return;
                     }
                     
-                    InternalNodeCache.Add(entityNode.InternalGuid, entityNode);
                     Asset.AddObject(entityNode.Object);
+                    InternalNodeCache.Add(entityNode.InternalGuid, entityNode);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Objects.Add(pointerRef);
                     
