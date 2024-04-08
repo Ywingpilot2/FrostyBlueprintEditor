@@ -149,6 +149,23 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                         {
                             PropType = PropertyType.Default;
                         } break;
+                        case "Connection realm is invalid!":
+                        {
+                            if (source.Realm != Realm.Any && source.Realm != Realm.Invalid)
+                            {
+                                Realm = source.Realm;
+                            }
+                            else if (source.Realm == Realm.Any)
+                            {
+                                Realm = source.DetermineRealm();
+                            }
+                            else
+                            {
+                                source.ForceFixRealm();
+                                target.ForceFixRealm();
+                                ForceFixRealm();
+                            }
+                        } break;
                         default:
                         {
                             if (!synced && CurrentStatus.ToolTip == "Client to Server is not a valid combination of realms" && Type == ConnectionType.Event)
