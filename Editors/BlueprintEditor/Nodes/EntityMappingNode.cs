@@ -87,6 +87,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             string[] propertyArg = property.Split(new[] { "=\"" }, StringSplitOptions.None);
             string value = propertyArg[1];
             value = value.Trim('"');
+            Realm realm = Realm;
+            
+            if (value.Split(',').Length == 2)
+            {
+                if (!Enum.TryParse<Realm>(value.Split(',')[1].Trim(), out realm))
+                {
+                    realm = Realm;
+                }
+            }
 
             switch (propertyArg[0])
             {
@@ -100,28 +109,28 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 
                 case "InputEvent":
                 {
-                    AddInput(value, ConnectionType.Event);
+                    AddInput(value, ConnectionType.Event, realm);
                 } break;
                 case "InputProperty":
                 {
-                    AddInput(value, ConnectionType.Property);
+                    AddInput(value, ConnectionType.Property, realm);
                 } break;
                 case "InputLink":
                 {
-                    AddInput(value, ConnectionType.Link);
+                    AddInput(value, ConnectionType.Link, realm);
                 } break;
                 
                 case "OutputEvent":
                 {
-                    AddOutput(value, ConnectionType.Event);
+                    AddOutput(value, ConnectionType.Event, realm);
                 } break;
                 case "OutputProperty":
                 {
-                    AddOutput(value, ConnectionType.Property);
+                    AddOutput(value, ConnectionType.Property, realm);
                 } break;
                 case "OutputLink":
                 {
-                    AddOutput(value, ConnectionType.Link);
+                    AddOutput(value, ConnectionType.Link, realm);
                 } break;
             }
         }
