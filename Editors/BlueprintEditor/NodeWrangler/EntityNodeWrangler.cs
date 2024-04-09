@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
@@ -713,17 +714,25 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
             dynamic root = (dynamic)Asset.RootObject;
             EntityConnection entityConnection = (EntityConnection)connection;
 
-            switch (entityConnection.Type)
+            switch (entityConnection)
             {
-                case ConnectionType.Event:
+                case EventConnection eventConnection:
                 {
                     root.EventConnections.Remove((dynamic)entityConnection.Object);
+                    if (eventConnection.HasPlayer)
+                    {
+                        eventConnection.HasPlayer = false; // Set this to false so it stops bitching
+                        if (eventConnection.Target.Node is EntityNode entityNode)
+                        {
+                            entityNode.HasPlayerEvent = GetConnections(entityNode).Any(alt => alt != connection && alt is EntityConnection entConnection && entConnection.HasPlayer);
+                        }
+                    }
                 } break;
-                case ConnectionType.Link:
+                case LinkConnection linkConnection:
                 {
                     root.LinkConnections.Remove((dynamic)entityConnection.Object);
                 } break;
-                case ConnectionType.Property:
+                case PropertyConnection propertyConnection:
                 {
                     root.PropertyConnections.Remove((dynamic)entityConnection.Object);
                 } break;
