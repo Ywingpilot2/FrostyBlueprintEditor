@@ -64,7 +64,7 @@
                                    MinHeight="20"
                                    Cursor="SizeNWSE"
                                    Foreground="{TemplateBinding Foreground}"
-                                   Visibility="{TemplateBinding CanResize, Converter={StaticResource BoolToVis}}"
+                                   Visibility="{TemplateBinding CanResize, Converter={StaticResource BooleanToVisibilityConverter}}"
                                    Grid.Row="1">
                                 <Thumb.Template>
                                     <ControlTemplate>

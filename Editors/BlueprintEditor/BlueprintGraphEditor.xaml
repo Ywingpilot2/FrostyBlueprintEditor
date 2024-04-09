@@ -20,6 +20,7 @@
              xmlns:connections1="clr-namespace:BlueprintEditorPlugin.Views.Connections"
              xmlns:nodes1="clr-namespace:BlueprintEditorPlugin.Views.Nodes"
              xmlns:editor="clr-namespace:BlueprintEditorPlugin.Views.Editor"
+             xmlns:nodes2="clr-namespace:BlueprintEditorPlugin.Models.Nodes"
              mc:Ignorable="d"
              d:DesignHeight="702" d:DesignWidth="1520">
     
@@ -1364,6 +1365,7 @@
                     </Border>
                 </Grid>
             
+                <!--Property grid & search-->
                 <Grid Grid.Column="2" x:Name="PropertyPanel"
                       Background="{StaticResource MenuItemBackground}">
                     <controls:FrostyTabControl x:Name="PropertiesTabControl" SelectedIndex="0">
@@ -1377,12 +1379,38 @@
                                 </Border>
                             </controls:FrostyTabItem.Content>
                         </controls:FrostyTabItem>
-                        <controls:FrostyTabItem Header="Interface"
-                                                Icon="pack://application:,,,/FrostyEditor;component/Images/interface.png"
-                                                Visibility="Collapsed">
+                        <controls:FrostyTabItem Header="Search"
+                                                Icon="pack://application:,,,/FrostyEditor;component/Images/filter.png">
                             <controls:FrostyTabItem.Content>
                                 <Border BorderBrush="{StaticResource SubItemPressed}"
-                                        BorderThickness="0,2,0,0" />
+                                        BorderThickness="0,2,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <controls:FrostyWatermarkTextBox Height="24" Margin="-1,1,1,1" WatermarkText="Filter" VerticalContentAlignment="Center" BorderThickness="1"
+                                                                         LostFocus="FilterBox_LostFocus"
+                                                                         KeyUp="FilterBox_KeyUp"
+                                                                         x:Name="FilterBox"/>
+                                        
+                                        <ListBox Grid.Row="1" x:Name="NodesList"
+                                                 ItemsSource="{Binding NodeWrangler.Vertices, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1,AncestorType=UserControl}}"
+                                                 MouseDoubleClick="NodesList_OnMouseDoubleClick">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type nodes2:IVertex}">
+                                                    <TextBlock Text="{Binding }"/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                            
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel IsItemsHost="True"/>                            
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                        </ListBox>
+                                    </Grid>
+                                </Border>
                             </controls:FrostyTabItem.Content>
                         </controls:FrostyTabItem>
                     </controls:FrostyTabControl>
@@ -1472,7 +1500,7 @@
                                 HorizontalAlignment="Left"
                                 ToolTip="View the list of controls for the editor"
                                 Click="ControlsMenuVisible_OnClick">
-                            <Image Source="/FrostyEditor;component/Images/EditLabel.png"
+                            <Image Source="/FrostyEditor;component/Images/more.png"
                                    Width="20" />
                         </Button>
                     </StackPanel>

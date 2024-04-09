@@ -18,6 +18,9 @@ namespace BlueprintEditorPlugin.Windows
                                 "\nCtrl + X: Cuts the selected node/object from the graph editor and copies it to the clipboard" +
                                 "\nCtrl + V: Pastes the object from the clipboard to the graph editor";
 
+            SearchText.Text = "guid: Searches for a node with a matching guid" +
+                              "fguid: Searches for a nod with a matching file guid";
+
             CreditsText.Text = "Emanuel Miroiu - Nodify library used for Graph Editor\n" +
                                "MagixGames - Optimizations to loading Ebx into graphed form\n" +
                                "Mophead01 - Original ObjectFlags calculation implementation\n" +

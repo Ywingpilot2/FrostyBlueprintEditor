@@ -62,9 +62,11 @@
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
-                    <RowDefinition Height="180" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="30" />
-                    <RowDefinition Height="150" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Controls:"
@@ -90,8 +92,32 @@
                              FontFamily="Consolas"
                              x:Name="ControlsText"/>
                 </Border>
+                
+                <TextBlock Grid.Row="2" Text="Search Terms:"
+                           TextAlignment="Center"
+                           Foreground="{StaticResource FontColor}"
+                           FontFamily="Consolas"
+                           FontSize="18"
+                           Margin="0, 8, 0, 0">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Opacity="0.25" />
+                    </TextBlock.Effect>
+                </TextBlock>
 
-                <TextBlock Grid.Row="2" Text="Credits:"
+                <Border Grid.Row="3"
+                        BorderBrush="{StaticResource ControlBackground}"
+                        Margin="8,2,8,4"
+                        BorderThickness="2">
+                    <TextBox IsReadOnly="True"
+                             Padding="4"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto"
+                             FontFamily="Consolas"
+                             x:Name="SearchText"/>
+                </Border>
+
+                <TextBlock Grid.Row="4" Text="Credits:"
                            TextAlignment="Center"
                            Foreground="{StaticResource FontColor}"
                            FontFamily="Consolas"
@@ -101,7 +127,7 @@
                     </TextBlock.Effect>
                 </TextBlock>
 
-                <Border Grid.Row="3"
+                <Border Grid.Row="5"
                         BorderBrush="{StaticResource ControlBackground}"
                         Margin="8,2,8,0"
                         BorderThickness="2">

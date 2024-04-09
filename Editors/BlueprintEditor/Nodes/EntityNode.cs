@@ -1512,7 +1512,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         
         public override string ToString()
         {
-            return $"{Realm} - {Header}";
+            #if RELEASE___FINAL
+            return $"{Header}";
+            #else
+            return $"{Realm} {Header} {InternalGuid.ToString()}";
+            #endif
         }
     }
     

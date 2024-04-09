@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -1019,5 +1020,90 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
+
+        private void FilterBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            FilterBox_Search();
+        }
+
+        private void FilterBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                FilterBox_Search();
+            }
+        }
+
+        private void FilterBox_Search()
+        {
+            if (string.IsNullOrEmpty(FilterBox.Text))
+            {
+                for (var index = 0; index < NodesList.Items.Count; index++)
+                {
+                    ListBoxItem item = NodesList.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
+                
+                    if (item == null)
+                        continue;
+
+                    item.Visibility = Visibility.Visible;
+                }
+                
+                return;
+            }
+
+            for (var index = 0; index < NodeWrangler.Vertices.Count; index++)
+            {
+                var vert = (IVertex)NodesList.Items.GetItemAt(index);
+                ListBoxItem item = NodesList.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
+                
+                if (item == null)
+                    continue;
+
+                if (FilterBox.Text.StartsWith("guid:"))
+                {
+                    string guid = FilterBox.Text.Split(':').LastOrDefault();
+                    if (guid == null)
+                        return;
+
+                    if (!(vert is IEntityObject entityObject)) continue;
+                    
+                    if (entityObject.InternalGuid.ToString() == guid)
+                        continue;
+
+                    item.Visibility = Visibility.Collapsed;
+                }
+                else if (FilterBox.Text.StartsWith("fguid:"))
+                {
+                    string guid = FilterBox.Text.Split(':').LastOrDefault();
+                    if (guid == null)
+                        return;
+
+                    if (!(vert is IEntityObject entityObject)) continue;
+                    
+                    if (entityObject.FileGuid.ToString() == guid)
+                        continue;
+
+                    item.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    if (!(vert.ToString().IndexOf(FilterBox.Text.ToLower(), StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        item.Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
+        }
+
+        private void NodesList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (NodesList.SelectedItem is IVertex vertex)
+            {
+                // We want to get the center point of the node
+                Point location = new Point(vertex.Location.X + (vertex.Size.Width / 2),
+                    vertex.Location.Y + (vertex.Size.Height / 2));
+                Editor.BringIntoView(location);
+            }
+        }
     }
 }

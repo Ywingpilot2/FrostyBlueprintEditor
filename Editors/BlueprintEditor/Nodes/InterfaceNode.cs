@@ -373,7 +373,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         public override string ToString()
         {
-            return Header ?? base.ToString();
+            return $"{ConnectionType} Interface {Header}";
         }
     }
 

@@ -87,6 +87,8 @@
                 Value="{StaticResource ConnectionTemplate}" />
         <Setter Property="PendingConnectionTemplate"
                 Value="{StaticResource PendingConnectionTemplate}" />
+        <Setter Property="BringIntoViewSpeed" Value="15000" />
+        <Setter Property="BringIntoViewMaxDuration" Value="1.0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:NodifyEditor}">
