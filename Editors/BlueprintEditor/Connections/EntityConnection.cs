@@ -447,7 +447,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 }
             }
 
-            if (Realm == Realm.Any)
+            // Links don't have realms, so naturally they are probably gonna be set to any.
+            if (Realm == Realm.Any && Type != ConnectionType.Link)
             {
                 SetStatus(EditorStatus.Broken, "A connection cannot have its realm set to any");
                 return;
