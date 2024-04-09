@@ -24,7 +24,7 @@ using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
-    public class InterfaceNode : ITransient, IObjectNode
+    public class InterfaceNode : ITransient, IEntityNode
     {
         private string _header;
         private Point _location;

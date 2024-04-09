@@ -30,7 +30,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
     /// <summary>
     /// A basic implementation of an entity in a node form. For creation, please see <see cref="GetNodeFromEntity(object,BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler.INodeWrangler,bool)"/>
     /// </summary>
-    public class EntityNode : IObjectNode, INetworked
+    public class EntityNode : IEntityNode, INetworked
     {
         #region Generic node implementation
 

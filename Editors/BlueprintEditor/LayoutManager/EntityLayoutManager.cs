@@ -256,7 +256,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
                         string name = layoutReader.ReadNullTerminatedString();
                         ConnectionType type = (ConnectionType)layoutReader.ReadInt();
                         Realm realm = (Realm)layoutReader.ReadInt();
-                        EntityInput port = ((IObjectNode)node).GetInput(name, type);
+                        EntityInput port = ((IEntityNode)node).GetInput(name, type);
 
                         if (port == null)
                         {

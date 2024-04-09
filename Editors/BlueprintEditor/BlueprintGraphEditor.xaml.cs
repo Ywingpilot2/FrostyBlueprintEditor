@@ -187,8 +187,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 PointerRef source = propertyConnection.Source;
                 PointerRef target = propertyConnection.Target;
 
-                IObjectNode sourceNode = null;
-                IObjectNode targetNode = null;
+                IEntityNode sourceNode = null;
+                IEntityNode targetNode = null;
 
                 switch (source.Type)
                 {
@@ -284,8 +284,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 PointerRef source = linkConnection.Source;
                 PointerRef target = linkConnection.Target;
 
-                IObjectNode sourceNode = null;
-                IObjectNode targetNode = null;
+                IEntityNode sourceNode = null;
+                IEntityNode targetNode = null;
 
                 switch (source.Type)
                 {
@@ -381,8 +381,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 PointerRef source = eventConnection.Source;
                 PointerRef target = eventConnection.Target;
 
-                IObjectNode sourceNode = null;
-                IObjectNode targetNode = null;
+                IEntityNode sourceNode = null;
+                IEntityNode targetNode = null;
 
                 switch (source.Type)
                 {

@@ -1,13 +1,14 @@
 ﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
+using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Nodes;
 
-namespace BlueprintEditorPlugin.Models.Entities
+namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
     /// <summary>
     /// Base implementation for a node tied to an entity object
     /// </summary>
-    public interface IObjectNode : INode, IEntityObject
+    public interface IEntityNode : INode, IEntityObject
     {
         EntityInput GetInput(string name, ConnectionType type);
         EntityOutput GetOutput(string name, ConnectionType type);

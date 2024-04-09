@@ -19,16 +19,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             base.UpdateSourceRef(source);
             
             PointerRef sourceRef;
-            if (((IObjectNode)source.Node).Type == PointerRefType.Internal)
+            if (((IEntityNode)source.Node).Type == PointerRefType.Internal)
             {
-                sourceRef = new PointerRef(((IObjectNode)source.Node).Object);
+                sourceRef = new PointerRef(((IEntityNode)source.Node).Object);
             }
             else
             {
                 sourceRef = new PointerRef(new EbxImportReference()
                 {
-                    FileGuid = ((IObjectNode)source.Node).FileGuid,
-                    ClassGuid = ((IObjectNode)source.Node).ClassGuid
+                    FileGuid = ((IEntityNode)source.Node).FileGuid,
+                    ClassGuid = ((IEntityNode)source.Node).ClassGuid
                 });
             }
             
@@ -41,16 +41,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             base.UpdateTargetRef(target);
             
             PointerRef targetRef;
-            if (((IObjectNode)target.Node).Type == PointerRefType.Internal)
+            if (((IEntityNode)target.Node).Type == PointerRefType.Internal)
             {
-                targetRef = new PointerRef(((IObjectNode)target.Node).Object);
+                targetRef = new PointerRef(((IEntityNode)target.Node).Object);
             }
             else
             {
                 targetRef = new PointerRef(new EbxImportReference()
                 {
-                    FileGuid = ((IObjectNode)target.Node).FileGuid,
-                    ClassGuid = ((IObjectNode)target.Node).ClassGuid
+                    FileGuid = ((IEntityNode)target.Node).FileGuid,
+                    ClassGuid = ((IEntityNode)target.Node).ClassGuid
                 });
             }
             
@@ -107,30 +107,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                     EntityPort source = (EntityPort)Source;
                     EntityPort target = (EntityPort)Target;
                     
-                    if (((IObjectNode)source.Node).Type == PointerRefType.Internal)
+                    if (((IEntityNode)source.Node).Type == PointerRefType.Internal)
                     {
-                        sourceRef = new PointerRef(((IObjectNode)source.Node).Object);
+                        sourceRef = new PointerRef(((IEntityNode)source.Node).Object);
                     }
                     else
                     {
                         sourceRef = new PointerRef(new EbxImportReference()
                         {
-                            FileGuid = ((IObjectNode)source.Node).FileGuid,
-                            ClassGuid = ((IObjectNode)source.Node).ClassGuid
+                            FileGuid = ((IEntityNode)source.Node).FileGuid,
+                            ClassGuid = ((IEntityNode)source.Node).ClassGuid
                         });
                     }
             
                     PointerRef targetRef;
-                    if (((IObjectNode)target.Node).Type == PointerRefType.Internal)
+                    if (((IEntityNode)target.Node).Type == PointerRefType.Internal)
                     {
-                        targetRef = new PointerRef(((IObjectNode)target.Node).Object);
+                        targetRef = new PointerRef(((IEntityNode)target.Node).Object);
                     }
                     else
                     {
                         targetRef = new PointerRef(new EbxImportReference()
                         {
-                            FileGuid = ((IObjectNode)target.Node).FileGuid,
-                            ClassGuid = ((IObjectNode)target.Node).ClassGuid
+                            FileGuid = ((IEntityNode)target.Node).FileGuid,
+                            ClassGuid = ((IEntityNode)target.Node).ClassGuid
                         });
                     }
 

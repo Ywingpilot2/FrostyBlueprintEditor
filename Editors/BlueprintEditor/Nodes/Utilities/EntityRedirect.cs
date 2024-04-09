@@ -233,7 +233,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 return;
             }
             
-            IObjectNode node = (IObjectNode)RedirectTarget.Node;
+            IEntityNode node = (IEntityNode)RedirectTarget.Node;
             
             writer.Write(false);
             writer.WriteNullTerminatedString(Header ?? "{None}");
@@ -644,7 +644,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
                 return;
             }
             
-            IObjectNode node = (IObjectNode)RedirectTarget.Node;
+            IEntityNode node = (IEntityNode)RedirectTarget.Node;
             
             writer.Write(false);
             writer.WriteNullTerminatedString(Header ?? "{None}");
