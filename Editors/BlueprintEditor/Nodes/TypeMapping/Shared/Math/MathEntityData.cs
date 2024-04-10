@@ -48,8 +48,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             base.OnObjectModified(sender, args);
             ParseInstructions();
             
-            
-
             if (args.Item.Name == "Instructions")
             {
                 switch (args.ModifiedArgs.Type)

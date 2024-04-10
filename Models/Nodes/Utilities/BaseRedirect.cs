@@ -209,5 +209,15 @@ namespace BlueprintEditorPlugin.Models.Nodes.Utilities
         protected BaseRedirect()
         {
         }
+
+        public override string ToString()
+        {
+            if (Header == null)
+            {
+                return $"Redirect of {RedirectTarget}";
+            }
+
+            return $"Redirect {Header} of {RedirectTarget}";
+        }
     }
 }

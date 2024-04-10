@@ -20,10 +20,12 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Che
         private int _currentRow = 0;
         private double _currentY = 0.0;
         private int _idx = 0;
+        private int _currentEntry = 0;
         public void SortGraph()
         {
             for (; _idx < _nodeWrangler.Vertices.Count; _idx++)
             {
+                _currentEntry++;
                 IVertex vertex = _nodeWrangler.Vertices[_idx];
                 
                 if (_assignedVerts.Contains(vertex))
@@ -33,10 +35,11 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Che
                 vertex.Location = new Point(_current + vertex.Size.Width, _currentY + vertex.Size.Height);
 
                 _current += EditorOptions.VertXSpacing + vertex.Size.Width;
-                if (_idx - 25 >= _currentRow)
+                if (_currentEntry - 25 >= _currentRow)
                 {
                     _currentY += EditorOptions.VertYSpacing * 4 + vertex.Size.Height;
                     _currentRow += 1;
+                    _currentEntry = 0;
                 }
             }
         }
@@ -47,15 +50,17 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Che
                 return;
 
             _idx++;
-                
+            _currentEntry++;
+            
             _assignedVerts.Add(vertex);
             vertex.Location = new Point(_current + vertex.Size.Width, _currentY + vertex.Size.Height);
 
             _current += EditorOptions.VertXSpacing + vertex.Size.Width;
-            if (_idx - 25 >= _currentRow)
+            if (_currentEntry - 25 >= _currentRow)
             {
                 _currentY += EditorOptions.VertYSpacing * 4 + vertex.Size.Height;
                 _currentRow += 1;
+                _currentEntry = 0;
             }
         }
 

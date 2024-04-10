@@ -70,28 +70,20 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
                         {
                             case "FieldAccessType_Source":
                             {
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.In, NodeWrangler));
                             } break;
                             case "FieldAccessType_Target":
                             {
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.Out, NodeWrangler));
                             } break;
                             case "FieldAccessType_SourceAndTarget":
                             {
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.In, NodeWrangler));
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.Out, NodeWrangler));
                             } break;
                         }
                         cheap.SortGraph(wrangler.Vertices.Last());
@@ -99,39 +91,30 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler)
-                        {
-                            SubObject = inputEvent
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputEvent, inputEvent.Name,
+                            ConnectionType.Event, PortDirection.Out, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler)
-                        {
-                            SubObject = outputEvent
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputEvent, outputEvent.Name,
+                            ConnectionType.Event, PortDirection.In, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler)
-                        {
-                            SubObject = inputLink
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputLink, inputLink.Name,
+                            ConnectionType.Link, PortDirection.Out, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler)
-                        {
-                            SubObject = outputLink
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputLink, outputLink.Name,
+                            ConnectionType.Link, PortDirection.In, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     
-                    cheap.SortGraph();
                     continue;
                 }
 

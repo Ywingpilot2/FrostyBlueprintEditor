@@ -14,22 +14,25 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
         {
             base.OnObjectModified(sender, args);
 
-            Footer = null;
-            
             if ((bool)TryGetProperty("TriggerOnStart"))
             {
-                Footer = "On Start";
+                Footer = "Triggers on start";
             }
 
             if ((bool)TryGetProperty("TriggerOnPropertyChange"))
             {
                 if (Footer != null)
                 {
-                    Footer += "\n";
+                    Footer += ", ";
                 }
-                Footer += "On Property Changed";
-            }
+                else
+                {
+                    Footer = "Triggers ";
+                }
 
+                Footer += "On property changed";
+            }
+            
             if (TryGetProperty("AlwaysSend") != null && (bool)TryGetProperty("AlwaysSend"))
             {
                 if (Footer != null)
@@ -37,7 +40,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                     Footer += "\n";
                 }
 
-                Footer += "Always sends";
+                Footer += "Always sends outputs";
             }
             
             if (TryGetProperty("AlwaysSendOnEvent") != null && (bool)TryGetProperty("AlwaysSendOnEvent"))
@@ -47,7 +50,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                     Footer += "\n";
                 }
 
-                Footer += "Send when triggered";
+                Footer += "Always sends when In is triggered";
             }
         }
 

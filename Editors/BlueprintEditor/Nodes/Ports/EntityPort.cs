@@ -205,7 +205,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports
                     }
                 });
                 EntityNodeWrangler wrangler = (EntityNodeWrangler)Node.NodeWrangler;
-                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(wrangler.Asset.FileGuid).Name, wrangler.Asset);
+                wrangler.ModifyAsset();
             }
         }
 

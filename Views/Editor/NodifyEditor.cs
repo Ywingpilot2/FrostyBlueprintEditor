@@ -752,6 +752,34 @@ namespace BlueprintEditorPlugin.Views.Editor
         }
 
         /// <summary>
+        /// Zoom at the specified location in graph space coordinates with an animation
+        /// </summary>
+        /// <param name="zoom">The zoom to set</param>
+        /// <param name="location">The location to move to</param>
+        /// <param name="speed">The speed at which to zoom</param>
+        /// <param name="maxDuration">The maximum amount of time zooming</param>
+        public void AnimatedZoomAtPosition(double zoom, Point location, double speed, double maxDuration)
+        {
+            if (!DisableZooming)
+            {
+                if (location != ViewportLocation)
+                {
+                    BringIntoView(location, maxDuration / 2, speed);
+                    maxDuration /= 2; // We should distribute the amount of time spent zooming & moving equally 
+                }
+                
+                double zoomDiff = ViewportZoom - zoom;
+                double duration = zoomDiff / (speed + (zoomDiff / 10));
+                duration = Math.Max(0.1, Math.Min(duration, maxDuration));
+
+                if (zoom > 0.001)
+                {
+                    this.StartAnimation(ViewportLocationProperty, zoom, duration);
+                }
+            }
+        }
+
+        /// <summary>
         /// Moves the viewport center at the specified location.
         /// </summary>
         /// <param name="point">The location in graph space coordinates.</param>
@@ -759,6 +787,20 @@ namespace BlueprintEditorPlugin.Views.Editor
         /// <param name="onFinish">The callback invoked when movement is finished.</param>
         /// <remarks>Temporarily disables editor controls when animated.</remarks>
         public void BringIntoView(Point point, bool animated = true, Action onFinish = null)
+        {
+            BringIntoView(point, BringIntoViewMaxDuration, BringIntoViewSpeed, animated, onFinish);
+        }
+
+        /// <summary>
+        /// Moves the viewport center at the specified location.
+        /// </summary>
+        /// <param name="point">The location in graph space coordinates.</param>
+        /// <param name="speed">The speed at which the camera moves</param>
+        /// <param name="animated">True to animate the movement.</param>
+        /// <param name="onFinish">The callback invoked when movement is finished.</param>
+        /// <param name="maxDuration">The maximum amount of time the animation is allowed to take</param>
+        /// <remarks>Temporarily disables editor controls when animated.</remarks>
+        public void BringIntoView(Point point, double maxDuration, double speed, bool animated = true, Action onFinish = null)
         {
             Point newLocation = (Point)((Vector)point - (Vector)ViewportSize / 2);
 
@@ -769,8 +811,8 @@ namespace BlueprintEditorPlugin.Views.Editor
                 DisableZooming = true;
 
                 double distance = (newLocation - ViewportLocation).Length;
-                double duration = distance / (BringIntoViewSpeed + (distance / 10)) * ViewportZoom;
-                duration = Math.Max(0.1, Math.Min(duration, BringIntoViewMaxDuration));
+                double duration = distance / (speed + (distance / 10)) * ViewportZoom;
+                duration = Math.Max(0.1, Math.Min(duration, maxDuration));
 
                 this.StartAnimation(ViewportLocationProperty, newLocation, duration, (s, e) =>
                 {

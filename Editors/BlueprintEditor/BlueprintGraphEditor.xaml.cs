@@ -109,28 +109,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             case "FieldAccessType_Source":
                             {
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.In, NodeWrangler));
                             } break;
                             case "FieldAccessType_Target":
                             {
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.Out, NodeWrangler));
                             } break;
                             case "FieldAccessType_SourceAndTarget":
                             {
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.In, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
-                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field.Name, ConnectionType.Property, PortDirection.Out, NodeWrangler)
-                                {
-                                    SubObject = field
-                                });
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.In, NodeWrangler));
+                                wrangler.AddVertexTransient(new InterfaceNode(assetObject, field, field.Name,
+                                    ConnectionType.Property, PortDirection.Out, NodeWrangler));
                             } break;
                         }
                         cheap.SortGraph(wrangler.Vertices.Last());
@@ -138,39 +130,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
                     foreach (dynamic inputEvent in ((dynamic)assetObject).InputEvents)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputEvent.Name, ConnectionType.Event, PortDirection.Out, NodeWrangler)
-                        {
-                            SubObject = inputEvent
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputEvent, inputEvent.Name,
+                            ConnectionType.Event, PortDirection.Out, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     foreach (dynamic outputEvent in ((dynamic)assetObject).OutputEvents)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputEvent.Name, ConnectionType.Event, PortDirection.In, NodeWrangler)
-                        {
-                            SubObject = outputEvent
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputEvent, outputEvent.Name,
+                            ConnectionType.Event, PortDirection.In, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     
                     foreach (dynamic inputLink in ((dynamic)assetObject).InputLinks)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputLink.Name, ConnectionType.Link, PortDirection.Out, NodeWrangler)
-                        {
-                            SubObject = inputLink
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, inputLink, inputLink.Name,
+                            ConnectionType.Link, PortDirection.Out, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     foreach (dynamic outputLink in ((dynamic)assetObject).OutputLinks)
                     {
-                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputLink.Name, ConnectionType.Link, PortDirection.In, NodeWrangler)
-                        {
-                            SubObject = outputLink
-                        });
+                        wrangler.AddVertexTransient(new InterfaceNode(assetObject, outputLink, outputLink.Name,
+                            ConnectionType.Link, PortDirection.In, NodeWrangler));
                         cheap.SortGraph(wrangler.Vertices.Last());
                     }
                     
-                    cheap.SortGraph();
                     continue;
                 }
 
@@ -568,12 +551,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                             {
                                 node.TrySetProperty(e.Item.Name, e.NewValue);
                                 node.OnObjectModified(sender, e);
-                                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                                ((EntityNodeWrangler)NodeWrangler).ModifyAsset();
                             } break;
                             case InterfaceNode interfaceNode:
                             {
                                 interfaceNode.OnObjectModified(sender, e);
-                                App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                                ((EntityNodeWrangler)NodeWrangler).ModifyAsset();
                             } break;
                             case EntityComment comment:
                             {
@@ -594,12 +577,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     case EntityNode node:
                     {
                         node.OnObjectModified(sender, e);
-                        App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                        ((EntityNodeWrangler)NodeWrangler).ModifyAsset();
                     } break;
                     case InterfaceNode interfaceNode:
                     {
                         interfaceNode.OnObjectModified(sender, e);
-                        App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid).Name, ((EntityNodeWrangler)NodeWrangler).Asset);
+                        ((EntityNodeWrangler)NodeWrangler).ModifyAsset();
                     } break;
                     case EntityComment comment:
                     {
@@ -684,7 +667,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
                         subObj.Name = new CString(args.Name);
 
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
                         {
                             SubObject = subObj
                         });
@@ -694,7 +677,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
                         subObj.Name = new CString(args.Name);
 
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
                         {
                             SubObject = subObj
                         });
@@ -710,7 +693,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                             subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
                         }
 
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
+                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
                         {
                             SubObject = subObj
                         });
@@ -817,7 +800,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         private void SaveOrganizationButton_OnClick(object sender, RoutedEventArgs e)
         {
             EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(((EntityNodeWrangler)NodeWrangler).Asset.FileGuid);
-            LayoutManager.SaveLayout($"{assetEntry.Name}.lyt");
+            if (LayoutManager.SaveLayout($"{assetEntry.Name}.lyt"))
+            {
+                App.Logger.Log("Layout saved!");
+            }
+            else
+            {
+                App.Logger.LogError("Failed to save layout... Sorry!");
+            }
         }
         
         private void ImportOrganizationButton_OnClick(object sender, RoutedEventArgs e)
@@ -1103,6 +1093,28 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 Point location = new Point(vertex.Location.X + (vertex.Size.Width / 2),
                     vertex.Location.Y + (vertex.Size.Height / 2));
                 Editor.BringIntoView(location);
+            }
+        }
+
+        private void RedirectGoToSource_OnClick(object sender, RoutedEventArgs e)
+        {
+            // the data context of the menu item will be the redirect... hopefully
+            if (((MenuItem)sender).DataContext is IRedirect redirect)
+            {
+                if (redirect.SourceRedirect == null)
+                {
+                    // We want to get the center point of the node
+                    Point location = new Point(redirect.TargetRedirect.Location.X + (redirect.TargetRedirect.Size.Width / 2),
+                        redirect.TargetRedirect.Location.Y + (redirect.TargetRedirect.Size.Height / 2));
+                    Editor.BringIntoView(location);
+                }
+                else
+                {
+                    // We want to get the center point of the node
+                    Point location = new Point(redirect.SourceRedirect.Location.X + (redirect.SourceRedirect.Size.Width / 2),
+                        redirect.SourceRedirect.Location.Y + (redirect.SourceRedirect.Size.Height / 2));
+                    Editor.BringIntoView(location);
+                }
             }
         }
     }

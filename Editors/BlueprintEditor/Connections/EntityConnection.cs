@@ -76,8 +76,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
                 }
             }
 
-            EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(asset.FileGuid).Name, asset);
+            ((EntityNodeWrangler)Target.Node.NodeWrangler).ModifyAsset();
         }
         
         public ICommand RemoveCommand => new DelegateCommand(Remove);
@@ -403,14 +402,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         {
             Realm = DetermineRealm();
             EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(asset.FileGuid).Name, asset);
+            ((EntityNodeWrangler)Target.Node.NodeWrangler).ModifyAsset();
         }
 
         public void ForceFixRealm()
         {
             Realm = DetermineRealm(true);
             EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(asset.FileGuid).Name, asset);
+            ((EntityNodeWrangler)Target.Node.NodeWrangler).ModifyAsset();
         }
 
         #endregion

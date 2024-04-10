@@ -44,7 +44,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Object.Internal.Components.Add(pointerRef);
                     
-                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                    ModifyAsset();
                 } break;
                 case InterfaceNode interfaceNode:
                 {
@@ -94,7 +94,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                         } break;
                     }
                     
-                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                    ModifyAsset();
                 } break;
             }
 
@@ -131,9 +131,9 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
             Asset.AddObject(entityNode.Object);
             PointerRef pointerRef = new PointerRef(entityNode.Object);
             ((dynamic)parentNode.Object).Components.Add(pointerRef);
-                    
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+            
             UpdateComponentCount();
+            ModifyAsset();
             
             // TODO: Stupid threading bullshit won't let me access this because it's on a UI thread
             // Asshole!
@@ -169,7 +169,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                     Asset.RemoveObject(entityNode.Object);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Object.Internal.Components.Remove(pointerRef); // TODO: Remove from parent node components
-                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                    ModifyAsset();
                     UpdateComponentCount();
                 } break;
                 case InterfaceNode interfaceNode:

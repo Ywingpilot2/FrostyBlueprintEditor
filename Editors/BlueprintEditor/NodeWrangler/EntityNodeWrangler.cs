@@ -17,6 +17,7 @@ using FrostyEditor;
 using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
+using FrostySdk.Managers;
 using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
@@ -24,6 +25,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
     public class EntityNodeWrangler : BaseNodeWrangler, IEbxNodeWrangler
     {
         public EbxAsset Asset { get; set; }
+        public EbxAssetEntry AssetEntry => App.AssetManager.GetEbxEntry(Asset.FileGuid);
         public AssetClassGuid InterfaceGuid { get; set; }
         protected readonly Dictionary<AssetClassGuid, EntityNode> InternalNodeCache = new Dictionary<AssetClassGuid, EntityNode>();
         protected readonly Dictionary<(Guid, Guid), EntityNode> ExternalNodeCache = new Dictionary<(Guid, Guid), EntityNode>();
@@ -495,7 +497,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Objects.Add(pointerRef);
                     
-                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                    ModifyAsset();
                 } break;
                 case InterfaceNode interfaceNode:
                 {
@@ -545,7 +547,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         } break;
                     }
                     
-                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                    ModifyAsset();
                 } break;
             }
 
@@ -574,7 +576,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     Asset.RemoveObject(entityNode.Object);
                     PointerRef pointerRef = new PointerRef(entityNode.Object);
                     ((dynamic)Asset.RootObject).Objects.Remove(pointerRef);
-                    App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+                    ModifyAsset();
                 } break;
                 case InterfaceNode interfaceNode:
                 {
@@ -697,7 +699,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 } break;
             }
 
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+            ModifyAsset();
         }
 
         #endregion
@@ -737,10 +739,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     root.PropertyConnections.Remove((dynamic)entityConnection.Object);
                 } break;
             }
-            App.AssetManager.ModifyEbx(App.AssetManager.GetEbxEntry(Asset.FileGuid).Name, Asset);
+            ModifyAsset();
         }
 
         #endregion
+
+        public void ModifyAsset()
+        {
+            App.AssetManager.ModifyEbx(AssetEntry.Name, Asset);
+            Frosty.Core.App.EditorWindow.DataExplorer.RefreshAll();
+        }
 
         public EntityNodeWrangler()
         {

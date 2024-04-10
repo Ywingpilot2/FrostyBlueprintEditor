@@ -102,44 +102,58 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             if (args.OldValue == args.NewValue)
                 return;
-            
-            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
-            if (wrangler.GetInterfaceNode(EditArgs.Name, Direction, ConnectionType) != null)
+
+            switch (args.Item.Name)
             {
-                App.Logger.LogError("Cannot have 2 interface nodes of the same name.");
-                EditArgs.Name = args.OldValue.ToString();
-                return;
-            }
-            
-            ((dynamic)SubObject).Name = new CString(EditArgs.Name);
-            Header = EditArgs.Name;
-            if (Direction == PortDirection.In)
-            {
-                Inputs[0].Name = Header;
-                
-                if (ConnectionType == ConnectionType.Property)
+                case "Name":
                 {
-                    if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                    EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+                    if (wrangler.GetInterfaceNode(EditArgs.Name, Direction, ConnectionType) != null)
                     {
-                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.Out, ConnectionType);
-                        interfaceNode.Header = Header;
-                        interfaceNode.Outputs[0].Name = Header;
+                        App.Logger.LogError("Cannot have 2 interface nodes of the same name.");
+                        EditArgs.Name = args.OldValue.ToString();
+                        return;
                     }
-                }
-            }
-            else
-            {
-                Outputs[0].Name = Header;
+                    
+                    ((dynamic)SubObject).Name = new CString(EditArgs.Name);
+                    
+                    Header = EditArgs.Name;
+                    if (Direction == PortDirection.In)
+                    {
+                        Inputs[0].Name = Header;
                 
-                if (ConnectionType == ConnectionType.Property)
-                {
-                    if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
-                    {
-                        InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.In, ConnectionType);
-                        interfaceNode.Header = Header;
-                        interfaceNode.Inputs[0].Name = Header;
+                        if (ConnectionType == ConnectionType.Property)
+                        {
+                            if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                            {
+                                InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.Out, ConnectionType);
+                                interfaceNode.Header = Header;
+                                interfaceNode.Outputs[0].Name = Header;
+                            }
+                        }
                     }
-                }
+                    else
+                    {
+                        Outputs[0].Name = Header;
+                
+                        if (ConnectionType == ConnectionType.Property)
+                        {
+                            if (((dynamic)SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
+                            {
+                                InterfaceNode interfaceNode = wrangler.GetInterfaceNode(args.OldValue.ToString(), PortDirection.In, ConnectionType);
+                                interfaceNode.Header = Header;
+                                interfaceNode.Inputs[0].Name = Header;
+                            }
+                        }
+                    }
+                } break;
+                case "Value":
+                {
+                    if (ConnectionType == ConnectionType.Property)
+                    {
+                        ((dynamic)SubObject).Value = new CString(((EditPropInterfaceArgs)EditArgs).Value);
+                    }
+                } break;
             }
         }
 
@@ -278,9 +292,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
-        public InterfaceNode(object obj, string name, ConnectionType type, PortDirection direction, INodeWrangler wrangler, Realm realm = Realm.Any)
+        public InterfaceNode(object obj, object subObject, string name, ConnectionType type, PortDirection direction, INodeWrangler wrangler)
         {
             Object = obj;
+            SubObject = subObject;
             InternalGuid = ((dynamic)obj).GetInstanceGuid();
             if (name.StartsWith("0x"))
             {
@@ -304,7 +319,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     {
                         EventInput input = new EventInput(Header, this)
                         {
-                            Realm = realm
+                            Realm = Realm.Any
                         };
                         Inputs.Add(input);
                     } break;
@@ -312,7 +327,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     {
                         LinkInput input = new LinkInput(Header, this)
                         {
-                            Realm = realm
+                            Realm = Realm.Any
                         };
                         Inputs.Add(input);
                     } break;
@@ -320,7 +335,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     {
                         PropertyInput input = new PropertyInput(Header, this)
                         {
-                            Realm = realm,
+                            Realm = Realm.Any,
                             IsInterface = true
                         };
                         Inputs.Add(input);
@@ -335,7 +350,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     {
                         EventOutput input = new EventOutput(Header, this)
                         {
-                            Realm = realm
+                            Realm = Realm.Any
                         };
                         Outputs.Add(input);
                     } break;
@@ -343,7 +358,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     {
                         LinkOutput input = new LinkOutput(Header, this)
                         {
-                            Realm = realm
+                            Realm = Realm.Any
                         };
                         Outputs.Add(input);
                     } break;
@@ -351,7 +366,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     {
                         PropertyOutput input = new PropertyOutput(Header, this)
                         {
-                            Realm = realm,
+                            Realm = Realm.Any,
                             IsInterface = true
                         };
                         Outputs.Add(input);
@@ -359,7 +374,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 }
             }
 
-            EditArgs = new EditInterfaceArgs(this);
+            if (type == ConnectionType.Property)
+            {
+                EditArgs = new EditPropInterfaceArgs(this);
+            }
+            else
+            {
+                EditArgs = new EditInterfaceArgs(this);
+            }
         }
 
         public InterfaceNode(INodeWrangler nodeWrangler)
@@ -393,6 +415,24 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public EditInterfaceArgs()
         {
             Name = "";
+        }
+    }
+
+    public class EditPropInterfaceArgs : EditInterfaceArgs
+    {
+        [Description("The value of this interface")]
+        public string Value { get; set; }
+
+        public EditPropInterfaceArgs(InterfaceNode node)
+        {
+            Name = node.Header;
+            Node = node;
+            Value = ((dynamic)node.SubObject).Value.ToString();
+        }
+        
+        public EditPropInterfaceArgs()
+        {
+            Value = "";
         }
     }
 
