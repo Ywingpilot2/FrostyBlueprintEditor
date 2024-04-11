@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using BlueprintEditorPlugin.Attributes;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
@@ -27,7 +28,8 @@ namespace BlueprintEditorPlugin
         private static List<Type> _graphEditors = new List<Type>();
         public static IEnumerable<Type> GraphEditorExtensions => _graphEditors;
 
-        private static List<Type> _graphAlgorithms = new List<Type>();
+        private static List<Type> _blueprintMenuItems = new List<Type>();
+        public static IEnumerable<Type> BlueprintMenuItemExtensions => _blueprintMenuItems;
 
         /// <summary>
         /// Initiates the ExtensionManager
@@ -105,81 +107,83 @@ namespace BlueprintEditorPlugin
                 {
                     if (attribute is RegisterEntityNode entityRegister)
                     {
-                        try
-                        {
-                            var extension = (EntityNode)Activator.CreateInstance(entityRegister.EntityNodeExtension);
-                            if (extension.IsValid())
-                            {
-                                // Override our internal extension with external one
-                                if (EntityNodeExtensions.ContainsKey(extension.ObjectType))
-                                {
-                                    EntityNodeExtensions.Remove(extension.ObjectType);
-                                }
-                                
-                                EntityNodeExtensions.Add(extension.ObjectType, entityRegister.EntityNodeExtension);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            App.Logger.LogError("Could not load node extension {0}", entityRegister.EntityNodeExtension.Name);
-                        }
+                        RegisterExtension(entityRegister);
                     }
                     else if (attribute is RegisterEbxGraphEditor graphRegister)
                     {
-                        try
-                        {
-                            var extension = (IEbxGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
-
-                            if (extension.IsValid() && extension is Control)
-                            {
-                                // Override our internal extension with external one
-                                _graphEditors.Add(graphRegister.GraphType);
-                            }
-                            else if (!(extension is Control))
-                            {
-                                App.Logger.LogError("Graph editor {0} must be a control", graphRegister.GraphType.Name);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            App.Logger.LogError("Could not load graph extension {0}", graphRegister.GraphType.Name);
-                        }
+                        RegisterExtension(graphRegister);
+                    }
+                    else if (attribute is RegisterBlueprintMenuExtension menuExtension)
+                    {
+                        RegisterExtension(menuExtension);
                     }
                 }
             }
         }
 
-        public static void RegisterExtension(RegisterEbxGraphEditor registerEbxGraphEditor)
+        #region Register methods
+
+        public static void RegisterExtension(RegisterEbxGraphEditor graphRegister)
         {
             try
             {
-                IEbxGraphEditor graphEditor = (IEbxGraphEditor)Activator.CreateInstance(registerEbxGraphEditor.GraphType);
-                if (graphEditor.IsValid())
+                var extension = (IEbxGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
+
+                if (extension.IsValid() && extension is Control)
                 {
-                    _graphEditors.Add(registerEbxGraphEditor.GraphType);
+                    // Override our internal extension with external one
+                    _graphEditors.Add(graphRegister.GraphType);
+                }
+                else if (!(extension is Control))
+                {
+                    App.Logger.LogError("Graph editor {0} must be a control", graphRegister.GraphType.Name);
                 }
             }
             catch (Exception e)
             {
-                App.Logger.LogError("Graph Editor {0} caused an exception when processing! Exception: {1}", registerEbxGraphEditor.GraphType.Name, e.Message);
+                App.Logger.LogError("Could not load graph extension {0}", graphRegister.GraphType.Name);
             }
         }
 
-        public static void RegisterExtension(RegisterEntityNode registerEntityNode)
+        public static void RegisterExtension(RegisterEntityNode entityRegister)
         {
             try
             {
-                EntityNode node = (EntityNode)Activator.CreateInstance(registerEntityNode.EntityNodeExtension);
-                if (node.IsValid() && !EntityNodeExtensions.ContainsKey(node.ObjectType))
+                var extension = (EntityNode)Activator.CreateInstance(entityRegister.EntityNodeExtension);
+                if (extension.IsValid())
                 {
-                    EntityNodeExtensions.Add(node.ObjectType, registerEntityNode.EntityNodeExtension);
+                    // Override our internal extension with external one
+                    if (EntityNodeExtensions.ContainsKey(extension.ObjectType))
+                    {
+                        EntityNodeExtensions.Remove(extension.ObjectType);
+                    }
+                                
+                    EntityNodeExtensions.Add(extension.ObjectType, entityRegister.EntityNodeExtension);
                 }
             }
             catch (Exception e)
             {
-                App.Logger.LogError("Entity node {0} caused an exception when processing! Exception: {1}", registerEntityNode.EntityNodeExtension.Name, e.Message);
+                App.Logger.LogError("Could not load node extension {0}", entityRegister.EntityNodeExtension.Name);
             }
         }
+
+        public static void RegisterExtension(RegisterBlueprintMenuExtension menuRegister)
+        {
+            try
+            {
+                var extension = (BlueprintMenuItemExtension)Activator.CreateInstance(menuRegister.MenuType);
+                if (extension.IsValid())
+                {
+                    _blueprintMenuItems.Add(menuRegister.MenuType);
+                }
+            }
+            catch (Exception e)
+            {
+                App.Logger.LogError("Blueprint editor menu extension {0} threw the exception {1} at {2}", menuRegister.MenuType.Name, e.Message, e.StackTrace);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets a valid <see cref="IEbxGraphEditor"/> for the specified <see cref="EbxAssetEntry"/>
@@ -188,7 +192,7 @@ namespace BlueprintEditorPlugin
         /// <returns></returns>
         public static IEbxGraphEditor GetValidGraphEditor(EbxAssetEntry assetEntry)
         {
-            foreach (Type graphType in _graphEditors)
+            foreach (Type graphType in GraphEditorExtensions)
             {
                 IEbxGraphEditor graphEditor = (IEbxGraphEditor)Activator.CreateInstance(graphType);
                 if (graphEditor.IsValid(assetEntry))

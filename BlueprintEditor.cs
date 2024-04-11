@@ -55,7 +55,7 @@ namespace BlueprintEditorPlugin
         {
             _hasLoaded = true;
 #if DEVELOPER___DEBUG
-            graphEditor.LoadAsset(assetEntry);
+            _graphEditor.LoadAsset(_assetEntry);
 #else
             FrostyTaskWindow.Show("Loading Blueprint...", "", task =>
             {

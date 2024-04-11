@@ -1,6 +1,8 @@
 ﻿using Frosty.Core.Attributes;
 using System.Runtime.InteropServices;
 using System.Windows;
+using BlueprintEditorPlugin.Attributes;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions;
 using BlueprintEditorPlugin.Extensions;
 using BlueprintEditorPlugin.Options;
 
@@ -28,3 +30,7 @@ using BlueprintEditorPlugin.Options;
 [assembly: RegisterDataExplorerContextMenu(typeof(ViewBlueprintContextMenuItem))]
 [assembly: RegisterOptionsExtension(typeof(GraphEditorOptions))]
 [assembly: RegisterStartupAction(typeof(BlueprintEditorStartupAction))]
+
+#if DEVELOPER___DEBUG
+[assembly: RegisterBlueprintMenuExtension(typeof(TestMenuExtension))]
+#endif

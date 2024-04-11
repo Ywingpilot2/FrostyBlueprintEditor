@@ -21,6 +21,7 @@
              xmlns:nodes1="clr-namespace:BlueprintEditorPlugin.Views.Nodes"
              xmlns:editor="clr-namespace:BlueprintEditorPlugin.Views.Editor"
              xmlns:nodes2="clr-namespace:BlueprintEditorPlugin.Models.Nodes"
+             xmlns:buttons="clr-namespace:BlueprintEditorPlugin.Views.Buttons"
              mc:Ignorable="d"
              d:DesignHeight="702" d:DesignWidth="1520">
     
@@ -1446,8 +1447,8 @@
                         BorderThickness="0, 1, 0, 1"
                         Background="{StaticResource ControlBackground}">
                     <!--Buttons-->
-                    <StackPanel Orientation="Horizontal" RenderOptions.EdgeMode="Aliased">
-                        <!--Organization Buttons-->
+                    <StackPanel Orientation="Horizontal" RenderOptions.EdgeMode="Aliased"
+                                x:Name="HeaderButtons">
                         <Button x:Name="OrganizeButton"
                                 Width="20"
                                 Height="20"
@@ -1483,8 +1484,7 @@
                         </Button>
 
                         <Grid Background="{StaticResource SubMenuItemHighlight}" Width="1" />
-
-                        <!--Visibility Buttons-->
+                        
                         <Button x:Name="ToolboxVisible"
                                 Width="20"
                                 Height="20"
@@ -1512,9 +1512,25 @@
                                 HorizontalAlignment="Left"
                                 ToolTip="View the list of controls for the editor"
                                 Click="ControlsMenuVisible_OnClick">
-                            <Image Source="/FrostyEditor;component/Images/more.png"
+                            <Image Source="/FrostyEditor;component/Images/reference.png"
                                    Width="20" />
                         </Button>
+                        
+                        <Grid Background="{StaticResource SubMenuItemHighlight}" Width="1" />
+                        
+                        <buttons:DropDownButton Width="25"
+                                                Height="20"
+                                                Margin="2,0,2,0"
+                                                HorizontalAlignment="Left">
+                            <Image Source="/FrostyEditor;component/Images/more.png"
+                                   Width="25" />
+                            
+                            <buttons:DropDownButton.Menu>
+                                <ContextMenu x:Name="MenuItems">
+                                    
+                                </ContextMenu>
+                            </buttons:DropDownButton.Menu>
+                        </buttons:DropDownButton>
                     </StackPanel>
                 </Border>
             </Border>

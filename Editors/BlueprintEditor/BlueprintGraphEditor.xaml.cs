@@ -7,8 +7,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Ribbon;
 using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
@@ -40,6 +42,14 @@ using App = FrostyEditor.App;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 {
+    /// <summary>
+    /// A <see cref="IEbxGraphEditor"/> for editing Blueprints, such as LogicPrefabs or SpatialPrefabs.
+    ///
+    /// <seealso cref="EntityNode"/>
+    /// <seealso cref="EntityConnection"/>
+    /// <seealso cref="EntityNodeWrangler"/>
+    /// <seealso cref="EntityLayoutManager"/>
+    /// </summary>
     public partial class BlueprintGraphEditor : UserControl, IEbxGraphEditor
     {
         #region Graph Editor Implementation
@@ -87,6 +97,34 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             InitializeComponent();
             NodePropertyGrid.NodeWrangler = NodeWrangler;
             LayoutManager = new EntityLayoutManager(NodeWrangler);
+
+            foreach (Type extensionType in ExtensionsManager.BlueprintMenuItemExtensions)
+            {
+                BlueprintMenuItemExtension menuExtension =
+                    (BlueprintMenuItemExtension)Activator.CreateInstance(extensionType);
+
+                MenuItem subItem = new MenuItem
+                {
+                    Header = menuExtension.DisplayName,
+                    ToolTip = menuExtension.ToolTip,
+                    Icon = new Image {Source = menuExtension.Icon},
+                    Command = menuExtension.ButtonClicked
+                };
+
+                if (menuExtension.SubLevelMenuName != null)
+                {
+                    MenuItem topItem = new MenuItem()
+                    {
+                        Header = menuExtension.SubLevelMenuName
+                    };
+                    topItem.Items.Add(subItem);
+                    MenuItems.Items.Add(topItem);
+                }
+                else
+                {
+                    MenuItems.Items.Add(subItem);
+                }
+            }
         }
 
         public virtual void LoadAsset(EbxAssetEntry assetEntry)
@@ -1011,6 +1049,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         #endregion
 
+        #region Node filtering
+
         private void FilterBox_LostFocus(object sender, RoutedEventArgs e)
         {
             FilterBox_Search();
@@ -1095,6 +1135,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 Editor.BringIntoView(location);
             }
         }
+
+        #endregion
 
         private void RedirectGoToSource_OnClick(object sender, RoutedEventArgs e)
         {

@@ -18,6 +18,13 @@ using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 {
+    /// <summary>
+    /// Base class for connections found in a <see cref="BlueprintGraphEditor"/> which connect 2 ports together
+    /// with networking features and <see cref="Object"/> which represents the original connections object.
+    ///
+    /// <seealso cref="EntityNodeWrangler"/>
+    /// <seealso cref="EntityPort"/>
+    /// </summary>
     public abstract class EntityConnection : BaseConnection, INetworked
     {
         private static readonly List<(Realm, Realm)> ImplicitConnectionCombos = new List<(Realm, Realm)>

@@ -16,7 +16,8 @@
     xmlns:presentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
     xmlns:nodify="clr-namespace:BlueprintEditorPlugin.Views.Nodes"
     xmlns:itemsContainer="clr-namespace:BlueprintEditorPlugin.Views.ItemsContainer"
-    xmlns:editor="clr-namespace:BlueprintEditorPlugin.Views.Editor">
+    xmlns:editor="clr-namespace:BlueprintEditorPlugin.Views.Editor"
+    xmlns:buttons="clr-namespace:BlueprintEditorPlugin.Views.Buttons">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
@@ -59,53 +60,49 @@
         </Setter>
     </Style>
     
-    <!--Generic node style-->
-    <!--<Style TargetType="{x:Type nodify:Node}">
-        <Setter Property="Background" Value="{StaticResource NodeBackgroundColor}"/>
-        <Setter Property="ContentBrush" Value="{StaticResource NodeBackgroundColor}"/>
-        <Setter Property="HeaderBrush" Value="{StaticResource NodeHeaderColor}" />
-        <Setter Property="FontFamily" Value="Consolas" />
-        <Setter Property="BorderBrush" Value="#555555" />
-    </Style>-->
-    
-    <!--Item container style-->
-    <!--<Style TargetType="{x:Type itemsContainer:ItemContainer}"
-           BasedOn="{StaticResource {x:Type itemsContainer:ItemContainer}}"
-           x:Key="VertexStyle">
-        <Setter Property="Location"
-                Value="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Setter Property="BorderThickness"
-                Value="2">
-        </Setter>
-        <Setter Property="HighlightBrush"
-                Value="{StaticResource NodeSelectedColor}">
-        </Setter>
-        <Setter Property="BorderBrush"
-                Value="{StaticResource NodeBorderColor}">
-        </Setter>
-        <Setter Property="SelectedBrush"
-                Value="{StaticResource NodeSelectedColor}">
-        </Setter>
-        <Setter Property="ActualSize"
-                Value="{Binding Size, Mode=OneWayToSource}" />
-        <Style.Triggers>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Panel.ZIndex" Value="1" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>-->
-    
-    <!--<Style TargetType="{x:Type editor:NodifyEditor}">
-        <Setter Property="Background">
+    <Style TargetType="{x:Type buttons:DropDownButton}">
+        <Setter Property="Foreground"
+                Value="{StaticResource FontColor}" />
+        <Setter Property="Background"
+                Value="{StaticResource ControlBackground}" />
+        <Setter Property="Padding"
+                Value="2" />
+        <Setter Property="Template">
             <Setter.Value>
-                <DrawingBrush TileMode="Tile"
-                              ViewportUnits="Absolute"
-                              Viewport="0 0 32 32"
-                              Transform="{Binding ViewportTransform, ElementName=Editor}"
-                              Drawing="{StaticResource SmallGridGeometry}" />
+                <ControlTemplate TargetType="{x:Type buttons:DropDownButton}">
+                    <Border x:Name="buttonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="#A0A0A0"
+                            BorderThickness="0">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="buttonBorder"
+                                    Property="Background"
+                                    Value="#FF585858" />
+                        </Trigger>
+                        <Trigger Property="IsChecked"
+                                 Value="True">
+                            <Setter TargetName="buttonBorder"
+                                    Property="Background"
+                                    Value="#FF585858" />
+                            <Setter TargetName="buttonBorder"
+                                    Property="BorderThickness"
+                                    Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="buttonBorder"
+                                    Property="Background"
+                                    Value="#FF707070" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="DisplayConnectionsOnTop" Value="{x:Static options:EditorOptions.WiresOververts}"/>
-        <Setter Property="ItemContainerStyle" Value="{StaticResource VertexStyle}"/>
-    </Style>-->
+    </Style>
 </ResourceDictionary>

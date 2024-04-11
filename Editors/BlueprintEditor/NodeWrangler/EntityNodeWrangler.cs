@@ -22,6 +22,11 @@ using Prism.Commands;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 {
+    /// <summary>
+    /// This class manages all of the <see cref="EntityNode"/>s, <see cref="EntityConnection"/>s, and other <see cref="IVertex"/>es in a graph.
+    ///
+    /// <seealso cref="BlueprintGraphEditor"/>
+    /// </summary>
     public class EntityNodeWrangler : BaseNodeWrangler, IEbxNodeWrangler
     {
         public EbxAsset Asset { get; set; }
