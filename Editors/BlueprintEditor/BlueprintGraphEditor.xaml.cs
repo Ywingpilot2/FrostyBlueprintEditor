@@ -102,6 +102,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 BlueprintMenuItemExtension menuExtension =
                     (BlueprintMenuItemExtension)Activator.CreateInstance(extensionType);
+                menuExtension.GraphEditor = this;
 
                 MenuItem subItem = new MenuItem
                 {

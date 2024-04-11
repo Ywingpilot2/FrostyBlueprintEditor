@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using BlueprintEditorPlugin.Editors.GraphEditor;
 using Frosty.Core;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions
@@ -13,7 +14,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions
         /// </summary>
         /// <returns>The name of the child menu item to place the menu item into</returns>
         public virtual string SubLevelMenuName { get; }
-        
+
         /// <summary>
         /// The name of this menu item to display in the UI
         /// </summary>
@@ -28,6 +29,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions
         /// When implemented in a derived class, this provides the Icon to display 
         /// </summary>
         public virtual ImageSource Icon { get; }
+        
+        public IEbxGraphEditor GraphEditor { get; internal set; }
         
         /// <summary>
         /// When implemented in a derived class, this series of actions will be performed after the button is clicked
