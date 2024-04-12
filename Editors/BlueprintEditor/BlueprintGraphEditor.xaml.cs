@@ -114,12 +114,26 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
                 if (menuExtension.SubLevelMenuName != null)
                 {
-                    MenuItem topItem = new MenuItem()
+                    MenuItem topItem = null;
+                    foreach (MenuItem menuItem in MenuItems.Items)
                     {
-                        Header = menuExtension.SubLevelMenuName
-                    };
+                        if ((string)menuItem.Header == menuExtension.SubLevelMenuName)
+                        {
+                            topItem = menuItem;
+                        }
+                    }
+
+
+                    if (topItem == null)
+                    {
+                        topItem = new MenuItem()
+                        {
+                            Header = menuExtension.SubLevelMenuName
+                        };
+                        MenuItems.Items.Add(topItem);
+                    }
+                    
                     topItem.Items.Add(subItem);
-                    MenuItems.Items.Add(topItem);
                 }
                 else
                 {

@@ -31,6 +31,7 @@ using BlueprintEditorPlugin.Options;
 [assembly: RegisterOptionsExtension(typeof(GraphEditorOptions))]
 [assembly: RegisterStartupAction(typeof(BlueprintEditorStartupAction))]
 
-#if DEVELOPER___DEBUG
-[assembly: RegisterBlueprintMenuExtension(typeof(TestMenuExtension))]
-#endif
+[assembly: RegisterBlueprintMenuExtension(typeof(AlignHorizontallyExtension))]
+[assembly: RegisterBlueprintMenuExtension(typeof(AlignVerticallyExtension))]
+[assembly: RegisterBlueprintMenuExtension(typeof(DistributeHorizontallyMenuExtension))]
+[assembly: RegisterBlueprintMenuExtension(typeof(DistributeVerticallyMenuExtension))]
