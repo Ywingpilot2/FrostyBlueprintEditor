@@ -427,7 +427,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         {
             Name = node.Header;
             Node = node;
-            Value = ((dynamic)node.SubObject).Value.ToString();
+            Value = ((dynamic)node.SubObject).Value.ToString() ?? "";
         }
         
         public EditPropInterfaceArgs()
