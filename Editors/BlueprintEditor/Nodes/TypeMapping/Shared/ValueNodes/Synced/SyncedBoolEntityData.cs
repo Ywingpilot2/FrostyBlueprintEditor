@@ -15,8 +15,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             AddOutput("OnTrue", ConnectionType.Event, Realm.Server);
             AddOutput("OnFalse", ConnectionType.Event, Realm.Server);
 
-            AddInput("SetTrue", ConnectionType.Event, Realm.Server);
-            AddInput("SetFalse", ConnectionType.Event, Realm.Server);
+            AddInput("SetTrue", ConnectionType.Event, Realm.Client);
+            AddInput("SetFalse", ConnectionType.Event, Realm.Client);
         }
     }
 }

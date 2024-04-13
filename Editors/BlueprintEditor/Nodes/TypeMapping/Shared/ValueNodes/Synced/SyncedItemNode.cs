@@ -11,7 +11,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
         {
             base.OnCreation();
 
-            AddInput("In", ConnectionType.Property);
+            AddInput("In", ConnectionType.Property, Realm.Client);
             AddOutput("Out", ConnectionType.Property, Realm.Server);
         }
     }

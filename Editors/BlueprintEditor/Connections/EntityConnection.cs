@@ -380,14 +380,16 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             {
                 EntityPort source = (EntityPort)Source;
                 EntityPort target = (EntityPort)Target;
-                
-                if (target.Realm != Realm.Any && target.Realm != Realm.Invalid)
+
+                Realm sourceRealm = source.DetermineRealm();
+                Realm targetRealm = target.DetermineRealm();
+                if (targetRealm != Realm.Any && targetRealm != Realm.Invalid)
                 {
-                    realm = target.Realm;
+                    realm = targetRealm;
                 }
-                else if (source.Realm != Realm.Any && source.Realm != Realm.Invalid)
+                else if (sourceRealm != Realm.Any && sourceRealm != Realm.Invalid)
                 {
-                    realm = source.Realm;
+                    realm = sourceRealm;
                 }
                 // Fuck you
                 else
@@ -464,12 +466,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             {
                 SetStatus(EditorStatus.Flawed, $"{source.Realm} to {target.Realm} is not a valid combination of realms");
             }
-
-            if (Realm != target.Realm && target.Realm != Realm.Any && !IdenticalTargetCombos.Contains((target.Realm, Realm)))
-            {
-                SetStatus(EditorStatus.Flawed, "Connection realm should be the same as target realm");
-            }
-            
         }
 
         #region Construction

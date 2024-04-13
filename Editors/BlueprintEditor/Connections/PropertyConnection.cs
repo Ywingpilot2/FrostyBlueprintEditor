@@ -125,7 +125,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         public PropertyConnection(PropertyOutput source, PropertyInput target) : base(source, target)
         {
             Object = TypeLibrary.CreateObject("PropertyConnection");
-            PropType = target.IsInterface || source.IsInterface ? PropertyType.Interface : PropertyType.Default;
+            PropType = target.IsInterface ? PropertyType.Interface : PropertyType.Default;
             
             UpdateSourceRef();
             UpdateTargetRef();
