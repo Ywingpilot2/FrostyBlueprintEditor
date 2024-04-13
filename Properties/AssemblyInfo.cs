@@ -36,3 +36,6 @@ using BlueprintEditorPlugin.Options;
 [assembly: RegisterBlueprintMenuExtension(typeof(AlignVerticallyExtension))]
 [assembly: RegisterBlueprintMenuExtension(typeof(DistributeHorizontallyMenuExtension))]
 [assembly: RegisterBlueprintMenuExtension(typeof(DistributeVerticallyMenuExtension))]
+#if DEVELOPER___DEBUG
+[assembly: RegisterBlueprintMenuExtension(typeof(GenerateBoilerPlateExtension))]
+#endif

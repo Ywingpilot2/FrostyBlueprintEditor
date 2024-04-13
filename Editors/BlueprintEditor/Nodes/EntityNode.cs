@@ -259,7 +259,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         public object Object { get; private set; }
-        public virtual string ObjectType { get; }
+        public virtual string ObjectType { get; private set; }
 
         private bool _hasPlayerEvent;
         public bool HasPlayerEvent
@@ -1353,6 +1353,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.Object = entity;
                 
                 node.Type = PointerRefType.Internal;
+                node.ObjectType = entity.GetType().Name;
                 node.RefreshCache();
                 
                 return node;
@@ -1436,6 +1437,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.NodeWrangler = wrangler;
 
                 node.Type = PointerRefType.Internal;
+                node.ObjectType = entity.GetType().Name;
                 
                 node.Load(entity.GetType().Name);
 
@@ -1483,6 +1485,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 node.FileGuid = fileGuid;
                 node.ClassGuid = ((dynamic)entity).GetInstanceGuid().ExportedGuid;
                 node.Type = PointerRefType.External;
+                node.ObjectType = entity.GetType().Name;
                 node.RefreshCache();
 
                 return node;

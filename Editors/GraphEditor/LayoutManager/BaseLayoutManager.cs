@@ -127,9 +127,10 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
 
         public virtual bool SaveLayout(string path)
         {
-            if (!Directory.Exists($@"{CurrentLayoutPath}\{path.Replace("/", "\\")}"))
+            FileInfo fileInfo = new FileInfo($@"{CurrentLayoutPath}\{path.Replace("/", "\\")}");
+            if (!fileInfo.Directory.Exists)
             {
-                Directory.CreateDirectory($@"{CurrentLayoutPath}\{path.Replace("/", "\\")}");
+                Directory.CreateDirectory(fileInfo.DirectoryName);
             }
             
             LayoutWriter layoutWriter = new LayoutWriter(new FileStream($@"{CurrentLayoutPath}\{path.Replace("/", "\\")}", FileMode.Create));

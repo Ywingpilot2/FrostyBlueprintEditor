@@ -54,14 +54,10 @@ namespace BlueprintEditorPlugin
         private void InternalLoad()
         {
             _hasLoaded = true;
-#if DEVELOPER___DEBUG
-            _graphEditor.LoadAsset(_assetEntry);
-#else
             FrostyTaskWindow.Show("Loading Blueprint...", "", task =>
             {
                 _graphEditor.LoadAsset(_assetEntry);
             });
-#endif
         }
 
         public override void Closed()
