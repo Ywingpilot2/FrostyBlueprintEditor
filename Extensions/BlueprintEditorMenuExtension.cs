@@ -39,4 +39,16 @@ namespace BlueprintEditorPlugin.Extensions
             App.EditorWindow.OpenEditor($"{App.SelectedAsset.Filename} (Ebx Graph)", editor);
         });
     }
+
+    public class ViewHashingUtils : MenuExtension
+    {
+        public override string TopLevelMenuName => "View";
+        public override string MenuItemName => "Hashing Utilities";
+
+        public override RelayCommand MenuItemClicked => new RelayCommand(o =>
+        {
+            HashingUtilsWindow window = new HashingUtilsWindow();
+            window.Show();
+        });
+    }
 }
