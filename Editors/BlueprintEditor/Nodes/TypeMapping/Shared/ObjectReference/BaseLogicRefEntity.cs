@@ -163,6 +163,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                 if (((dynamic)source.Internal).GetInstanceGuid() == interfaceGuid)
                 {
                     EventInput input = GetInput(eventConnection.SourceEvent.Name.ToString(), ConnectionType.Event);
+                    if (input == null)
+                    {
+                        continue;
+                    }
 
                     input.Realm = input.ParseRealm(eventConnection.TargetType.ToString());
                 }
@@ -170,6 +174,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                 if (((dynamic)target.Internal).GetInstanceGuid() == interfaceGuid)
                 {
                     EventOutput output = GetOutput(eventConnection.TargetEvent.Name.ToString(), ConnectionType.Event);
+                    if (output == null)
+                    {
+                        continue;
+                    }
                     
                     // TODO: Stupid. Stupid. Stupid. Stupid. Stupid. Stupud. Stupuid. Stupid. Stupid. Stpid. Stupid. Stupid. Stupid
                     if (ExtensionsManager.EntityNodeExtensions.ContainsKey(source.Internal.GetType().Name))

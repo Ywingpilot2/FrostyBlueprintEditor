@@ -243,6 +243,11 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
         /// </summary>
         public void UpdateComponentCount()
         {
+            // Not all component types have counts
+            // Some for example are entirely based on the client and don't need to keep track as a result(e.g UI Widgets)
+            if (Asset.RootObject.GetType().GetProperty("ClientRuntimeComponentCount") == null)
+                return;
+            
             foreach (PointerRef componentRef in ((dynamic)Asset.RootObject).Object.Internal.Components)
             {
                 EntityNode node = GetEntityNode(((dynamic)componentRef.Internal).GetInstanceGuid());
