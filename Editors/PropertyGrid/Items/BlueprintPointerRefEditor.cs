@@ -124,6 +124,9 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                     return pointerRef.External.ClassGuid.ToString();
 
                 dynamic obj = pointerRef.Internal;
+                if (obj == null)
+                    return "";
+                
                 return obj.GetInstanceGuid().ToString();
             }
         }
@@ -311,7 +314,11 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                         // use existing guid if replacing an object
                         PointerRef existingValue = (PointerRef)Value;
                         dynamic obj = existingValue.Internal;
-                        guid = obj.GetInstanceGuid();
+                        
+                        if (obj != null)
+                        {
+                            guid = obj.GetInstanceGuid();
+                        }
                     }
 
                     // otherwise a new guid
