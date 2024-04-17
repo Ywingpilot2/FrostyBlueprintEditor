@@ -432,17 +432,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 case Realm.NetworkedClientAndServer when entityPort.Type == ConnectionType.Property:
                 case Realm.ClientAndServer when entityPort.Type == ConnectionType.Property:
                 {
-                    flagsHelper.ClientEvent = true;
-                    flagsHelper.ServerEvent = true;
+                    flagsHelper.ClientProperty = true;
+                    flagsHelper.ServerProperty = true;
                 } break;
                 case Realm.NetworkedClient when entityPort.Type == ConnectionType.Property:
                 case Realm.Client when entityPort.Type == ConnectionType.Property:
                 {
-                    flagsHelper.ClientEvent = true;
+                    flagsHelper.ClientProperty = true;
                 } break;
                 case Realm.Server when entityPort.Type == ConnectionType.Property:
                 {
-                    flagsHelper.ServerEvent = true;
+                    flagsHelper.ServerProperty = true;
                 } break;
             }
             
