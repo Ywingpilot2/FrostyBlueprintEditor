@@ -14,21 +14,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 
             AddInput("In", ConnectionType.Event, Realm);
             AddOutput("0xca2039c7", ConnectionType.Event, Realm); // TODO: Solve hash
-
-            dynamic templates = TryGetProperty("Templates");
-            foreach (CString template in templates)
-            {
-                if (template.IsNull())
-                    continue;
-                
-                AddFooter(template.ToString());
-            }
         }
 
-        public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
+        public override void BuildFooter()
         {
-            base.OnObjectModified(sender, args);
-            
             ClearFooter();
             dynamic templates = TryGetProperty("Templates");
             foreach (CString template in templates)

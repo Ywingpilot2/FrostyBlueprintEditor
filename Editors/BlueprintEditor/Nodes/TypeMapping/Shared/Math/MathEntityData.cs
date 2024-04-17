@@ -22,23 +22,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             AddOutput("Out", ConnectionType.Property, Realm);
             AddOutput("OnCalculate", ConnectionType.Event, Realm);
 
-            dynamic assembly = TryGetProperty("Assembly");
-            foreach (dynamic instruction in assembly.Instructions)
-            {
-                switch (instruction.Code.ToString())
-                {
-                    case "MathOpCode_InputV4":
-                    case "MathOpCode_InputV3":
-                    case "MathOpCode_InputV2":
-                    case "MathOpCode_InputT":
-                    case "MathOpCode_InputF":
-                    case "MathOpCode_InputI":
-                    case "MathOpCode_InputB":
-                    {
-                        AddInput(Utils.GetString(instruction.Param1), ConnectionType.Property, Realm);
-                    } break;
-                }
-            }
+            UpdateInputs();
             
             ParseInstructions();
         }
@@ -46,8 +30,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
         public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
         {
             base.OnObjectModified(sender, args);
-            ParseInstructions();
-            
+
             if (args.Item.Name == "Instructions")
             {
                 switch (args.ModifiedArgs.Type)
@@ -88,6 +71,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             }
             
             UpdateInputs();
+        }
+
+        public override void BuildFooter()
+        {
+            ParseInstructions();
         }
 
         private void UpdateInputs()

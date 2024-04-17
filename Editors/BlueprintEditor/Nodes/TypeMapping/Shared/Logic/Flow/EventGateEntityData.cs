@@ -16,21 +16,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             AddInput("Close", ConnectionType.Event);
 
             AddOutput("Out", ConnectionType.Event);
-
-            if ((bool)TryGetProperty("Default"))
-            {
-                AddFooter("Default: Open");
-            }
-            else
-            {
-                AddFooter("Default: Closed");
-            }
         }
 
-        public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
+        public override void BuildFooter()
         {
-            base.OnObjectModified(sender, args);
-            
             if ((bool)TryGetProperty("Default"))
             {
                 AddFooter("Default: Open");

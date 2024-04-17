@@ -15,17 +15,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 
             AddInput("In", ConnectionType.Event, Realm);
             AddOutput("Out", ConnectionType.Event, Realm, true);
-
-            if ((bool)TryGetProperty("AllLocalPlayers"))
-            {
-                AddFooter("AllLocalPlayers: True");
-            }
         }
 
-        public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
+        public override void BuildFooter()
         {
-            base.OnObjectModified(sender, args);
-            
             ClearFooter();
             if ((bool)TryGetProperty("AllLocalPlayers"))
             {

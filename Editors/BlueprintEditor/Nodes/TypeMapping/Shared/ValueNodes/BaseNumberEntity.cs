@@ -9,17 +9,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
     {
         public override string ToolTip => "This node stores a number value which can be incremented and decremented";
 
-        public override void OnCreation()
+        public override void BuildFooter()
         {
-            base.OnCreation();
-
-            Footer = $"Default Value: {TryGetProperty("DefaultValue")}\nAdjustment Value: {TryGetProperty("IncDecValue")}";
-        }
-
-        public override void OnObjectModified(object sender, ItemModifiedEventArgs args)
-        {
-            base.OnObjectModified(sender, args);
-            
             Footer = $"Default Value: {TryGetProperty("DefaultValue")}\nAdjustment Value: {TryGetProperty("IncDecValue")}";
         }
 

@@ -342,6 +342,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         #endregion
 
+        /// <summary>
+        /// This method is called whenever the <see cref="Footer"/> needs to be updated. For example when the object is modified
+        /// </summary>
+        public virtual void BuildFooter()
+        {
+            // TODO: Automatically build footer based on properties
+        }
+
         #endregion
 
         #region Basic node implementation
@@ -375,14 +383,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
             else
             {
-                Realm = ParseRealm(TryGetProperty("Realm"));
+                Realm = Realm.Any;
                 
                 // Update our input/output realms 
                 foreach (EntityInput input in Inputs)
                 {
                     if (input.Realm == Realm.Invalid)
                     {
-                        input.Realm = Realm;
+                        input.Realm = Realm.Any;
                     }
                 }
                 
@@ -390,10 +398,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 {
                     if (output.Realm == Realm.Invalid)
                     {
-                        output.Realm = Realm;
+                        output.Realm = Realm.Any;
                     }
                 }
             }
+            
+            BuildFooter();
         }
 
         public virtual void OnDestruction()
@@ -487,7 +497,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         
         public virtual void OnObjectModified(object sender, ItemModifiedEventArgs args)
         {
-            if (args.Item.Name == "Realm" && TryGetProperty("Realm") != null)
+            if (args.Item.Name == "Realm")
             {
                 Realm = ParseRealm(args.NewValue);
                 Realm oldRealm = ParseRealm(args.OldValue);
@@ -506,6 +516,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     }
                 }
             }
+            
+            BuildFooter();
         }
 
         #endregion

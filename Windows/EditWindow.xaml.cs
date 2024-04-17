@@ -31,6 +31,18 @@ namespace BlueprintEditorPlugin.Windows
             return editPromptWindow.Result;
         }
 
+        public static MessageBoxResult Show(object args, ResizeMode resizeMode, string title = "Edit Properties")
+        {
+            EditPromptWindow editPromptWindow = new EditPromptWindow(args)
+            {
+                Title = title,
+                ResizeMode = resizeMode
+            };
+            editPromptWindow.ShowDialog();
+            
+            return editPromptWindow.Result;
+        }
+
         private void OkButton_OnClick(object sender, RoutedEventArgs e)
         {
             Result = MessageBoxResult.Yes;
