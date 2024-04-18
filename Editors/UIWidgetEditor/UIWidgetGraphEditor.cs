@@ -1,61 +1,34 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using BlueprintEditorPlugin.Editors.BlueprintEditor;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
-using BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.CheapGraph;
-using BlueprintEditorPlugin.Models.Entities;
+using BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
-using Frosty.Core.Controls;
+using BlueprintEditorPlugin.Windows;
 using FrostyEditor;
+using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
 
-namespace BlueprintEditorPlugin.Editors.ComponentEditor
+namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
 {
-    /// <summary>
-    /// Base implementation of a <see cref="BlueprintGraphEditor"/> which can edit assets with Components
-    /// </summary>
-    public class ComponentGraphEditor : BlueprintGraphEditor
+    public class UIWidgetGraphEditor : BlueprintGraphEditor
     {
         public override bool IsValid(EbxAssetEntry assetEntry)
         {
             EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
             Type assetType = asset.RootObject.GetType();
 
-            // Let the UI editor handle this
-            if (assetType.Name == "UIWidgetBlueprint")
-            {
-                return false;
-            }
-            
-            // We only check property connections since we can assume if it has property connections it has everything else
-            if (assetType.GetProperty("Object") != null 
-                && assetType.GetProperty("PropertyConnections") != null 
-                && assetType.GetProperty("Interface") != null)
-            {
-                Type objectType = ((dynamic)asset.RootObject).Object.Internal.GetType();
-                
-                if (objectType.GetProperty("Components") == null)
-                    return false;
-                
-                return true;
-            }
-            
-            return false;
+            return assetType.Name == "UIWidgetBlueprint";
         }
-
-        public ComponentGraphEditor()
-        {
-            NodeWrangler = new ComponentNodeWrangler();
-            NodePropertyGrid.NodeWrangler = NodeWrangler;
-        }
-
+        
         public override void LoadAsset(EbxAssetEntry assetEntry)
         {
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
@@ -435,10 +408,41 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
             }
         }
 
-        protected override void NodePropertyGrid_OnOnModified(object sender, ItemModifiedEventArgs e)
+        private void OnAddLayerClick(object sender, RoutedEventArgs routedEventArgs)
         {
-            base.NodePropertyGrid_OnOnModified(sender, e);
-            ((ComponentNodeWrangler)NodeWrangler).UpdateComponentCount();
+            AddLayerArgs args = new AddLayerArgs();
+            MessageBoxResult result = EditPromptWindow.Show(args, "Add UI layer");
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            dynamic layer = TypeLibrary.CreateObject("UIElementLayerEntityData");
+            layer.LayerName = new CString(args.Name);
+            EntityNode node = EntityNode.GetNodeFromEntity(layer, NodeWrangler, true);
+            
+            NodeWrangler.AddVertex(node);
+        }
+
+        public UIWidgetGraphEditor()
+        {
+            NodeWrangler = new UIWidgetNodeWrangler();
+            NodePropertyGrid.NodeWrangler = NodeWrangler;
+
+            MenuItem addLayerItem = new MenuItem()
+            {
+                Header = "Add Layer"
+            };
+            GraphContextMenu.Items.Add(addLayerItem);
+            addLayerItem.Click += OnAddLayerClick;
+        }
+    }
+
+    public class AddLayerArgs
+    {
+        public string Name { get; set; }
+
+        public AddLayerArgs()
+        {
+            Name = "";
         }
     }
 }

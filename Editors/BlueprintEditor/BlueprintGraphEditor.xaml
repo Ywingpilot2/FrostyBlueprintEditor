@@ -144,6 +144,18 @@
                                     <Image Source="pack://application:,,,/FrostyCore;component/images/cross.png"/>
                                 </MenuItem.Icon>
                             </MenuItem>
+                            <MenuItem Header="Go to Source" Click="ConnectionGoToSource_OnClick">
+                                <MenuItem.Icon>
+                                    <Image
+                                        Source="pack://application:,,,/FrostyEditor;component/images/assign.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Go to Target" Click="ConnectionGoToTarget_OnClick">
+                                <MenuItem.Icon>
+                                    <Image
+                                        Source="pack://application:,,,/FrostyEditor;component/images/assign.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem Header="Remove" Command="{Binding RemoveCommand}">
                                 <MenuItem.Icon>
                                     <Image Source="pack://application:,,,/FrostyEditor;component/images/clear.png"/>
@@ -1314,7 +1326,7 @@
                     <!--This contains a list of all of the types we can use and a filter box-->
                     <Border BorderBrush="{StaticResource ScrollbarBackground}"
                             BorderThickness="0">
-                        <controls:FrostyTabControl x:Name="TabControl">
+                        <controls:FrostyTabControl x:Name="ToolboxTabControl">
                             <controls:FrostyTabControl.Items>
                                 <controls:FrostyTabItem Header="Toolbox"
                                                         Icon="pack://application:,,,/FrostyEditor;component/Images/Database.png">

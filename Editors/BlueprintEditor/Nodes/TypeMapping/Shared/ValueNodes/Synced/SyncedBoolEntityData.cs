@@ -17,6 +17,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 
             AddInput("SetTrue", ConnectionType.Event, Realm.Client);
             AddInput("SetFalse", ConnectionType.Event, Realm.Client);
+            AddInput("Toggle", ConnectionType.Event, Realm.Client);
         }
     }
 }

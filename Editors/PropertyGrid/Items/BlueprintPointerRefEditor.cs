@@ -363,17 +363,20 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
 
                     if (NodeWrangler is IEbxNodeWrangler wrangler)
                     {
-                        if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                        if (!(NodeWrangler.SelectedVertices.LastOrDefault() is IEntityObject))
                             return;
 
+                        IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices.LastOrDefault();
+                        
                         // add it to the list of objects so it can be assigned places
-                        if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                        if (node.Type == PointerRefType.Internal)
                         {
                             wrangler.Asset.AddObject(newValue.Internal);
+                            // TODO: Implement method for adding this object as a new node
                         }
                         else
                         {
-                            IEntityObject node = (IEntityObject)NodeWrangler.SelectedVertices.LastOrDefault();
+                            
                             if (node != null)
                             {
                                 EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(node.FileGuid);
@@ -447,17 +450,17 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
 
                 if (NodeWrangler is IEbxNodeWrangler wrangler)
                 {
-                    if (!(NodeWrangler.SelectedVertices[0] is IEntityObject))
+                    if (!(NodeWrangler.SelectedVertices.LastOrDefault() is IEntityObject))
                         return;
                 
                     //I hope I someday meet gman so I can tell him how much I fucking hate him for making me do this
-                    if (((IEntityObject)NodeWrangler.SelectedVertices[0]).Type == PointerRefType.Internal)
+                    if (((IEntityObject)NodeWrangler.SelectedVertices.LastOrDefault()).Type == PointerRefType.Internal)
                     {
                         wrangler.Asset.AddDependency(reference.FileGuid);
                     }
                     else
                     {
-                        IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices[0]);
+                        IEntityObject node = ((IEntityObject)NodeWrangler.SelectedVertices.LastOrDefault());
                         EbxAssetEntry asset = App.AssetManager.GetEbxEntry(node.FileGuid);
                         EbxAsset ebx = App.AssetManager.GetEbx(asset);
 

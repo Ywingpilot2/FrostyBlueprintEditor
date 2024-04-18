@@ -28,7 +28,7 @@ using Prism.Commands;
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 {
     /// <summary>
-    /// A basic implementation of an entity in a node form. For creation, please see <see cref="GetNodeFromEntity(object,BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler.INodeWrangler,bool)"/>
+    /// A basic implementation of an entity in a node form. For creation, please see <see cref="GetNodeFromEntity(object,BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler.INodeWrangler,bool)"/> or its overloads
     /// </summary>
     public class EntityNode : IEntityNode, INetworked
     {
@@ -1338,7 +1338,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         #region Static construction
 
         /// <summary>
-        /// Gets a proper Node from an internal object. This will return subclasses if they are found.
+        /// Gets a proper Node from an internal object. This will return subclasses of <see cref="EntityNode"/> if they are found.
         /// </summary>
         /// <param name="entity">The object this will be constructed off of</param>
         /// <param name="wrangler">The <see cref="INodeWrangler"/> this belongs to</param>
@@ -1390,7 +1390,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
         
         /// <summary>
-        /// Gets a proper Node from an internal object. This will return subclasses if they are found.  
+        /// Gets a proper Node from a type. This will return subclasses of <see cref="EntityNode"/> if they are found.  
         /// </summary>
         /// <param name="type">The object type this will be constructed off of</param>
         /// <param name="wrangler">The <see cref="INodeWrangler"/> this belongs to</param>
@@ -1462,7 +1462,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         }
 
         /// <summary>
-        /// Gets a proper Node from an external object. This will return subclasses if they are found.  
+        /// Gets a proper Node from an external object. This will return subclasses of <see cref="EntityNode"/> if they are found.  
         /// </summary>
         /// <param name="entity">The object this will be constructed off of</param>
         /// <param name="fileGuid">The guid of the file this external object hails from</param>

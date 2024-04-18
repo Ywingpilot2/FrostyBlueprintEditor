@@ -22,6 +22,7 @@ using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.CheapGraph;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms.Sugiyama;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -1039,7 +1040,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         {
             if (e.ChangedButton == MouseButton.Right && (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
             {
-                if (TabControl.SelectedIndex == 0)
+                if (ToolboxTabControl.SelectedIndex == 0)
                 {
                     if (ClassList.SelectedClass == null)
                         return;
@@ -1172,6 +1173,30 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         redirect.SourceRedirect.Location.Y + (redirect.SourceRedirect.Size.Height / 2));
                     Editor.BringIntoView(location);
                 }
+            }
+        }
+
+        private void ConnectionGoToSource_OnClick(object sender, RoutedEventArgs e)
+        {
+            // the data context of the menu item will be the connection... hopefully
+            if (((MenuItem)sender).DataContext is IConnection connection)
+            {
+                // We want to get the center point of the node
+                Point location = new Point(connection.Source.Node.Location.X + (connection.Source.Node.Size.Width / 2),
+                    connection.Source.Node.Location.Y + (connection.Source.Node.Size.Height / 2));
+                Editor.BringIntoView(location);
+            }
+        }
+
+        private void ConnectionGoToTarget_OnClick(object sender, RoutedEventArgs e)
+        {
+            // the data context of the menu item will be the connection... hopefully
+            if (((MenuItem)sender).DataContext is IConnection connection)
+            {
+                // We want to get the center point of the node
+                Point location = new Point(connection.Target.Node.Location.X + (connection.Target.Node.Size.Width / 2),
+                    connection.Target.Node.Location.Y + (connection.Target.Node.Size.Height / 2));
+                Editor.BringIntoView(location);
             }
         }
     }

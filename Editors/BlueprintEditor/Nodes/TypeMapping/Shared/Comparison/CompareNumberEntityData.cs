@@ -2,7 +2,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared.Comparison
 {
-	public class CompareNumberNode : EntityNode
+	public abstract class CompareNumberNode : EntityNode
 	{
 		public override void OnCreation()
 		{
