@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Models.Nodes;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
@@ -21,7 +22,11 @@ namespace BlueprintEditorPlugin.Models.Connections
                 {
                     _source.PropertyChanged -= NotifyPropertyChanged;
                     _source.Node.PropertyChanged -= NotifyPropertyChanged;
-                    _source.IsConnected = false;
+                    
+                    if (!_source.Node.NodeWrangler.GetConnections(_source).Any())
+                    {
+                        _source.IsConnected = false;
+                    }
                 }
                 
                 //Subscribed! Liked! W!
@@ -31,7 +36,6 @@ namespace BlueprintEditorPlugin.Models.Connections
                 _source = value;
                 _source.IsConnected = true;
                 NotifyPropertyChanged(nameof(Source));
-                NotifyPropertyChanged(nameof(CurvePoint1));
             }
         }
 
@@ -46,7 +50,11 @@ namespace BlueprintEditorPlugin.Models.Connections
                 {
                     _target.PropertyChanged -= NotifyPropertyChanged;
                     _target.Node.PropertyChanged -= NotifyPropertyChanged;
-                    _target.IsConnected = false;
+                    
+                    if (!_target.Node.NodeWrangler.GetConnections(_target).Any())
+                    {
+                        _target.IsConnected = false;
+                    }
                 }
                 
                 //Subscribed! Liked! W!
@@ -56,7 +64,6 @@ namespace BlueprintEditorPlugin.Models.Connections
                 _target = value;
                 _target.IsConnected = true;
                 NotifyPropertyChanged(nameof(Target));
-                NotifyPropertyChanged(nameof(CurvePoint2));
             }
         }
         
@@ -79,11 +86,6 @@ namespace BlueprintEditorPlugin.Models.Connections
         {
             switch (e.PropertyName)
             {
-                case "Anchor":
-                {
-                    NotifyPropertyChanged(nameof(CurvePoint1));
-                    NotifyPropertyChanged(nameof(CurvePoint2));
-                } break;
                 case "IsSelected":
                 {
                     IsSelected = Source.Node.IsSelected || Target.Node.IsSelected;
@@ -94,46 +96,6 @@ namespace BlueprintEditorPlugin.Models.Connections
 
         #endregion
 
-        #region Visuals
-        
-        public Point CurvePoint1
-        {
-            get
-            {
-                if (EditorOptions.WireStyle == ConnectionStyle.Curvy)
-                {
-                    //The curve point is just the average of the 2 points
-                    return new Point(Source.Anchor.X + 85,
-                        Source.Anchor.Y);
-                }
-                else
-                {
-                    return new Point(Source.Anchor.X + 25,
-                        Source.Anchor.Y);
-                }
-            }
-        }
-
-        public Point CurvePoint2
-        {
-            get
-            {
-                if (EditorOptions.WireStyle == ConnectionStyle.Curvy)
-                {
-                    //The curve point is just the average of the 2 points
-                    return new Point(Target.Anchor.X - 85,
-                        Target.Anchor.Y);
-                }
-                else
-                {
-                    return new Point(Target.Anchor.X - 25,
-                        Target.Anchor.Y);
-                }
-            }
-        }
-
-        #endregion
-        
         #region Status
 
         public EditorStatusArgs CurrentStatus { get; set; }
@@ -190,14 +152,7 @@ namespace BlueprintEditorPlugin.Models.Connections
         public BaseConnection(IPort source, IPort target)
         {
             Source = source;
-            Source.IsConnected = true;
             Target = target;
-            Target.IsConnected = true;
-            
-            Source.PropertyChanged += NotifyPropertyChanged;
-            Target.PropertyChanged += NotifyPropertyChanged;
-            Source.Node.PropertyChanged += NotifyPropertyChanged;
-            Target.Node.PropertyChanged += NotifyPropertyChanged;
 
             CurrentStatus = new EditorStatusArgs(EditorStatus.Alright);
         }

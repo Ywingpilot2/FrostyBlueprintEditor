@@ -377,29 +377,29 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 Header = ObjectType;
             }
             
-            if (TryGetProperty("Realm") == null)
+            if (TryGetProperty("Realm") != null)
             {
-                Realm = Realm.Any;
+                Realm = ParseRealm(TryGetProperty("Realm").ToString());
             }
             else
             {
                 Realm = Realm.Any;
-                
-                // Update our input/output realms 
-                foreach (EntityInput input in Inputs)
+            }
+            
+            // Update our input/output realms 
+            foreach (EntityInput input in Inputs)
+            {
+                if (input.Realm == Realm.Invalid)
                 {
-                    if (input.Realm == Realm.Invalid)
-                    {
-                        input.Realm = Realm.Any;
-                    }
+                    input.Realm = Realm;
                 }
+            }
                 
-                foreach (EntityOutput output in Outputs)
+            foreach (EntityOutput output in Outputs)
+            {
+                if (output.Realm == Realm.Invalid)
                 {
-                    if (output.Realm == Realm.Invalid)
-                    {
-                        output.Realm = Realm.Any;
-                    }
+                    output.Realm = Realm;
                 }
             }
             

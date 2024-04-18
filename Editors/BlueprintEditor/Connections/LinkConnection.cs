@@ -81,11 +81,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         {
             switch (e.PropertyName)
             {
-                case "Anchor":
-                {
-                    NotifyPropertyChanged(nameof(CurvePoint1));
-                    NotifyPropertyChanged(nameof(CurvePoint2));
-                } break;
                 case "IsSelected":
                 {
                     IsSelected = Source.Node.IsSelected || Target.Node.IsSelected;

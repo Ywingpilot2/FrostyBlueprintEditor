@@ -212,6 +212,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
 
                                 Target = input;
                                 target = input;
+                                
+                                UpdateTargetRef(); // Make sure the update is synced in the ebx
 
                                 break;
                             }
@@ -295,7 +297,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             {
                 PropType = PropertyType.Interface;
             }
-            UpdateStatus();
         }
 
         /// <summary>
@@ -321,7 +322,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
             {
                 PropType = PropertyType.Interface;
             }
-            UpdateStatus();
         }
 
         #endregion

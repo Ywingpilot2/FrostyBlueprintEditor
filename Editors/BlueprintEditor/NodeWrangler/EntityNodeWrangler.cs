@@ -751,8 +751,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         public void ModifyAsset()
         {
+            if (AssetEntry.IsDirty)
+                return;
+            
             App.AssetManager.ModifyEbx(AssetEntry.Name, Asset);
-            Frosty.Core.App.EditorWindow.DataExplorer.RefreshAll();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Frosty.Core.App.EditorWindow.DataExplorer.RefreshItems();
+            });
         }
 
         public EntityNodeWrangler()
