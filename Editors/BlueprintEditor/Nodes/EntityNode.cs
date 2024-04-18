@@ -1572,7 +1572,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         /// <returns></returns>
         public uint GetAsFlags()
         {
-            bool isTooLarge = !uint.TryParse(GuidMask, System.Globalization.NumberStyles.HexNumber, null, out var newFlags);
+            bool isTooLarge = !uint.TryParse(GuidMask, NumberStyles.HexNumber, null, out var newFlags);
             if (isTooLarge || newFlags > 33554431)
             {
                 newFlags = 0;

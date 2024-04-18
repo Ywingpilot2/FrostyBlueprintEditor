@@ -155,7 +155,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
 
                 layoutWriter.Dispose();
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 App.Logger.LogError("Unable to write to this file. Are you sure its not being used and is accessible?");
                 return false;

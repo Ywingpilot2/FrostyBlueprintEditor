@@ -139,7 +139,7 @@ namespace BlueprintEditorPlugin
                     App.Logger.LogError("Graph editor {0} must be a control", graphRegister.GraphType.Name);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 App.Logger.LogError("Could not load graph extension {0}", graphRegister.GraphType.Name);
             }
@@ -161,7 +161,7 @@ namespace BlueprintEditorPlugin
                     EntityNodeExtensions.Add(extension.ObjectType, entityRegister.EntityNodeExtension);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 App.Logger.LogError("Could not load node extension {0}", entityRegister.EntityNodeExtension.Name);
             }

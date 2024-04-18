@@ -777,7 +777,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 NodeWrangler.AddVertex(node);
                 NodeWrangler.SelectedVertices.Add(node);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 // ignored
             }
@@ -993,7 +993,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         NodeWrangler.AddVertex(node);
                         NodeWrangler.SelectedVertices.Add(node);
                     }
-                    catch (Exception exception)
+                    catch (Exception)
                     {
                         // ignored
                     }

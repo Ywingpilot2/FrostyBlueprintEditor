@@ -31,7 +31,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 {
                     ReadProperty(line);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     App.Logger.LogError("Unable to load property {0} in node mapping {1}", line, type);
                 }
@@ -69,7 +69,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     EntityMappings.Add(propertyArg[1].Trim('"'), file);
                     reader.Dispose();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     App.Logger.Log("nmc {0} could not be loaded", file);
                 }

@@ -410,14 +410,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Connections
         public void FixRealm()
         {
             Realm = DetermineRealm();
-            EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
             ((EntityNodeWrangler)Target.Node.NodeWrangler).ModifyAsset();
         }
 
         public void ForceFixRealm()
         {
             Realm = DetermineRealm(true);
-            EbxAsset asset = ((EntityNodeWrangler)Target.Node.NodeWrangler).Asset;
             ((EntityNodeWrangler)Target.Node.NodeWrangler).ModifyAsset();
         }
 
