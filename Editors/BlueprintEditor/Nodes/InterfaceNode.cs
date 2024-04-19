@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
@@ -175,6 +176,54 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
         public void AddOutput(EntityOutput output)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// This will safely try to set a property on the node's <see cref="Object"/>
+        /// </summary>
+        /// <param name="name">Name of the property to set</param>
+        /// <param name="value">Value of the property</param>
+        /// <returns>Whether or not the property was set</returns>
+        public bool TrySetProperty(string name, object value)
+        {
+            if (Object == null)
+                return false;
+            
+            PropertyInfo property = Object.GetType().GetProperty(name);
+            if (property != null)
+            {
+                try
+                {
+                    property.SetValue(Object, value);
+                }
+                catch
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to get a value from the node's <see cref="Object"/>
+        /// </summary>
+        /// <param name="name">The name of the property to fetch</param>
+        /// <returns>The value of the property. Null if it was not found</returns>
+        public object TryGetProperty(string name)
+        {
+            if (Object == null)
+                return null;
+            
+            PropertyInfo property = Object.GetType().GetProperty(name);
+            if (property != null)
+            {
+                return property.GetValue(Object);
+            }
+
+            return null;
         }
 
         public ConnectionType ConnectionType { get; set; }

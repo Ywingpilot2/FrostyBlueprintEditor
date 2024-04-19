@@ -15,5 +15,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         void AddInput(EntityInput input);
         void AddOutput(EntityOutput output);
+
+        bool TrySetProperty(string name, object value);
+        object TryGetProperty(string name);
     }
 }

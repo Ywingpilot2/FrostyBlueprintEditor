@@ -1,11 +1,17 @@
 ﻿using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Models.Entities.Networking;
+using FrostySdk;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.StarWarsBattlefrontII.AutoPlayers
 {
     public class AutoPlayerManagerNode : EntityNode
     {
         public override string ObjectType => "AutoPlayerManagerEntityData";
+        
+        public override bool IsValid()
+        {
+            return ProfilesLibrary.ProfileName == "starwarsbattlefrontii" || ProfilesLibrary.ProfileName == "bfv";
+        }
 
         public override void OnCreation()
         {

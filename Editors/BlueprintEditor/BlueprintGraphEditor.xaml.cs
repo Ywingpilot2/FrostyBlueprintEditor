@@ -564,14 +564,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 switch (e.AddedItems[0])
                 {
-                    case EntityNode entityNode:
-                    {
-                        NodePropertyGrid.Object = entityNode.Object;
-                    } break;
-                    case EntityComment comment:
-                    {
-                        NodePropertyGrid.Object = comment.Object;
-                    } break;
                     case InterfaceNode interfaceNode:
                     {
                         NodePropertyGrid.Object = interfaceNode.EditArgs;
@@ -601,16 +593,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     {
                         switch (selectedNode)
                         {
-                            case EntityNode node:
+                            case IEntityNode node:
                             {
                                 node.TrySetProperty(e.Item.Name, e.NewValue);
                                 node.OnObjectModified(sender, e);
-                                ((EntityNodeWrangler)NodeWrangler).ModifyAsset();
-                            } break;
-                            case InterfaceNode interfaceNode:
-                            {
-                                interfaceNode.OnObjectModified(sender, e);
-                                ((EntityNodeWrangler)NodeWrangler).ModifyAsset();
+                                ((IEbxNodeWrangler)NodeWrangler).ModifyAsset();
                             } break;
                             case EntityComment comment:
                             {
@@ -652,7 +639,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         
         #region Adding & removing nodes
         
-        private void DeleteNode_OnClick(object sender, RoutedEventArgs e)
+        protected virtual void DeleteNode_OnClick(object sender, RoutedEventArgs e)
         {
             List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedVertices);
             foreach (IVertex selectedNode in oldSelection)
@@ -673,7 +660,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             }
         }
         
-        private void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
+        protected virtual void DuplicateNode_OnClick(object sender, RoutedEventArgs e)
         {
             List<IVertex> oldSelection = new List<IVertex>(NodeWrangler.SelectedVertices);
             NodeWrangler.SelectedVertices.Clear();
