@@ -11,6 +11,7 @@ using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Models.Connections;
 using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Entities.Networking;
 using BlueprintEditorPlugin.Models.Nodes;
@@ -418,6 +419,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             object value = TryGetProperty("Flags");
             if (value == null)
                 return;
+            
+            if (entityPort.Type == ConnectionType.Link)
+                return;
 
             ObjectFlagsHelper flagsHelper = new ObjectFlagsHelper((uint)value);
             
@@ -426,33 +430,162 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 case Realm.NetworkedClientAndServer when entityPort.Type == ConnectionType.Event:
                 case Realm.ClientAndServer when entityPort.Type == ConnectionType.Event:
                 {
-                    flagsHelper.ClientEvent = true;
-                    flagsHelper.ServerEvent = true;
+                    if (NodeWrangler.GetConnections(port).Any(c =>
+                            c is EntityConnection e && (e.Realm == Realm.Server || e.Realm == Realm.ClientAndServer)))
+                    {
+                        flagsHelper.ClientEvent = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ClientEvent = false;
+                    }
+                    
+                    if (NodeWrangler.GetConnections(port).Any(c =>
+                            c is EntityConnection e && (e.Realm == Realm.Server || e.Realm == Realm.ClientAndServer)))
+                    {
+                        flagsHelper.ServerEvent = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ServerEvent = false;
+                    }
                 } break;
                 case Realm.NetworkedClient when entityPort.Type == ConnectionType.Event:
                 case Realm.Client when entityPort.Type == ConnectionType.Event:
                 {
-                    flagsHelper.ClientEvent = true;
+                    if (NodeWrangler.GetConnections(port).Any())
+                    {
+                        flagsHelper.ClientEvent = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ClientEvent = false;
+                    }
                 } break;
                 case Realm.Server when entityPort.Type == ConnectionType.Event:
                 {
-                    flagsHelper.ServerEvent = true;
+                    if (NodeWrangler.GetConnections(port).Any())
+                    {
+                        flagsHelper.ServerEvent = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ServerEvent = false;
+                    }
                 } break;
                 
                 case Realm.NetworkedClientAndServer when entityPort.Type == ConnectionType.Property:
                 case Realm.ClientAndServer when entityPort.Type == ConnectionType.Property:
                 {
-                    flagsHelper.ClientProperty = true;
-                    flagsHelper.ServerProperty = true;
+                    if (NodeWrangler.GetConnections(port).Any(c =>
+                            c is EntityConnection e && (e.Realm == Realm.Server || e.Realm == Realm.ClientAndServer)))
+                    {
+                        flagsHelper.ClientProperty = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ClientProperty = false;
+                    }
+                    
+                    if (NodeWrangler.GetConnections(port).Any(c =>
+                            c is EntityConnection e && (e.Realm == Realm.Server || e.Realm == Realm.ClientAndServer)))
+                    {
+                        flagsHelper.ServerProperty = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ServerProperty = false;
+                    }
                 } break;
                 case Realm.NetworkedClient when entityPort.Type == ConnectionType.Property:
                 case Realm.Client when entityPort.Type == ConnectionType.Property:
                 {
-                    flagsHelper.ClientProperty = true;
+                    if (NodeWrangler.GetConnections(port).Any())
+                    {
+                        flagsHelper.ClientProperty = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ClientProperty = false;
+                    }
                 } break;
                 case Realm.Server when entityPort.Type == ConnectionType.Property:
                 {
-                    flagsHelper.ServerProperty = true;
+                    if (NodeWrangler.GetConnections(port).Any())
+                    {
+                        flagsHelper.ServerProperty = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ServerProperty = false;
+                    }
+                } break;
+                
+                case Realm.Any:
+                {
+                    bool client = false;
+                    bool server = false;
+                    foreach (IConnection connection in NodeWrangler.GetConnections(port))
+                    {
+                        if (connection is EntityConnection entityConnection)
+                        {
+                            switch (entityConnection.DetermineRealm())
+                            {
+                                case Realm.Any:
+                                    continue;
+                                case Realm.Invalid:
+                                    continue;
+                                case Realm.NetworkedClientAndServer:
+                                case Realm.ClientAndServer:
+                                {
+                                    client = true;
+                                    server = true;
+                                } break;
+                                case Realm.NetworkedClient:
+                                case Realm.Client:
+                                {
+                                    client = true;
+                                } break;
+                                case Realm.Server:
+                                {
+                                    server = true;
+                                } break;
+                            }
+                        }
+                        
+                        if (client && server)
+                            break;
+                    }
+
+                    if (client)
+                    {
+                        switch (entityPort.Type)
+                        {
+                            case ConnectionType.Event:
+                            {
+                                flagsHelper.ClientEvent = true;
+                            } break;
+                            case ConnectionType.Property:
+                            {
+                                flagsHelper.ClientProperty = true;
+                            } break;
+                        }
+                    }
+
+                    if (server)
+                    {
+                        switch (entityPort.Type)
+                        {
+                            case ConnectionType.Event:
+                            {
+                                flagsHelper.ServerEvent = true;
+                            } break;
+                            case ConnectionType.Property:
+                            {
+                                flagsHelper.ServerProperty = true;
+                            } break;
+                        }
+                    }
                 } break;
             }
             
@@ -478,17 +611,48 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 case Realm.NetworkedClientAndServer:
                 case Realm.ClientAndServer:
                 {
-                    flagsHelper.ClientLinkSource = true;
-                    flagsHelper.ServerLinkSource = true;
+                    if (NodeWrangler.GetConnections(port).Any(c =>
+                            c is EntityConnection e && (e.Realm == Realm.Server || e.Realm == Realm.ClientAndServer)))
+                    {
+                        flagsHelper.ClientLinkSource = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ClientLinkSource = false;
+                    }
+                    
+                    if (NodeWrangler.GetConnections(port).Any(c =>
+                            c is EntityConnection e && (e.Realm == Realm.Server || e.Realm == Realm.ClientAndServer)))
+                    {
+                        flagsHelper.ServerLinkSource = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ServerLinkSource = false;
+                    }
                 } break;
                 case Realm.NetworkedClient:
                 case Realm.Client:
                 {
-                    flagsHelper.ClientLinkSource = true;
+                    if (NodeWrangler.GetConnections(port).Any())
+                    {
+                        flagsHelper.ClientLinkSource = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ClientLinkSource = false;
+                    }
                 } break;
                 case Realm.Server:
                 {
-                    flagsHelper.ServerLinkSource = true;
+                    if (NodeWrangler.GetConnections(port).Any())
+                    {
+                        flagsHelper.ServerLinkSource = true;
+                    }
+                    else
+                    {
+                        flagsHelper.ServerLinkSource = false;
+                    }
                 } break;
             }
 

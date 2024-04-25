@@ -703,6 +703,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     ((dynamic)Asset.RootObject).PropertyConnections.Add((dynamic)propertyConnection.Object);
                 } break;
             }
+            
+            connection.Source.Node.OnOutputUpdated(connection.Source);
+            connection.Target.Node.OnInputUpdated(connection.Target);
 
             ModifyAsset();
         }
@@ -744,6 +747,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                     root.PropertyConnections.Remove((dynamic)entityConnection.Object);
                 } break;
             }
+            
             ModifyAsset();
         }
 

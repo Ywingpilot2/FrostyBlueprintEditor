@@ -143,11 +143,26 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
             }
         }
 
+        #endregion
+
+        #region Getting Connections
+
         public virtual IEnumerable<IConnection> GetConnections(INode node)
         {
             foreach (IConnection connection in Connections)
             {
                 if (connection.Source.Node == node || connection.Target.Node == node)
+                {
+                    yield return connection;
+                }
+            }
+        }
+        
+        public virtual IEnumerable<IConnection> GetConnections(INode node, PortDirection direction)
+        {
+            foreach (IConnection connection in Connections)
+            {
+                if ((connection.Source.Node == node && direction == PortDirection.Out) || (connection.Target.Node == node && direction == PortDirection.In))
                 {
                     yield return connection;
                 }

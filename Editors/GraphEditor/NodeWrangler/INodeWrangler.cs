@@ -27,6 +27,7 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler
         void ClearConnections(IPort port);
 
         IEnumerable<IConnection> GetConnections(INode node);
+        IEnumerable<IConnection> GetConnections(INode node, PortDirection direction);
         IEnumerable<IConnection> GetConnections(IPort port);
     }
 }
