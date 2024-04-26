@@ -100,23 +100,30 @@ namespace BlueprintEditorPlugin
             
             foreach (string item in Directory.EnumerateFiles("Plugins", "*.dll", SearchOption.AllDirectories))
             {
-                FileInfo fileInfo = new FileInfo(item);
-                Assembly plugin = Assembly.LoadFile(fileInfo.FullName);
-
-                foreach (Attribute attribute in plugin.GetCustomAttributes())
+                try
                 {
-                    if (attribute is RegisterEntityNode entityRegister)
+                    FileInfo fileInfo = new FileInfo(item);
+                    Assembly plugin = Assembly.LoadFile(fileInfo.FullName);
+
+                    foreach (Attribute attribute in plugin.GetCustomAttributes())
                     {
-                        RegisterExtension(entityRegister);
+                        if (attribute is RegisterEntityNode entityRegister)
+                        {
+                            RegisterExtension(entityRegister);
+                        }
+                        else if (attribute is RegisterEbxGraphEditor graphRegister)
+                        {
+                            RegisterExtension(graphRegister);
+                        }
+                        else if (attribute is RegisterBlueprintMenuExtension menuExtension)
+                        {
+                            RegisterExtension(menuExtension);
+                        }
                     }
-                    else if (attribute is RegisterEbxGraphEditor graphRegister)
-                    {
-                        RegisterExtension(graphRegister);
-                    }
-                    else if (attribute is RegisterBlueprintMenuExtension menuExtension)
-                    {
-                        RegisterExtension(menuExtension);
-                    }
+                }
+                catch (Exception )
+                {
+                    // Suppress all errors please!
                 }
             }
         }
