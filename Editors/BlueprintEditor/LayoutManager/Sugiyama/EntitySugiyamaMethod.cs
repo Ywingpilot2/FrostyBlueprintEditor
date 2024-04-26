@@ -25,7 +25,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager.Sugiyama
                 {
                     if (vertex is INode node)
                     {
-                        EntityCycleBreaker cycleBreaker = new EntityCycleBreaker(_connections);
+                        EntityCycleBreaker cycleBreaker = new(_connections);
                         cycleBreaker.RemoveCycles(node);
                     }
                 }
@@ -40,19 +40,19 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager.Sugiyama
             {
                 if (vertex is INode node)
                 {
-                    CycleRemover cycleBreaker = new CycleRemover(_connections);
+                    CycleRemover cycleBreaker = new(_connections);
                     cycleBreaker.RemoveCycles(node);
                 }
             }
             
-            TopologicalSort topologicalSort = new TopologicalSort(_vertices, _connections);
+            TopologicalSort topologicalSort = new(_vertices, _connections);
             List<IVertex> sortedVerts = topologicalSort.SortGraph();
 
             RemoveEmpty();
             RemoveLoops();
             
             // Create islands
-            IslandSolver islandSolver = new IslandSolver(_connections);
+            IslandSolver islandSolver = new(_connections);
             foreach (IVertex vertex in _vertices)
             {
                 if (vertex is INode node)
@@ -65,7 +65,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager.Sugiyama
                 }
             }
 
-            LayerMaker layerMaker = new LayerMaker(sortedVerts, _connections);
+            LayerMaker layerMaker = new(sortedVerts, _connections);
             _layers = layerMaker.CreateLayers();
             
             MergeLayers();

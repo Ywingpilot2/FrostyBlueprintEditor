@@ -14,13 +14,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions
         public override string DisplayName => "Generate Boilerplate";
         private static string BoilerPlatePath => $@"{AppDomain.CurrentDomain.BaseDirectory}BlueprintEditor\BoilerPlate\";
 
-        public override RelayCommand ButtonClicked => new RelayCommand(o =>
+        public override RelayCommand ButtonClicked => new(o =>
         {
             foreach (IVertex selectedVertex in GraphEditor.NodeWrangler.SelectedVertices)
             {
                 if (selectedVertex is EntityNode node && !ExtensionsManager.EntityNodeExtensions.ContainsKey(node.ObjectType))
                 {
-                    BoilerPlateGenerator boilerPlate = new BoilerPlateGenerator($"{BoilerPlatePath}{node.ObjectType}.cs");
+                    BoilerPlateGenerator boilerPlate = new($"{BoilerPlatePath}{node.ObjectType}.cs");
                     
                     boilerPlate.WriteCode("using System.Collections.ObjectModel");
                     boilerPlate.WriteCode("using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports");
@@ -159,7 +159,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions
                     header += ");";
                     WriteIndentedLine(header);
                     return;
-                } break;
+                }
             }
 
             header += "(";
@@ -212,13 +212,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions
 
         public BoilerPlateGenerator(string path)
         {
-            FileInfo fileInfo = new FileInfo($@"{path}");
+            FileInfo fileInfo = new($@"{path}");
             if (!fileInfo.Directory.Exists)
             {
                 Directory.CreateDirectory(fileInfo.DirectoryName);
             }
             
-            _writer = new StreamWriter(path);
+            _writer = new(path);
         }
         
         public void Dispose()

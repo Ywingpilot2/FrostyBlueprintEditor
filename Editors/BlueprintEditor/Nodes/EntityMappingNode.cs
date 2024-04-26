@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Models.Entities.Networking;
-using BlueprintEditorPlugin.Models.Nodes;
 using FrostyEditor;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
@@ -44,11 +45,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
 
         public static void Register()
         {
+            ExtractNodeMappings();
+
             foreach (string file in Directory.EnumerateFiles(@"BlueprintEditor\NodeMappings", "*.nmc"))
             {
                 try
                 {
-                    StreamReader reader = new StreamReader(file);
+                    StreamReader reader = new(file);
                     string line = reader.ReadLine();
                     if (!line.StartsWith("Type"))
                     {
@@ -150,6 +153,25 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             }
 
             return line;
+        }
+
+        private static void ExtractNodeMappings()
+        {
+            string destinationDir = @"BlueprintEditor\NodeMappings\";
+            if (!Directory.Exists(destinationDir))
+                Directory.CreateDirectory(destinationDir);
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            foreach (string embeddedResource in assembly.GetManifestResourceNames().Where(r => r.Contains("BlueprintEditor.Nodes.TypeMapping.Configs") && r.EndsWith(".nmc")))
+            {
+                string fileName = Path.Combine(destinationDir, embeddedResource.Split('.').ElementAtOrDefault(embeddedResource.Split('.').Length - 2) + ".nmc");
+                if (File.Exists(fileName)) // Dont overwrite any existing nmc's
+                    continue;
+
+                using Stream stream = assembly.GetManifestResourceStream(embeddedResource);
+                if (stream is not null)
+                    File.WriteAllText(fileName, new StreamReader(stream).ReadToEnd());
+            }
         }
     }
 }

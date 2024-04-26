@@ -22,13 +22,13 @@ namespace BlueprintEditorPlugin
     /// </summary>
     public static class ExtensionsManager
     {
-        public static readonly Dictionary<string, Type> EntityNodeExtensions = new Dictionary<string, Type>();
-        public static readonly Dictionary<string, Type> TransientNodeExtensions = new Dictionary<string, Type>();
+        public static readonly Dictionary<string, Type> EntityNodeExtensions = new();
+        public static readonly Dictionary<string, Type> TransientNodeExtensions = new();
         
-        private static List<Type> _graphEditors = new List<Type>();
+        private static List<Type> _graphEditors = new();
         public static IEnumerable<Type> GraphEditorExtensions => _graphEditors;
 
-        private static List<Type> _blueprintMenuItems = new List<Type>();
+        private static List<Type> _blueprintMenuItems = new();
         public static IEnumerable<Type> BlueprintMenuItemExtensions => _blueprintMenuItems;
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace BlueprintEditorPlugin
             {
                 try
                 {
-                    FileInfo fileInfo = new FileInfo(item);
+                    FileInfo fileInfo = new(item);
                     Assembly plugin = Assembly.LoadFile(fileInfo.FullName);
 
                     foreach (Attribute attribute in plugin.GetCustomAttributes())
@@ -141,7 +141,7 @@ namespace BlueprintEditorPlugin
                     // Override our internal extension with external one
                     _graphEditors.Add(graphRegister.GraphType);
                 }
-                else if (!(extension is Control))
+                else if (extension is not Control)
                 {
                     App.Logger.LogError("Graph editor {0} must be a control", graphRegister.GraphType.Name);
                 }
