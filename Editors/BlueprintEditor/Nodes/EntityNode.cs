@@ -679,6 +679,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                         output.Realm = Realm;
                     }
                 }
+
+                foreach (IConnection connection in NodeWrangler.GetConnections(this))
+                {
+                    if (connection is EntityConnection entityConnection)
+                    {
+                        entityConnection.ForceFixRealm();
+                    }
+                }
             }
             
             BuildFooter();

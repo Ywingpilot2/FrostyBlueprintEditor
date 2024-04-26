@@ -54,13 +54,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
 
         public override bool Load(LayoutReader reader)
         {
-            Header = reader.ReadNullTerminatedString();
-            HeaderColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadNullTerminatedString()));
-            Location = reader.ReadPoint();
-            double width = reader.ReadDouble();
-            double height = reader.ReadDouble();
-            Size = new System.Windows.Size(width, height);
-            CommentSize = new System.Windows.Size(width, height);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Header = reader.ReadNullTerminatedString();
+                HeaderColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadNullTerminatedString()));
+                Location = reader.ReadPoint();
+                double width = reader.ReadDouble();
+                double height = reader.ReadDouble();
+                CommentSize = new System.Windows.Size(width, height);
+            });
             return true;
         }
 
@@ -77,8 +79,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Utilities
             writer.WriteNullTerminatedString(Header);
             writer.WriteNullTerminatedString(HeaderColor.Color.ToString());
             writer.Write(Location);
-            writer.Write(Size.Width);
-            writer.Write(Size.Height);
+            writer.Write(CommentSize.Width);
+            writer.Write(CommentSize.Height);
         }
 
         
