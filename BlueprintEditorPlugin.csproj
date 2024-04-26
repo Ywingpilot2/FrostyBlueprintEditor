@@ -64,7 +64,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Editors\BlueprintEditor\Nodes.zip" />
     <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AICombatBehaviorEntityData.nmc" />
     <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AICombatGroupEntityData.nmc" />
     <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIDefendAreaEntityData.nmc" />
@@ -96,7 +95,6 @@
     <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamFilterEntityData.nmc" />
     <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamIdToIntEntityData.nmc" />
     <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamRelationEntityData.nmc" />
-    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\NodeMappings.zip" />
     <None Remove="Images\BlueprintEdit.png" />
     <Resource Include="Images\BlueprintEdit.png" />
     <None Remove="Images\AddObjectButton.png" />
