@@ -8,9 +8,7 @@ namespace BlueprintEditorPlugin.Extensions
 {
     public class BlueprintEditorStartupAction : StartupAction
     {
-        public override Action<ILogger> Action => action;
-
-        private void action(ILogger logger)
+        public override Action<ILogger> Action => (logger) =>
         {
             logger.Log("Updating Blueprint Editor options...");
             EditorOptions.Update();
@@ -18,6 +16,6 @@ namespace BlueprintEditorPlugin.Extensions
             ExtensionsManager.Initiate();
             logger.Log("Getting Node Mapping Configs...");
             EntityMappingNode.Register();
-        }
+        };
     }
 }

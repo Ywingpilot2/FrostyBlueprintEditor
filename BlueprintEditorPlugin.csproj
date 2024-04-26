@@ -10,9 +10,19 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <UseWPF>true</UseWPF>
     <OutputType>Library</OutputType>
-    <LangVersion>8</LangVersion>
+    <LangVersion>11</LangVersion>
     <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=$(MSBuildProjectName)\</PathMap>
     <DebugType>embedded</DebugType>
+
+    <WeaverConfiguration>
+      <Weavers>
+        <Costura>
+          <IncludeAssemblies>
+            Prism
+          </IncludeAssemblies>
+        </Costura>
+      </Weavers>
+    </WeaverConfiguration>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Developer - Debug|x64' ">
@@ -53,6 +63,37 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AICombatBehaviorEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AICombatGroupEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIDefendAreaEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIKillCounterEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AISensingParameterEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIUseCoverEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIVehicleBehaviorEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CheckGameModeEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConditionalFloatEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConditionalIntEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConditionalTransformEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConsoleCommandTriggerEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CoopSpawnHelperEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CoopSplitterEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CustomizeSoldierEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\FadeEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\FloatEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\HumanPlayerProxyEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\LocalPlayerGateEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\LocatorEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\PbrSphereLightEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ProjectileStateEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\PropertyCacheEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\PropertyCastEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\SendEventEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\SoundEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\StringConstantEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\SubLevelStatusEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamFilterEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamIdToIntEntityData.nmc" />
+    <None Remove="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamRelationEntityData.nmc" />
     <None Remove="Images\BlueprintEdit.png" />
     <Resource Include="Images\BlueprintEdit.png" />
     <None Remove="Images\AddObjectButton.png" />
@@ -86,6 +127,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
@@ -107,6 +151,37 @@
 
   <ItemGroup>
     <None Remove="Images\Client.png" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AICombatBehaviorEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AICombatGroupEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIDefendAreaEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIKillCounterEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AISensingParameterEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIUseCoverEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\AIVehicleBehaviorEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CheckGameModeEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConditionalFloatEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConditionalIntEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConditionalTransformEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ConsoleCommandTriggerEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CoopSpawnHelperEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CoopSplitterEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\CustomizeSoldierEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\FadeEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\FloatEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\HumanPlayerProxyEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\LocalPlayerGateEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\LocatorEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\PbrSphereLightEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ProjectileStateEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\PropertyCacheEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\PropertyCastEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\SendEventEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\SoundEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\StringConstantEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\SubLevelStatusEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamFilterEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamIdToIntEntityData.nmc" />
+    <EmbeddedResource Include="Editors\BlueprintEditor\Nodes\TypeMapping\Configs\TeamRelationEntityData.nmc" />
     <Resource Include="Images\Client.png" />
   </ItemGroup>
 
@@ -118,13 +193,7 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!-- Replace the second directory with the directory to your frosty's plugins folder -->
     <Exec Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
-    <Exec Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" Command="xcopy /Y $(ProjectDir)Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\BlueprintEditor\NodeMappings" />
     <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(TargetPath) ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
-    <Exec Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" Command="xcopy /Y $(ProjectDir)Editors\BlueprintEditor\Nodes\TypeMapping\Configs\ ..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\BlueprintEditor\NodeMappings" />
-    
-    <!-- And replace the DestinationFolder here to be your frosty's plugins directory as well -->
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Developer - Debug|x64'" SourceFiles="bin\Developer\Debug\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\Plugins\" />
-    <Copy Condition="'$(Configuration)|$(Platform)' == 'Release - Final|x64'" SourceFiles="bin\Release\Final\Prism.dll" DestinationFolder="..\..\1063\FrostyToolsuite\FrostyEditor\bin\Release\Final\Plugins\" />
   </Target>
 
   <PropertyGroup>
