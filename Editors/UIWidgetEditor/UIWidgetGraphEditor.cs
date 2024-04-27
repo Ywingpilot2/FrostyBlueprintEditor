@@ -182,7 +182,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 
                 if (sourceNode.GetOutput(propertyConnection.SourceField, ConnectionType.Property) == null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(delegate
                     {
                         sourceNode.AddOutput(new PropertyOutput(propertyConnection.SourceField, sourceNode));
                     });
@@ -190,7 +190,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 
                 if (targetNode.GetInput(propertyConnection.TargetField, ConnectionType.Property) == null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(delegate
                     {
                         targetNode.AddInput(new PropertyInput(propertyConnection.TargetField, targetNode));
                     });
@@ -279,7 +279,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 
                 if (sourceNode.GetOutput(linkConnection.SourceField, ConnectionType.Link) == null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(delegate
                     {
                         sourceNode.AddOutput(new LinkOutput(linkConnection.SourceField, sourceNode));
                     });
@@ -287,7 +287,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 
                 if (targetNode.GetInput(linkConnection.TargetField, ConnectionType.Link) == null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(delegate
                     {
                         targetNode.AddInput(new LinkInput(linkConnection.TargetField, targetNode));
                     });
@@ -376,7 +376,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 
                 if (sourceNode.GetOutput(eventConnection.SourceEvent.Name, ConnectionType.Event) == null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(delegate
                     {
                         sourceNode.AddOutput(new EventOutput(eventConnection.SourceEvent.Name, sourceNode));
                     });
@@ -384,7 +384,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 
                 if (targetNode.GetInput(eventConnection.TargetEvent.Name, ConnectionType.Event) == null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(delegate
                     {
                         targetNode.AddInput(new EventInput(eventConnection.TargetEvent.Name, targetNode));
                     });
