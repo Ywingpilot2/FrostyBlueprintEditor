@@ -20,6 +20,7 @@ using Frosty.Controls;
 using FrostyEditor;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
+using FrostySdk.Managers;
 
 namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
 {
@@ -60,6 +61,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager
     public class EntityLayoutManager : BaseLayoutManager
     {
         public override int Version => 1006;
+
+        public virtual bool IsValid(EbxAssetEntry assetEntry)
+        {
+            return true;
+        }
 
         public override bool SaveLayout(string path)
         {

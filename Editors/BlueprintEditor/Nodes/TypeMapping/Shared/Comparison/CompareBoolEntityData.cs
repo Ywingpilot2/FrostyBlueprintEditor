@@ -12,6 +12,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 
         public override void BuildFooter()
         {
+            ClearFooter();
             if ((bool)TryGetProperty("TriggerOnStart"))
             {
                 Footer = "Triggers on start";

@@ -20,6 +20,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
         {
             ClearFooter();
             dynamic templates = TryGetProperty("Templates");
+            if (templates == null)
+                return;
+            
             foreach (CString template in templates)
             {
                 if (template.IsNull())

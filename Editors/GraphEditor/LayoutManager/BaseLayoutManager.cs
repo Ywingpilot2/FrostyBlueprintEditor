@@ -41,6 +41,11 @@ namespace BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager
             }
         }
 
+        public virtual bool IsValid()
+        {
+            return true;
+        }
+
         public virtual void SortLayout(bool optimized = false)
         {
             if (optimized)

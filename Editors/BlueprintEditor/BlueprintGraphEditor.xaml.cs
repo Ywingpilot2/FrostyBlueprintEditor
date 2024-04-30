@@ -97,6 +97,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             
             InitializeComponent();
             NodePropertyGrid.NodeWrangler = NodeWrangler;
+            
             LayoutManager = new EntityLayoutManager(NodeWrangler);
 
             foreach (Type extensionType in ExtensionsManager.BlueprintMenuItemExtensions)
@@ -147,6 +148,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         {
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
             wrangler.Asset = App.AssetManager.GetEbx(assetEntry);
+            EntityLayoutManager layoutManager = ExtensionsManager.GetValidLayoutManager(assetEntry);
+            if (layoutManager != null)
+            {
+                LayoutManager = layoutManager;
+            }
 
             CheapMethod cheap = new CheapMethod(NodeWrangler);
             foreach (object assetObject in wrangler.Asset.Objects)

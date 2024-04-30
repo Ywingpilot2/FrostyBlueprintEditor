@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -6,8 +7,10 @@ using System.Windows;
 using System.Windows.Controls;
 using BlueprintEditorPlugin.Attributes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Extensions;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.GraphEditor;
+using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.GraphEditor.LayoutManager.Algorithms;
 using BlueprintEditorPlugin.Models.Nodes;
 using FrostyEditor;
@@ -30,6 +33,9 @@ namespace BlueprintEditorPlugin
 
         private static List<Type> _blueprintMenuItems = new();
         public static IEnumerable<Type> BlueprintMenuItemExtensions => _blueprintMenuItems;
+        
+        private static List<Type> _entityLayoutManagers = new();
+        public static IEnumerable<Type> EntityLayoutManagers => _entityLayoutManagers;
 
         /// <summary>
         /// Initiates the ExtensionManager
@@ -190,6 +196,22 @@ namespace BlueprintEditorPlugin
             }
         }
 
+        public static void RegisterExtensions(RegisterEntityLayoutExtension layoutExtension)
+        {
+            try
+            {
+                var extension = (EntityLayoutManager)Activator.CreateInstance(layoutExtension.LayoutManagerType);
+                if (extension.IsValid())
+                {
+                    _entityLayoutManagers.Add(layoutExtension.LayoutManagerType);
+                }
+            }
+            catch (Exception e)
+            {
+                App.Logger.LogError("Blueprint editor menu extension {0} threw the exception {1} at {2}", layoutExtension.LayoutManagerType.Name, e.Message, e.StackTrace);
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -205,6 +227,25 @@ namespace BlueprintEditorPlugin
                 if (graphEditor.IsValid(assetEntry))
                 {
                     return graphEditor;
+                }
+            }
+
+            return null;
+        }
+        
+        /// <summary>
+        /// Gets a valid <see cref="EntityLayoutManager"/> for the specified <see cref="EbxAssetEntry"/>
+        /// </summary>
+        /// <param name="assetEntry"></param>
+        /// <returns></returns>
+        public static EntityLayoutManager GetValidLayoutManager(EbxAssetEntry assetEntry)
+        {
+            foreach (Type layoutType in _entityLayoutManagers)
+            {
+                EntityLayoutManager layoutManager = (EntityLayoutManager)Activator.CreateInstance(layoutType);
+                if (layoutManager.IsValid(assetEntry))
+                {
+                    return layoutManager;
                 }
             }
 
