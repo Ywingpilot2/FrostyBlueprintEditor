@@ -125,6 +125,10 @@ namespace BlueprintEditorPlugin
                         {
                             RegisterExtension(menuExtension);
                         }
+                        else if (attribute is RegisterEntityLayoutExtension layoutExtension)
+                        {
+                            RegisterExtension(layoutExtension);
+                        }
                     }
                 }
                 catch (Exception )
@@ -196,7 +200,7 @@ namespace BlueprintEditorPlugin
             }
         }
 
-        public static void RegisterExtensions(RegisterEntityLayoutExtension layoutExtension)
+        public static void RegisterExtension(RegisterEntityLayoutExtension layoutExtension)
         {
             try
             {
