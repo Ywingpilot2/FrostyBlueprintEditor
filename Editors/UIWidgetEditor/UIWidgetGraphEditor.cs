@@ -39,6 +39,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
             if (layoutManager != null)
             {
                 LayoutManager = layoutManager;
+                LayoutManager.NodeWrangler = NodeWrangler;
             }
 
             CheapMethod cheap = new CheapMethod(NodeWrangler);

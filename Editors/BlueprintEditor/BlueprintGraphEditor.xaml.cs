@@ -152,6 +152,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             if (layoutManager != null)
             {
                 LayoutManager = layoutManager;
+                LayoutManager.NodeWrangler = NodeWrangler;
             }
 
             CheapMethod cheap = new CheapMethod(NodeWrangler);
