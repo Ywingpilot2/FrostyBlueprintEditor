@@ -204,7 +204,7 @@ namespace BlueprintEditorPlugin
         {
             try
             {
-                var extension = (EntityLayoutManager)Activator.CreateInstance(layoutExtension.LayoutManagerType);
+                var extension = (EntityLayoutManager)Activator.CreateInstance(layoutExtension.LayoutManagerType, new object[] { null });
                 if (extension.IsValid())
                 {
                     _entityLayoutManagers.Add(layoutExtension.LayoutManagerType);
@@ -246,7 +246,7 @@ namespace BlueprintEditorPlugin
         {
             foreach (Type layoutType in _entityLayoutManagers)
             {
-                EntityLayoutManager layoutManager = (EntityLayoutManager)Activator.CreateInstance(layoutType);
+                EntityLayoutManager layoutManager = (EntityLayoutManager)Activator.CreateInstance(layoutType, new object[] { null });
                 if (layoutManager.IsValid(assetEntry))
                 {
                     return layoutManager;
