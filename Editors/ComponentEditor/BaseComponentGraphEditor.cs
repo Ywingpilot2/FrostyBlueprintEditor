@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using BlueprintEditorPlugin.Editors.BlueprintEditor;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
+using BlueprintEditorPlugin.Editors.BlueprintEditor.LayoutManager;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
@@ -60,6 +61,12 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
         {
             EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
             wrangler.Asset = App.AssetManager.GetEbx(assetEntry);
+            
+            EntityLayoutManager layoutManager = ExtensionsManager.GetValidLayoutManager(assetEntry);
+            if (layoutManager != null)
+            {
+                LayoutManager = layoutManager;
+            }
 
             CheapMethod cheap = new CheapMethod(NodeWrangler);
             foreach (object assetObject in wrangler.Asset.Objects)
