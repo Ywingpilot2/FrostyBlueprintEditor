@@ -755,14 +755,22 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
 
         public void ModifyAsset()
         {
-            if (AssetEntry.IsDirty)
-                return;
-            
-            App.AssetManager.ModifyEbx(AssetEntry.Name, Asset);
-            Application.Current.Dispatcher.Invoke(() =>
+            if (!AssetEntry.IsDirty)
             {
-                Frosty.Core.App.EditorWindow.DataExplorer.RefreshItems();
-            });
+                App.AssetManager.ModifyEbx(AssetEntry.Name, Asset);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Frosty.Core.App.EditorWindow.DataExplorer.RefreshItems();
+                });
+            }
+            
+            Asset.Update();
+
+            if (AssetEntry.HasModifiedData)
+            {
+                AssetEntry.ModifiedEntry.DependentAssets.Clear();
+                AssetEntry.ModifiedEntry.DependentAssets.AddRange(Asset.Dependencies);
+            }
         }
 
         public EntityNodeWrangler()
