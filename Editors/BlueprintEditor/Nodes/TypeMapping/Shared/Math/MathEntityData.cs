@@ -13,6 +13,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
     public class MathNode : EntityNode
     {
         public override string ObjectType => "MathEntityData";
+        public override string ToolTip => "This performs math operations on inputted values and outputs a result";
 
         public override void OnCreation()
         {

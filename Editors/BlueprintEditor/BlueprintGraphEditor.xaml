@@ -22,6 +22,7 @@
              xmlns:editor="clr-namespace:BlueprintEditorPlugin.Views.Editor"
              xmlns:nodes2="clr-namespace:BlueprintEditorPlugin.Models.Nodes"
              xmlns:buttons="clr-namespace:BlueprintEditorPlugin.Views.Buttons"
+             xmlns:treeViews="clr-namespace:BlueprintEditorPlugin.Views.TreeViews"
              mc:Ignorable="d"
              d:DesignHeight="702" d:DesignWidth="1520">
     
@@ -1338,7 +1339,14 @@
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                         
-                                            <controls1:FrostyClassSelector x:Name="ClassList"
+                                            <!--<controls1:FrostyClassSelector x:Name="ClassList"
+                                                                           Grid.Row="1"
+                                                                           ItemDoubleClicked="ClassSelector_OnItemDoubleClicked"
+                                                                           SelectedItemChanged="ClassList_OnSelectedItemChanged"
+                                                                           Types="{x:Static local:BlueprintGraphEditor.Types}"
+                                                                           ItemBeginDrag="ClassList_OnItemBeginDrag"/>-->
+                                            
+                                            <treeViews:TypeSelectorTreeView x:Name="ClassList"
                                                                            Grid.Row="1"
                                                                            ItemDoubleClicked="ClassSelector_OnItemDoubleClicked"
                                                                            SelectedItemChanged="ClassList_OnSelectedItemChanged"

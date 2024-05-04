@@ -783,10 +783,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
 
         private void ClassSelector_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
         {
-            if (ClassList.SelectedClass == null)
+            if (ClassList.SelectedType == null)
                 return;
             
-            EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedClass, NodeWrangler);
+            EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedType, NodeWrangler);
             node.Location = new Point(Editor.ViewportLocation.X + (575 / Editor.ViewportZoom), Editor.ViewportLocation.Y + 287.5 / Editor.ViewportZoom);
             NodeWrangler.AddVertex(node);
         }
@@ -819,17 +819,17 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         
         private void ClassList_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (ClassList.SelectedClass == null)
+            if (ClassList.SelectedType == null)
             {
                 EntDocBoxHeader.Text = "";
                 EntDocBoxText.Text = "";
                 return;
             }
             
-            EntDocBoxHeader.Text = ClassList.SelectedClass.Name;
-            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(ClassList.SelectedClass.Name))
+            EntDocBoxHeader.Text = ClassList.SelectedType.Name;
+            if (ExtensionsManager.EntityNodeExtensions.ContainsKey(ClassList.SelectedType.Name))
             {
-                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[ClassList.SelectedClass.Name]);
+                EntityNode node = (EntityNode)Activator.CreateInstance(ExtensionsManager.EntityNodeExtensions[ClassList.SelectedType.Name]);
                 EntDocBoxText.Text = node.ToolTip;
             }
         }
@@ -1036,10 +1036,10 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
             {
                 if (ToolboxTabControl.SelectedIndex == 0)
                 {
-                    if (ClassList.SelectedClass == null)
+                    if (ClassList.SelectedType == null)
                         return;
                     
-                    EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedClass, NodeWrangler);
+                    EntityNode node = EntityNode.GetNodeFromEntity(ClassList.SelectedType, NodeWrangler);
                     node.Location = Editor.MouseLocation;
                     NodeWrangler.AddVertex(node);
                 }

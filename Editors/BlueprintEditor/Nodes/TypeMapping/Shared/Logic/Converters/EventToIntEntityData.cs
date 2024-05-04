@@ -12,6 +12,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
     public class EventToIntNode : EntityNode
     {
         public override string ObjectType => "EventToIntEntityData";
+        public override string ToolTip => "Outputs an integer property depending on the last fired event";
 
         public override void OnCreation()
         {

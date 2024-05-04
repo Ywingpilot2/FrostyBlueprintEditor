@@ -17,7 +17,9 @@
     xmlns:nodify="clr-namespace:BlueprintEditorPlugin.Views.Nodes"
     xmlns:itemsContainer="clr-namespace:BlueprintEditorPlugin.Views.ItemsContainer"
     xmlns:editor="clr-namespace:BlueprintEditorPlugin.Views.Editor"
-    xmlns:buttons="clr-namespace:BlueprintEditorPlugin.Views.Buttons">
+    xmlns:buttons="clr-namespace:BlueprintEditorPlugin.Views.Buttons"
+    xmlns:treeViews="clr-namespace:BlueprintEditorPlugin.Views.TreeViews"
+    xmlns:converters="clr-namespace:Frosty.Core.Converters;assembly=FrostyCore">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
@@ -25,6 +27,7 @@
     </ResourceDictionary.MergedDictionaries>
     
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    <converters:StringToBitmapSourceConverter x:Key="StringToBitmapSourceConverter"/>
     
     <SolidColorBrush x:Key="EventConnectionColor"
                      Color="#F8F8F8" 
@@ -60,6 +63,7 @@
         </Setter>
     </Style>
     
+    <!--Drop down button-->
     <Style TargetType="{x:Type buttons:DropDownButton}">
         <Setter Property="Foreground"
                 Value="{StaticResource FontColor}" />
@@ -101,6 +105,59 @@
                                     Value="#FF707070" />
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <HierarchicalDataTemplate DataType="{x:Type treeViews:BaseTreeExplorerItem}">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="22">
+            <Image x:Name="imageRect" Width="16" Height="16" Source="{Binding Icon}"/>
+            <TextBlock x:Name="name" Text="{Binding Path=Name}" Foreground="{StaticResource FontColor}" FontFamily="Global User Interface" Margin="6 0 0 0" VerticalAlignment="Center"/>
+        </StackPanel>
+    </HierarchicalDataTemplate>
+    
+    <HierarchicalDataTemplate DataType="{x:Type treeViews:TreeExplorerFolderItem}" ItemsSource="{Binding SubItems}">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="22">
+            <Rectangle x:Name="imageRect" Width="16" Height="16" Fill="{StaticResource FontColor}" Margin="3,0,0,0">
+                <Rectangle.OpacityMask>
+                    <ImageBrush ImageSource="{Binding Icon}"/>
+                </Rectangle.OpacityMask>
+            </Rectangle>
+            <TextBlock Text="{Binding Path=Name}" Foreground="{StaticResource FontColor}" FontFamily="Global User Interface" Margin="6,0,0,0" VerticalAlignment="Center"/>
+        </StackPanel>
+        
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Path=IsExpanded}" Value="True">
+                <Setter Property="OpacityMask" TargetName="imageRect">
+                    <Setter.Value>
+                        <ImageBrush ImageSource="/FrostyEditor;component/Images/OpenFolder.png"/>
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+    
+    <Style TargetType="{x:Type treeViews:BaseTreeViewSelector}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type treeViews:BaseTreeViewSelector}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <ctrl:FrostyWatermarkTextBox x:Name="FilterBox_Element" Grid.Row="0" WatermarkText="Filter" Margin="1" BorderThickness="1" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
+                        <TreeView Grid.Row="1" x:Name="TreeExplorer_Element">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource baseTreeViewItemStyle}">
+                                    <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}"/>
+                                    <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                        </TreeView>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

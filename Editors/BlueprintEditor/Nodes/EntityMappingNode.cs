@@ -53,7 +53,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 {
                     StreamReader reader = new(file);
                     string line = reader.ReadLine();
-                    if (!line.StartsWith("Type"))
+                    if (!line!.StartsWith("Type"))
                     {
                         App.Logger.LogError("{0} did not start with the object's type. Please always include the object's type as the first property entry");
                         continue;
