@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,13 +25,36 @@ namespace BlueprintEditorPlugin.Views.TreeViews
         }
     }
 
-    public class BaseTreeExplorerItem
+    public class BaseTreeExplorerItem : INotifyPropertyChanged
     {
         public virtual string Name { get; set; }
         public virtual ImageSource Icon { get; }
         public bool IsSelected { get; set; }
         public bool IsExpanded { get; set; }
+
+        private bool _isVisible;
+        public bool IsVisible 
+        {
+            get => _isVisible;
+            set 
+            {
+                _isVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         public virtual bool IsExpandable => false;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public BaseTreeExplorerItem()
+        {
+            IsVisible = true;
+        }
     }
     
     public enum TreeViewSelectionMode
@@ -128,48 +154,55 @@ namespace BlueprintEditorPlugin.Views.TreeViews
             if (e.Key == Key.Enter)
                 filterTextBox_LostFocus(this, new RoutedEventArgs());
         }
-
-        /// <summary>
-        /// TODO: This isn't a good way to filter a tree view. This limits only 1 level of filtering down a folder chain
-        /// How deep down folders go shouldn't matter to begin with
-        /// Though I also suppose if someone needed it to do more, they would override this and <see cref="UpdateTreeView"/> to remake the tree
-        /// </summary>
-        /// <param name="filter"></param>
-        public virtual void SetFilter(Predicate<object> filter)
+        
+        public void SetFilter(Predicate<object> filter)
         {
-            if (filter == null)
-            {
-                _treeExplorer.Items.Filter = null;
-                foreach (BaseTreeExplorerItem item in _treeExplorer.Items)
-                {
-                    if (item is TreeExplorerFolderItem)
-                    {
-                        TreeViewItem folderItem = _treeExplorer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
-                        folderItem.Items.Filter = null;
-                    }
-                }
-                
-                return;
-            }
-            
-            _treeExplorer.Items.Filter = item =>
+            foreach (BaseTreeExplorerItem item in _treeExplorer.Items)
             {
                 if (item is TreeExplorerFolderItem folder)
                 {
-                    if (folder.SubItems.Any(i => filter.Invoke(i)))
+                    if (filter == null)
                     {
-                        TreeViewItem folderItem = _treeExplorer.ItemContainerGenerator.ContainerFromItem(folder) as TreeViewItem;
-                        folderItem.Items.Filter = filter;
-                        return true;
+                        folder.IsVisible = true;
+                        FilterItems(null, folder);
+                        continue;
                     }
 
-                    return false;
+                    folder.IsVisible = FilterItems(filter, folder);
                 }
                 else
                 {
-                    return filter.Invoke((BaseTreeExplorerItem)item);
+                    item.IsVisible = filter == null || filter.Invoke(item);
                 }
-            };
+            }
+        }
+
+        private bool FilterItems(Predicate<object> filter, TreeExplorerFolderItem rootFolder)
+        {
+            bool visible = false;
+            foreach (BaseTreeExplorerItem item in rootFolder.SubItems)
+            {
+                if (item is TreeExplorerFolderItem folder)
+                {
+                    if (filter == null)
+                    {
+                        folder.IsVisible = true;
+                        visible = true;
+                        FilterItems(null, folder);
+                        continue;
+                    }
+
+                    folder.IsVisible = FilterItems(filter, folder);
+                    visible = folder.IsVisible || visible;
+                }
+                else
+                {
+                    item.IsVisible = filter == null || filter.Invoke(item);
+                    visible = item.IsVisible || visible;
+                }
+            }
+
+            return visible;
         }
 
         protected virtual void UpdateTreeView()
