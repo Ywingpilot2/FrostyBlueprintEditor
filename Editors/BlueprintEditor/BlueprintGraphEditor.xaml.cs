@@ -1107,99 +1107,107 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     
                     foreach (string arg in args)
                     {
-                        if (item.Visibility == Visibility.Collapsed)
-                            break;
-                        
-                        string p1 = arg.Split(':')[0].Trim();
-                        string p2 = arg.Split(':')[1].Trim();
-
-                        switch (p1)
+                        try
                         {
-                            case "guid":
+                            if (item.Visibility == Visibility.Collapsed)
+                                break;
+                        
+                            string p1 = arg.Split(':')[0].Trim();
+                            string p2 = arg.Split(':')[1].Trim();
+
+                            switch (p1)
                             {
-                                if (!(vert is IEntityObject entityObject))
+                                case "guid":
                                 {
-                                    item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
+                                    if (!(vert is IEntityObject entityObject))
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
 
-                                if (entityObject.InternalGuid.ToString() != p2)
-                                {
-                                    item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
+                                    if (entityObject.InternalGuid.ToString() != p2)
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
 
-                                item.Visibility = Visibility.Visible;
-                            } break;
-                            case "fguid":
-                            {
-                                if (!(vert is IEntityObject entityObject))
-                                {
-                                    item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
-
-                                if (entityObject.FileGuid.ToString() == p2)
-                                {
-                                    item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
-
-                                item.Visibility = Visibility.Visible;
-                            } break;
-                            case "search":
-                            {
-                                if (!(vert.ToString().IndexOf(p2.ToLower(), StringComparison.OrdinalIgnoreCase) >= 0))
-                                {
-                                    item.Visibility = Visibility.Collapsed;
-                                }
-                                else
-                                {
                                     item.Visibility = Visibility.Visible;
-                                }
-                            } break;
-                            case "hasproperty":
-                            {
-                                if (!(vert is IEntityNode entityNode))
+                                } break;
+                                case "fguid":
                                 {
-                                    item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
+                                    if (!(vert is IEntityObject entityObject))
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
+
+                                    if (entityObject.FileGuid.ToString() == p2)
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
+
+                                    item.Visibility = Visibility.Visible;
+                                } break;
+                                case "search":
+                                {
+                                    if (!(vert.ToString().IndexOf(p2.ToLower(), StringComparison.OrdinalIgnoreCase) >= 0))
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                    }
+                                    else
+                                    {
+                                        item.Visibility = Visibility.Visible;
+                                    }
+                                } break;
+                                case "hasproperty":
+                                {
+                                    if (!(vert is IEntityNode entityNode))
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
                                 
-                                if (entityNode.TryGetProperty(p2) != null)
-                                {
-                                    item.Visibility = Visibility.Visible;
-                                    break;
-                                }
+                                    if (entityNode.TryGetProperty(p2) != null)
+                                    {
+                                        item.Visibility = Visibility.Visible;
+                                        break;
+                                    }
 
-                                item.Visibility = Visibility.Collapsed;
-                            } break;
-                            case "hasvalue":
-                            {
-                                string c1 = p2.Split(',')[0].Trim();
-                                string c2 = p2.Split(',')[1].Trim();
+                                    item.Visibility = Visibility.Collapsed;
+                                } break;
+                                case "hasvalue":
+                                {
+                                    string c1 = p2.Split(',')[0].Trim();
+                                    string c2 = p2.Split(',')[1].Trim();
                                 
-                                if (!(vert is IEntityNode entityNode))
-                                {
+                                    if (!(vert is IEntityNode entityNode))
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
+
+                                    object value = entityNode.TryGetProperty(c1);
+                                    if (value == null)
+                                    {
+                                        item.Visibility = Visibility.Collapsed;
+                                        break;
+                                    }
+
+                                    if (value.ToString().ToLower() == c2.ToLower())
+                                    {
+                                        item.Visibility = Visibility.Visible;
+                                        break;
+                                    }
+
                                     item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
-
-                                object value = entityNode.TryGetProperty(c1);
-                                if (value == null)
-                                {
-                                    item.Visibility = Visibility.Collapsed;
-                                    break;
-                                }
-
-                                if (value.ToString().ToLower() == c2.ToLower())
-                                {
-                                    item.Visibility = Visibility.Visible;
-                                    break;
-                                }
-
-                                item.Visibility = Visibility.Collapsed;
-                            } break;
+                                } break;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            App.Logger.LogError("Invalid search input");
+                            continue;
                         }
                     }
                 }
