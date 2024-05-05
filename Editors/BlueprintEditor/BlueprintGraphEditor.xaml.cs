@@ -1099,37 +1099,119 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 if (item == null)
                     continue;
 
-                if (FilterBox.Text.StartsWith("guid:"))
+                // Parse text arguments
+                if (FilterBox.Text.Contains(':'))
                 {
-                    string guid = FilterBox.Text.Split(':').LastOrDefault();
-                    if (guid == null)
-                        return;
-
-                    if (!(vert is IEntityObject entityObject)) continue;
+                    string[] args = FilterBox.Text.Split(' ');
+                    item.Visibility = Visibility.Visible;
                     
-                    if (entityObject.InternalGuid.ToString() == guid)
-                        continue;
+                    foreach (string arg in args)
+                    {
+                        if (item.Visibility == Visibility.Collapsed)
+                            break;
+                        
+                        string p1 = arg.Split(':')[0].Trim();
+                        string p2 = arg.Split(':')[1].Trim();
 
-                    item.Visibility = Visibility.Collapsed;
-                }
-                else if (FilterBox.Text.StartsWith("fguid:"))
-                {
-                    string guid = FilterBox.Text.Split(':').LastOrDefault();
-                    if (guid == null)
-                        return;
+                        switch (p1)
+                        {
+                            case "guid":
+                            {
+                                if (!(vert is IEntityObject entityObject))
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
 
-                    if (!(vert is IEntityObject entityObject)) continue;
-                    
-                    if (entityObject.FileGuid.ToString() == guid)
-                        continue;
+                                if (entityObject.InternalGuid.ToString() != p2)
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
 
-                    item.Visibility = Visibility.Collapsed;
+                                item.Visibility = Visibility.Visible;
+                            } break;
+                            case "fguid":
+                            {
+                                if (!(vert is IEntityObject entityObject))
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+
+                                if (entityObject.FileGuid.ToString() == p2)
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+
+                                item.Visibility = Visibility.Visible;
+                            } break;
+                            case "search":
+                            {
+                                if (!(vert.ToString().IndexOf(p2.ToLower(), StringComparison.OrdinalIgnoreCase) >= 0))
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                }
+                                else
+                                {
+                                    item.Visibility = Visibility.Visible;
+                                }
+                            } break;
+                            case "hasproperty":
+                            {
+                                if (!(vert is IEntityNode entityNode))
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+                                
+                                if (entityNode.TryGetProperty(p2) != null)
+                                {
+                                    item.Visibility = Visibility.Visible;
+                                    break;
+                                }
+
+                                item.Visibility = Visibility.Collapsed;
+                            } break;
+                            case "hasvalue":
+                            {
+                                string c1 = p2.Split(',')[0].Trim();
+                                string c2 = p2.Split(',')[1].Trim();
+                                
+                                if (!(vert is IEntityNode entityNode))
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+
+                                object value = entityNode.TryGetProperty(c1);
+                                if (value == null)
+                                {
+                                    item.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+
+                                if (value.ToString().ToLower() == c2.ToLower())
+                                {
+                                    item.Visibility = Visibility.Visible;
+                                    break;
+                                }
+
+                                item.Visibility = Visibility.Collapsed;
+                            } break;
+                        }
+                    }
                 }
                 else
                 {
                     if (!(vert.ToString().IndexOf(FilterBox.Text.ToLower(), StringComparison.OrdinalIgnoreCase) >= 0))
                     {
                         item.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        item.Visibility = Visibility.Visible;
                     }
                 }
             }
@@ -1147,6 +1229,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         }
 
         #endregion
+
+        #region Navigation
 
         private void RedirectGoToSource_OnClick(object sender, RoutedEventArgs e)
         {
@@ -1193,5 +1277,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                 Editor.BringIntoView(location);
             }
         }
+
+        #endregion
     }
 }

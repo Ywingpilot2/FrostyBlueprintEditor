@@ -509,6 +509,9 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid
             string filterText = filterBox.Text;
             if (filterText == FilterText)
                 return;
+            
+            if (Object == null)
+                return;
 
             filterBox.IsEnabled = false;
             tv.IsEnabled = false;
