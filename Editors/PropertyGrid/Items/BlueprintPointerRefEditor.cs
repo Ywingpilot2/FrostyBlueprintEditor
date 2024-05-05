@@ -671,12 +671,10 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
             if (pointerRef.Type == PointerRefType.External)
             {
                 EbxAssetEntry entry = App.AssetManager.GetEbxEntry(pointerRef.External.FileGuid);
-                EbxAssetEntry assetEntry = App.AssetManager.GetEbxEntry(pointerRef.External.FileGuid);
-                
-                EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
 
                 if (entry != null)
                 {
+                    EbxAsset asset = App.AssetManager.GetEbx(entry);
                     if (asset == null || pointerRef.External.ClassGuid == Guid.Empty || pointerRef.External.ClassGuid == asset.RootInstanceGuid)
                     {
                         // fallback or external root asset
@@ -724,6 +722,15 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
             {
                 EbxAssetEntry currentAsset = App.AssetManager.GetEbxEntry(wrangler.Asset.FileGuid);
                 value = pointerRef.Internal;
+                if (value == null)
+                {
+                    RefValue = "(invalid)";
+                    RefValueName = RefValue;
+                    RefValuePath = "";
+                    RefType = (baseType != null) ? baseType.Name : "";
+                    return;
+                }
+                
                 path = currentAsset.Name;
                 type = pointerRef.Internal.GetType().Name;
             }

@@ -1207,7 +1207,6 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         catch (Exception e)
                         {
                             App.Logger.LogError("Invalid search input");
-                            continue;
                         }
                     }
                 }
