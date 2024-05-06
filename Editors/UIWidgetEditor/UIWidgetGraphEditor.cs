@@ -32,7 +32,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
         
         public override void LoadAsset(EbxAssetEntry assetEntry)
         {
-            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+            UIWidgetNodeWrangler wrangler = (UIWidgetNodeWrangler)NodeWrangler;
             wrangler.Asset = App.AssetManager.GetEbx(assetEntry);
             
             EntityLayoutManager layoutManager = ExtensionsManager.GetValidLayoutManager(assetEntry);
@@ -106,6 +106,10 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
                 }
 
                 EntityNode node = EntityNode.GetNodeFromEntity(assetObject, NodeWrangler);
+                if (node.ObjectType == "UIElementLayerEntityData")
+                {
+                    wrangler.LayerNameCache.Add(node.TryGetProperty("LayerName").ToString(), node);
+                }
                 cheap.SortGraph(node);
                 
                 wrangler.AddVertexTransient(node);

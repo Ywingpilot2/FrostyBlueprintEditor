@@ -19,7 +19,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler
 {
     public class UIWidgetNodeWrangler : EntityNodeWrangler
     {
-        private Dictionary<string, EntityNode> _layerNameCache = new Dictionary<string, EntityNode>();
+        public Dictionary<string, EntityNode> LayerNameCache = new();
 
         /// <summary>
         /// The root component of this asset
@@ -52,7 +52,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler
                         if (result != MessageBoxResult.Yes)
                             return;
 
-                        if (!_layerNameCache.ContainsKey(args.LayerName))
+                        if (!LayerNameCache.ContainsKey(args.LayerName))
                         {
                             App.Logger.LogError("Unable to find layer {0}", args.LayerName);
                             return;
@@ -62,7 +62,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler
                         InternalNodeCache.Add(entityNode.InternalGuid, entityNode);
                         PointerRef pointerRef = new PointerRef(entityNode.Object);
                         
-                        EntityNode layer = _layerNameCache[args.LayerName];
+                        EntityNode layer = LayerNameCache[args.LayerName];
                         ((dynamic)layer.Object).Elements.Add(pointerRef);
                     }
                     else
@@ -74,7 +74,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler
                         if (entityNode.ObjectType == "UIElementLayerEntityData")
                         {
                             ((dynamic)Asset.RootObject).Object.Internal.Layers.Add(pointerRef);
-                            _layerNameCache.Add(entityNode.TryGetProperty("LayerName").ToString(), entityNode);
+                            LayerNameCache.Add(entityNode.TryGetProperty("LayerName").ToString(), entityNode);
                         }
                         else
                         {
@@ -188,7 +188,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler
                                 RemoveVertex(elementNode); // TODO: Big stutter issue? We're doing a lot with this we don't need to
                             }
 
-                            _layerNameCache.Remove(entityNode.TryGetProperty("LayerName").ToString());
+                            LayerNameCache.Remove(entityNode.TryGetProperty("LayerName").ToString());
                         }
                         else
                         {
@@ -271,7 +271,7 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor.NodeWrangler
         /// <returns>The <see cref="EntityNode"/> of containing the layer, null if not found</returns>
         private EntityNode GetLayerFromNode(EntityNode node)
         {
-            foreach (EntityNode layerNode in _layerNameCache.Values)
+            foreach (EntityNode layerNode in LayerNameCache.Values)
             {
                 dynamic elements = layerNode.TryGetProperty("Elements");
                 if (elements == null)
