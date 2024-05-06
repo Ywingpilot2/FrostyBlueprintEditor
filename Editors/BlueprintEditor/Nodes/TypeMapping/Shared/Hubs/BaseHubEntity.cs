@@ -42,8 +42,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             // A hash was edited
             if (args.Item.Parent.Name == "HashedInput")
             {
-                EntityInput input = GetInput((int)args.OldValue, ConnectionType.Property);
-                input.Name = Utils.GetString((int)args.NewValue);
+                uint old = (uint)args.OldValue;
+                uint newV = (uint)args.NewValue;
+                
+                EntityInput input = GetInput((int)old, ConnectionType.Property);
+                input.Name = Utils.GetString((int)newV);
             }
             else switch (args.Item.Name)
             {
@@ -55,7 +58,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                         case ItemModifiedTypes.Insert:
                         case ItemModifiedTypes.Add:
                         {
-                            AddInput(args.NewValue.ToString(), ConnectionType.Property, Realm);
+                            uint newV = (uint)args.NewValue;
+                            AddInput(Utils.GetString((int)newV), ConnectionType.Property, Realm);
                         } break;
                         case ItemModifiedTypes.Remove:
                         {
