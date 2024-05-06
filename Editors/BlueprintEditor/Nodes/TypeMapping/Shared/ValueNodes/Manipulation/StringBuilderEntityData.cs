@@ -49,13 +49,28 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                         string type = args.NewValue.ToString();
                         if (type == "StringBuilderTextEntryType_Passthrough")
                             return;
-                        
-                        EntityInput input = GetInput(Utils.GetString((int)args.OldValue), ConnectionType.Property);
-                        input.Name = Utils.GetString((int)args.NewValue);
+
+                        dynamic entry = args.Item.Parent.Value;
+                        int hash = (int)entry.FieldHash;
+                        EntityInput input = GetInput(hash, ConnectionType.Property);
+                        if (input == null)
+                        {
+                            input = AddInput(Utils.GetString(hash), ConnectionType.Property, Realm);
+                        }
+                        else
+                        {
+                            input.Name = Utils.GetString(hash);
+                        }
                     } break;
                     case "FieldHash":
                     {
                         EntityInput input = GetInput(Utils.GetString((int)args.OldValue), ConnectionType.Property);
+                        if (input == null)
+                        {
+                            AddInput(Utils.GetString((int)args.NewValue), ConnectionType.Property, Realm);
+                            return;
+                        }
+                        
                         input.Name = Utils.GetString((int)args.NewValue);
                     } break;
                 }
