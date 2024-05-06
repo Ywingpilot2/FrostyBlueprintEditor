@@ -687,11 +687,9 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid
 
         protected virtual void SubItem_Modified(object sender, ItemModifiedEventArgs e)
         {
-            object nodeObj;
             if (additionalData != null)
             {
                 additionalData.Save(e);
-                nodeObj = additionalData.Original;
             }
             else
             {
@@ -703,16 +701,15 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid
                     binding = parent.Binding as PropertyValueBinding;
                     parent = parent.Parent;
                 }
-                nodeObj = typeof(PropertyValueBinding).GetField("instance", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(binding);
             }
 
-            if (asset != null)
+            if (NodeWrangler is IEbxNodeWrangler ebxNodeWrangler)
             {
                 // @hack: To ensure that changes to only the transient id field are not exported to mods, but
                 //        are saved to projects. This allows users to modify ids to their hearts contents without
                 //        bloating their mods with unintentional edits.
 
-                asset.TransientEdit = e.Item.GetCustomAttribute<IsTransientAttribute>() != null && e.Item.Name.Equals("__Id");
+                ebxNodeWrangler.Asset.TransientEdit = e.Item.GetCustomAttribute<IsTransientAttribute>() != null && e.Item.Name.Equals("__Id");
             }
 
             Modified = true;
