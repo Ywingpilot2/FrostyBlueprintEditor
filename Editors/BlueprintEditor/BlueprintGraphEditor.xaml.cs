@@ -243,9 +243,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
+                        if (source.Internal == null)
+                        {
+                            App.Logger.LogError("Reference in connection was invalid");
+                            continue;
+                        }
+                        
                         if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
                             sourceNode = wrangler.GetInterfaceNode(propertyConnection.SourceField, PortDirection.Out, ConnectionType.Property);
+                            if (sourceNode == null)
+                            {
+                                App.Logger.LogError("Unable to find an interface entry by the name of {0}", propertyConnection.SourceField.ToString());
+                                continue;
+                            }
                         }
                         else
                         {
@@ -259,7 +270,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             // Import the node
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
-                            sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                            object obj = asset.GetObject(source.External.ClassGuid);
+                            if (obj == null)
+                            {
+                                App.Logger.LogError("Reference in connection was invalid");
+                                return;
+                            }
+                            
+                            sourceNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
                             wrangler.AddVertexTransient(sourceNode);
@@ -276,9 +294,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                     }
                     case PointerRefType.Internal:
                     {
+                        if (target.Internal == null)
+                        {
+                            App.Logger.LogError("Reference in connection was invalid");
+                            continue;
+                        }
+                        
                         if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
                             targetNode = wrangler.GetInterfaceNode(propertyConnection.TargetField, PortDirection.In, ConnectionType.Property);
+                            if (targetNode == null)
+                            {
+                                App.Logger.LogError("Unable to find an interface entry by the name of {0}", propertyConnection.TargetField.ToString());
+                                continue;
+                            }
                         }
                         else
                         {
@@ -293,7 +322,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (targetNode == null)
                         {
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
-                            targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                            object obj = asset.GetObject(target.External.ClassGuid);
+                            if (obj == null)
+                            {
+                                App.Logger.LogError("Reference in connection was invalid");
+                            }
+                            
+                            targetNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(targetNode);
                         
                             wrangler.AddVertexTransient(targetNode);
@@ -343,6 +378,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
                             sourceNode = wrangler.GetInterfaceNode(linkConnection.SourceField, PortDirection.Out, ConnectionType.Link);
+                            if (sourceNode == null)
+                            {
+                                App.Logger.LogError("Unable to find an interface entry by the name of {0}", linkConnection.SourceField.ToString());
+                                continue;
+                            }
                         }
                         else
                         {
@@ -356,7 +396,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             // Import the node
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
-                            sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                            object obj = asset.GetObject(source.External.ClassGuid);
+                            if (obj == null)
+                            {
+                                App.Logger.LogError("Reference in connection was invalid");
+                                return;
+                            }
+                            
+                            sourceNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
                             wrangler.AddVertexTransient(sourceNode);
@@ -376,6 +423,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
                             targetNode = wrangler.GetInterfaceNode(linkConnection.TargetField, PortDirection.In, ConnectionType.Link);
+                            if (targetNode == null)
+                            {
+                                App.Logger.LogError("Unable to find an interface entry by the name of {0}", linkConnection.TargetField.ToString());
+                                continue;
+                            }
                         }
                         else
                         {
@@ -390,7 +442,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (targetNode == null)
                         {
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
-                            targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                            object obj = asset.GetObject(target.External.ClassGuid);
+                            if (obj == null)
+                            {
+                                App.Logger.LogError("Reference in connection was invalid");
+                                return;
+                            }
+                            
+                            targetNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(targetNode);
                         
                             wrangler.AddVertexTransient(targetNode);
@@ -440,6 +499,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (((dynamic)source.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
                             sourceNode = wrangler.GetInterfaceNode(eventConnection.SourceEvent.Name, PortDirection.Out, ConnectionType.Event);
+                            if (sourceNode == null)
+                            {
+                                App.Logger.LogError("Unable to find an interface entry by the name of {0}", eventConnection.SourceEvent.Name.ToString());
+                                continue;
+                            }
                         }
                         else
                         {
@@ -453,7 +517,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         {
                             // Import the node
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(source.External.FileGuid));
-                            sourceNode = EntityNode.GetNodeFromEntity(asset.GetObject(source.External.ClassGuid), source.External.FileGuid, NodeWrangler);
+                            object obj = asset.GetObject(source.External.ClassGuid);
+                            if (obj == null)
+                            {
+                                App.Logger.LogError("Reference in connection was invalid");
+                                return;
+                            }
+                            
+                            sourceNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
                             wrangler.AddVertexTransient(sourceNode);
@@ -473,6 +544,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (((dynamic)target.Internal).GetInstanceGuid() == wrangler.InterfaceGuid)
                         {
                             targetNode = wrangler.GetInterfaceNode(eventConnection.TargetEvent.Name, PortDirection.In, ConnectionType.Event);
+                            if (targetNode == null)
+                            {
+                                App.Logger.LogError("Unable to find an interface entry by the name of {0}", eventConnection.TargetEvent.ToString());
+                                continue;
+                            }
                         }
                         else
                         {
@@ -487,7 +563,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                         if (targetNode == null)
                         {
                             EbxAsset asset = App.AssetManager.GetEbx(App.AssetManager.GetEbxEntry(target.External.FileGuid));
-                            targetNode = EntityNode.GetNodeFromEntity(asset.GetObject(target.External.ClassGuid), target.External.FileGuid, NodeWrangler);
+                            object obj = asset.GetObject(target.External.ClassGuid);
+                            if (obj == null)
+                            {
+                                App.Logger.LogError("Reference in connection was invalid");
+                                return;
+                            }
+                            
+                            targetNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(targetNode);
                         
                             wrangler.AddVertexTransient(targetNode);

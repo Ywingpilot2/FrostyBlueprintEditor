@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using BlueprintEditorPlugin.BlueprintUtils;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
@@ -56,12 +57,12 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                             if (interfaceNode.Direction == PortDirection.In)
                             {
                                 intrfc.OutputEvents.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceEiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceEiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                             else
                             {
                                 intrfc.InputEvents.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceEoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceEoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                         } break;
                         case ConnectionType.Link:
@@ -70,12 +71,12 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                             if (interfaceNode.Direction == PortDirection.In)
                             {
                                 intrfc.OutputLinks.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceLiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceLiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                             else
                             {
                                 intrfc.InputLinks.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceLoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceLoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                         } break;
                         case ConnectionType.Property:
@@ -85,11 +86,11 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                             
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfacePiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfacePiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                             else
                             {
-                                InterfacePoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfacePoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                         } break;
                     }
@@ -180,12 +181,12 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfaceEiCache.Remove(interfaceNode.Header);
+                                InterfaceEiCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).OutputEvents.Remove((dynamic)interfaceNode.SubObject);
                             }
                             else
                             {
-                                InterfaceEoCache.Remove(interfaceNode.Header);
+                                InterfaceEoCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).InputEvents.Remove((dynamic)interfaceNode.SubObject);
                             }
                         } break;
@@ -193,12 +194,12 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfaceLiCache.Remove(interfaceNode.Header);
+                                InterfaceLiCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).OutputLinks.Remove((dynamic)interfaceNode.SubObject);
                             }
                             else
                             {
-                                InterfaceLoCache.Remove(interfaceNode.Header);
+                                InterfaceLoCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).InputLinks.Remove((dynamic)interfaceNode.SubObject);
                             }
                         } break;
@@ -206,7 +207,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfacePiCache.Remove(interfaceNode.Header);
+                                InterfacePiCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
                                 if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                                 {
@@ -220,7 +221,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor.NodeWrangler
                             }
                             else
                             {
-                                InterfacePoCache.Remove(interfaceNode.Header);
+                                InterfacePoCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
                                 if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                                 {

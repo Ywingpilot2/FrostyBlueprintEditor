@@ -56,14 +56,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                         case ItemModifiedTypes.Add:
                         {
                             AddInput(args.NewValue.ToString(), ConnectionType.Property, Realm);
-                        }
-                            break;
+                        } break;
                         case ItemModifiedTypes.Remove:
                         {
                             EntityInput input = GetInput((int)args.OldValue, ConnectionType.Property);
                             RemoveInput(input);
-                        }
-                            break;
+                        } break;
                         case ItemModifiedTypes.Clear:
                         {
                             List<IPort> inputs = Inputs.ToList();
@@ -80,8 +78,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                                 IPort output = outputs[i];
                                 RemoveOutput((EntityOutput)output);
                             }
-                        }
-                            break;
+                        } break;
                     }
                 } break;
                 case "InputCount":

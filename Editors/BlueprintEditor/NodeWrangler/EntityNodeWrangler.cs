@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using BlueprintEditorPlugin.BlueprintUtils;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.Ports;
@@ -32,15 +33,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         public EbxAsset Asset { get; set; }
         public EbxAssetEntry AssetEntry => App.AssetManager.GetEbxEntry(Asset.FileGuid);
         public AssetClassGuid InterfaceGuid { get; set; }
-        protected readonly Dictionary<AssetClassGuid, EntityNode> InternalNodeCache = new Dictionary<AssetClassGuid, EntityNode>();
-        protected readonly Dictionary<(Guid, Guid), EntityNode> ExternalNodeCache = new Dictionary<(Guid, Guid), EntityNode>();
+        protected readonly Dictionary<AssetClassGuid, EntityNode> InternalNodeCache = new();
+        protected readonly Dictionary<(Guid, Guid), EntityNode> ExternalNodeCache = new();
 
-        protected readonly Dictionary<string, InterfaceNode> InterfacePiCache = new Dictionary<string, InterfaceNode>();
-        protected readonly Dictionary<string, InterfaceNode> InterfaceLiCache = new Dictionary<string, InterfaceNode>();
-        protected readonly Dictionary<string, InterfaceNode> InterfaceEiCache = new Dictionary<string, InterfaceNode>();
-        protected readonly Dictionary<string, InterfaceNode> InterfacePoCache = new Dictionary<string, InterfaceNode>();
-        protected readonly Dictionary<string, InterfaceNode> InterfaceLoCache = new Dictionary<string, InterfaceNode>();
-        protected readonly Dictionary<string, InterfaceNode> InterfaceEoCache = new Dictionary<string, InterfaceNode>();
+        protected readonly Dictionary<int, InterfaceNode> InterfacePiCache = new();
+        protected readonly Dictionary<int, InterfaceNode> InterfaceLiCache = new();
+        protected readonly Dictionary<int, InterfaceNode> InterfaceEiCache = new();
+        protected readonly Dictionary<int, InterfaceNode> InterfacePoCache = new();
+        protected readonly Dictionary<int, InterfaceNode> InterfaceLoCache = new();
+        protected readonly Dictionary<int, InterfaceNode> InterfaceEoCache = new();
 
         #region Transient edits
 
@@ -78,27 +79,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             case ConnectionType.Event:
                             {
-                                if (InterfaceEiCache.ContainsKey(interfaceNode.Header))
+                                if (InterfaceEiCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
                                 }
-                                InterfaceEiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceEiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
                             case ConnectionType.Link:
                             {
-                                if (InterfaceLiCache.ContainsKey(interfaceNode.Header))
+                                if (InterfaceLiCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
                                 }
-                                InterfaceLiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceLiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
                             case ConnectionType.Property:
                             {
-                                if (InterfacePiCache.ContainsKey(interfaceNode.Header))
+                                if (InterfacePiCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
                                 }
-                                InterfacePiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfacePiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
                         }
                     }
@@ -108,27 +109,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             case ConnectionType.Event:
                             {
-                                if (InterfaceEoCache.ContainsKey(interfaceNode.Header))
+                                if (InterfaceEoCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
                                 }
-                                InterfaceEoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceEoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
                             case ConnectionType.Link:
                             {
-                                if (InterfaceLoCache.ContainsKey(interfaceNode.Header))
+                                if (InterfaceLoCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
                                 }
-                                InterfaceLoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceLoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
                             case ConnectionType.Property:
                             {
-                                if (InterfacePoCache.ContainsKey(interfaceNode.Header))
+                                if (InterfacePoCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
                                 }
-                                InterfacePoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfacePoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
                         }
                     }
@@ -273,45 +274,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 {
                     case ConnectionType.Event:
                     {
-                        if (!InterfaceEiCache.ContainsKey(name))
+                        if (!InterfaceEiCache.ContainsKey(HashingUtils.SmartHashString(name)))
                         {
-                            if (name.StartsWith("0x"))
-                            {
-                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
-                            }
-
                             return null;
                         }
-                        return InterfaceEiCache[name];
+                        return InterfaceEiCache[HashingUtils.SmartHashString(name)];
                     }
                     case ConnectionType.Link:
                     {
-                        if (!InterfaceLiCache.ContainsKey(name))
+                        if (!InterfaceLiCache.ContainsKey(HashingUtils.SmartHashString(name)))
                         {
-                            if (name.StartsWith("0x"))
-                            {
-                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
-                            }
-
                             return null;
                         }
-                        return InterfaceLiCache[name];
+                        return InterfaceLiCache[HashingUtils.SmartHashString(name)];
                     }
                     case ConnectionType.Property:
                     {
-                        if (!InterfacePiCache.ContainsKey(name))
+                        if (!InterfacePiCache.ContainsKey(HashingUtils.SmartHashString(name)))
                         {
-                            if (name.StartsWith("0x"))
-                            {
-                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
-                            }
-
                             return null;
                         }
-                        return InterfacePiCache[name];
+                        return InterfacePiCache[HashingUtils.SmartHashString(name)];
                     }
                 }
             }
@@ -321,45 +304,27 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                 {
                     case ConnectionType.Event:
                     {
-                        if (!InterfaceEoCache.ContainsKey(name))
+                        if (!InterfaceEoCache.ContainsKey(HashingUtils.SmartHashString(name)))
                         {
-                            if (name.StartsWith("0x"))
-                            {
-                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
-                            }
-
                             return null;
                         }
-                        return InterfaceEoCache[name];
+                        return InterfaceEoCache[HashingUtils.SmartHashString(name)];
                     }
                     case ConnectionType.Link:
                     {
-                        if (!InterfaceLoCache.ContainsKey(name))
+                        if (!InterfaceLoCache.ContainsKey(HashingUtils.SmartHashString(name)))
                         {
-                            if (name.StartsWith("0x"))
-                            {
-                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
-                            }
-
                             return null;
                         }
-                        return InterfaceLoCache[name];
+                        return InterfaceLoCache[HashingUtils.SmartHashString(name)];
                     }
                     case ConnectionType.Property:
                     {
-                        if (!InterfacePoCache.ContainsKey(name))
+                        if (!InterfacePoCache.ContainsKey(HashingUtils.SmartHashString(name)))
                         {
-                            if (name.StartsWith("0x"))
-                            {
-                                int hash = int.Parse(name.Remove(0, 2), NumberStyles.AllowHexSpecifier);
-                                return GetInterfaceNode(Utils.GetString(hash), direction, type);
-                            }
-
                             return null;
                         }
-                        return InterfacePoCache[name];
+                        return InterfacePoCache[HashingUtils.SmartHashString(name)];
                     }
                 }
             }
@@ -373,54 +338,54 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         public void UpdateInputInterfaceCache()
         {
             // Properties
-            List<string> keysToUpdate = new List<string>();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in InterfacePiCache)
+            List<int> keysToUpdate = new List<int>();
+            foreach (KeyValuePair<int,InterfaceNode> keyValuePair in InterfacePiCache)
             {
-                if (keyValuePair.Key == keyValuePair.Value.Header)
+                if (keyValuePair.Key == HashingUtils.SmartHashString(keyValuePair.Value.Header))
                     continue;
                 
                 keysToUpdate.Add(keyValuePair.Key);
             }
 
-            foreach (string key in keysToUpdate)
+            foreach (int key in keysToUpdate)
             {
                 InterfaceNode node = InterfacePiCache[key];
                 InterfacePiCache.Remove(key);
-                InterfacePiCache.Add(node.Header, node);
+                InterfacePiCache.Add(HashingUtils.SmartHashString(node.Header), node);
             }
             
             // Links
             keysToUpdate.Clear();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in InterfaceLiCache)
+            foreach (KeyValuePair<int,InterfaceNode> keyValuePair in InterfaceLiCache)
             {
-                if (keyValuePair.Key == keyValuePair.Value.Header)
+                if (keyValuePair.Key == HashingUtils.SmartHashString(keyValuePair.Value.Header))
                     continue;
                 
                 keysToUpdate.Add(keyValuePair.Key);
             }
 
-            foreach (string key in keysToUpdate)
+            foreach (int key in keysToUpdate)
             {
                 InterfaceNode node = InterfaceLiCache[key];
                 InterfaceLiCache.Remove(key);
-                InterfaceLiCache.Add(node.Header, node);
+                InterfaceLiCache.Add(HashingUtils.SmartHashString(node.Header), node);
             }
             
             // Events
             keysToUpdate.Clear();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in InterfaceEiCache)
+            foreach (KeyValuePair<int,InterfaceNode> keyValuePair in InterfaceEiCache)
             {
-                if (keyValuePair.Key == keyValuePair.Value.Header)
+                if (keyValuePair.Key == HashingUtils.SmartHashString(keyValuePair.Value.Header))
                     continue;
                 
                 keysToUpdate.Add(keyValuePair.Key);
             }
 
-            foreach (string key in keysToUpdate)
+            foreach (int key in keysToUpdate)
             {
                 InterfaceNode node = InterfaceEiCache[key];
                 InterfaceEiCache.Remove(key);
-                InterfaceEiCache.Add(node.Header, node);
+                InterfaceEiCache.Add(HashingUtils.SmartHashString(node.Header), node);
             }
         }
         
@@ -430,54 +395,54 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
         public void UpdateOutputInterfaceCache()
         {
             // Properties
-            List<string> keysToUpdate = new List<string>();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in InterfacePoCache)
+            List<int> keysToUpdate = new List<int>();
+            foreach (KeyValuePair<int,InterfaceNode> keyValuePair in InterfacePoCache)
             {
-                if (keyValuePair.Key == keyValuePair.Value.Header)
+                if (keyValuePair.Key == HashingUtils.SmartHashString(keyValuePair.Value.Header))
                     continue;
                 
                 keysToUpdate.Add(keyValuePair.Key);
             }
 
-            foreach (string key in keysToUpdate)
+            foreach (int key in keysToUpdate)
             {
                 InterfaceNode node = InterfacePoCache[key];
                 InterfacePoCache.Remove(key);
-                InterfacePoCache.Add(node.Header, node);
+                InterfacePoCache.Add(HashingUtils.SmartHashString(node.Header), node);
             }
             
             // Links
             keysToUpdate.Clear();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in InterfaceLoCache)
+            foreach (KeyValuePair<int,InterfaceNode> keyValuePair in InterfaceLoCache)
             {
-                if (keyValuePair.Key == keyValuePair.Value.Header)
+                if (keyValuePair.Key == HashingUtils.SmartHashString(keyValuePair.Value.Header))
                     continue;
                 
                 keysToUpdate.Add(keyValuePair.Key);
             }
 
-            foreach (string key in keysToUpdate)
+            foreach (int key in keysToUpdate)
             {
                 InterfaceNode node = InterfaceLoCache[key];
                 InterfaceLoCache.Remove(key);
-                InterfaceLoCache.Add(node.Header, node);
+                InterfaceLoCache.Add(HashingUtils.SmartHashString(node.Header), node);
             }
             
             // Events
             keysToUpdate.Clear();
-            foreach (KeyValuePair<string,InterfaceNode> keyValuePair in InterfaceEoCache)
+            foreach (KeyValuePair<int,InterfaceNode> keyValuePair in InterfaceEoCache)
             {
-                if (keyValuePair.Key == keyValuePair.Value.Header)
+                if (keyValuePair.Key == HashingUtils.SmartHashString(keyValuePair.Value.Header))
                     continue;
                 
                 keysToUpdate.Add(keyValuePair.Key);
             }
 
-            foreach (string key in keysToUpdate)
+            foreach (int key in keysToUpdate)
             {
                 InterfaceNode node = InterfaceEoCache[key];
                 InterfaceEoCache.Remove(key);
-                InterfaceEoCache.Add(node.Header, node);
+                InterfaceEoCache.Add(HashingUtils.SmartHashString(node.Header), node);
             }
         }
 
@@ -514,12 +479,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             if (interfaceNode.Direction == PortDirection.In)
                             {
                                 intrfc.OutputEvents.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceEiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceEiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                             else
                             {
                                 intrfc.InputEvents.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceEoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceEoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                         } break;
                         case ConnectionType.Link:
@@ -528,12 +493,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             if (interfaceNode.Direction == PortDirection.In)
                             {
                                 intrfc.OutputLinks.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceLiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceLiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                             else
                             {
                                 intrfc.InputLinks.Add((dynamic)interfaceNode.SubObject);
-                                InterfaceLoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfaceLoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                         } break;
                         case ConnectionType.Property:
@@ -543,11 +508,11 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfacePiCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfacePiCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                             else
                             {
-                                InterfacePoCache.Add(interfaceNode.Header, interfaceNode);
+                                InterfacePoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             }
                         } break;
                     }
@@ -591,12 +556,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfaceEiCache.Remove(interfaceNode.Header);
+                                InterfaceEiCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).OutputEvents.Remove((dynamic)interfaceNode.SubObject);
                             }
                             else
                             {
-                                InterfaceEoCache.Remove(interfaceNode.Header);
+                                InterfaceEoCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).InputEvents.Remove((dynamic)interfaceNode.SubObject);
                             }
                         } break;
@@ -604,12 +569,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfaceLiCache.Remove(interfaceNode.Header);
+                                InterfaceLiCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).OutputLinks.Remove((dynamic)interfaceNode.SubObject);
                             }
                             else
                             {
-                                InterfaceLoCache.Remove(interfaceNode.Header);
+                                InterfaceLoCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).InputLinks.Remove((dynamic)interfaceNode.SubObject);
                             }
                         } break;
@@ -617,7 +582,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                         {
                             if (interfaceNode.Direction == PortDirection.In)
                             {
-                                InterfacePiCache.Remove(interfaceNode.Header);
+                                InterfacePiCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
                                 if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                                 {
@@ -631,7 +596,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                             }
                             else
                             {
-                                InterfacePoCache.Remove(interfaceNode.Header);
+                                InterfacePoCache.Remove(HashingUtils.SmartHashString(interfaceNode.Header));
                                 ((dynamic)interfaceNode.Object).Fields.Remove((dynamic)interfaceNode.SubObject);
                                 if (((dynamic)interfaceNode.SubObject).AccessType.ToString() == "FieldAccessType_SourceAndTarget")
                                 {

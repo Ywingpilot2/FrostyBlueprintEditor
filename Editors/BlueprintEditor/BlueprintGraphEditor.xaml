@@ -671,6 +671,7 @@
                                            Foreground="DarkGray"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Top"
+                                           Margin="0,0,14,0"
                                            RenderOptions.BitmapScalingMode="Linear"
                                            RenderOptions.EdgeMode="Aliased">
                                     <TextBlock.Style>
