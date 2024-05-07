@@ -331,12 +331,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
             return realm;
         }
 
-        public virtual void FixRealm()
+        public void FixRealm()
         {
             Realm = DetermineRealm();
         }
         
-        public virtual void ForceFixRealm()
+        public void ForceFixRealm()
         {
             Realm = DetermineRealm(true);
         }
