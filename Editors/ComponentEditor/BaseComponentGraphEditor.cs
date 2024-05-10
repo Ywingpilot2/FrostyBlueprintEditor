@@ -13,6 +13,7 @@ using BlueprintEditorPlugin.Models.Entities;
 using BlueprintEditorPlugin.Models.Nodes.Ports;
 using Frosty.Core.Controls;
 using FrostyEditor;
+using FrostySdk;
 using FrostySdk.Ebx;
 using FrostySdk.IO;
 using FrostySdk.Managers;
@@ -30,7 +31,7 @@ namespace BlueprintEditorPlugin.Editors.ComponentEditor
             Type assetType = asset.RootObject.GetType();
 
             // Let the UI editor handle this
-            if (assetType.Name == "UIWidgetBlueprint")
+            if (assetType.Name == "UIWidgetBlueprint" && ProfilesLibrary.ProfileName != "starwarsbattlefrontii")
             {
                 return false;
             }

@@ -22,6 +22,13 @@ namespace BlueprintEditorPlugin.Editors.UIWidgetEditor
 {
     public class UIWidgetGraphEditor : BlueprintGraphEditor
     {
+        public override bool IsValid()
+        {
+            // swbf2 handles its UI widgets in a dumb way
+            // Layers lack names for example and elements are given weird names too
+            return ProfilesLibrary.ProfileName != "starwarsbattlefrontii";
+        }
+
         public override bool IsValid(EbxAssetEntry assetEntry)
         {
             EbxAsset asset = App.AssetManager.GetEbx(assetEntry);
