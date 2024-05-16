@@ -277,7 +277,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                                 return;
                             }
                             
-                            sourceNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
+                            sourceNode = EntityNode.GetNodeFromEntity(obj, source.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
                             wrangler.AddVertexTransient(sourceNode);
@@ -403,7 +403,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                                 return;
                             }
                             
-                            sourceNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
+                            sourceNode = EntityNode.GetNodeFromEntity(obj, source.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
                             wrangler.AddVertexTransient(sourceNode);
@@ -524,7 +524,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
                                 return;
                             }
                             
-                            sourceNode = EntityNode.GetNodeFromEntity(obj, target.External.FileGuid, NodeWrangler);
+                            sourceNode = EntityNode.GetNodeFromEntity(obj, source.External.FileGuid, NodeWrangler);
                             cheap.SortGraph(sourceNode);
                         
                             wrangler.AddVertexTransient(sourceNode);
@@ -777,59 +777,73 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor
         {
             AddInterfaceArgs args = new AddInterfaceArgs();
             MessageBoxResult result = EditPromptWindow.Show(args, "Add Interface");
-            if (result == MessageBoxResult.Yes)
+            if (result != MessageBoxResult.Yes)
             {
-                EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
+                return;
+            }
+
+            EntityNodeWrangler wrangler = (EntityNodeWrangler)NodeWrangler;
                 
-                // Ensure that the interface exists
-                PointerRef interfaceRef = ((dynamic)wrangler.Asset.RootObject).Interface;
-                if (interfaceRef.Type == PointerRefType.Null)
-                {
-                    dynamic intrfc = TypeLibrary.CreateObject("InterfaceDescriptorData");
-                    wrangler.Asset.AddObject(intrfc);
-                    interfaceRef = new PointerRef(intrfc);
-                    ((dynamic)wrangler.Asset.RootObject).Interface = interfaceRef;
-                }
+            if (wrangler.GetInterfaceNode(args.Name, args.Direction, args.Type) != null)
+            {
+                App.Logger.LogError("Cannot have duplicate interface nodes");
+                return;
+            }
                 
-                switch (args.Type)
+            // Ensure that the interface exists
+            PointerRef interfaceRef = ((dynamic)wrangler.Asset.RootObject).Interface;
+            if (interfaceRef.Type == PointerRefType.Null)
+            {
+                dynamic intrfc = TypeLibrary.CreateObject("InterfaceDescriptorData");
+                wrangler.Asset.AddObject(intrfc);
+                interfaceRef = new PointerRef(intrfc);
+                ((dynamic)wrangler.Asset.RootObject).Interface = interfaceRef;
+            }
+                
+            switch (args.Type)
+            {
+                case ConnectionType.Event:
                 {
-                    case ConnectionType.Event:
+                    dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
+                    subObj.Name = new CString(args.Name);
+
+                    wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
                     {
-                        dynamic subObj = TypeLibrary.CreateObject("DynamicEvent");
-                        subObj.Name = new CString(args.Name);
+                        SubObject = subObj,
+                        // TODO: This is kind of a cheaty way of doing this, it'd be better to place at the center of the screen
+                        Location = new Point(Editor.MouseLocation.X, Editor.MouseLocation.Y)
+                    });
+                } break;
+                case ConnectionType.Link:
+                {
+                    dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
+                    subObj.Name = new CString(args.Name);
 
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Event, args.Direction, NodeWrangler)
-                        {
-                            SubObject = subObj
-                        });
-                    } break;
-                    case ConnectionType.Link:
+                    wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
                     {
-                        dynamic subObj = TypeLibrary.CreateObject("DynamicLink");
-                        subObj.Name = new CString(args.Name);
+                        SubObject = subObj,
+                        // TODO: This is kind of a cheaty way of doing this, it'd be better to place at the center of the screen
+                        Location = new Point(Editor.MouseLocation.X, Editor.MouseLocation.Y)
+                    });
+                } break;
+                case ConnectionType.Property:
+                {
+                    dynamic subObj = TypeLibrary.CreateObject("DataField");
+                    subObj.Name = new CString(args.Name);
 
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Link, args.Direction, NodeWrangler)
-                        {
-                            SubObject = subObj
-                        });
-                    } break;
-                    case ConnectionType.Property:
+                    if (args.Direction == PortDirection.Out)
                     {
-                        dynamic subObj = TypeLibrary.CreateObject("DataField");
-                        subObj.Name = new CString(args.Name);
+                        Type enumType = subObj.AccessType.GetType();
+                        subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
+                    }
 
-                        if (args.Direction == PortDirection.Out)
-                        {
-                            Type enumType = subObj.AccessType.GetType();
-                            subObj.AccessType = (dynamic)Enum.Parse(enumType, "FieldAccessType_Target");
-                        }
-
-                        wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
-                        {
-                            SubObject = subObj
-                        });
-                    } break;
-                }
+                    wrangler.AddVertex(new InterfaceNode(interfaceRef.Internal, subObj, args.Name, ConnectionType.Property, args.Direction, NodeWrangler)
+                    {
+                        SubObject = subObj,
+                        // TODO: This is kind of a cheaty way of doing this, it'd be better to place at the center of the screen
+                        Location = new Point(Editor.MouseLocation.X, Editor.MouseLocation.Y)
+                    });
+                } break;
             }
         }
 

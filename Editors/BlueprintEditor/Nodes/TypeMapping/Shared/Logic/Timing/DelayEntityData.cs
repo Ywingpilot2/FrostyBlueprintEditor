@@ -13,6 +13,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 
             AddInput("Delay", ConnectionType.Property, Realm);
             AddInput("In", ConnectionType.Event, Realm);
+            AddInput("Reset", ConnectionType.Event, Realm);
             AddOutput("Out", ConnectionType.Event, Realm);
         }
         
