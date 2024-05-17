@@ -40,7 +40,7 @@ namespace BlueprintEditorPlugin.Views.TreeViews
         {
             get
             {
-                if (_treeExplorer.SelectedItem is ClassSelectorClassItem item)
+                if (_treeExplorer.SelectedItem is TypeSelectorItem item)
                     return item.Type;
                 return null;
             }
