@@ -260,7 +260,7 @@ namespace BlueprintEditorPlugin.Views.TreeViews
                 if (data != DependencyProperty.UnsetValue)
                 {
                     (element as TreeViewItem).IsSelected = true;
-                    return data is ClassSelectorModuleItem ? GetDataFromMousePosition(element as TreeViewItem) : data;
+                    return data is BaseTreeExplorerItem ? GetDataFromMousePosition(element as TreeViewItem) : data;
                 }
             }
 
