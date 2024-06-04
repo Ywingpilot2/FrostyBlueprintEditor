@@ -486,6 +486,20 @@
                                     <Binding Path="IsCategory"/>
                                 </MultiBinding>
                             </ContentControl.Padding>
+                            
+                            <!--This would allow for a similar style to the "lines" we see go along child properties in FrostEd-->
+                            <!--This works really well, but for some reason highlighted and selected properties cover this up-->
+                            <!--TODO: Investigate why properties are able to overlay this when selected-->
+                            <!--TODO: Also investigate a way to properly line the start of the line up with the arrow shape-->
+                            <!--<Border BorderBrush="#3F3F3F"
+                                    BorderThickness="2,0,0,2"
+                                    CornerRadius="0,0,0,3"
+                                    Margin="25,0,0,2"
+                                    x:Name="ItemsBorder"
+                                    Visibility="Collapsed"
+                                    KeyboardNavigation.IsTabStop="False">
+                                <ItemsPresenter x:Name="ItemsHost" UseLayoutRounding="True" Margin="-25,0,0,0"/>
+                            </Border>-->
                             <ItemsPresenter x:Name="ItemsHost" UseLayoutRounding="True" Visibility="Collapsed" KeyboardNavigation.IsTabStop="False"/>
                         </ContentControl>
 

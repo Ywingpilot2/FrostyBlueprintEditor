@@ -404,7 +404,14 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                 }
             }
             
-            BuildFooter();
+            try
+            {
+                BuildFooter();
+            }
+            catch (Exception e)
+            {
+                ClearFooter();
+            }
         }
 
         public virtual void OnDestruction()
@@ -688,8 +695,15 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes
                     }
                 }
             }
-            
-            BuildFooter();
+
+            try
+            {
+                BuildFooter();
+            }
+            catch (Exception e)
+            {
+                ClearFooter();
+            }
         }
 
         #endregion

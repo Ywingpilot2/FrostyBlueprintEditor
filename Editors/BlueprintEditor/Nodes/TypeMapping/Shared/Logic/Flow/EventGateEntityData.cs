@@ -20,7 +20,20 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 
         public override void BuildFooter()
         {
-            if ((bool)TryGetProperty("Default"))
+            bool def = false;
+            if (TryGetProperty("DefaultOpen") != null)
+            {
+                def = (bool)TryGetProperty("DefaultOpen");
+            }
+            else
+            {
+                if (TryGetProperty("Default") == null)
+                    return;
+                
+                def = (bool)TryGetProperty("Default");
+            }
+            
+            if (def)
             {
                 AddFooter("Default: Open");
             }

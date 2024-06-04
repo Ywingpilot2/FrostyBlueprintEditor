@@ -124,7 +124,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                 PointerRef source = propertyConnection.Source;
                 PointerRef target = propertyConnection.Target;
                 
-                if (source.Type == PointerRefType.Null || target.Type == PointerRefType.Null)
+                if (source.Type != PointerRefType.Internal || target.Type != PointerRefType.Internal)
                     continue;
                 
                 if (((dynamic)source.Internal).GetInstanceGuid() != interfaceGuid && ((dynamic)target.Internal).GetInstanceGuid() != interfaceGuid)
@@ -154,7 +154,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                 PointerRef source = eventConnection.Source;
                 PointerRef target = eventConnection.Target;
                 
-                if (source.Type == PointerRefType.Null || target.Type == PointerRefType.Null)
+                if (source.Type != PointerRefType.Internal || target.Type != PointerRefType.Internal)
                     continue;
                 
                 if (((dynamic)source.Internal).GetInstanceGuid() != interfaceGuid && ((dynamic)target.Internal).GetInstanceGuid() != interfaceGuid)
