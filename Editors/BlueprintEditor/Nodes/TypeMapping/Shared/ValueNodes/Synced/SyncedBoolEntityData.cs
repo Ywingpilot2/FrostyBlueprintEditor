@@ -6,7 +6,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
     public class SyncedBoolNode : SyncedNode
     {
         public override string ObjectType => "SyncedBoolEntityData";
-        public override string ToolTip => "This node syncs a value between all clients connected to the server.";
+        public override string ToolTip => "This node syncs a boolean value between all clients connected to the server.";
 
         public override void OnCreation()
         {
