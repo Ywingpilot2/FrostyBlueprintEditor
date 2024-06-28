@@ -5,13 +5,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
 {
     public abstract class SyncedNode : EntityNode
     {
-        public override string ToolTip => "This node syncs a value between client and server.";
+        public override string ToolTip => "This node syncs a value between all clients connected to the server.";
 
         public override void OnCreation()
         {
             base.OnCreation();
 
-            AddInput("In", ConnectionType.Property, Realm.Client);
+            AddInput("In", ConnectionType.Property, Realm.Server);
             AddOutput("Out", ConnectionType.Property, Realm.Server);
         }
     }
