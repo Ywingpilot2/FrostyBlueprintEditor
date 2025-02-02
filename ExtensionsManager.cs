@@ -142,24 +142,27 @@ namespace BlueprintEditorPlugin
 
         public static void RegisterExtension(RegisterEbxGraphEditor graphRegister)
         {
-            try
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                var extension = (IEbxGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
+                try
+                {
+                    var extension = (IEbxGraphEditor)Activator.CreateInstance(graphRegister.GraphType);
 
-                if (extension.IsValid() && extension is Control)
-                {
-                    // Override our internal extension with external one
-                    _graphEditors.Add(graphRegister.GraphType);
+                    if (extension.IsValid() && extension is Control)
+                    {
+                        // Override our internal extension with external one
+                        _graphEditors.Add(graphRegister.GraphType);
+                    }
+                    else if (extension is not Control)
+                    {
+                        App.Logger.LogError("Graph editor {0} must be a control", graphRegister.GraphType.Name);
+                    }
                 }
-                else if (extension is not Control)
+                catch (Exception)
                 {
-                    App.Logger.LogError("Graph editor {0} must be a control", graphRegister.GraphType.Name);
+                    App.Logger.LogError("Could not load graph extension {0}", graphRegister.GraphType.Name);
                 }
-            }
-            catch (Exception)
-            {
-                App.Logger.LogError("Could not load graph extension {0}", graphRegister.GraphType.Name);
-            }
+            });
         }
 
         public static void RegisterExtension(RegisterEntityNode entityRegister)
@@ -174,7 +177,7 @@ namespace BlueprintEditorPlugin
                     {
                         EntityNodeExtensions.Remove(extension.ObjectType);
                     }
-                                
+
                     EntityNodeExtensions.Add(extension.ObjectType, entityRegister.EntityNodeExtension);
                 }
             }
