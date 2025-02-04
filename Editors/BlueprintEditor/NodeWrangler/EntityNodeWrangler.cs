@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -112,6 +112,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                                 if (InterfaceEoCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                    return;
                                 }
                                 InterfaceEoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
@@ -120,6 +121,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                                 if (InterfaceLoCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                    return;
                                 }
                                 InterfaceLoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;
@@ -128,6 +130,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler
                                 if (InterfacePoCache.ContainsKey(HashingUtils.SmartHashString(interfaceNode.Header)))
                                 {
                                     App.Logger.LogError("Multiple copies of {0} interfaces exist!", interfaceNode.Header);
+                                    return;
                                 }
                                 InterfacePoCache.Add(HashingUtils.SmartHashString(interfaceNode.Header), interfaceNode);
                             } break;

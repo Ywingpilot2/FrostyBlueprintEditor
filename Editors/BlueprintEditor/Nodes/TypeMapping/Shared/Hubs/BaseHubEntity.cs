@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -63,7 +63,12 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                         } break;
                         case ItemModifiedTypes.Remove:
                         {
-                            EntityInput input = GetInput((int)args.OldValue, ConnectionType.Property);
+                            int index = Convert.ToInt32(args.OldValue);
+                            EntityInput input = GetInput(index, ConnectionType.Property);
+                            if (input == null)
+                                {
+                                    return;
+                                }
                             RemoveInput(input);
                         } break;
                         case ItemModifiedTypes.Clear:

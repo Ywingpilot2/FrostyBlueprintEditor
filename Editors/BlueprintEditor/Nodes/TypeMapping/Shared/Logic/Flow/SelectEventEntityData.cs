@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Connections;
@@ -25,7 +25,7 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             {
                 if (evnt.IsNull())
                     continue;
-                
+
                 AddOutput(evnt.ToString(), ConnectionType.Event, Realm);
                 AddInput($"Select{evnt.ToString()}", ConnectionType.Event);
             }
@@ -38,10 +38,13 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
             // An event was edited
             if (args.Item.Parent.Name == "Events")
             {
-                EntityInput input = GetInput($"Select{args.OldValue}", ConnectionType.Event);
-                EntityOutput output = GetOutput(args.OldValue.ToString(), ConnectionType.Event);
-                input.Name = args.NewValue.ToString();
-                output.Name = $"Select{args.NewValue}";
+                string oldName = (args.OldValue == null || ((CString)args.OldValue).IsNull()) ? "Event" : args.OldValue.ToString();
+                EntityInput input = GetInput($"Select{oldName}", ConnectionType.Event);
+                EntityOutput output = GetOutput(oldName, ConnectionType.Event);
+                // Update names to the new value
+                string newName = args.NewValue.ToString();
+                input.Name = newName;
+                output.Name = $"Select{newName}";
                 RefreshCache();
             }
             // The list itself was edited
@@ -52,6 +55,9 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                     case ItemModifiedTypes.Insert:
                     case ItemModifiedTypes.Add:
                     {
+                        CString eventName = (dynamic)args.NewValue;
+                        if (eventName.IsNull())
+                            break;
                         AddOutput(args.NewValue.ToString(), ConnectionType.Event, Realm);
                         AddInput($"Select{args.NewValue.ToString()}", ConnectionType.Event, Realm);
                     } break;
