@@ -26,9 +26,8 @@ namespace BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes.TypeMapping.Shared
                 if (evnt.IsNull())
                     continue;
 
-                string eventName = (evnt == null || evnt.IsNull()) ? "Event" : evnt.ToString();
-                AddOutput(eventName, ConnectionType.Event, Realm);
-                AddInput($"Select{eventName}", ConnectionType.Event, Realm);
+                AddOutput(evnt.ToString(), ConnectionType.Event, Realm);
+                AddInput($"Select{evnt.ToString()}", ConnectionType.Event);
             }
         }
 
