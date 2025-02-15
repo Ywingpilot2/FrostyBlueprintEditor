@@ -10,7 +10,9 @@ using System.Windows.Data;
 using System.Windows.Media;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.Nodes;
 using BlueprintEditorPlugin.Editors.BlueprintEditor.NodeWrangler;
+using BlueprintEditorPlugin.Editors.GraphEditor;
 using BlueprintEditorPlugin.Editors.GraphEditor.NodeWrangler;
+using BlueprintEditorPlugin.Options;
 using BlueprintEditorPlugin.Models.Entities;
 using Frosty.Controls;
 using Frosty.Core;
@@ -260,6 +262,7 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
             Button clearButton = (popupMenu.FindName("PART_ClearButton") as Button);
             Button openButton = (popupMenu.FindName("PART_OpenButton") as Button);
             Button findButton = (popupMenu.FindName("PART_FindButton") as Button);
+            Button graphButton = (popupMenu.FindName("PART_OpenGraphButton") as Button);
             Button createButton = (popupMenu.FindName("PART_CreateButton") as Button);
             TextBlock textBlock = (popupMenu.FindName("PART_TextBlock") as TextBlock);
             Border separator = (popupMenu.FindName("PART_Separator") as Border);
@@ -268,11 +271,13 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
 
             clearButton.Click -= ClearButton_Click;
             findButton.Click -= FindButton_Click;
+            graphButton.Click -= GraphButton_Click;
             openButton.Click -= OpenButton_Click;
             createButton.Click -= CreateButton_Click;
 
             clearButton.Click += ClearButton_Click;
             findButton.Click += FindButton_Click;
+            graphButton.Click += GraphButton_Click;
             openButton.Click += OpenButton_Click;
             createButton.Click += CreateButton_Click;
             filter.TextChanged += Filter_TextChanged;
@@ -280,6 +285,7 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
             PointerRef ptrRef = (PointerRef)Value;
             clearButton.IsEnabled = ptrRef.Type != PointerRefType.Null;
             findButton.IsEnabled = !(ptrRef.Type == PointerRefType.Internal || ptrRef.Type == PointerRefType.Null);
+            graphButton.IsEnabled = !(ptrRef.Type == PointerRefType.Internal || ptrRef.Type == PointerRefType.Null);
             openButton.IsEnabled = !(ptrRef.Type == PointerRefType.Internal || ptrRef.Type == PointerRefType.Null);
             createButton.IsEnabled = canCreate;
             textBlock.Text = "Assign from " + ((isInternal) ? "self" : App.AssetManager.GetEbxEntry(assignFileGuid).Name);
@@ -419,6 +425,42 @@ namespace BlueprintEditorPlugin.Editors.PropertyGrid.Items
                 App.EditorWindow.DataExplorer.SelectAsset(App.AssetManager.GetEbxEntry(ptrRef.External.FileGuid));
             }
             popup.IsDropDownOpen = false;
+        }
+
+        private void GraphButton_Click(object sender, RoutedEventArgs e)
+        {
+            PointerRef ptrRef = (PointerRef)Value;
+            if (ptrRef.Type == PointerRefType.External)
+            {
+                EbxAssetEntry selectedAsset = App.AssetManager.GetEbxEntry(ptrRef.External.FileGuid);
+                if (selectedAsset == null)
+                {
+                    popup.IsDropDownOpen = false;
+                    return;
+                }
+            
+                IEbxGraphEditor graphEditor = ExtensionsManager.GetValidGraphEditor(selectedAsset);
+                if (graphEditor == null)
+                {
+                    App.Logger.LogError("No valid graph editor exists for this file");
+                    popup.IsDropDownOpen = false;
+                    return;
+                }
+
+                BlueprintEditorPlugin.BlueprintEditor editor;
+                if (EditorOptions.LoadBeforeOpen)
+                {
+                    editor = new BlueprintEditorPlugin.BlueprintEditor();
+                    editor.LoadBlueprint(selectedAsset, graphEditor);
+                }
+                else
+                {
+                    editor = new BlueprintEditorPlugin.BlueprintEditor(selectedAsset, graphEditor);
+                }
+                
+                App.EditorWindow.OpenEditor($"{selectedAsset.Filename} (Ebx Graph)", editor);
+                popup.IsDropDownOpen = false;
+            }
         }
 
         /// <summary>
