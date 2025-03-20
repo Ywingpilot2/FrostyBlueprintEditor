@@ -42,6 +42,8 @@ namespace BlueprintEditorPlugin.Extensions
 
     public class ViewHashingUtils : MenuExtension
     {
+        public static readonly ImageSource IconImageSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/BlueprintEditorPlugin;component/Images/HashingUtilsIcon.png") as ImageSource;
+
         public override string TopLevelMenuName => "View";
         public override string MenuItemName => "Hashing Utilities";
 
