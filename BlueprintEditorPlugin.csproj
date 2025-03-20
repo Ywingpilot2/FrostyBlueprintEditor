@@ -124,6 +124,8 @@
     <Resource Include="Images\AddRedirectIcon.png" />
     <None Remove="Images\OutputRedirectIcon.png" />
     <Resource Include="Images\OutputRedirectIcon.png" />
+    <None Remove="Images\HashingUtilsIcon.png" />
+    <Resource Include="Images\HashingUtilsIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
